@@ -1,0 +1,24 @@
+grammar
+  {  
+    any                   = ['\u0000'..'\uFFFF'];
+    digit                 = ['0'..'9']+;
+    whitespace            = ' '*;
+    
+    number             : int = digit;
+
+
+    expression         : int = whitespace (number / unaryOperation / binaryOperation / priorityExpression) whitespace
+    priorityExpression : int = '(' expression ')'    
+
+    unaryOperation     : int = negation
+    negation           : int = '-' expression
+    
+    binaryOperation    : int = multiplication / devision / sum / substraction
+    
+    multiplication     : int = expression '*' expression
+    devision           : int = expression '/' expression
+    sum                : int = expression '+' expression
+    subtraction        : int = expression '-' expression
+
+    start              : int = expression !any;
+  }
