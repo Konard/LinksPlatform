@@ -1,0 +1,6 @@
+LinksPlatform
+
+The original idea by Konstantin Dyachenko.
+Inspired by work of Simon Williams (The Associative Model of Data, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
+
+Links Platform is a system, that combine simple database and execution engine. So it is provide ability to program that system in any way, due to fact that all algorithms are data inside this database. Idea behind Links Platform is a model of associative memory of human mind. So it is actually copy most of it advantages and disadvantages.
