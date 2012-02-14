@@ -1,0 +1,5 @@
+C:\Users\Konstantin\Desktop\Mini projects\New Generation\Net\Gexf\bin\Debug\Gexf.dll
+C:\Users\Konstantin\Desktop\Mini projects\New Generation\Net\Gexf\bin\Debug\Gexf.pdb
+C:\Users\Konstantin\Desktop\Mini projects\New Generation\Net\Gexf\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\Konstantin\Desktop\Mini projects\New Generation\Net\Gexf\obj\Debug\Gexf.dll
+C:\Users\Konstantin\Desktop\Mini projects\New Generation\Net\Gexf\obj\Debug\Gexf.pdb
