@@ -1,1 +1,1 @@
-long long GetTimestamp();
+﻿long long GetTimestamp();

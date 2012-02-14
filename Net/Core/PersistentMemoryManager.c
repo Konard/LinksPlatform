@@ -1,4 +1,4 @@
-#include <Windows.h>
+п»ї#include <Windows.h>
 #include <stdio.h>
 
 #include "Common.h"
@@ -9,8 +9,8 @@ int					currentMemoryPageSize;
 int					mappingTableSizeInBytes;
 int					serviceBlockSizeInBytes;
 
-// Константы, расчитываемые при запуске приложения
-unsigned long long	baseLinksTableBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+// РљРѕРЅСЃС‚Р°РЅС‚С‹, СЂР°СЃС‡РёС‚С‹РІР°РµРјС‹Рµ РїСЂРё Р·Р°РїСѓСЃРєРµ РїСЂРёР»РѕР¶РµРЅРёСЏ
+unsigned long long	baseLinksTableBlockSizeInBytes; // Р‘Р°Р·РѕРІС‹Р№ СЂР°Р·РјРµСЂ Р±Р»РѕРєР° РґР°РЅРЅС‹С… (СЏРІР»СЏРµС‚СЃСЏ РјРёРЅРёРјР°Р»СЊРЅС‹Рј СЂР°Р·РјРµСЂРѕРј С„Р°Р№Р»Р°, Р° С‚Р°РєР¶Рµ С€Р°РіРѕРј РїСЂРё СЂРѕСЃС‚Рµ СЌС‚РѕРіРѕ С„Р°Р№Р»Р°)
 void*				basePersistentMemoryAddress;
 void**				previousBasePersistentMemoryAddress;
 unsigned long*		previousMemoryPageSize;
@@ -18,7 +18,7 @@ int*				mappingTableMaxSizeAddress;
 Link**				mappingTableDataAddress;
 long long*			linksTableMaxSizeAddress;
 long long*			linksTableSizeAddress;
-/* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
+/* РќРµ РёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ Р±Р»РѕРє РїР°РјСЏС‚Рё, СЃ СЂР°Р·РјРµСЂРѕРј (sizeof(Link) - 16) */
 Link*				linksTableUnusedLinkMarker;
 Link*				linksTableDataAddress;
 
@@ -100,7 +100,7 @@ void InitPersistentMemoryManager()
 	mappingTableDataAddress = (Link**)(baseVirtualMemoryOffset + 8 + 4 + 4);
 	linksTableMaxSizeAddress = (long long*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes);
 	linksTableSizeAddress = (long long*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 8);
-	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
+	/* Р”Р°Р»РµРµ СЃР»РµРґСѓРµС‚ РЅРµРёСЃРїРѕР»СЊР·СѓРµРјС‹Р№ Р±Р»РѕРє РїР°РјСЏС‚Рё, СЃ СЂР°Р·РјРµСЂРѕРј (sizeof(Link) - 16) */
 	linksTableUnusedLinkMarker = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + sizeof(Link));
 	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
@@ -136,8 +136,8 @@ unsigned long CloseStorageFile()
 {
 	printf("Closing storage file...\n");
 
-	// При освобождении лишнего места, можно уменьшать размер файла, для этогоиспользуется функция SetEndOfFile(fh); 
-	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
+	// РџСЂРё РѕСЃРІРѕР±РѕР¶РґРµРЅРёРё Р»РёС€РЅРµРіРѕ РјРµСЃС‚Р°, РјРѕР¶РЅРѕ СѓРјРµРЅСЊС€Р°С‚СЊ СЂР°Р·РјРµСЂ С„Р°Р№Р»Р°, РґР»СЏ СЌС‚РѕРіРѕРёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ С„СѓРЅРєС†РёСЏ SetEndOfFile(fh); 
+	// РџРѕ Р·Р°РІРµСЂС€РµРЅРёСЋ СЂР°Р±РѕС‚С‹ СЃ С„Р°Р№Р»РѕРј РјРѕР¶РЅРѕ СѓСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ РѕРіСЂР°РЅРёС‡РµРЅРёРµ РЅР° СЂР°Р·РјРµСЂ СЂРµР°Р»СЊРЅС‹С… РґР°РЅРЅС‹С… С„Р°Р№Р»Р°	SetFileValidData(fh,newFileLen); 
 
 	if (storageFileHandle == null)
 	{
@@ -241,7 +241,7 @@ unsigned long SetStorageFileMemoryMapping()
 		return error;
 	}
 
-	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
+	// Р’С‹РїРѕР»РЅСЏРµРј РїРµСЂРІРѕРЅР°С‡Р°Р»СЊРЅСѓСЋ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЋ Рё РІР°Р»РёРґР°С†РёСЋ РѕСЃРЅРѕРІРЅС‹С… РІСЃРїРѕРјРѕРіР°С‚РµР»СЊРЅС‹С… СЃС‡С‘С‚С‡РёРєРѕРІ Рё Р·РЅР°С‡РµРЅРёР№
 	if (*previousBasePersistentMemoryAddress == null)
 		*previousBasePersistentMemoryAddress = basePersistentMemoryAddress;
 
@@ -366,7 +366,7 @@ void FreeLink(Link* link)
 				--*linksTableSizeAddress;
 			}
 
-			ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
+			ShrinkStorageFile(); // Р Р°Р·РјРµСЂ Р±СѓРґРµС‚ СѓРјРµРЅСЊС€РµРЅ, С‚РѕР»СЊРєРѕ РµСЃР»Рё РґРѕРїСѓСЃС‚РёРјРѕ
 		}
 	}
 }

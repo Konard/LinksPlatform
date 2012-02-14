@@ -1,4 +1,4 @@
-#define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
+п»ї#define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
 void methodName(elementType **root)																												  \
 { 																																				  \
 	elementType *rightNode = GetRightNode(*root);																								  \
@@ -121,7 +121,7 @@ void methodName(elementType **root, elementType *nodeToDetach)																		
 	else																																																		   \
 	{																																																			   \
 		elementType *currentNode = *root;																																										   \
-		elementType *parent = null; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */																								   \
+		elementType *parent = null; /* РР·РЅР°С‡Р°Р»СЊРЅРѕ Р·Р°РЅСѓР»РµРЅРёРµ, С‚Р°Рє РєР°Рє СЂРѕРґРёС‚РµР»СЏ РјРѕР¶РµС‚ Рё РЅРµ Р±С‹С‚СЊ (РљРѕСЂРµРЅСЊ РґРµСЂРµРІР°). */																								   \
 		elementType *replacementNode = null;																																									   \
 																																																				   \
 		while (currentNode != nodeToDetach)																																										   \
@@ -132,13 +132,13 @@ void methodName(elementType **root, elementType *nodeToDetach)																		
 			else if (IsElementGreaterThanOtherElement(nodeToDetach, currentNode))																																   \
 				parent = currentNode, currentNode = GetRightNode(currentNode);																																	   \
 																																																				   \
-			/* Проблемная ситуация не обрабатывается специально - её не должно происходить */																													   \
+			/* РџСЂРѕР±Р»РµРјРЅР°СЏ СЃРёС‚СѓР°С†РёСЏ РЅРµ РѕР±СЂР°Р±Р°С‚С‹РІР°РµС‚СЃСЏ СЃРїРµС†РёР°Р»СЊРЅРѕ - РµС‘ РЅРµ РґРѕР»Р¶РЅРѕ РїСЂРѕРёСЃС…РѕРґРёС‚СЊ */																													   \
 		}																																																		   \
 																																																				   \
 		if (GetLeftNode(nodeToDetach) && GetRightNode(nodeToDetach))																																			   \
 		{																																																		   \
 			elementType *minNode = GetRightNode(nodeToDetach);																																					   \
-			while (GetLeftNode(minNode)) minNode = GetLeftNode(minNode); /* Передвигаемся до минимума */																										   \
+			while (GetLeftNode(minNode)) minNode = GetLeftNode(minNode); /* РџРµСЂРµРґРІРёРіР°РµРјСЃСЏ РґРѕ РјРёРЅРёРјСѓРјР° */																										   \
 																																																				   \
 			methodName(&GetRightNode(nodeToDetach), minNode);																																					   \
 																																																				   \
@@ -171,8 +171,8 @@ void methodName(elementType **root, elementType *nodeToDetach)																		
 	}																																																			   \
 }
 
-// Пока что медленнее чем рекурсивная реализация, так как всё что написано на inline асм, компилятор понимает буквально и не пытается
-// оптимизировать, до тех пор пока нет точной уверенности в своих знаниях асма, лучше не соваться в дебри.
+// РџРѕРєР° С‡С‚Рѕ РјРµРґР»РµРЅРЅРµРµ С‡РµРј СЂРµРєСѓСЂСЃРёРІРЅР°СЏ СЂРµР°Р»РёР·Р°С†РёСЏ, С‚Р°Рє РєР°Рє РІСЃС‘ С‡С‚Рѕ РЅР°РїРёСЃР°РЅРѕ РЅР° inline Р°СЃРј, РєРѕРјРїРёР»СЏС‚РѕСЂ РїРѕРЅРёРјР°РµС‚ Р±СѓРєРІР°Р»СЊРЅРѕ Рё РЅРµ РїС‹С‚Р°РµС‚СЃСЏ
+// РѕРїС‚РёРјРёР·РёСЂРѕРІР°С‚СЊ, РґРѕ С‚РµС… РїРѕСЂ РїРѕРєР° РЅРµС‚ С‚РѕС‡РЅРѕР№ СѓРІРµСЂРµРЅРЅРѕСЃС‚Рё РІ СЃРІРѕРёС… Р·РЅР°РЅРёСЏС… Р°СЃРјР°, Р»СѓС‡С€Рµ РЅРµ СЃРѕРІР°С‚СЊСЃСЏ РІ РґРµР±СЂРё.
 #define BeginWalkThroughtTree(elementType, element, root, GetLeftNode)			    \
 {																					\
 	register elementType *element = root;											\

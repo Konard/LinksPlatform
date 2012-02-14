@@ -1,4 +1,4 @@
-__declspec(dllexport) void InitPersistentMemoryManager();
+﻿__declspec(dllexport) void InitPersistentMemoryManager();
 __declspec(dllexport) unsigned long OpenStorageFile(char *filename);
 __declspec(dllexport) unsigned long CloseStorageFile();
 __declspec(dllexport) unsigned long EnlargeStorageFile();
