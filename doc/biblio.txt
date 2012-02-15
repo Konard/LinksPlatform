@@ -1,7 +1,19 @@
 Список литературы
 -----------------
+
+Деревья, графы
+
 1. Автор: Роберт Седжвик (директор компании Adobe Systems)
    Название: Фундаментальные алгоритмы на Си++
    Части 1 - 4. "Анализ. Структуры данных. Сортировка. Поиск."
    начиная со страницы стр. 218 "5.4. Деревья"
+
+Си, Си++
+
+1. Разработчик: Joint Technical Committee ISO/IEC JTC 1,
+     Information technology, Subcommittee SC 22, Programming languages,
+     their environments and system software interfaces.
+   Название: International Standard ISO/IEC 9899:TC3 (черновик
+     стандарта C99 с поправками TC1, TC2 и TC3)
+   URL: http://www.open-std.org/JTC1/SC22/WG14/
 
