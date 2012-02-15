@@ -2,22 +2,28 @@
 #include "Common.h"
 #include "Time.h"
 
-#ifdef _MFC_VER
+// see http://stackoverflow.com/questions/163058/how-can-i-detect-if-im-compiling-for-a-64bits-architecture-in-c
+#if defined(_LP64) || defined(__amd64__) || defined(_M_X64)
+#else
+#warning "Links platform needs 64-bit CPU architecture."
+#endif
+
+#if defined(_MFC_VER)
 long long LastTimestamp = 0;
 #endif
 
-#ifdef __LINUX__
+#if defined(__LINUX__)
 uint64_t LastTimestamp = 0;
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
         // to do ...
 #endif
 
 
 // Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
-#ifdef _MFC_VER
+#if defined(_MFC_VER)
 #include <Windows.h>
 long long GetTimestamp()
 {
@@ -40,7 +46,7 @@ long long GetTimestamp()
 }
 #endif
 
-#ifdef __LINUX__
+#if defined(__LINUX__)
 uint64_t GetTimestamp()
 {
 
@@ -63,7 +69,7 @@ uint64_t GetTimestamp()
 }
 #endif
 
-#ifdef __APPLE__
+#if defined(__APPLE__)
 	// to do ...
 #endif
 
