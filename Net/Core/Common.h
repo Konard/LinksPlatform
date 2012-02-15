@@ -3,7 +3,7 @@
 #pragma inline_depth(2)
 */
 
-#include <omp.h>
+//#include <omp.h>
 
 #define null 0
 #define false 0

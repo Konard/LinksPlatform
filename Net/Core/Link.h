@@ -1,7 +1,13 @@
-﻿#ifndef __LINKS_LINK_H__
+#ifndef __LINKS_LINK_H__
 #define __LINKS_LINK_H__
 
 #define itself 0
+
+#if defined(_MFC_VER)
+#elif defined(__GNUC__)
+#include <stdint.h>
+#endif
+
 
 typedef struct Link
 {
@@ -20,7 +26,11 @@ typedef struct Link
 	unsigned long long ReferersBySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (количество элементов в дереве)
 	unsigned long long ReferersByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (количество элементов в дереве)
 	unsigned long long ReferersByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (количество элементов в дереве)
+#if defined(_MFC_VER)
 	long long Timestamp; // Не использутся
+#elif defined(__GNUC__)
+	uint64_t Timestamp;
+#endif
 } Link;
 
 __declspec(dllexport) Link* CreateLink(Link* source, Link* linker, Link* target);

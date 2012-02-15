@@ -1,6 +1,6 @@
 
 #include "Common.h"
-#include "Time.h"
+#include "Timestamp.h"
 
 // see http://stackoverflow.com/questions/163058/how-can-i-detect-if-im-compiling-for-a-64bits-architecture-in-c
 #if defined(_LP64) || defined(__amd64__) || defined(_M_X64)
@@ -12,7 +12,9 @@
 long long LastTimestamp = 0;
 #endif
 
-#if defined(__LINUX__)
+#if defined(__GNUC__)
+#include <stdint.h>
+#include <time.h>
 uint64_t LastTimestamp = 0;
 #endif
 
@@ -24,7 +26,7 @@ uint64_t LastTimestamp = 0;
 // Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
 #if defined(_MFC_VER)
-#include <Windows.h>
+#include <windows.h>
 long long GetTimestamp()
 {
 
@@ -46,11 +48,9 @@ long long GetTimestamp()
 }
 #endif
 
-#if defined(__LINUX__)
+#if defined(__GNUC__)
 uint64_t GetTimestamp()
 {
-
-#include <stdint.h>
 
 #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 
@@ -59,7 +59,7 @@ uint64_t GetTimestamp()
 	uint64_t time = t;
 
 	// see http://suacommunity.com/dictionary/gettimeofday-entry.php
-	time += DELTA_EPOCH_IN_MICROSECS
+	time += DELTA_EPOCH_IN_MICROSECS;
 	time *= 10;
 
 	if (time <= LastTimestamp)

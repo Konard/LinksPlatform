@@ -1,5 +1,5 @@
-#ifndef __LINKS_TIME_H__
-#define __LINKS_TIME_H__
+#ifndef __LINKS_TIMESTAMP_H__
+#define __LINKS_TIMESTAMP_H__
 
 #ifdef _MFC_VER
 long long GetTimestamp();
