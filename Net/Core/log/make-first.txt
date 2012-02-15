@@ -1,0 +1,145 @@
+"gcc" "-O3" -c -o Link.o Link.c
+In file included from Link.c:1:
+Link.h: In function ‘__declspec’:
+Link.h:24: error: expected declaration specifiers before ‘__declspec’
+Link.h:25: error: expected declaration specifiers before ‘__declspec’
+Link.h:26: error: expected declaration specifiers before ‘__declspec’
+Link.h:27: error: expected declaration specifiers before ‘__declspec’
+Link.h:29: error: expected declaration specifiers before ‘__declspec’
+Link.h:30: error: expected declaration specifiers before ‘__declspec’
+Link.h:31: error: expected declaration specifiers before ‘__declspec’
+Link.h:33: error: expected declaration specifiers before ‘__declspec’
+Link.h:34: error: expected declaration specifiers before ‘__declspec’
+Link.h:36: error: expected declaration specifiers before ‘__declspec’
+Link.h:37: error: expected declaration specifiers before ‘__declspec’
+Link.h:39: error: expected declaration specifiers before ‘__declspec’
+Link.h:40: error: expected declaration specifiers before ‘__declspec’
+In file included from Common.h:6,
+                 from Link.c:2:
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:38: error: storage class specified for parameter ‘omp_lock_t’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:44: error: storage class specified for parameter ‘omp_nest_lock_t’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:53: error: storage class specified for parameter ‘omp_sched_t’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:62: error: storage class specified for parameter ‘omp_set_num_threads’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:63: error: storage class specified for parameter ‘omp_get_num_threads’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:64: error: storage class specified for parameter ‘omp_get_max_threads’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:65: error: storage class specified for parameter ‘omp_get_thread_num’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:66: error: storage class specified for parameter ‘omp_get_num_procs’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:68: error: storage class specified for parameter ‘omp_in_parallel’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:70: error: storage class specified for parameter ‘omp_set_dynamic’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:71: error: storage class specified for parameter ‘omp_get_dynamic’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:73: error: storage class specified for parameter ‘omp_set_nested’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:74: error: storage class specified for parameter ‘omp_get_nested’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:76: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:77: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:78: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:79: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:80: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:82: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:83: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:84: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:85: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:86: error: expected ‘)’ before ‘*’ token
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:88: error: storage class specified for parameter ‘omp_get_wtime’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:89: error: storage class specified for parameter ‘omp_get_wtick’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:91: error: expected ‘)’ before ‘int’
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:92: error: expected ‘)’ before ‘*’ token
+In file included from Link.c:3:
+PersistentMemoryManager.h:1: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:2: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:3: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:4: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:5: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:6: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:7: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:8: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:9: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:10: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:11: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:16: error: expected declaration specifiers before ‘__declspec’
+PersistentMemoryManager.h:17: error: expected declaration specifiers before ‘__declspec’
+In file included from Link.c:4:
+SizeBalancedTree.h:202:60: warning: backslash-newline at end of file
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:9: error: expected declaration specifiers before ‘;’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:10: error: expected declaration specifiers before ‘;’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:11: error: expected declaration specifiers before ‘;’ token
+Link.c:13: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:13: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:13: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:13: error: expected declaration specifiers before ‘;’ token
+Link.c:16: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:27: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:38: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:45: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:52: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:60: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:92: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:125: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:162: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:166: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:167: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:168: error: expected ‘=’, ‘,’, ‘;’, ‘asm’ or ‘__attribute__’ before ‘{’ token
+Link.c:170: error: expected ‘;’, ‘,’ or ‘)’ before ‘action’
+Link.c:180: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:191: error: expected ‘;’, ‘,’ or ‘)’ before ‘action’
+Link.c:196: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:202: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:214: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:227: error: expected ‘;’, ‘,’ or ‘)’ before ‘action’
+Link.c:237: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:248: error: expected ‘;’, ‘,’ or ‘)’ before ‘action’
+Link.c:253: error: expected ‘;’, ‘,’ or ‘)’ before ‘func’
+Link.c:11: error: declaration for parameter ‘ReferersByTargetTreeRightMaintain’ but no such parameter
+Link.c:11: error: declaration for parameter ‘ReferersByTargetTreeLeftMaintain’ but no such parameter
+Link.c:10: error: declaration for parameter ‘ReferersByLinkerTreeRightMaintain’ but no such parameter
+Link.c:10: error: declaration for parameter ‘ReferersByLinkerTreeLeftMaintain’ but no such parameter
+Link.c:9: error: declaration for parameter ‘ReferersBySourceTreeRightMaintain’ but no such parameter
+Link.c:9: error: declaration for parameter ‘ReferersBySourceTreeLeftMaintain’ but no such parameter
+Time.h:1: error: declaration for parameter ‘GetTimestamp’ but no such parameter
+PersistentMemoryManager.h:14: error: declaration for parameter ‘FreeLink’ but no such parameter
+PersistentMemoryManager.h:13: error: declaration for parameter ‘AllocateLink’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:99: error: declaration for parameter ‘omp_get_active_level’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:98: error: declaration for parameter ‘omp_get_team_size’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:97: error: declaration for parameter ‘omp_get_ancestor_thread_num’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:96: error: declaration for parameter ‘omp_get_level’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:95: error: declaration for parameter ‘omp_get_max_active_levels’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:94: error: declaration for parameter ‘omp_set_max_active_levels’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:93: error: declaration for parameter ‘omp_get_thread_limit’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:89: error: declaration for parameter ‘omp_get_wtick’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:88: error: declaration for parameter ‘omp_get_wtime’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:74: error: declaration for parameter ‘omp_get_nested’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:73: error: declaration for parameter ‘omp_set_nested’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:71: error: declaration for parameter ‘omp_get_dynamic’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:70: error: declaration for parameter ‘omp_set_dynamic’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:68: error: declaration for parameter ‘omp_in_parallel’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:66: error: declaration for parameter ‘omp_get_num_procs’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:65: error: declaration for parameter ‘omp_get_thread_num’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:64: error: declaration for parameter ‘omp_get_max_threads’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:63: error: declaration for parameter ‘omp_get_num_threads’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:62: error: declaration for parameter ‘omp_set_num_threads’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:53: error: declaration for parameter ‘omp_sched_t’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:44: error: declaration for parameter ‘omp_nest_lock_t’ but no such parameter
+/usr/lib/gcc/x86_64-linux-gnu/4.4.5/include/omp.h:38: error: declaration for parameter ‘omp_lock_t’ but no such parameter
+Link.h:45: error: declaration for parameter ‘DetachLink’ but no such parameter
+Link.h:43: error: declaration for parameter ‘DetachLinkFromMarker’ but no such parameter
+Link.h:42: error: declaration for parameter ‘AttachLinkToMarker’ but no such parameter
+Link.h:23: error: declaration for parameter ‘CreateLink’ but no such parameter
+Link.c:257: error: expected ‘{’ at end of input
+make: *** [liblinkscore.a] Ошибка 1
