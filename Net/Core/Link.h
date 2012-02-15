@@ -1,4 +1,7 @@
-﻿#define itself 0
+﻿#ifndef __LINKS_LINK_H__
+#define __LINKS_LINK_H__
+
+#define itself 0
 
 typedef struct Link
 {
@@ -43,3 +46,5 @@ void AttachLinkToMarker(Link *link, Link *marker);
 void DetachLinkFromMarker(Link* link, Link* marker);
 
 void DetachLink(Link* link);
+
+#endif
