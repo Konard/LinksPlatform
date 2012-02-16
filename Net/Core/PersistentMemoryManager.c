@@ -92,9 +92,31 @@ int _tmain()
 void InitPersistentMemoryManager()
 {
 #if defined(_MFC_VER)
-	__int64 baseVirtualMemoryOffsetCounter = 2360000; //600000;
-	__int64 baseVirtualMemoryOffset;
-	SYSTEM_INFO info;
+	int64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
+	int64_t baseVirtualMemoryOffset;
+
+	SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
+	/* 
+typedef struct _SYSTEM_INFO {
+  union {
+    DWORD  dwOemId;
+    struct {
+      WORD wProcessorArchitecture;
+      WORD wReserved;
+    };
+  };
+  DWORD     dwPageSize;
+  LPVOID    lpMinimumApplicationAddress;
+  LPVOID    lpMaximumApplicationAddress;
+  DWORD_PTR dwActiveProcessorMask;
+  DWORD     dwNumberOfProcessors;
+  DWORD     dwProcessorType;
+  DWORD     dwAllocationGranularity;
+  WORD      wProcessorLevel;
+  WORD      wProcessorRevision;
+} SYSTEM_INFO;
+
+	*/
 	SIZE_T largestMemoryBlockSize;
 
 	GetSystemInfo(&info);
@@ -107,9 +129,10 @@ void InitPersistentMemoryManager()
 
 	//baseVirtualMemoryOffset = currentMemoryPageSize * baseVirtualMemoryOffsetCounter;
 
+	// см. 
 	largestMemoryBlockSize = GetLargestFreeMemRegion(&basePersistentMemoryAddress);
 
-	baseVirtualMemoryOffset = (__int64) basePersistentMemoryAddress;
+	baseVirtualMemoryOffset = (int64_t) basePersistentMemoryAddress;
 
 	//basePersistentMemoryAddress = (void*)(baseVirtualMemoryOffset);
 	previousBasePersistentMemoryAddress = (void**)(baseVirtualMemoryOffset);
@@ -266,6 +289,7 @@ unsigned long SetStorageFileMemoryMapping()
 		return error;
 	}
 
+	// аналог mmap(), см. http://msdn.microsoft.com/en-us/library/windows/desktop/aa366763%28v=vs.85%29.aspx
 	basePersistentMemoryAddress = MapViewOfFileEx(storageFileMappingHandle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, basePersistentMemoryAddress);
 	if (basePersistentMemoryAddress == null) 
 	{
@@ -348,7 +372,10 @@ unsigned long ResetStorageFileMemoryMapping()
 
 void PrintLinksTableSize()
 {
+#if defined(_MFC_VER)
 	printf("Links table size: %I64d links, %I64d bytes.\n", *linksTableSizeAddress, *linksTableSizeAddress * sizeof(Link));
+#elif defined(__GNUC__)
+#endif
 }
 
 Link* AllocateFromUnusedLinks()
@@ -461,12 +488,12 @@ void ReadTest()
 	printf("Reading data...\n");
 
 #if defined(_MFC_VER)
-	__int64 resultCounter = 0;
+	int64_t resultCounter = 0;
 
 	{
-		__int64* intMap = (__int64*) basePersistentMemoryAddress;
-		__int64* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		__int64* intCurrent = intMap;
+		int64_t* intMap = (__int64*) basePersistentMemoryAddress;
+		int64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
+		int64_t* intCurrent = intMap;
 
 		for(; intCurrent <= intMapLastAddress; intCurrent++)
 		{
@@ -486,9 +513,9 @@ void WriteTest()
 
 #if defined(_MFC_VER)
 	{
-		__int64* intMap = (__int64*) basePersistentMemoryAddress;
-		__int64* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		__int64* intCurrent = intMap;
+		int64_t* intMap = (__int64*) basePersistentMemoryAddress;
+		int64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
+		int64_t* intCurrent = intMap;
 
 		for(; intCurrent <= intMapLastAddress; intCurrent++)
 		{
