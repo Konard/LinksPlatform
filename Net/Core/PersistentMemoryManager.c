@@ -1,5 +1,14 @@
-#include <Windows.h>
+#if defined(_MFC_VER)
+#include <windows.h>
+#elif defined(__GNUC__)
+#endif
+
 #include <stdio.h>
+
+#if defined(_MFC_VER)
+#elif defined(__GNUC__)
+#include <stdint.h>
+#endif
 
 #include "Common.h"
 #include "Link.h"
@@ -25,10 +34,14 @@ Link*				linksTableDataAddress;
 
 unsigned long long	storageFileMinSizeInBytes;
 
+#if defined(_MFC_VER)
 HANDLE				storageFileHandle;
 HANDLE				storageFileMappingHandle;
 unsigned long long	storageFileSizeInBytes;
+#elif defined(__GNUC__)
+#endif
 
+#if defined(_MFC_VER)
 SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 {
 	SYSTEM_INFO systemInfo;
@@ -63,7 +76,10 @@ SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 	}
 	return largestSize;
 }
+#elif defined(__GNUC__)
+#endif
 
+/*
 int _tmain()
 {
 	LPVOID baseAddr;
@@ -71,9 +87,11 @@ int _tmain()
 	//_tprintf(_T("\nLargest Free Region: 0x%p bytes at 0x%p\n"), ls, baseAddr);
 	return 0;
 }
+*/
 
 void InitPersistentMemoryManager()
 {
+#if defined(_MFC_VER)
 	__int64 baseVirtualMemoryOffsetCounter = 2360000; //600000;
 	__int64 baseVirtualMemoryOffset;
 	SYSTEM_INFO info;
@@ -105,12 +123,15 @@ void InitPersistentMemoryManager()
 	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseLinksTableBlockSizeInBytes;
+#elif defined(__GNUC__)
+#endif
 }
 
 unsigned long OpenStorageFile(char *filename)
 {
 	printf("Opening file...\n");
 
+#if defined(_MFC_VER)
 	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (storageFileHandle == null)
 	{
@@ -126,6 +147,8 @@ unsigned long OpenStorageFile(char *filename)
 
 	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseLinksTableBlockSizeInBytes) > 0)
 		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseLinksTableBlockSizeInBytes * baseLinksTableBlockSizeInBytes) + baseLinksTableBlockSizeInBytes;
+#elif defined(__GNUC__)
+#endif
 
 	printf("File opened.\n\n");
 
@@ -139,6 +162,7 @@ unsigned long CloseStorageFile()
 	// При освобождении лишнего места, можно уменьшать размер файла, для этогоиспользуется функция SetEndOfFile(fh); 
 	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
 
+#if defined(_MFC_VER)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -149,6 +173,8 @@ unsigned long CloseStorageFile()
 	CloseHandle(storageFileHandle);
 	storageFileHandle = null;
 	storageFileSizeInBytes = 0;
+#elif defined(__GNUC__)
+#endif
 
 	printf("Storage file closed.\n\n");
 		
@@ -157,6 +183,7 @@ unsigned long CloseStorageFile()
 
 unsigned long EnlargeStorageFile()
 {
+#if defined(_MFC_VER)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -178,12 +205,15 @@ unsigned long EnlargeStorageFile()
 		if(error != 0)
 			return error;
 	}
+#elif defined(__GNUC__)
+#endif
 
 	return 0;
 }
 
 unsigned long ShrinkStorageFile()
 {
+#if defined(_MFC_VER)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -217,6 +247,8 @@ unsigned long ShrinkStorageFile()
 				return error;
 		}
 	}
+#elif defined(__GNUC__)
+#endif
 
 	return 0;
 }
@@ -225,6 +257,7 @@ unsigned long SetStorageFileMemoryMapping()
 {
 	printf("Setting memory mapping of storage file...\n");
 
+#if defined(_MFC_VER)
 	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
 	if (storageFileMappingHandle == null)
 	{
@@ -282,6 +315,8 @@ unsigned long SetStorageFileMemoryMapping()
 	PrintLinksTableSize();
 
 	printf("\n");
+#elif defined(__GNUC__)
+#endif
 
 	return 0;
 }
@@ -290,6 +325,7 @@ unsigned long ResetStorageFileMemoryMapping()
 {
 	printf("Resetting memory mapping of storage file...\n");
 
+#if defined(_MFC_VER)
 	if (storageFileMappingHandle == null)
 	{
 		unsigned long error = -1;
@@ -302,6 +338,8 @@ unsigned long ResetStorageFileMemoryMapping()
 	UnmapViewOfFile (basePersistentMemoryAddress);
 	CloseHandle(storageFileMappingHandle);
 	storageFileMappingHandle = null;
+#elif defined(__GNUC__)
+#endif
 
 	printf("Memory mapping of storage file is reset.\n\n");
 
@@ -371,7 +409,7 @@ void FreeLink(Link* link)
 	}
 }
 
-void WalkThroughAllLinks(void __stdcall func(Link *))
+void WalkThroughAllLinks(func func_)
 {
 	Link *currentLink = linksTableDataAddress;
 	Link* lastLink = linksTableDataAddress + *linksTableSizeAddress - 1;
@@ -380,13 +418,13 @@ void WalkThroughAllLinks(void __stdcall func(Link *))
 	{
 		if (currentLink->Linker != linksTableUnusedLinkMarker)
 		{
-			func(currentLink);
+			func_(currentLink);
 		}
 	}
 	while(++currentLink <= lastLink);
 }
 
-int WalkThroughLinks(int __stdcall func(Link *))
+int WalkThroughLinks(func func_)
 {
 	Link *currentLink = linksTableDataAddress;
 	Link* lastLink = linksTableDataAddress + *linksTableSizeAddress - 1;
@@ -395,7 +433,7 @@ int WalkThroughLinks(int __stdcall func(Link *))
 	{
 		if (currentLink->Linker != linksTableUnusedLinkMarker)
 		{
-			if(!func(currentLink)) return false;
+			if(!func_(currentLink)) return false;
 		}
 	}
 	while(++currentLink <= lastLink);
@@ -419,9 +457,11 @@ void SetMappedLink(int index, Link* link)
 
 void ReadTest()
 {
-	__int64 resultCounter = 0;
 
 	printf("Reading data...\n");
+
+#if defined(_MFC_VER)
+	__int64 resultCounter = 0;
 
 	{
 		__int64* intMap = (__int64*) basePersistentMemoryAddress;
@@ -433,6 +473,9 @@ void ReadTest()
 			resultCounter += *intCurrent;
 		}
 	}
+#elif defined(__GNUC__)
+	int64_t resultCounter = 0;
+#endif
 
 	printf("Data read. Counter result is: %I64d.\n\n", resultCounter);
 }
@@ -441,6 +484,7 @@ void WriteTest()
 {
 	printf("Filling data...\n");
 
+#if defined(_MFC_VER)
 	{
 		__int64* intMap = (__int64*) basePersistentMemoryAddress;
 		__int64* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
@@ -451,6 +495,8 @@ void WriteTest()
 			*intCurrent = intCurrent - intMap;
 		}
 	}
+#elif defined(__GNUC__)
+#endif
 
 	printf("Data filled.\n\n");
 }
