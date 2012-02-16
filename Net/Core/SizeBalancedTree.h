@@ -1,4 +1,4 @@
-﻿#define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
+#define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
 void methodName(elementType **root)																												  \
 { 																																				  \
 	elementType *rightNode = GetRightNode(*root);																								  \

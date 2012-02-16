@@ -4,6 +4,7 @@
 #define itself 0
 
 #if defined(_MFC_VER)
+/* none */
 #elif defined(__GNUC__)
 #include <stdint.h>
 #endif
@@ -33,28 +34,54 @@ typedef struct Link
 #endif
 } Link;
 
-__declspec(dllexport) Link* CreateLink(Link* source, Link* linker, Link* target);
-__declspec(dllexport) Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target);
-__declspec(dllexport) void DeleteLink(Link* link);
-__declspec(dllexport) Link* ReplaceLink(Link* link, Link* replacement);
-__declspec(dllexport) Link* SearchLink(Link* source, Link* linker, Link* target);
+typedef int (*func)(Link *); // callback
+typedef void (*action)(Link *); // callback
 
-__declspec(dllexport) unsigned long long GetLinkNumberOfReferersBySource(Link *link);
-__declspec(dllexport) unsigned long long GetLinkNumberOfReferersByLinker(Link *link);
-__declspec(dllexport) unsigned long long GetLinkNumberOfReferersByTarget(Link *link);
 
-__declspec(dllexport) void WalkThroughAllReferersBySource(Link* root, void __stdcall action(Link *));
-__declspec(dllexport) int WalkThroughReferersBySource(Link* root, int __stdcall func(Link *));
+#if defined(__cplusplus)
+extern "C" {
+#endif
 
-__declspec(dllexport) void WalkThroughAllReferersByLinker(Link* root, void __stdcall func(Link *));
-__declspec(dllexport) int WalkThroughReferersByLinker(Link* root, int __stdcall func(Link *));
+// see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
+#if defined(_WIN32)
+#if defined(LINKS_DLL)
+#define PREFIX_DLL __stdcall __declspec(dllexport)
+#else
+#define PREFIX_DLL __stdcall __declspec(dllimport)
+#endif
+// Linux,Unix
+#else
+#define PREFIX_DLL 
+#endif
 
-__declspec(dllexport) void WalkThroughAllReferersByTarget(Link* root, void __stdcall action(Link *));
-__declspec(dllexport) int WalkThroughReferersByTarget(Link* root, int __stdcall func(Link *));
+Link* PREFIX_DLL CreateLink(Link* source, Link* linker, Link* target);
+Link* PREFIX_DLL UpdateLink(Link* link, Link* source, Link* linker, Link* target);
+void  PREFIX_DLL DeleteLink(Link* link);
+Link* PREFIX_DLL ReplaceLink(Link* link, Link* replacement);
+Link* PREFIX_DLL SearchLink(Link* source, Link* linker, Link* target);
+
+unsigned long long PREFIX_DLL GetLinkNumberOfReferersBySource(Link *link);
+unsigned long long PREFIX_DLL GetLinkNumberOfReferersByLinker(Link *link);
+unsigned long long PREFIX_DLL GetLinkNumberOfReferersByTarget(Link *link);
+
+void PREFIX_DLL WalkThroughAllReferersBySource(Link* root, action);
+int PREFIX_DLL WalkThroughReferersBySource(Link* root, func);
+
+void PREFIX_DLL WalkThroughAllReferersByLinker(Link* root, action);
+int PREFIX_DLL WalkThroughReferersByLinker(Link* root, func);
+
+void PREFIX_DLL WalkThroughAllReferersByTarget(Link* root, action);
+int PREFIX_DLL WalkThroughReferersByTarget(Link* root, func);
+
+// not exported
 
 void AttachLinkToMarker(Link *link, Link *marker);
 void DetachLinkFromMarker(Link* link, Link* marker);
 
 void DetachLink(Link* link);
+
+#if defined(__cplusplus)
+}
+#endif
 
 #endif

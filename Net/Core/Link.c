@@ -1,16 +1,30 @@
 #include "Link.h"
+
 #include "Common.h"
 #include "PersistentMemoryManager.h"
 #include "SizeBalancedTree.h"
 #include "Timestamp.h"
 
-#include "Link.LowLevel.h"
+#include "LinkLowLevel.h"
 
-DefineAllReferersTreeMethods(Source);
-DefineAllReferersTreeMethods(Linker);
-DefineAllReferersTreeMethods(Target);
+#ifdef _WIN32
 
-DefineAllSearchMethods();
+#ifdef LINKS_DLL
+#define _H __stdcall
+#else
+#define _H 
+#endif
+
+#else
+#define _H 
+#endif
+
+
+DefineAllReferersTreeMethods(Source)
+DefineAllReferersTreeMethods(Linker)
+DefineAllReferersTreeMethods(Target)
+
+DefineAllSearchMethods()
 
 void AttachLink(Link* link, Link* source, Link* linker, Link* target)
 {
@@ -48,7 +62,7 @@ void DetachLinkFromMarker(Link* link, Link* marker)
 	link->Linker = null;
 }
 
-Link* SearchLink(Link* source, Link* linker, Link* target)
+Link* _H SearchLink(Link* source, Link* linker, Link* target)
 {
 	if (GetLinkNumberOfReferersByTarget(target) <= GetLinkNumberOfReferersBySource(source))
 		return SearchRefererOfTarget(target, source, linker);
@@ -56,7 +70,7 @@ Link* SearchLink(Link* source, Link* linker, Link* target)
 		return SearchRefererOfSource(source, target, linker);
 }
 
-Link* CreateLink(Link* source, Link* linker, Link* target)
+Link* _H CreateLink(Link* source, Link* linker, Link* target)
 {
     if (source != itself && linker != itself && target != itself)
     {
@@ -88,7 +102,7 @@ Link* CreateLink(Link* source, Link* linker, Link* target)
 	}
 }
 
-Link* ReplaceLink(Link* link, Link* replacement)
+Link* _H ReplaceLink(Link* link, Link* replacement)
 {
 	if (link != replacement)
 	{
@@ -121,7 +135,7 @@ Link* ReplaceLink(Link* link, Link* replacement)
 	return replacement;
 }
 
-Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target)
+Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
 {
 	if(link->Source == source && link->Linker == linker && link->Target == target)
 		return link;
@@ -158,100 +172,101 @@ Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target)
 	}
 }
 
-void DeleteLink(Link* link)
+void _H DeleteLink(Link* link)
 {
 	FreeLink(link);
 }
 
-unsigned long long GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
-unsigned long long GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
-unsigned long long GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
+unsigned long long _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
+unsigned long long _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
+unsigned long long _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
 
-void WalkThroughAllReferersBySourceCore(Link* root, void __stdcall action(Link *))
+void WalkThroughAllReferersBySourceCore(Link* root, action a)
 {
 	if (root != null)
 	{
-		WalkThroughAllReferersBySourceCore(root->PreviousSiblingRefererBySource, action);
-		action(root);
-		WalkThroughAllReferersBySourceCore(root->NextSiblingRefererBySource, action);
+		WalkThroughAllReferersBySourceCore(root->PreviousSiblingRefererBySource, a);
+		a(root);
+		WalkThroughAllReferersBySourceCore(root->NextSiblingRefererBySource, a);
 	}
 }
 	
-int WalkThroughReferersBySourceCore(Link* root, int __stdcall func(Link *))
+int WalkThroughReferersBySourceCore(Link* root, func f)
 {
 	if (root != null)
 	{
-		if(!WalkThroughReferersBySourceCore(root->PreviousSiblingRefererBySource, func)) return false;
-		if(!func(root)) return false;
-		if(!WalkThroughReferersBySourceCore(root->NextSiblingRefererBySource, func)) return false;
+		if(!WalkThroughReferersBySourceCore(root->PreviousSiblingRefererBySource, f)) return false;
+		if(!f(root)) return false;
+		if(!WalkThroughReferersBySourceCore(root->NextSiblingRefererBySource, f)) return false;
 	}
 	return true;
 }
 
-void WalkThroughAllReferersBySource(Link* root, void __stdcall action(Link *))
+void _H WalkThroughAllReferersBySource(Link* root, action a)
 {
-	if (root != null) WalkThroughAllReferersBySourceCore(root->FirstRefererBySource, action);
+	if (root != null) WalkThroughAllReferersBySourceCore(root->FirstRefererBySource, a);
 }
 	
-int WalkThroughReferersBySource(Link* root, int __stdcall func(Link *))
+int _H WalkThroughReferersBySource(Link* root, func f)
 {
-	if (root != null) return WalkThroughReferersBySourceCore(root->FirstRefererBySource, func);
+	if (root != null) return WalkThroughReferersBySourceCore(root->FirstRefererBySource, f);
 	else return true;
 }
 
-void WalkThroughAllReferersByLinker(Link* root, void __stdcall func(Link *))
+void _H WalkThroughAllReferersByLinker(Link* root, action a)
 {
 	if(root != null)
 	{
 		BeginWalkThroughReferersByLinker(element, root)
 		{
-			func(element);
+			a(element);
 		}
 		EndWalkThroughReferersByLinker(element);
 	}
 }
 
-int WalkThroughReferersByLinker(Link* root, int __stdcall func(Link *))
+int _H WalkThroughReferersByLinker(Link* root, func f)
 {
 	if(root != null)
 	{
 		BeginWalkThroughReferersByLinker(element, root)
 		{
-			if(!func(element)) return false;
+			if(!f(element)) return false;
 		}
 		EndWalkThroughReferersByLinker(element);
 	}
 	return true;
 }
 
-void WalkThroughAllReferersByTargetCore(Link* root, void __stdcall action(Link *))
+void WalkThroughAllReferersByTargetCore(Link* root, action a)
 {
 	if (root != null)
 	{
-		WalkThroughAllReferersByTargetCore(root->PreviousSiblingRefererByTarget, action);
-		action(root);
-		WalkThroughAllReferersByTargetCore(root->NextSiblingRefererByTarget, action);
+		WalkThroughAllReferersByTargetCore(root->PreviousSiblingRefererByTarget, a);
+		a(root);
+		WalkThroughAllReferersByTargetCore(root->NextSiblingRefererByTarget, a);
 	}
 }
 	
-int WalkThroughReferersByTargetCore(Link* root, int __stdcall func(Link *))
+int WalkThroughReferersByTargetCore(Link* root, func f)
 {
 	if(root != null)
 	{
-		if(!WalkThroughReferersByTargetCore(root->PreviousSiblingRefererByTarget, func)) return false;
-		if(!func(root)) return false;
-		if(!WalkThroughReferersByTargetCore(root->NextSiblingRefererByTarget, func)) return false;
+		if(!WalkThroughReferersByTargetCore(root->PreviousSiblingRefererByTarget, f)) return false;
+		if(!f(root)) return false;
+		if(!WalkThroughReferersByTargetCore(root->NextSiblingRefererByTarget, f)) return false;
 	}
 	return true;
 }
 
-void WalkThroughAllReferersByTarget(Link* root, void __stdcall action(Link *))
+void _H WalkThroughAllReferersByTarget(Link* root, action a)
 {
-	if (root != null) WalkThroughAllReferersByTargetCore(root->FirstRefererByTarget, action);
+	if (root != null) WalkThroughAllReferersByTargetCore(root->FirstRefererByTarget, a);
 }
 	
-int WalkThroughReferersByTarget(Link* root, int __stdcall func(Link *))
+int _H WalkThroughReferersByTarget(Link* root, func f)
 {
-	if (root != null) return WalkThroughReferersByTargetCore(root->FirstRefererByTarget, func);
+	if (root != null) return WalkThroughReferersByTargetCore(root->FirstRefererByTarget, f);
 	else return true;
 }
+

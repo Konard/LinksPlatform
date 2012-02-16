@@ -1,4 +1,5 @@
-﻿#define of(x) x
+
+#define of(x) x
 #define to(x) x
 #define in(x) x
 
@@ -302,3 +303,4 @@ Link *SearchRefererOfTarget(Link *link, Link *refererSource, Link* refererLinker
 	DefineSearchInTreeOfReferersBySourceMethod() \
 	DefineSearchInListOfReferersByLinkerMethod() \
 	DefineSearchInTreeOfReferersByTargetMethod()
+

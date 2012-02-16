@@ -5,8 +5,8 @@
 long long GetTimestamp();
 #endif
 
-#ifdef __LINUX__
-#include <time.h>
+#ifdef __GNUC__
+#include <stdint.h>
 uint64_t GetTimestamp();
 #endif
 
