@@ -1,5 +1,6 @@
 #ifndef __LINKS_COMMON_H__
 #define __LINKS_COMMON_H__
+
 /*
 #pragma inline_recursion(on)
 #pragma inline_depth(2)

@@ -1,3 +1,6 @@
+#ifndef __LINKS_SIZE_BALANCED_TREE_H__
+#define __LINKS_SIZE_BALANCED_TREE_H__
+
 #define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
 void methodName(elementType **root)																												  \
 { 																																				  \
@@ -205,3 +208,5 @@ void methodName(elementType **root, elementType *nodeToDetach)																		
 		}																			\
 	}																				\
 }
+
+#endif
