@@ -24,13 +24,20 @@ typedef struct Link
 	struct Link *PreviousSiblingRefererBySource; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве начальной связи
 	struct Link *PreviousSiblingRefererByLinker; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве связи связки
 	struct Link *PreviousSiblingRefererByTarget; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве конечной связи
+#if defined(_MFC_VER)
 	unsigned long long ReferersBySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (количество элементов в дереве)
 	unsigned long long ReferersByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (количество элементов в дереве)
 	unsigned long long ReferersByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (количество элементов в дереве)
+#elif defined(__GNUC__)
+	uint64_t ReferersBySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (количество элементов в дереве)
+	uint64_t ReferersByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (количество элементов в дереве)
+	uint64_t ReferersByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (количество элементов в дереве)
+#endif
+
 #if defined(_MFC_VER)
 	long long Timestamp; // Не использутся
 #elif defined(__GNUC__)
-	uint64_t Timestamp;
+	int64_t Timestamp;
 #endif
 } Link;
 
@@ -60,9 +67,15 @@ void  PREFIX_DLL DeleteLink(Link* link);
 Link* PREFIX_DLL ReplaceLink(Link* link, Link* replacement);
 Link* PREFIX_DLL SearchLink(Link* source, Link* linker, Link* target);
 
+#if defined(_MFC_VER)
 unsigned long long PREFIX_DLL GetLinkNumberOfReferersBySource(Link *link);
 unsigned long long PREFIX_DLL GetLinkNumberOfReferersByLinker(Link *link);
 unsigned long long PREFIX_DLL GetLinkNumberOfReferersByTarget(Link *link);
+#elif defined(__GNUC__)
+uint64_t PREFIX_DLL GetLinkNumberOfReferersBySource(Link *link);
+uint64_t PREFIX_DLL GetLinkNumberOfReferersByLinker(Link *link);
+uint64_t PREFIX_DLL GetLinkNumberOfReferersByTarget(Link *link);
+#endif
 
 void PREFIX_DLL WalkThroughAllReferersBySource(Link* root, action);
 int PREFIX_DLL WalkThroughReferersBySource(Link* root, func);
