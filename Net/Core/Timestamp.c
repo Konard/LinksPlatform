@@ -8,26 +8,15 @@
 #warning "Links platform needs 64-bit CPU architecture."
 #endif
 
-#if defined(_MFC_VER)
-long long LastTimestamp = 0;
-#endif
 
-#if defined(__GNUC__)
-#include <stdint.h>
-#include <time.h>
-uint64_t LastTimestamp = 0;
-#endif
-
-#if defined(__APPLE__)
-        // to do ...
-#endif
-
+int64_t LastTimestamp = 0;
 
 // Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
 #if defined(_MFC_VER)
 #include <windows.h>
-long long GetTimestamp()
+
+int64_t GetTimestamp()
 {
 
 	FILETIME fileTime;
@@ -38,7 +27,7 @@ long long GetTimestamp()
 	GetSystemTimeAsFileTime(&fileTime);
 
 	{
-		long long time = (((long long) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
+		int64_t = (((int64_t) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
 
 		if (time <= LastTimestamp)
 			return ++LastTimestamp;
@@ -46,17 +35,20 @@ long long GetTimestamp()
 			return LastTimestamp = time;
 	}
 }
-#endif
 
-#if defined(__GNUC__)
-uint64_t GetTimestamp()
+#elif defined(__GNUC__)
+
+#include <stdint.h>
+#include <time.h>
+
+int64_t GetTimestamp()
 {
 
 #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 
 	// see 3.5 in http://citforum.ru/programming/c_unix/gl_3.shtml
 	time_t t = time((time_t *)NULL);
-	uint64_t time = t;
+	int64_t time = t;
 
 	// see http://suacommunity.com/dictionary/gettimeofday-entry.php
 	time += DELTA_EPOCH_IN_MICROSECS;
@@ -68,8 +60,3 @@ uint64_t GetTimestamp()
 		return LastTimestamp = time;
 }
 #endif
-
-#if defined(__APPLE__)
-	// to do ...
-#endif
-

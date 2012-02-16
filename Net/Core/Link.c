@@ -1,6 +1,8 @@
+
 #include "Link.h"
 
 #include "Common.h"
+
 #include "PersistentMemoryManager.h"
 #include "SizeBalancedTree.h"
 #include "Timestamp.h"
@@ -15,11 +17,6 @@
 #endif
 #else
 #define _H 
-#endif
-
-#if defined(_MFC_VER)
-#elif defined(__GNUC__)
-#include <stdint.h>
 #endif
 
 
@@ -180,15 +177,9 @@ void _H DeleteLink(Link* link)
 	FreeLink(link);
 }
 
-#if defined(_MFC_VER)
-unsigned long long _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
-unsigned long long _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
-unsigned long long _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
-#elif defined(__GNUC__)
 uint64_t _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
 uint64_t _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
 uint64_t _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
-#endif
 
 void WalkThroughAllReferersBySourceCore(Link* root, action a)
 {
