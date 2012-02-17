@@ -1,14 +1,10 @@
 #if defined(_MFC_VER)
 #include <windows.h>
 #elif defined(__GNUC__)
+#include <unistd.h>
 #endif
 
 #include <stdio.h>
-
-#if defined(_MFC_VER)
-#elif defined(__GNUC__)
-#include <stdint.h>
-#endif
 
 #include "Common.h"
 #include "Link.h"
@@ -91,9 +87,10 @@ int _tmain()
 
 void InitPersistentMemoryManager()
 {
-#if defined(_MFC_VER)
-	int64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
+//	int64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
 	int64_t baseVirtualMemoryOffset;
+
+#if defined(_MFC_VER)
 
 	SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
 	/* 
@@ -122,15 +119,24 @@ typedef struct _SYSTEM_INFO {
 	GetSystemInfo(&info);
 
 	currentMemoryPageSize = info.dwPageSize;
-	
 	serviceBlockSizeInBytes = info.dwPageSize * 2;
+
+	// см. 
+	largestMemoryBlockSize = GetLargestFreeMemRegion(&basePersistentMemoryAddress);
+
+#elif defined(__GNUC__)
+
+	long sz = sysconf(_SC_PAGESIZE);
+	currentMemoryPageSize = sz; // ? привести к одному типу
+	serviceBlockSizeInBytes = sz * 2;
+	// отсутствует largestMemoryBlockSize = ...
+
+#endif
+
 	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
 	baseLinksTableBlockSizeInBytes = currentMemoryPageSize * 256 * 4 * sizeof(Link); // ~ 512 mb
 
 	//baseVirtualMemoryOffset = currentMemoryPageSize * baseVirtualMemoryOffsetCounter;
-
-	// см. 
-	largestMemoryBlockSize = GetLargestFreeMemRegion(&basePersistentMemoryAddress);
 
 	baseVirtualMemoryOffset = (int64_t) basePersistentMemoryAddress;
 
@@ -146,8 +152,7 @@ typedef struct _SYSTEM_INFO {
 	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseLinksTableBlockSizeInBytes;
-#elif defined(__GNUC__)
-#endif
+	return;
 }
 
 unsigned long OpenStorageFile(char *filename)
@@ -173,7 +178,7 @@ unsigned long OpenStorageFile(char *filename)
 #elif defined(__GNUC__)
 #endif
 
-	printf("File opened.\n\n");
+	printf("File %s opened.\n\n", filename);
 
 	return 0;
 }
@@ -487,9 +492,9 @@ void ReadTest()
 
 	printf("Reading data...\n");
 
-#if defined(_MFC_VER)
 	int64_t resultCounter = 0;
 
+#if defined(_MFC_VER)
 	{
 		int64_t* intMap = (__int64*) basePersistentMemoryAddress;
 		int64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
@@ -500,11 +505,11 @@ void ReadTest()
 			resultCounter += *intCurrent;
 		}
 	}
+	printf("Data read. Counter result is: %I64d.\n\n", resultCounter);
 #elif defined(__GNUC__)
-	int64_t resultCounter = 0;
+	printf("Data read. Counter result is: %lld.\n\n", (long long int)resultCounter);
 #endif
 
-	printf("Data read. Counter result is: %I64d.\n\n", resultCounter);
 }
 
 void WriteTest()
