@@ -24,10 +24,10 @@ extern "C" {
 
 PREFIX_DLL void InitPersistentMemoryManager();
 PREFIX_DLL int OpenStorageFile(char *filename);
-PREFIX_DLL unsigned long CloseStorageFile();
+PREFIX_DLL int CloseStorageFile();
 PREFIX_DLL unsigned long EnlargeStorageFile();
 PREFIX_DLL unsigned long ShrinkStorageFile();
-PREFIX_DLL unsigned long SetStorageFileMemoryMapping();
+PREFIX_DLL int SetStorageFileMemoryMapping();
 PREFIX_DLL unsigned long ResetStorageFileMemoryMapping();
 PREFIX_DLL Link* GetMappedLink(int index);
 PREFIX_DLL void SetMappedLink(int index, Link* link);

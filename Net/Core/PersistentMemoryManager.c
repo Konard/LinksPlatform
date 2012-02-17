@@ -8,6 +8,8 @@
 #include <fcntl.h>
 // errno
 #include <errno.h>
+// mmap()...
+#include <sys/mman.h>
 #endif
 
 #include <stdio.h>
@@ -23,19 +25,19 @@ int					serviceBlockSizeInBytes;
 
 // Константы, расчитываемые при запуске приложения
 unsigned long long	baseLinksTableBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-void*				basePersistentMemoryAddress;
+void*				basePersistentMemoryAddress; // result of mmap()
 void**				previousBasePersistentMemoryAddress;
-unsigned long*		previousMemoryPageSize;
+int*				previousMemoryPageSize;
 int*				mappingTableMaxSizeAddress;
 Link**				mappingTableDataAddress;
-long long*			linksTableMaxSizeAddress;
-long long*			linksTableSizeAddress;
+uint64_t*			linksTableMaxSizeAddress;
+uint64_t*			linksTableSizeAddress;
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
 Link*				linksTableUnusedLinkMarker;
-Link*				linksTableDataAddress;
+Link*				linksTableDataAddress; // здесь хранятся линки
 
 
-int64_t			storageFileMinSizeInBytes;
+uint64_t			storageFileMinSizeInBytes;
 
 #if defined(_MFC_VER)
 HANDLE				storageFileHandle;
@@ -44,7 +46,15 @@ HANDLE				storageFileMappingHandle;
 int				storageFileHandle; // для open()
 int				storageFileMappingHandle;
 #endif
-int64_t				storageFileSizeInBytes; // <- off_t
+uint64_t				storageFileSizeInBytes; // <- off_t
+
+void PrintLinksTableSize()
+{
+#if defined(_MFC_VER)
+	printf("Links table size: %I64d links, %I64d bytes.\n", *linksTableSizeAddress, *linksTableSizeAddress * sizeof(Link));
+#elif defined(__GNUC__)
+#endif
+}
 
 #if defined(_MFC_VER)
 SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
@@ -96,8 +106,8 @@ int _tmain()
 
 void InitPersistentMemoryManager()
 {
-//	int64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
-	int64_t baseVirtualMemoryOffset;
+//	uint64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
+	uint64_t baseVirtualMemoryOffset;
 
 #if defined(_MFC_VER)
 
@@ -147,15 +157,15 @@ typedef struct _SYSTEM_INFO {
 
 	//baseVirtualMemoryOffset = currentMemoryPageSize * baseVirtualMemoryOffsetCounter;
 
-	baseVirtualMemoryOffset = (int64_t) basePersistentMemoryAddress;
+	baseVirtualMemoryOffset = (uint64_t) basePersistentMemoryAddress;
 
 	//basePersistentMemoryAddress = (void*)(baseVirtualMemoryOffset);
 	previousBasePersistentMemoryAddress = (void**)(baseVirtualMemoryOffset);
-	previousMemoryPageSize = (unsigned long*)(baseVirtualMemoryOffset + 8);
+	previousMemoryPageSize = (int *)(baseVirtualMemoryOffset + 8);
 	mappingTableMaxSizeAddress = (int*)(baseVirtualMemoryOffset + 8 + 4);
 	mappingTableDataAddress = (Link**)(baseVirtualMemoryOffset + 8 + 4 + 4);
-	linksTableMaxSizeAddress = (long long*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes);
-	linksTableSizeAddress = (long long*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 8);
+	linksTableMaxSizeAddress = (uint64_t *)(baseVirtualMemoryOffset + serviceBlockSizeInBytes);
+	linksTableSizeAddress = (uint64_t *)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
 	linksTableUnusedLinkMarker = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + sizeof(Link));
 	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
@@ -178,6 +188,7 @@ int OpenStorageFile(char *filename)
 		printf("File opening failed. Error code: %d.\n", error);
 		return error;
 	}
+	// ? need to fix
 	*((LPDWORD)&storageFileSizeInBytes) = GetFileSize(storageFileHandle, (LPDWORD)&storageFileSizeInBytes + 1);
 
 #elif defined(__GNUC__)
@@ -189,7 +200,7 @@ int OpenStorageFile(char *filename)
 	}
 	struct stat statbuf;
 	fstat(storageFileHandle, &statbuf);
-	storageFileSizeInBytes = statbuf.st_size; // ? int64_t = off_t
+	storageFileSizeInBytes = statbuf.st_size; // ? uint64_t = off_t
 #endif
 
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes)
@@ -203,7 +214,7 @@ int OpenStorageFile(char *filename)
 	return 0;
 }
 
-unsigned long CloseStorageFile()
+int CloseStorageFile()
 {
 	printf("Closing storage file...\n");
 
@@ -222,6 +233,15 @@ unsigned long CloseStorageFile()
 	storageFileHandle = null;
 	storageFileSizeInBytes = 0;
 #elif defined(__GNUC__)
+	if (storageFileHandle == -1)
+	{
+		printf("Storage file is not open or already closed.\n\n");
+		return -1;
+	}
+
+	close(storageFileHandle);
+	storageFileHandle = 0;
+	storageFileSizeInBytes = 0;
 #endif
 
 	printf("Storage file closed.\n\n");
@@ -301,7 +321,8 @@ unsigned long ShrinkStorageFile()
 	return 0;
 }
 
-unsigned long SetStorageFileMemoryMapping()
+// стандартный тип ошибки - int
+int SetStorageFileMemoryMapping()
 {
 	printf("Setting memory mapping of storage file...\n");
 
@@ -315,6 +336,8 @@ unsigned long SetStorageFileMemoryMapping()
 	}
 
 	// аналог mmap(), см. http://msdn.microsoft.com/en-us/library/windows/desktop/aa366763%28v=vs.85%29.aspx
+	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa366761%28v=vs.85%29.aspx
+	// hFileMappingObject [in] A handle to a file mapping object. The CreateFileMapping and OpenFileMapping functions return this handle.
 	basePersistentMemoryAddress = MapViewOfFileEx(storageFileMappingHandle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, basePersistentMemoryAddress);
 	if (basePersistentMemoryAddress == null) 
 	{
@@ -322,6 +345,15 @@ unsigned long SetStorageFileMemoryMapping()
 		printf("Mapping view set failed. Error code: %lu.\n\n", error);
 		return error;
 	}
+#elif defined(__GNUC__)
+	basePersistentMemoryAddress = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
+	if (basePersistentMemoryAddress == MAP_FAILED)
+	{
+		int error = errno;
+		printf("Mapping view set failed. Error code: %d.\n\n", error);
+		return error;
+	}
+#endif
 
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
 	if (*previousBasePersistentMemoryAddress == null)
@@ -332,15 +364,19 @@ unsigned long SetStorageFileMemoryMapping()
 
 	if (*previousBasePersistentMemoryAddress != basePersistentMemoryAddress)
 	{
-		unsigned long error = -1;
-		printf("Saved links table located in different address offset. Previous address is %I64d instead of %I64d.\n\n", *previousBasePersistentMemoryAddress, basePersistentMemoryAddress);
+		int error = -1;
+		printf("Saved links table located in different address offset. Previous address is %llu instead of %llu.\n\n",
+		    (unsigned long long)*previousBasePersistentMemoryAddress,
+		    (unsigned long long)basePersistentMemoryAddress);
 		return error;
 	}
 
 	if (*previousMemoryPageSize != currentMemoryPageSize)
 	{
-		unsigned long error = -2;
-		printf("Saved links table was mapped with different memory page size. Memory page size is %lu instead of %lu.\n\n", *previousMemoryPageSize, currentMemoryPageSize);
+		int error = -2;
+		printf("Saved links table was mapped with different memory page size. Memory page size is %llu instead of %llu.\n\n",
+		    (unsigned long long)*previousMemoryPageSize,
+		    (unsigned long long)currentMemoryPageSize);
 		return error;
 	}
 
@@ -354,7 +390,7 @@ unsigned long SetStorageFileMemoryMapping()
 
 	if (*linksTableSizeAddress > *linksTableMaxSizeAddress)
 	{
-		unsigned long error = -3;
+		int error = -3;
 		printf("Saved links table size counter is set to bigger value than maximum allowed table size.\n\n");
 		return error;
 	}
@@ -364,8 +400,6 @@ unsigned long SetStorageFileMemoryMapping()
 	PrintLinksTableSize();
 
 	printf("\n");
-#elif defined(__GNUC__)
-#endif
 
 	return 0;
 }
@@ -393,14 +427,6 @@ unsigned long ResetStorageFileMemoryMapping()
 	printf("Memory mapping of storage file is reset.\n\n");
 
 	return 0;
-}
-
-void PrintLinksTableSize()
-{
-#if defined(_MFC_VER)
-	printf("Links table size: %I64d links, %I64d bytes.\n", *linksTableSizeAddress, *linksTableSizeAddress * sizeof(Link));
-#elif defined(__GNUC__)
-#endif
 }
 
 Link* AllocateFromUnusedLinks()
@@ -512,13 +538,13 @@ void ReadTest()
 
 	printf("Reading data...\n");
 
-	int64_t resultCounter = 0;
+	uint64_t resultCounter = 0;
 
 #if defined(_MFC_VER)
 	{
-		int64_t* intMap = (__int64*) basePersistentMemoryAddress;
-		int64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		int64_t* intCurrent = intMap;
+		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
+		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
+		uint64_t* intCurrent = intMap;
 
 		for(; intCurrent <= intMapLastAddress; intCurrent++)
 		{
@@ -538,9 +564,9 @@ void WriteTest()
 
 #if defined(_MFC_VER)
 	{
-		int64_t* intMap = (__int64*) basePersistentMemoryAddress;
-		int64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		int64_t* intCurrent = intMap;
+		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
+		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
+		uint64_t* intCurrent = intMap;
 
 		for(; intCurrent <= intMapLastAddress; intCurrent++)
 		{
