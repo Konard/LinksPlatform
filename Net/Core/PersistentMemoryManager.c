@@ -1,4 +1,4 @@
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 #include <windows.h>
 #elif defined(__GNUC__)
 #include <unistd.h>
@@ -24,7 +24,7 @@ int					mappingTableSizeInBytes;
 int					serviceBlockSizeInBytes;
 
 // Константы, расчитываемые при запуске приложения
-unsigned long long	baseLinksTableBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t			baseLinksTableBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
 void*				basePersistentMemoryAddress; // result of mmap()
 void**				previousBasePersistentMemoryAddress;
 int*				previousMemoryPageSize;
@@ -39,7 +39,7 @@ Link*				linksTableDataAddress; // здесь хранятся линки
 
 uint64_t			storageFileMinSizeInBytes;
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 HANDLE				storageFileHandle;
 HANDLE				storageFileMappingHandle;
 #elif defined(__GNUC__)
@@ -50,13 +50,13 @@ uint64_t				storageFileSizeInBytes; // <- off_t
 
 void PrintLinksTableSize()
 {
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	printf("Links table size: %I64d links, %I64d bytes.\n", *linksTableSizeAddress, *linksTableSizeAddress * sizeof(Link));
 #elif defined(__GNUC__)
 #endif
 }
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 {
 	SYSTEM_INFO systemInfo;
@@ -109,7 +109,7 @@ void InitPersistentMemoryManager()
 //	uint64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
 	uint64_t baseVirtualMemoryOffset;
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 
 	SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
 	/* 
@@ -179,7 +179,7 @@ int OpenStorageFile(char *filename)
 {
 	printf("Opening file...\n");
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (storageFileHandle == null)
 	{
@@ -221,7 +221,7 @@ int CloseStorageFile()
 	// При освобождении лишнего места, можно уменьшать размер файла, для этогоиспользуется функция SetEndOfFile(fh); 
 	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -251,7 +251,7 @@ int CloseStorageFile()
 
 unsigned long EnlargeStorageFile()
 {
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -281,7 +281,7 @@ unsigned long EnlargeStorageFile()
 
 unsigned long ShrinkStorageFile()
 {
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	if (storageFileHandle == null)
 	{
 		unsigned long error = -1;
@@ -326,7 +326,7 @@ int SetStorageFileMemoryMapping()
 {
 	printf("Setting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
 	if (storageFileMappingHandle == null)
 	{
@@ -408,7 +408,7 @@ unsigned long ResetStorageFileMemoryMapping()
 {
 	printf("Resetting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	if (storageFileMappingHandle == null)
 	{
 		unsigned long error = -1;
@@ -540,7 +540,7 @@ void ReadTest()
 
 	uint64_t resultCounter = 0;
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	{
 		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
 		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
@@ -562,7 +562,7 @@ void WriteTest()
 {
 	printf("Filling data...\n");
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	{
 		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
 		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);

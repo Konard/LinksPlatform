@@ -2,18 +2,12 @@
 #include "Common.h"
 #include "Timestamp.h"
 
-// see http://stackoverflow.com/questions/163058/how-can-i-detect-if-im-compiling-for-a-64bits-architecture-in-c
-#if defined(_LP64) || defined(__amd64__) || defined(_M_X64)
-#else
-#warning "Links platform needs 64-bit CPU architecture."
-#endif
-
 
 int64_t LastTimestamp = 0;
 
 // Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
-#if defined(_MFC_VER)
+#if defined(_MFC_VER) || defined(__MINGW32__)
 #include <windows.h>
 
 int64_t GetTimestamp()
