@@ -2,9 +2,16 @@
 #include <windows.h>
 #elif defined(__GNUC__)
 #include <unistd.h>
+// open()
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+// errno
+#include <errno.h>
 #endif
 
 #include <stdio.h>
+
 
 #include "Common.h"
 #include "Link.h"
@@ -28,14 +35,16 @@ Link*				linksTableUnusedLinkMarker;
 Link*				linksTableDataAddress;
 
 
-unsigned long long	storageFileMinSizeInBytes;
+int64_t			storageFileMinSizeInBytes;
 
 #if defined(_MFC_VER)
 HANDLE				storageFileHandle;
 HANDLE				storageFileMappingHandle;
-unsigned long long	storageFileSizeInBytes;
 #elif defined(__GNUC__)
+int				storageFileHandle; // для open()
+int				storageFileMappingHandle;
 #endif
+int64_t				storageFileSizeInBytes; // <- off_t
 
 #if defined(_MFC_VER)
 SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
@@ -155,7 +164,8 @@ typedef struct _SYSTEM_INFO {
 	return;
 }
 
-unsigned long OpenStorageFile(char *filename)
+// DWORD == int
+int OpenStorageFile(char *filename)
 {
 	printf("Opening file...\n");
 
@@ -163,20 +173,30 @@ unsigned long OpenStorageFile(char *filename)
 	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (storageFileHandle == null)
 	{
-		unsigned long error = GetLastError();
-		printf("File opening failed. Error code: %lu.\n", error);
+		// см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms679360%28v=vs.85%29.aspx
+		int error = GetLastError();
+		printf("File opening failed. Error code: %d.\n", error);
 		return error;
 	}
-
 	*((LPDWORD)&storageFileSizeInBytes) = GetFileSize(storageFileHandle, (LPDWORD)&storageFileSizeInBytes + 1);
+
+#elif defined(__GNUC__)
+	storageFileHandle = open(filename, O_CREAT, S_IRUSR | S_IWUSR);
+	if (storageFileHandle == -1) {
+		int error = errno;
+		printf("File opening failed. Error code: %d.\n", error);
+		return error;
+	}
+	struct stat statbuf;
+	fstat(storageFileHandle, &statbuf);
+	storageFileSizeInBytes = statbuf.st_size; // ? int64_t = off_t
+#endif
 
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes)
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 
 	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseLinksTableBlockSizeInBytes) > 0)
 		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseLinksTableBlockSizeInBytes * baseLinksTableBlockSizeInBytes) + baseLinksTableBlockSizeInBytes;
-#elif defined(__GNUC__)
-#endif
 
 	printf("File %s opened.\n\n", filename);
 

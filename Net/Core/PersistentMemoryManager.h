@@ -23,7 +23,7 @@ extern "C" {
 #endif
 
 PREFIX_DLL void InitPersistentMemoryManager();
-PREFIX_DLL unsigned long OpenStorageFile(char *filename);
+PREFIX_DLL int OpenStorageFile(char *filename);
 PREFIX_DLL unsigned long CloseStorageFile();
 PREFIX_DLL unsigned long EnlargeStorageFile();
 PREFIX_DLL unsigned long ShrinkStorageFile();
