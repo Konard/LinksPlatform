@@ -39,12 +39,13 @@ Link*				linksTableDataAddress; // здесь хранятся линки
 
 uint64_t			storageFileMinSizeInBytes;
 
+// Дескриптор файла базы данных и дескриптор объекта отображения (map)
 #if defined(_MFC_VER) || defined(__MINGW32__)
 HANDLE				storageFileHandle;
 HANDLE				storageFileMappingHandle;
 #elif defined(__GNUC__)
 int				storageFileHandle; // для open()
-int				storageFileMappingHandle;
+//int				storageFileMappingHandle;
 #endif
 uint64_t				storageFileSizeInBytes; // <- off_t
 
@@ -92,6 +93,10 @@ SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
 	return largestSize;
 }
 #elif defined(__GNUC__)
+uint64_t GetLargestFreeMemRegion()
+{
+    return 0;
+}
 #endif
 
 /*
@@ -180,16 +185,23 @@ int OpenStorageFile(char *filename)
 	printf("Opening file...\n");
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
+	// см. MSDN "CreateFile function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v=vs.85%29.aspx
 	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (storageFileHandle == null)
+	if (storageFileHandle == INVALID_HANDLE_VALUE)
 	{
-		// см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms679360%28v=vs.85%29.aspx
+		// см. MSDN "GetLastError function", http://msdn.microsoft.com/en-us/library/windows/desktop/ms679360%28v=vs.85%29.aspx
 		int error = GetLastError();
 		printf("File opening failed. Error code: %d.\n", error);
 		return error;
 	}
-	// ? need to fix
+	// см. MSDN "GetFileSize function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa364955%28v=vs.85%29.aspx
 	*((LPDWORD)&storageFileSizeInBytes) = GetFileSize(storageFileHandle, (LPDWORD)&storageFileSizeInBytes + 1);
+	if (storageFileSizeInBytes == INVALID_FILE_SIZE)
+	{
+		int error = GetLastError();
+		printf("File size get failed. Error code: %d.\n", error);
+		return error;
+	}
 
 #elif defined(__GNUC__)
 	storageFileHandle = open(filename, O_CREAT, S_IRUSR | S_IWUSR);
@@ -199,7 +211,12 @@ int OpenStorageFile(char *filename)
 		return error;
 	}
 	struct stat statbuf;
-	fstat(storageFileHandle, &statbuf);
+	if (fstat(storageFileHandle, &statbuf) != 0)
+	{
+		int error = errno;
+		printf("File size get failed. Error code: %d.\n", error);
+		return error;
+	}
 	storageFileSizeInBytes = statbuf.st_size; // ? uint64_t = off_t
 #endif
 
