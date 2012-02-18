@@ -176,6 +176,8 @@ typedef struct _SYSTEM_INFO {
 	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseLinksTableBlockSizeInBytes;
+
+	storageFileHandle = INVALID_HANDLE_VALUE;
 	return;
 }
 
@@ -220,6 +222,7 @@ int OpenStorageFile(char *filename)
 	storageFileSizeInBytes = statbuf.st_size; // ? uint64_t = off_t
 #endif
 
+	// ? надо изучить
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes)
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 
@@ -235,19 +238,19 @@ int CloseStorageFile()
 {
 	printf("Closing storage file...\n");
 
-	// При освобождении лишнего места, можно уменьшать размер файла, для этогоиспользуется функция SetEndOfFile(fh); 
+	// При освобождении лишнего места, можно уменьшать размер файла, для этого используется функция SetEndOfFile(fh); 
 	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
-	if (storageFileHandle == null)
+	if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
 	{
-		unsigned long error = -1;
+//		unsigned long error = -1;
 		printf("Storage file is not open or already closed.\n\n");
-		return error;
+//		return error;
 	}
 
 	CloseHandle(storageFileHandle);
-	storageFileHandle = null;
+	storageFileHandle = INVALID_HANDLE_VALUE;
 	storageFileSizeInBytes = 0;
 #elif defined(__GNUC__)
 	if (storageFileHandle == -1)
@@ -257,7 +260,7 @@ int CloseStorageFile()
 	}
 
 	close(storageFileHandle);
-	storageFileHandle = 0;
+	storageFileHandle = -1;
 	storageFileSizeInBytes = 0;
 #endif
 
