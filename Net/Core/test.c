@@ -14,7 +14,7 @@ uint64_t thing = CreateLink(itself, isNotA, link);
 
 UpdateLink(isA, isA, isA, link); // После этого минимальное ядро системы можно считать сформированным
 
-DeleteLink(isA); // Одна эта операция удалит все 4 связи
+//DeleteLink(isA); // Одна эта операция удалит все 4 связи
 
 	CloseStorageFile();
 	return 0;

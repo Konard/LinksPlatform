@@ -98,6 +98,7 @@ typedef struct _SYSTEM_INFO {
 	long sz = sysconf(_SC_PAGESIZE);
 	currentMemoryPageSizeInBytes = sz; // ? привести к одному типу
 	serviceBlockSizeInBytes = sz * 2;
+	printf("_SC_PAGESIZE = %lu\n", sz);
 
 #endif
 
@@ -225,6 +226,10 @@ int SetStorageFileMemoryMapping()
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
 	linksTableUnusedLinkMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
 	linksTableDataAddress = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+
+	printf("pointerToBaseLinksTableMaxSize = %d\n", *pointerToBaseLinksTableMaxSize);
+	printf("linksTableMaxSizeAddress = %llu\n", *linksTableMaxSizeAddress);
+	printf("linksTableSizeAddress = %llu\n", *linksTableSizeAddress);
 
 
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
