@@ -2,6 +2,7 @@
 
 int main() {
 	InitPersistentMemoryManager();
-	OpenStorageFile("test.txt");
+	OpenStorageFile("test.bin");
+	SetStorageFileMemoryMapping();
 	return 0;
 }

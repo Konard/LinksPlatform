@@ -1,6 +1,13 @@
 #if defined(_MFC_VER) || defined(__MINGW32__)
 #include <windows.h>
 #elif defined(__GNUC__)
+
+// for 64-bit files
+#define _LARGEFILE_SOURCE
+#define _FILE_OFFSET_BITS 64
+// for AIX?
+#define _LARGE_FILES
+
 #include <unistd.h>
 // open()
 #include <sys/types.h>
@@ -10,6 +17,7 @@
 #include <errno.h>
 // mmap()...
 #include <sys/mman.h>
+
 #endif
 
 #include <stdio.h>
@@ -19,26 +27,6 @@
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-int					currentMemoryPageSize;
-int					mappingTableSizeInBytes;
-int					serviceBlockSizeInBytes;
-
-// Константы, расчитываемые при запуске приложения
-uint64_t			baseLinksTableBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-void*				basePersistentMemoryAddress; // result of mmap()
-void**				previousBasePersistentMemoryAddress;
-int*				previousMemoryPageSize;
-int*				mappingTableMaxSizeAddress;
-Link**				mappingTableDataAddress;
-uint64_t*			linksTableMaxSizeAddress;
-uint64_t*			linksTableSizeAddress;
-/* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*				linksTableUnusedLinkMarker;
-Link*				linksTableDataAddress; // здесь хранятся линки
-
-
-uint64_t			storageFileMinSizeInBytes;
-
 // Дескриптор файла базы данных и дескриптор объекта отображения (map)
 #if defined(_MFC_VER) || defined(__MINGW32__)
 HANDLE				storageFileHandle;
@@ -47,7 +35,29 @@ HANDLE				storageFileMappingHandle;
 int				storageFileHandle; // для open()
 //int				storageFileMappingHandle;
 #endif
-uint64_t				storageFileSizeInBytes; // <- off_t
+uint64_t		storageFileSizeInBytes; // <- off_t
+
+
+// Константы, рассчитываемые при запуске приложения
+
+int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
+int			serviceBlockSizeInBytes;	// Размер сервисных данных
+int			mappingTableSizeInBytes;	
+uint64_t		linksTableBaseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t		storageFileMinSizeInBytes;
+
+void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
+
+int*				pointerToBaseLinksTableMaxSize;
+Link**				mappingTableDataAddress;
+uint64_t*			linksTableMaxSizeAddress;
+uint64_t*			linksTableSizeAddress;
+/* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
+Link*				linksTableUnusedLinkMarker;
+Link*				linksTableDataAddress; // здесь хранятся линки
+
+
+
 
 void PrintLinksTableSize()
 {
@@ -57,67 +67,12 @@ void PrintLinksTableSize()
 #endif
 }
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
-SIZE_T GetLargestFreeMemRegion(LPVOID *lpBaseAddr)
-{
-	SYSTEM_INFO systemInfo;
-	MEMORY_BASIC_INFORMATION mbi;
-	VOID *p = 0;
-	SIZE_T largestSize = 0;
-
-	GetSystemInfo(&systemInfo);
-	//p = 0;
-	//largestSize = 0;
-
-	while(p < systemInfo.lpMaximumApplicationAddress)
-	{
-		SIZE_T dwRet = VirtualQuery(p, &mbi, sizeof(mbi));
-		if (dwRet > 0)
-		{
-			if (mbi.State == MEM_FREE)
-			{
-				if (largestSize < mbi.RegionSize)
-				{
-					largestSize = mbi.RegionSize;
-					if (lpBaseAddr != NULL)
-					*lpBaseAddr = mbi.BaseAddress;
-				}
-			}
-			p = (void*) (((char*)p) + mbi.RegionSize);
-		}
-		else
-		{
-			p = (void*) (((char*)p) + systemInfo.dwPageSize);
-		}
-	}
-	return largestSize;
-}
-#elif defined(__GNUC__)
-uint64_t GetLargestFreeMemRegion()
-{
-    return 0;
-}
-#endif
-
-/*
-int _tmain()
-{
-	LPVOID baseAddr;
-	SIZE_T ls = GetLargestFreeMemRegion(&baseAddr);
-	//_tprintf(_T("\nLargest Free Region: 0x%p bytes at 0x%p\n"), ls, baseAddr);
-	return 0;
-}
-*/
-
 void InitPersistentMemoryManager()
 {
-//	uint64_t baseVirtualMemoryOffsetCounter = 2360000; //600000; //? Почему именно такой отступ?
-	uint64_t baseVirtualMemoryOffset;
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 
-	SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
-	/* 
+/* 
 typedef struct _SYSTEM_INFO {
   union {
     DWORD  dwOemId;
@@ -136,48 +91,30 @@ typedef struct _SYSTEM_INFO {
   WORD      wProcessorLevel;
   WORD      wProcessorRevision;
 } SYSTEM_INFO;
+*/
 
-	*/
-	SIZE_T largestMemoryBlockSize;
-
+	SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
 	GetSystemInfo(&info);
-
-	currentMemoryPageSize = info.dwPageSize;
+	currentMemoryPageSizeInBytes = info.dwPageSize;
 	serviceBlockSizeInBytes = info.dwPageSize * 2;
-
-	// см. 
-	largestMemoryBlockSize = GetLargestFreeMemRegion(&basePersistentMemoryAddress);
 
 #elif defined(__GNUC__)
 
 	long sz = sysconf(_SC_PAGESIZE);
-	currentMemoryPageSize = sz; // ? привести к одному типу
+	currentMemoryPageSizeInBytes = sz; // ? привести к одному типу
 	serviceBlockSizeInBytes = sz * 2;
-	// отсутствует largestMemoryBlockSize = ...
 
 #endif
 
 	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
-	baseLinksTableBlockSizeInBytes = currentMemoryPageSize * 256 * 4 * sizeof(Link); // ~ 512 mb
+	linksTableBaseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
+	storageFileMinSizeInBytes = serviceBlockSizeInBytes + linksTableBaseBlockSizeInBytes;
 
-	//baseVirtualMemoryOffset = currentMemoryPageSize * baseVirtualMemoryOffsetCounter;
-
-	baseVirtualMemoryOffset = (uint64_t) basePersistentMemoryAddress;
-
-	//basePersistentMemoryAddress = (void*)(baseVirtualMemoryOffset);
-	previousBasePersistentMemoryAddress = (void**)(baseVirtualMemoryOffset);
-	previousMemoryPageSize = (int *)(baseVirtualMemoryOffset + 8);
-	mappingTableMaxSizeAddress = (int*)(baseVirtualMemoryOffset + 8 + 4);
-	mappingTableDataAddress = (Link**)(baseVirtualMemoryOffset + 8 + 4 + 4);
-	linksTableMaxSizeAddress = (uint64_t *)(baseVirtualMemoryOffset + serviceBlockSizeInBytes);
-	linksTableSizeAddress = (uint64_t *)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 8);
-	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	linksTableUnusedLinkMarker = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + sizeof(Link));
-	linksTableDataAddress = (Link*)(baseVirtualMemoryOffset + serviceBlockSizeInBytes + 2 * sizeof(Link));
-
-	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseLinksTableBlockSizeInBytes;
-
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	storageFileHandle = INVALID_HANDLE_VALUE;
+#elif defined(__GNUC__)
+	storageFileHandle = -1;
+#endif
 	return;
 }
 
@@ -220,16 +157,96 @@ int OpenStorageFile(char *filename)
 		return error;
 	}
 	storageFileSizeInBytes = statbuf.st_size; // ? uint64_t = off_t
+
 #endif
 
 	// ? надо изучить
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes)
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 
-	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseLinksTableBlockSizeInBytes) > 0)
-		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseLinksTableBlockSizeInBytes * baseLinksTableBlockSizeInBytes) + baseLinksTableBlockSizeInBytes;
+	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % linksTableBaseBlockSizeInBytes) > 0)
+		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / linksTableBaseBlockSizeInBytes * linksTableBaseBlockSizeInBytes) + linksTableBaseBlockSizeInBytes;
 
 	printf("File %s opened.\n\n", filename);
+
+	return 0;
+}
+
+// стандартный тип ошибки - int
+int SetStorageFileMemoryMapping()
+{
+	printf("Setting memory mapping of storage file...\n");
+
+#if defined(_MFC_VER) || defined(__MINGW32__)
+	// см. MSDN "CreateFileMapping function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366537%28v=vs.85%29.aspx
+	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
+	if (storageFileMappingHandle == NULL)
+	{
+		unsigned long error = GetLastError();
+		printf("Mapping creation failed. Error code: %lu.\n\n", error);
+		return error;
+	}
+
+	// аналог mmap(),
+	// см. MSDN "MapViewOfFileEx function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366763%28v=vs.85%29.aspx
+	// см. MSDN "MapViewOfFile function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366761%28v=vs.85%29.aspx
+	// hFileMappingObject [in] A handle to a file mapping object. The CreateFileMapping and OpenFileMapping functions return this handle.
+	pointerToMappedRegion = MapViewOfFileEx(storageFileMappingHandle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, pointerToMappedRegion);
+	if (pointerToMappedRegion == NULL) 
+	{
+		unsigned long error = GetLastError();
+		printf("Mapping view set failed. Error code: %lu.\n\n", error);
+		return error;
+	}
+#elif defined(__GNUC__)
+	// см. также под Linux, MAP_POPULATE
+	// см. также mmap64() (size_t?)
+	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
+//	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ, MAP_SHARED, storageFileHandle, 0);
+	if (pointerToMappedRegion == MAP_FAILED)
+	{
+		int error = errno;
+		printf("Mapping view set failed. Error code: %d.\n\n", error);
+		return error;
+	}
+#endif
+
+
+//	baseVirtualMemoryOffset = (uint64_t) pointerToMappedRegion;
+
+	pointerToBaseLinksTableMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
+	mappingTableDataAddress = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
+	linksTableMaxSizeAddress = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
+	linksTableSizeAddress = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
+	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
+	linksTableUnusedLinkMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	linksTableDataAddress = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+
+
+	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
+
+
+
+	if (*pointerToBaseLinksTableMaxSize == 0)
+		*pointerToBaseLinksTableMaxSize = (mappingTableSizeInBytes - 4) / 8;
+
+	if (*linksTableMaxSizeAddress == 0)
+		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+	else if (*linksTableMaxSizeAddress != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
+		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+
+	if (*linksTableSizeAddress > *linksTableMaxSizeAddress)
+	{
+		int error = -3;
+		printf("Saved links table size counter is set to bigger value than maximum allowed table size.\n\n");
+		return error;
+	}
+
+	printf("Memory mapping of storage file is set.\n");
+
+	PrintLinksTableSize();
+
+	printf("\n");
 
 	return 0;
 }
@@ -287,7 +304,7 @@ unsigned long EnlargeStorageFile()
 		if(error != 0)
 			return error;
 
-		storageFileSizeInBytes += baseLinksTableBlockSizeInBytes;
+		storageFileSizeInBytes += linksTableBaseBlockSizeInBytes;
 
 		error = SetStorageFileMemoryMapping();
 		if(error != 0)
@@ -312,7 +329,7 @@ unsigned long ShrinkStorageFile()
 	if (storageFileSizeInBytes > storageFileMinSizeInBytes)
 	{
 		unsigned long error = 0;
-		unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - baseLinksTableBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+		unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - linksTableBaseBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
 		if (*linksTableSizeAddress < linksTableNewMaxSize)
 		{
@@ -322,9 +339,9 @@ unsigned long ShrinkStorageFile()
 
 			{
 				LARGE_INTEGER distanceToMoveFilePointer;
-				distanceToMoveFilePointer.QuadPart = -((long long)baseLinksTableBlockSizeInBytes);
+				distanceToMoveFilePointer.QuadPart = -((long long)linksTableBaseBlockSizeInBytes);
 
-				storageFileSizeInBytes -= baseLinksTableBlockSizeInBytes;
+				storageFileSizeInBytes -= linksTableBaseBlockSizeInBytes;
 
 				SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END);
 				SetEndOfFile(storageFileHandle);
@@ -341,88 +358,6 @@ unsigned long ShrinkStorageFile()
 	return 0;
 }
 
-// стандартный тип ошибки - int
-int SetStorageFileMemoryMapping()
-{
-	printf("Setting memory mapping of storage file...\n");
-
-#if defined(_MFC_VER) || defined(__MINGW32__)
-	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
-	if (storageFileMappingHandle == null)
-	{
-		unsigned long error = GetLastError();
-		printf("Mapping creation failed. Error code: %lu.\n\n", error);
-		return error;
-	}
-
-	// аналог mmap(), см. http://msdn.microsoft.com/en-us/library/windows/desktop/aa366763%28v=vs.85%29.aspx
-	// http://msdn.microsoft.com/en-us/library/windows/desktop/aa366761%28v=vs.85%29.aspx
-	// hFileMappingObject [in] A handle to a file mapping object. The CreateFileMapping and OpenFileMapping functions return this handle.
-	basePersistentMemoryAddress = MapViewOfFileEx(storageFileMappingHandle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, basePersistentMemoryAddress);
-	if (basePersistentMemoryAddress == null) 
-	{
-		unsigned long error = GetLastError();
-		printf("Mapping view set failed. Error code: %lu.\n\n", error);
-		return error;
-	}
-#elif defined(__GNUC__)
-	basePersistentMemoryAddress = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
-	if (basePersistentMemoryAddress == MAP_FAILED)
-	{
-		int error = errno;
-		printf("Mapping view set failed. Error code: %d.\n\n", error);
-		return error;
-	}
-#endif
-
-	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
-	if (*previousBasePersistentMemoryAddress == null)
-		*previousBasePersistentMemoryAddress = basePersistentMemoryAddress;
-
-	if (*previousMemoryPageSize == 0)
-		*previousMemoryPageSize = currentMemoryPageSize;
-
-	if (*previousBasePersistentMemoryAddress != basePersistentMemoryAddress)
-	{
-		int error = -1;
-		printf("Saved links table located in different address offset. Previous address is %llu instead of %llu.\n\n",
-		    (unsigned long long)*previousBasePersistentMemoryAddress,
-		    (unsigned long long)basePersistentMemoryAddress);
-		return error;
-	}
-
-	if (*previousMemoryPageSize != currentMemoryPageSize)
-	{
-		int error = -2;
-		printf("Saved links table was mapped with different memory page size. Memory page size is %llu instead of %llu.\n\n",
-		    (unsigned long long)*previousMemoryPageSize,
-		    (unsigned long long)currentMemoryPageSize);
-		return error;
-	}
-
-	if (*mappingTableMaxSizeAddress == 0)
-		*mappingTableMaxSizeAddress = (mappingTableSizeInBytes - 4) / 8;
-
-	if (*linksTableMaxSizeAddress == 0)
-		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
-	else if (*linksTableMaxSizeAddress != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
-		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
-
-	if (*linksTableSizeAddress > *linksTableMaxSizeAddress)
-	{
-		int error = -3;
-		printf("Saved links table size counter is set to bigger value than maximum allowed table size.\n\n");
-		return error;
-	}
-
-	printf("Memory mapping of storage file is set.\n");
-
-	PrintLinksTableSize();
-
-	printf("\n");
-
-	return 0;
-}
 
 unsigned long ResetStorageFileMemoryMapping()
 {
@@ -438,7 +373,7 @@ unsigned long ResetStorageFileMemoryMapping()
 
 	PrintLinksTableSize();
 
-	UnmapViewOfFile (basePersistentMemoryAddress);
+	UnmapViewOfFile (pointerToMappedRegion);
 	CloseHandle(storageFileMappingHandle);
 	storageFileMappingHandle = null;
 #elif defined(__GNUC__)
@@ -541,7 +476,7 @@ int WalkThroughLinks(func func_)
 
 Link* GetMappedLink(int index)
 {
-	if (index < *mappingTableMaxSizeAddress)
+	if (index < *pointerToBaseLinksTableMaxSize)
 		return mappingTableDataAddress[index];
 	else
 		return null;
@@ -549,7 +484,7 @@ Link* GetMappedLink(int index)
 
 void SetMappedLink(int index, Link* link)
 {
-	if (index < *mappingTableMaxSizeAddress)
+	if (index < *pointerToBaseLinksTableMaxSize)
 		mappingTableDataAddress[index] = link;
 }
 
@@ -562,7 +497,7 @@ void ReadTest()
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 	{
-		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
+		uint64_t* intMap = (uint64_t *) pointerToMappedRegion;
 		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
 		uint64_t* intCurrent = intMap;
 
@@ -584,7 +519,7 @@ void WriteTest()
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 	{
-		uint64_t* intMap = (uint64_t *) basePersistentMemoryAddress;
+		uint64_t* intMap = (uint64_t *) pointerToMappedRegion;
 		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
 		uint64_t* intCurrent = intMap;
 
