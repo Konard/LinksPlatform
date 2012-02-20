@@ -3,12 +3,9 @@
 #elif defined(__GNUC__)
 
 // for 64-bit files
-#define _LARGEFILE_SOURCE
-#define _FILE_OFFSET_BITS 64
-// for AIX?
-#define _LARGE_FILES
-
+#define _XOPEN_SOURCE 700
 #include <unistd.h>
+
 // open()
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -29,17 +26,15 @@
 
 // Дескриптор файла базы данных и дескриптор объекта отображения (map)
 #if defined(_MFC_VER) || defined(__MINGW32__)
-HANDLE				storageFileHandle;
-HANDLE				storageFileMappingHandle;
+HANDLE			storageFileHandle;
+HANDLE			storageFileMappingHandle;
 #elif defined(__GNUC__)
-int				storageFileHandle; // для open()
-//int				storageFileMappingHandle;
+int			storageFileHandle; // для open()
 #endif
 uint64_t		storageFileSizeInBytes; // <- off_t
 
 
 // Константы, рассчитываемые при запуске приложения
-
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
 int			serviceBlockSizeInBytes;	// Размер сервисных данных
 int			mappingTableSizeInBytes;	
@@ -109,6 +104,7 @@ typedef struct _SYSTEM_INFO {
 	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
 	linksTableBaseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + linksTableBaseBlockSizeInBytes;
+	printf("storageFileMinSizeInBytes = %llu\n", storageFileMinSizeInBytes);
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 	storageFileHandle = INVALID_HANDLE_VALUE;
@@ -143,7 +139,7 @@ int OpenStorageFile(char *filename)
 	}
 
 #elif defined(__GNUC__)
-	storageFileHandle = open(filename, O_CREAT, S_IRUSR | S_IWUSR);
+	storageFileHandle = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	if (storageFileHandle == -1) {
 		int error = errno;
 		printf("File opening failed. Error code: %d.\n", error);
@@ -161,11 +157,14 @@ int OpenStorageFile(char *filename)
 #endif
 
 	// ? надо изучить
-	if (storageFileSizeInBytes < storageFileMinSizeInBytes)
+	if (storageFileSizeInBytes < storageFileMinSizeInBytes) {
+		printf("enlarge\n");
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
+	}
 
 	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % linksTableBaseBlockSizeInBytes) > 0)
 		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / linksTableBaseBlockSizeInBytes * linksTableBaseBlockSizeInBytes) + linksTableBaseBlockSizeInBytes;
+	printf("storageFileSizeInBytes = %llu\n", storageFileSizeInBytes);
 
 	printf("File %s opened.\n\n", filename);
 
@@ -201,6 +200,7 @@ int SetStorageFileMemoryMapping()
 #elif defined(__GNUC__)
 	// см. также под Linux, MAP_POPULATE
 	// см. также mmap64() (size_t?)
+	ftruncate(storageFileHandle, storageFileSizeInBytes);
 	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
 //	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ, MAP_SHARED, storageFileHandle, 0);
 	if (pointerToMappedRegion == MAP_FAILED)
@@ -209,8 +209,12 @@ int SetStorageFileMemoryMapping()
 		printf("Mapping view set failed. Error code: %d.\n\n", error);
 		return error;
 	}
+	else {
+		printf("mmap() passed\n");
+	}
 #endif
-
+	printf("%02X\n", ((unsigned char *)pointerToMappedRegion)[0]);
+	printf("%02X\n", ((unsigned char *)pointerToMappedRegion)[10]);
 
 //	baseVirtualMemoryOffset = (uint64_t) pointerToMappedRegion;
 
