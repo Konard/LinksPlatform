@@ -38,18 +38,19 @@ uint64_t		storageFileSizeInBytes; // <- off_t
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
 int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
 int			mappingTableSizeInBytes;	
-uint64_t		linksTableBaseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t		baseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
 uint64_t		storageFileMinSizeInBytes;
 
 void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
-int*				pointerToBaseLinksTableMaxSize;
-Link**				pointerToBaseLinks;
+int*				pointerToBaseLinksMaxSize;
+Link**				pointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
 uint64_t*			pointerToLinksMaxSize;
 uint64_t*			pointerToLinksSize;
+
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*				linksTableUnusedLinkMarker;
-Link*				linksTableDataAddress; // здесь хранятся линки
+Link*				pointerToMarker;	// инициализируется в SetStorageFileMemoryMapping()
+Link*				pointerToLinks;		// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
 
 
 
@@ -105,8 +106,10 @@ typedef struct _SYSTEM_INFO {
 #endif
 
 	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
-	linksTableBaseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
-	storageFileMinSizeInBytes = serviceBlockSizeInBytes + linksTableBaseBlockSizeInBytes;
+	baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
+
+	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
+
 	printf("storageFileMinSizeInBytes = %llu\n",
 	       (long long unsigned int)storageFileMinSizeInBytes);
 
@@ -166,8 +169,8 @@ int OpenStorageFile(char *filename)
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 	}
 
-	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % linksTableBaseBlockSizeInBytes) > 0)
-		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / linksTableBaseBlockSizeInBytes * linksTableBaseBlockSizeInBytes) + linksTableBaseBlockSizeInBytes;
+	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseBlockSizeInBytes) > 0)
+		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseBlockSizeInBytes * baseBlockSizeInBytes) + baseBlockSizeInBytes;
 	printf("storageFileSizeInBytes = %llu\n",
 	       (long long unsigned int)storageFileSizeInBytes);
 
@@ -207,7 +210,7 @@ int SetStorageFileMemoryMapping()
 	// см. также mmap64() (size_t?)
 	ftruncate(storageFileHandle, storageFileSizeInBytes);
 	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
-//	pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ, MAP_SHARED, storageFileHandle, 0);
+
 	if (pointerToMappedRegion == MAP_FAILED)
 	{
 		int error = errno;
@@ -218,21 +221,17 @@ int SetStorageFileMemoryMapping()
 		printf("mmap() passed\n");
 	}
 #endif
-	printf("%02X\n", ((unsigned char *)pointerToMappedRegion)[0]);
-	printf("%02X\n", ((unsigned char *)pointerToMappedRegion)[10]);
 
-//	baseVirtualMemoryOffset = (uint64_t) pointerToMappedRegion;
-
-	pointerToBaseLinksTableMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
+	pointerToBaseLinksMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
 	pointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
 
 	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
 	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	linksTableUnusedLinkMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
-	linksTableDataAddress = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+	pointerToMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	pointerToLinks = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
-	printf("pointerToBaseLinksTableMaxSize = %d\n", *pointerToBaseLinksTableMaxSize);
+	printf("pointerToBaseLinksMaxSize = %d\n", *pointerToBaseLinksMaxSize);
 	printf("pointerToLinksMaxSize = %llu\n",
 	       (long long unsigned int)*pointerToLinksMaxSize);
 	printf("pointerToLinksSize = %llu\n",
@@ -243,8 +242,8 @@ int SetStorageFileMemoryMapping()
 
 
 
-	if (*pointerToBaseLinksTableMaxSize == 0)
-		*pointerToBaseLinksTableMaxSize = (mappingTableSizeInBytes - 4) / 8;
+	if (*pointerToBaseLinksMaxSize == 0)
+		*pointerToBaseLinksMaxSize = (mappingTableSizeInBytes - 4) / 8;
 
 	if (*pointerToLinksMaxSize == 0)
 		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
@@ -320,7 +319,7 @@ unsigned long EnlargeStorageFile()
 		if(error != 0)
 			return error;
 
-		storageFileSizeInBytes += linksTableBaseBlockSizeInBytes;
+		storageFileSizeInBytes += baseBlockSizeInBytes;
 
 		error = SetStorageFileMemoryMapping();
 		if(error != 0)
@@ -345,7 +344,7 @@ unsigned long ShrinkStorageFile()
 	if (storageFileSizeInBytes > storageFileMinSizeInBytes)
 	{
 		unsigned long error = 0;
-		unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - linksTableBaseBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+		unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - baseBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
 		if (*pointerToLinksSize < linksTableNewMaxSize)
 		{
@@ -355,9 +354,9 @@ unsigned long ShrinkStorageFile()
 
 			{
 				LARGE_INTEGER distanceToMoveFilePointer;
-				distanceToMoveFilePointer.QuadPart = -((long long)linksTableBaseBlockSizeInBytes);
+				distanceToMoveFilePointer.QuadPart = -((long long)baseBlockSizeInBytes);
 
-				storageFileSizeInBytes -= linksTableBaseBlockSizeInBytes;
+				storageFileSizeInBytes -= baseBlockSizeInBytes;
 
 				SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END);
 				SetEndOfFile(storageFileHandle);
@@ -402,8 +401,8 @@ unsigned long ResetStorageFileMemoryMapping()
 
 Link* AllocateFromUnusedLinks()
 {
-	Link* unusedLink = linksTableUnusedLinkMarker->FirstRefererByLinker;
-	DetachLinkFromMarker(unusedLink, linksTableUnusedLinkMarker);
+	Link* unusedLink = pointerToMarker->FirstRefererByLinker;
+	DetachLinkFromMarker(unusedLink, pointerToMarker);
 	return unusedLink;
 }
 
@@ -414,14 +413,14 @@ Link* AllocateFromFreeLinks()
 	if (*pointerToLinksMaxSize == *pointerToLinksSize)
 		EnlargeStorageFile();
 
-	freeLink = linksTableDataAddress + *pointerToLinksSize;
+	freeLink = pointerToLinks + *pointerToLinksSize;
 	++*pointerToLinksSize;
 	return freeLink;
 }
 
 Link* AllocateLink()
 {
-	if (linksTableUnusedLinkMarker->FirstRefererByLinker != null)
+	if (pointerToMarker->FirstRefererByLinker != null)
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
@@ -437,19 +436,19 @@ void FreeLink(Link* link)
     while (link->FirstRefererByTarget != null) FreeLink(link->FirstRefererByTarget);
 
 	{
-		Link* lastUsedLink = linksTableDataAddress + *pointerToLinksSize - 1;
+		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
 
 		if (link < lastUsedLink)
 		{
-			AttachLinkToMarker(link, linksTableUnusedLinkMarker);
+			AttachLinkToMarker(link, pointerToMarker);
 		}
 		else if(link == lastUsedLink)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->Linker == linksTableUnusedLinkMarker)
+			while((--lastUsedLink)->Linker == pointerToMarker)
 			{
-				DetachLinkFromMarker(lastUsedLink, linksTableUnusedLinkMarker);
+				DetachLinkFromMarker(lastUsedLink, pointerToMarker);
 				--*pointerToLinksSize;
 			}
 
@@ -460,12 +459,12 @@ void FreeLink(Link* link)
 
 void WalkThroughAllLinks(func func_)
 {
-	Link *currentLink = linksTableDataAddress;
-	Link* lastLink = linksTableDataAddress + *pointerToLinksSize - 1;
+	Link *currentLink = pointerToLinks;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (currentLink->Linker != linksTableUnusedLinkMarker)
+		if (currentLink->Linker != pointerToMarker)
 		{
 			func_(currentLink);
 		}
@@ -475,12 +474,12 @@ void WalkThroughAllLinks(func func_)
 
 int WalkThroughLinks(func func_)
 {
-	Link *currentLink = linksTableDataAddress;
-	Link* lastLink = linksTableDataAddress + *pointerToLinksSize - 1;
+	Link *currentLink = pointerToLinks;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (currentLink->Linker != linksTableUnusedLinkMarker)
+		if (currentLink->Linker != pointerToMarker)
 		{
 			if(!func_(currentLink)) return false;
 		}
@@ -492,7 +491,7 @@ int WalkThroughLinks(func func_)
 
 Link* GetMappedLink(int index)
 {
-	if (index < *pointerToBaseLinksTableMaxSize)
+	if (index < *pointerToBaseLinksMaxSize)
 		return pointerToBaseLinks[index];
 	else
 		return null;
@@ -500,6 +499,6 @@ Link* GetMappedLink(int index)
 
 void SetMappedLink(int index, Link* link)
 {
-	if (index < *pointerToBaseLinksTableMaxSize)
+	if (index < *pointerToBaseLinksMaxSize)
 		pointerToBaseLinks[index] = link;
 }
