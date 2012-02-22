@@ -36,7 +36,7 @@ uint64_t		storageFileSizeInBytes; // <- off_t
 
 // Константы, рассчитываемые при запуске приложения
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
-int			serviceBlockSizeInBytes;	// Размер сервисных данных
+int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
 int			mappingTableSizeInBytes;	
 uint64_t		linksTableBaseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
 uint64_t		storageFileMinSizeInBytes;
@@ -44,21 +44,23 @@ uint64_t		storageFileMinSizeInBytes;
 void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
 int*				pointerToBaseLinksTableMaxSize;
-Link**				mappingTableDataAddress;
-uint64_t*			linksTableMaxSizeAddress;
-uint64_t*			linksTableSizeAddress;
+Link**				pointerToBaseLinks;
+uint64_t*			pointerToLinksMaxSize;
+uint64_t*			pointerToLinksSize;
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
 Link*				linksTableUnusedLinkMarker;
 Link*				linksTableDataAddress; // здесь хранятся линки
 
 
 
-
 void PrintLinksTableSize()
 {
 #if defined(_MFC_VER) || defined(__MINGW32__)
-	printf("Links table size: %I64d links, %I64d bytes.\n", *linksTableSizeAddress, *linksTableSizeAddress * sizeof(Link));
+	printf("Links table size: %I64d links, %I64d bytes.\n", *pointerToLinksSize, *pointerToLinksSize * sizeof(Link));
 #elif defined(__GNUC__)
+	printf("Links table size: %llu links, %llu bytes.\n",
+	  (long long unsigned int)(*pointerToLinksSize),
+	  (long long unsigned int)(*pointerToLinksSize * sizeof(Link)));
 #endif
 }
 
@@ -105,7 +107,8 @@ typedef struct _SYSTEM_INFO {
 	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
 	linksTableBaseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + linksTableBaseBlockSizeInBytes;
-	printf("storageFileMinSizeInBytes = %llu\n", storageFileMinSizeInBytes);
+	printf("storageFileMinSizeInBytes = %llu\n",
+	       (long long unsigned int)storageFileMinSizeInBytes);
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 	storageFileHandle = INVALID_HANDLE_VALUE;
@@ -165,7 +168,8 @@ int OpenStorageFile(char *filename)
 
 	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % linksTableBaseBlockSizeInBytes) > 0)
 		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / linksTableBaseBlockSizeInBytes * linksTableBaseBlockSizeInBytes) + linksTableBaseBlockSizeInBytes;
-	printf("storageFileSizeInBytes = %llu\n", storageFileSizeInBytes);
+	printf("storageFileSizeInBytes = %llu\n",
+	       (long long unsigned int)storageFileSizeInBytes);
 
 	printf("File %s opened.\n\n", filename);
 
@@ -220,16 +224,19 @@ int SetStorageFileMemoryMapping()
 //	baseVirtualMemoryOffset = (uint64_t) pointerToMappedRegion;
 
 	pointerToBaseLinksTableMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
-	mappingTableDataAddress = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
-	linksTableMaxSizeAddress = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
-	linksTableSizeAddress = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
+	pointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
+
+	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
+	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
 	linksTableUnusedLinkMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
 	linksTableDataAddress = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	printf("pointerToBaseLinksTableMaxSize = %d\n", *pointerToBaseLinksTableMaxSize);
-	printf("linksTableMaxSizeAddress = %llu\n", *linksTableMaxSizeAddress);
-	printf("linksTableSizeAddress = %llu\n", *linksTableSizeAddress);
+	printf("pointerToLinksMaxSize = %llu\n",
+	       (long long unsigned int)*pointerToLinksMaxSize);
+	printf("pointerToLinksSize = %llu\n",
+	       (long long unsigned int)*pointerToLinksSize);
 
 
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
@@ -239,12 +246,12 @@ int SetStorageFileMemoryMapping()
 	if (*pointerToBaseLinksTableMaxSize == 0)
 		*pointerToBaseLinksTableMaxSize = (mappingTableSizeInBytes - 4) / 8;
 
-	if (*linksTableMaxSizeAddress == 0)
-		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
-	else if (*linksTableMaxSizeAddress != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
-		*linksTableMaxSizeAddress = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+	if (*pointerToLinksMaxSize == 0)
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
-	if (*linksTableSizeAddress > *linksTableMaxSizeAddress)
+	if (*pointerToLinksSize > *pointerToLinksMaxSize)
 	{
 		int error = -3;
 		printf("Saved links table size counter is set to bigger value than maximum allowed table size.\n\n");
@@ -340,7 +347,7 @@ unsigned long ShrinkStorageFile()
 		unsigned long error = 0;
 		unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - linksTableBaseBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
-		if (*linksTableSizeAddress < linksTableNewMaxSize)
+		if (*pointerToLinksSize < linksTableNewMaxSize)
 		{
 			error = ResetStorageFileMemoryMapping();
 			if(error != 0)
@@ -404,11 +411,11 @@ Link* AllocateFromFreeLinks()
 {
 	Link* freeLink;
 
-	if (*linksTableMaxSizeAddress == *linksTableSizeAddress)
+	if (*pointerToLinksMaxSize == *pointerToLinksSize)
 		EnlargeStorageFile();
 
-	freeLink = linksTableDataAddress + *linksTableSizeAddress;
-	++*linksTableSizeAddress;
+	freeLink = linksTableDataAddress + *pointerToLinksSize;
+	++*pointerToLinksSize;
 	return freeLink;
 }
 
@@ -430,7 +437,7 @@ void FreeLink(Link* link)
     while (link->FirstRefererByTarget != null) FreeLink(link->FirstRefererByTarget);
 
 	{
-		Link* lastUsedLink = linksTableDataAddress + *linksTableSizeAddress - 1;
+		Link* lastUsedLink = linksTableDataAddress + *pointerToLinksSize - 1;
 
 		if (link < lastUsedLink)
 		{
@@ -438,12 +445,12 @@ void FreeLink(Link* link)
 		}
 		else if(link == lastUsedLink)
 		{
-			--*linksTableSizeAddress;
+			--*pointerToLinksSize;
 
 			while((--lastUsedLink)->Linker == linksTableUnusedLinkMarker)
 			{
 				DetachLinkFromMarker(lastUsedLink, linksTableUnusedLinkMarker);
-				--*linksTableSizeAddress;
+				--*pointerToLinksSize;
 			}
 
 			ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
@@ -454,7 +461,7 @@ void FreeLink(Link* link)
 void WalkThroughAllLinks(func func_)
 {
 	Link *currentLink = linksTableDataAddress;
-	Link* lastLink = linksTableDataAddress + *linksTableSizeAddress - 1;
+	Link* lastLink = linksTableDataAddress + *pointerToLinksSize - 1;
 
 	do
 	{
@@ -469,7 +476,7 @@ void WalkThroughAllLinks(func func_)
 int WalkThroughLinks(func func_)
 {
 	Link *currentLink = linksTableDataAddress;
-	Link* lastLink = linksTableDataAddress + *linksTableSizeAddress - 1;
+	Link* lastLink = linksTableDataAddress + *pointerToLinksSize - 1;
 
 	do
 	{
@@ -486,7 +493,7 @@ int WalkThroughLinks(func func_)
 Link* GetMappedLink(int index)
 {
 	if (index < *pointerToBaseLinksTableMaxSize)
-		return mappingTableDataAddress[index];
+		return pointerToBaseLinks[index];
 	else
 		return null;
 }
@@ -494,51 +501,5 @@ Link* GetMappedLink(int index)
 void SetMappedLink(int index, Link* link)
 {
 	if (index < *pointerToBaseLinksTableMaxSize)
-		mappingTableDataAddress[index] = link;
-}
-
-void ReadTest()
-{
-
-	printf("Reading data...\n");
-
-	uint64_t resultCounter = 0;
-
-#if defined(_MFC_VER) || defined(__MINGW32__)
-	{
-		uint64_t* intMap = (uint64_t *) pointerToMappedRegion;
-		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		uint64_t* intCurrent = intMap;
-
-		for(; intCurrent <= intMapLastAddress; intCurrent++)
-		{
-			resultCounter += *intCurrent;
-		}
-	}
-	printf("Data read. Counter result is: %I64d.\n\n", resultCounter);
-#elif defined(__GNUC__)
-	printf("Data read. Counter result is: %lld.\n\n", (long long int)resultCounter);
-#endif
-
-}
-
-void WriteTest()
-{
-	printf("Filling data...\n");
-
-#if defined(_MFC_VER) || defined(__MINGW32__)
-	{
-		uint64_t* intMap = (uint64_t *) pointerToMappedRegion;
-		uint64_t* intMapLastAddress = intMap + (storageFileSizeInBytes / sizeof(__int64) - 1);
-		uint64_t* intCurrent = intMap;
-
-		for(; intCurrent <= intMapLastAddress; intCurrent++)
-		{
-			*intCurrent = intCurrent - intMap;
-		}
-	}
-#elif defined(__GNUC__)
-#endif
-
-	printf("Data filled.\n\n");
+		pointerToBaseLinks[index] = link;
 }
