@@ -49,7 +49,7 @@ uint64_t*			pointerToLinksMaxSize;
 uint64_t*			pointerToLinksSize;
 
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*				pointerToMarker;	// инициализируется в SetStorageFileMemoryMapping()
+Link*				pointerToUnusedMarker;	// инициализируется в SetStorageFileMemoryMapping()
 Link*				pointerToLinks;		// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
 
 
@@ -232,7 +232,7 @@ int SetStorageFileMemoryMapping()
 	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
 	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	pointerToMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	pointerToUnusedMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
 	pointerToLinks = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	printf("pointerToBaseLinksMaxSize = %d\n", *pointerToBaseLinksMaxSize);
@@ -425,11 +425,12 @@ unsigned long ResetStorageFileMemoryMapping()
 
 Link* AllocateFromUnusedLinks()
 {
-	Link* unusedLink = pointerToMarker->FirstRefererByLinker;
-	DetachLinkFromMarker(unusedLink, pointerToMarker);
+	Link* unusedLink = pointerToUnusedMarker->FirstRefererByLinker;
+	DetachLinkFromMarker(unusedLink, pointerToUnusedMarker);
 	return unusedLink;
 }
 
+// пока что программа - однопоточная, не надо использовать mutex'и
 Link* AllocateFromFreeLinks()
 {
 	Link* freeLink;
@@ -444,7 +445,7 @@ Link* AllocateFromFreeLinks()
 
 Link* AllocateLink()
 {
-	if (pointerToMarker->FirstRefererByLinker != null)
+	if (pointerToUnusedMarker->FirstRefererByLinker != null)
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
@@ -464,15 +465,15 @@ void FreeLink(Link* link)
 
 		if (link < lastUsedLink)
 		{
-			AttachLinkToMarker(link, pointerToMarker);
+			AttachLinkToMarker(link, pointerToUnusedMarker);
 		}
 		else if(link == lastUsedLink)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->Linker == pointerToMarker)
+			while((--lastUsedLink)->Linker == pointerToUnusedMarker)
 			{
-				DetachLinkFromMarker(lastUsedLink, pointerToMarker);
+				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
 				--*pointerToLinksSize;
 			}
 
@@ -488,7 +489,7 @@ void WalkThroughAllLinks(func func_)
 
 	do
 	{
-		if (currentLink->Linker != pointerToMarker)
+		if (currentLink->Linker != pointerToUnusedMarker)
 		{
 			func_(currentLink);
 		}
@@ -503,7 +504,7 @@ int WalkThroughLinks(func func_)
 
 	do
 	{
-		if (currentLink->Linker != pointerToMarker)
+		if (currentLink->Linker != pointerToUnusedMarker)
 		{
 			if(!func_(currentLink)) return false;
 		}
