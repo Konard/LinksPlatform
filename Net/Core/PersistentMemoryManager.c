@@ -54,6 +54,8 @@ Link*				pointerToLinks;		// здесь хранятся линки, иници�
 
 
 
+/***  Работа с памятью  ***/
+
 void PrintLinksTableSize()
 {
 #if defined(_MFC_VER) || defined(__MINGW32__)
@@ -304,7 +306,10 @@ int CloseStorageFile()
 unsigned long EnlargeStorageFile()
 {
 #if defined(_MFC_VER) || defined(__MINGW32__)
-	if (storageFileHandle == null)
+	if (storageFileHandle == INVALID_HANDLE_VALUE)
+#elif defined(__GNUC__)
+	if (storageFileHandle == -1)
+#endif
 	{
 		unsigned long error = -1;
 		printf("Storage file is not open.\n");
@@ -325,8 +330,6 @@ unsigned long EnlargeStorageFile()
 		if(error != 0)
 			return error;
 	}
-#elif defined(__GNUC__)
-#endif
 
 	return 0;
 }
@@ -334,7 +337,10 @@ unsigned long EnlargeStorageFile()
 unsigned long ShrinkStorageFile()
 {
 #if defined(_MFC_VER) || defined(__MINGW32__)
-	if (storageFileHandle == null)
+	if (storageFileHandle == INVALID_HANDLE_VALUE)
+#elif defined(__GNUC__)
+	if (storageFileHandle == -1)
+#endif
 	{
 		unsigned long error = -1;
 		printf("Storage file is not open.\n");
@@ -352,6 +358,7 @@ unsigned long ShrinkStorageFile()
 			if(error != 0)
 				return error;
 
+#if defined(_MFC_VER) || defined(__MINGW32__)
 			{
 				LARGE_INTEGER distanceToMoveFilePointer;
 				distanceToMoveFilePointer.QuadPart = -((long long)baseBlockSizeInBytes);
@@ -361,14 +368,15 @@ unsigned long ShrinkStorageFile()
 				SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END);
 				SetEndOfFile(storageFileHandle);
 			}
+#elif defined(__GNUC__)
+				storageFileSizeInBytes -= baseBlockSizeInBytes;
+#endif
 
 			error = SetStorageFileMemoryMapping();
 			if(error != 0)
 				return error;
 		}
 	}
-#elif defined(__GNUC__)
-#endif
 
 	return 0;
 }
@@ -379,7 +387,10 @@ unsigned long ResetStorageFileMemoryMapping()
 	printf("Resetting memory mapping of storage file...\n");
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
-	if (storageFileMappingHandle == null)
+	if (storageFileHandle == INVALID_HANDLE_VALUE)
+#elif defined(__GNUC__)
+	if (storageFileHandle == -1)
+#endif
 	{
 		unsigned long error = -1;
 		printf("Memory mapping of storage file is not set or already reset.\n");
@@ -388,16 +399,21 @@ unsigned long ResetStorageFileMemoryMapping()
 
 	PrintLinksTableSize();
 
+#if defined(_MFC_VER) || defined(__MINGW32__)
 	UnmapViewOfFile (pointerToMappedRegion);
 	CloseHandle(storageFileMappingHandle);
-	storageFileMappingHandle = null;
+	storageFileMappingHandle = INVALID_HANDLE_VALUE;
 #elif defined(__GNUC__)
+	munmap(pointerToMappedRegion, storageFileSizeInBytes);
+//	storageFileHandle = -1;
 #endif
 
 	printf("Memory mapping of storage file is reset.\n\n");
 
 	return 0;
 }
+
+/***  Работа с линками  ***/
 
 Link* AllocateFromUnusedLinks()
 {
