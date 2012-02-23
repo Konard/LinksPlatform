@@ -16,6 +16,7 @@ UpdateLink(isA, isA, isA, link); // После этого минимальное
 
 //DeleteLink(isA); // Одна эта операция удалит все 4 связи
 
+	ResetStorageFileMemoryMapping();
 	CloseStorageFile();
 	return 0;
 }
