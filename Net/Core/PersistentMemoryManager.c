@@ -37,14 +37,14 @@ uint64_t		storageFileSizeInBytes; // <- off_t
 // Константы, рассчитываемые при запуске приложения
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
 int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
-int			mappingTableSizeInBytes;	
+int			baseLinksSizeInBytes;	
 uint64_t		baseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
 uint64_t		storageFileMinSizeInBytes;
 
 void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
 int*				pointerToBaseLinksMaxSize;
-Link**				pointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
+Link**				pointerToPointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
 uint64_t*			pointerToLinksMaxSize;
 uint64_t*			pointerToLinksSize;
 
@@ -107,7 +107,7 @@ typedef struct _SYSTEM_INFO {
 
 #endif
 
-	mappingTableSizeInBytes = serviceBlockSizeInBytes - 12;
+	baseLinksSizeInBytes = serviceBlockSizeInBytes - 12;
 	baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
@@ -165,14 +165,16 @@ int OpenStorageFile(char *filename)
 
 #endif
 
-	// ? надо изучить
+	// по-крайней мере - минимальный блок для линков + сервисный блок
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes) {
 		printf("enlarge\n");
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 	}
 
+	// если блок линков выравнен неправильно (не кратен базовому размеру блока), выравниваем "вверх"
 	if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseBlockSizeInBytes) > 0)
-		storageFileSizeInBytes = ((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseBlockSizeInBytes * baseBlockSizeInBytes) + baseBlockSizeInBytes;
+		storageFileSizeInBytes = (((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseBlockSizeInBytes) * baseBlockSizeInBytes) + baseBlockSizeInBytes;
+
 	printf("storageFileSizeInBytes = %llu\n",
 	       (long long unsigned int)storageFileSizeInBytes);
 
@@ -225,7 +227,7 @@ int SetStorageFileMemoryMapping()
 #endif
 
 	pointerToBaseLinksMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
-	pointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
+	pointerToPointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
 
 	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
 	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
@@ -245,13 +247,16 @@ int SetStorageFileMemoryMapping()
 
 
 	if (*pointerToBaseLinksMaxSize == 0)
-		*pointerToBaseLinksMaxSize = (mappingTableSizeInBytes - 4) / 8;
+		*pointerToBaseLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ? почему так
 
 	if (*pointerToLinksMaxSize == 0)
 		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+		// <- число линков, после Marker, объем "памяти" (в линках)
+	// если переменная установлена неправильно, исправляем
 	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
 		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
+	// число линков почему-то превышает заданный размер (может быть, реакция должна быть не такой?)
 	if (*pointerToLinksSize > *pointerToLinksMaxSize)
 	{
 		int error = -3;
@@ -278,6 +283,7 @@ int CloseStorageFile()
 #if defined(_MFC_VER) || defined(__MINGW32__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
 	{
+		// убрал принудительный выход, так как даже в случае неправильного дескриптора, его можно попытаться закрыть
 //		unsigned long error = -1;
 		printf("Storage file is not open or already closed.\n\n");
 //		return error;
@@ -326,6 +332,7 @@ unsigned long EnlargeStorageFile()
 
 		storageFileSizeInBytes += baseBlockSizeInBytes;
 
+		// там происходит увеличение через ftruncate(), под Linux
 		error = SetStorageFileMemoryMapping();
 		if(error != 0)
 			return error;
@@ -372,6 +379,7 @@ unsigned long ShrinkStorageFile()
 				storageFileSizeInBytes -= baseBlockSizeInBytes;
 #endif
 
+			// уменьшение через ftruncate()
 			error = SetStorageFileMemoryMapping();
 			if(error != 0)
 				return error;
@@ -405,7 +413,7 @@ unsigned long ResetStorageFileMemoryMapping()
 	storageFileMappingHandle = INVALID_HANDLE_VALUE;
 #elif defined(__GNUC__)
 	munmap(pointerToMappedRegion, storageFileSizeInBytes);
-//	storageFileHandle = -1;
+//	storageFileHandle = -1; // некорректно так делать
 #endif
 
 	printf("Memory mapping of storage file is reset.\n\n");
@@ -508,7 +516,7 @@ int WalkThroughLinks(func func_)
 Link* GetMappedLink(int index)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		return pointerToBaseLinks[index];
+		return pointerToPointerToBaseLinks[index];
 	else
 		return null;
 }
@@ -516,5 +524,5 @@ Link* GetMappedLink(int index)
 void SetMappedLink(int index, Link* link)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		pointerToBaseLinks[index] = link;
+		pointerToPointerToBaseLinks[index] = link;
 }
