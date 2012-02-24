@@ -48,13 +48,15 @@
 #define __SetPreviousSiblingRefererByLinker(linkIndex, newValue) _SetPreviousSiblingRefererBy(LinkerIndex, linkIndex, newValue)
 #define __SetPreviousSiblingRefererByTarget(linkIndex, newValue) _SetPreviousSiblingRefererBy(TargetIndex, linkIndex, newValue)
 
-#define __GetNumberOfReferersBySource(link) _GetNumberOfReferersBy(Source, link)
-#define __GetNumberOfReferersByLinker(link) _GetNumberOfReferersBy(Linker, link)
-#define __GetNumberOfReferersByTarget(link) _GetNumberOfReferersBy(Target, link)
+// +Index
+#define __GetNumberOfReferersBySource(linkIndex) _GetNumberOfReferersBy(SourceIndex, linkIndex)
+#define __GetNumberOfReferersByLinker(linkIndex) _GetNumberOfReferersBy(LinkerIndex, linkIndex)
+#define __GetNumberOfReferersByTarget(linkIndex) _GetNumberOfReferersBy(TargetIndex, linkIndex)
 
-#define __SetNumberOfReferersBySource(link, newValue) _SetNumberOfReferersBy(Source, link, newValue)
-#define __SetNumberOfReferersByLinker(link, newValue) _SetNumberOfReferersBy(Linker, link, newValue)
-#define __SetNumberOfReferersByTarget(link, newValue) _SetNumberOfReferersBy(Target, link, newValue)
+// +Index
+#define __SetNumberOfReferersBySource(linkIndex, newValue) _SetNumberOfReferersBy(SourceIndex, linkIndex, newValue)
+#define __SetNumberOfReferersByLinker(linkIndex, newValue) _SetNumberOfReferersBy(LinkerIndex, linkIndex, newValue)
+#define __SetNumberOfReferersByTarget(linkIndex, newValue) _SetNumberOfReferersBy(TargetIndex, linkIndex, newValue)
 
 #define BeginWalkThroughReferersBySource(element, link) BeginWalkThroughLinksList(element, _GetFirstRefererBy(Source, link))
 #define EndWalkThroughReferersBySource(element) EndWalkThroughLinksList(element, __GetNextSiblingRefererBySource)
@@ -128,23 +130,27 @@
 	_IncrementNumberOfReferers(that, of(newValue));																		\
 }
 
-#define IsRefererLessThanOtherRefererBySourceCore(referer, otherRefererLinker, otherRefererTarget) ((referer)->Linker < (otherRefererLinker) || ((referer)->Linker == (otherRefererLinker) && (referer)->Target < (otherRefererTarget)))
-#define IsRefererGreaterThanOtherRefererBySourceCore(referer, otherRefererLinker, otherRefererTarget) ((referer)->Linker > (otherRefererLinker) || ((referer)->Linker == (otherRefererLinker) && (referer)->Target > (otherRefererTarget)))
+// +Index
+#define IsRefererLessThanOtherRefererBySourceCore(refererIndex, otherRefererLinkerIndex, otherRefererTargetIndex) (GetLinkerIndex(refererIndex) < (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetTargetIndex(refererIndex) < (otherRefererTargetIndex)))
+#define IsRefererGreaterThanOtherRefererBySourceCore(refererIndex, otherRefererLinkerIndex, otherRefererTargetIndex) (GetLinkerIndex(refererIndex) > (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetTargetIndex(refererIndex) > (otherRefererTargetIndex)))
+// +Index
+#define IsRefererLessThanOtherRefererBySource(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererBySourceCore(refererIndex, GetLinkerIndex(otherReferer), GetTargetIndex(otherRefererIndex))
+#define IsRefererGreaterThanOtherRefererBySource(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererBySourceCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetTargetIndex(otherRefererIndex))
 
-#define IsRefererLessThanOtherRefererBySource(referer, otherReferer) IsRefererLessThanOtherRefererBySourceCore(referer, (otherReferer)->Linker, (otherReferer)->Target)
-#define IsRefererGreaterThanOtherRefererBySource(referer, otherReferer) IsRefererGreaterThanOtherRefererBySourceCore(referer, (otherReferer)->Linker, (otherReferer)->Target)
+// +Index
+#define IsRefererLessThanOtherRefererByLinkerCore(refererIndex, otherRefererSourceIndex, otherRefererTargetIndex) (GetSourceIndex(refererIndex) < (otherRefererSourceIndex) || (GetSourceIndex(refererIndex) == (otherRefererSourceIndex) && GetTargetIndex(refererIndex) < (otherRefererTargetIndex)))
+#define IsRefererGreaterThanOtherRefererByLinkerCore(refererIndex, otherRefererSourceIndex, otherRefererTargetIndex) (GetSourceIndex(refererIndex) > (otherRefererSourceIndex) || (GetSourceIndex(refererIndex) == (otherRefererSourceIndex) && GetTargetIndex(refererIndex) > (otherRefererTargetIndex)))
+// +Index
+#define IsRefererLessThanOtherRefererByLinker(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererByLinkerCore(refererIndex, GetSourceIndex(otherRefererIndex), GetTargetIndex(otherRefererIndex))
+#define IsRefererGreaterThanOtherRefererByLinker(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererByLinkerCore(refererIndex, GetSourceIndex(otherRefererIndex), GetTargetIndex(otherRefererIndex))
 
-#define IsRefererLessThanOtherRefererByLinkerCore(referer, otherRefererSource, otherRefererTarget) ((referer)->Source < (otherRefererSource) || ((referer)->Source == (otherRefererSource) && (referer)->Target < (otherRefererTarget)))
-#define IsRefererGreaterThanOtherRefererByLinkerCore(referer, otherRefererSource, otherRefererTarget) ((referer)->Source > (otherRefererSource) || ((referer)->Source == (otherRefererSource) && (referer)->Target > (otherRefererTarget)))
+// +Index
+#define IsRefererLessThanOtherRefererByTargetCore(refererIndex, otherRefererLinkerIndex, otherRefererSourceIndex) (GetLinkerIndex(refererIndex) < (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetSourceIndex(refererIndex) < (otherRefererSourceIndex)))
+#define IsRefererGreaterThanOtherRefererByTargetCore(refererIndex, otherRefererLinkerIndex, otherRefererSourceIndex) (GetLinkerIndex(refererIndex) > (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetSourceIndex(refererIndex) > (otherRefererSourceIndex)))
+// +Index
+#define IsRefererLessThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
+#define IsRefererGreaterThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
 
-#define IsRefererLessThanOtherRefererByLinker(referer, otherReferer) IsRefererLessThanOtherRefererByLinkerCore(referer, (otherReferer)->Source, (otherReferer)->Target)
-#define IsRefererGreaterThanOtherRefererByLinker(referer, otherReferer) IsRefererGreaterThanOtherRefererByLinkerCore(referer, (otherReferer)->Source, (otherReferer)->Target)
-
-#define IsRefererLessThanOtherRefererByTargetCore(referer, otherRefererLinker, otherRefererSource) ((referer)->Linker < (otherRefererLinker) || ((referer)->Linker == (otherRefererLinker) && (referer)->Source < (otherRefererSource)))
-#define IsRefererGreaterThanOtherRefererByTargetCore(referer, otherRefererLinker, otherRefererSource) ((referer)->Linker > (otherRefererLinker) || ((referer)->Linker == (otherRefererLinker) && (referer)->Source > (otherRefererSource)))
-
-#define IsRefererLessThanOtherRefererByTarget(referer, otherReferer) IsRefererLessThanOtherRefererByTargetCore(referer, (otherReferer)->Linker, (otherReferer)->Source)
-#define IsRefererGreaterThanOtherRefererByTarget(referer, otherReferer) IsRefererGreaterThanOtherRefererByTargetCore(referer, (otherReferer)->Linker, (otherReferer)->Source)
 
 #define DefineReferersTreeLeftRotateMethod(referesToThat) \
 	DefineTreeLeftRotateMethod( \
@@ -310,6 +316,7 @@ Link *SearchRefererOfTarget(Link *link, Link *refererSource, Link* refererLinker
 	return null;																								 \
 }
 
+// OK
 #define DefineAllSearchMethods() \
 	DefineSearchInTreeOfReferersBySourceMethod() \
 	DefineSearchInListOfReferersByLinkerMethod() \
