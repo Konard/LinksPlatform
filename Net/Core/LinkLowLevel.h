@@ -58,28 +58,30 @@
 #define __SetNumberOfReferersByLinker(linkIndex, newValue) _SetNumberOfReferersBy(LinkerIndex, linkIndex, newValue)
 #define __SetNumberOfReferersByTarget(linkIndex, newValue) _SetNumberOfReferersBy(TargetIndex, linkIndex, newValue)
 
-#define BeginWalkThroughReferersBySource(element, link) BeginWalkThroughLinksList(element, _GetFirstRefererBy(Source, link))
-#define EndWalkThroughReferersBySource(element) EndWalkThroughLinksList(element, __GetNextSiblingRefererBySource)
 
-#define BeginWalkThroughReferersByLinker(element, link) BeginWalkThroughLinksList(element, _GetFirstRefererBy(Linker, link))
-#define EndWalkThroughReferersByLinker(element) EndWalkThroughLinksList(element, __GetNextSiblingRefererByLinker)
+#define BeginWalkThroughReferersBySource(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(SourceIndex, linkIndex))
+#define EndWalkThroughReferersBySource(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererBySource)
 
-#define BeginWalkThroughReferersByTarget(element, link) BeginWalkThroughLinksList(element, _GetFirstRefererBy(Target, link))
-#define EndWalkThroughReferersByTarget(element) EndWalkThroughLinksList(element, __GetNextSiblingRefererBySource)																													
+#define BeginWalkThroughReferersByLinker(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(LinkerIndex, linkIndex))
+#define EndWalkThroughReferersByLinker(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererByLinker)
 
-#define BeginWalkThroughLinksList(element, first)																		\
+#define BeginWalkThroughReferersByTarget(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(TargetIndex, linkIndex))
+#define EndWalkThroughReferersByTarget(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererBySource)																													
+
+
+#define BeginWalkThroughLinksList(elementIndex, firstIndex)																		\
 {																														\
-	Link* firstElement = first;																							\
-	if (firstElement != null) 																							\
+	firstElementIndex = firstIndex;																							\
+	if (firstElement != 0) 																							\
 	{																													\
-		Link* element = firstElement;																					\
+		elementIndex = firstElementIndex;																					\
 		do																												\
 		{																												
 
-#define EndWalkThroughLinksList(element, nextSelector)																	\
-			element = nextSelector(element);																			\
+#define EndWalkThroughLinksList(elementIndex, nextSelector)																	\
+			elementIndex = nextSelector(elementIndex);																			\
 		}																												\
-		while (element != firstElement);																				\
+		while (elementIndex != firstElementIndex);																				\
 	}																													\
 }
 
