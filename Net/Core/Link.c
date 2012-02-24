@@ -48,19 +48,30 @@ void DetachLink(Link* link)
 	link->Target = null;
 }
 
-void AttachLinkToMarker(Link *link, Link *marker)
+void AttachLinkToUnusedMarker(uint64_t linkIndex)
 {
-	link->Linker = marker;
+	GetLink(linkIndex)->LinkerIndex = 0; // markerIndex == 0
 
 	SubscribeToListOfReferersBy(Linker, link, marker);
 }
 
-void DetachLinkFromMarker(Link* link, Link* marker)
+//void AttachLinkToMarker(Link *link, Link *marker) {
+//        link->Linker = marker;
+//        SubscribeToListOfReferersBy(Linker, link, marker);
+//}
+
+
+void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 {
 	UnSubscribeFromListOfReferersBy(Linker, link, marker);
 
 	link->Linker = null;
 }
+//void DetachLinkFromMarker(Link* link, Link* marker) {
+//        UnSubscribeFromListOfReferersBy(Linker, link, marker);
+//        link->Linker = null;
+//}
+
 
 Link* _H SearchLink(Link* source, Link* linker, Link* target)
 {

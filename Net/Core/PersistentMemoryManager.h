@@ -29,8 +29,12 @@ PREFIX_DLL unsigned long EnlargeStorageFile();
 PREFIX_DLL unsigned long ShrinkStorageFile();
 PREFIX_DLL int SetStorageFileMemoryMapping();
 PREFIX_DLL unsigned long ResetStorageFileMemoryMapping();
-PREFIX_DLL Link* GetMappedLink(int index);
-PREFIX_DLL void SetMappedLink(int index, Link* link);
+
+PREFIX_DLL uint64_t GetBaseLink(int index);
+PREFIX_DLL void SetBaseLink(int index, uint64_t linkIndex);
+//PREFIX_DLL Link* GetMappedLink(int index);
+//PREFIX_DLL void SetMappedLink(int index, Link* link);
+
 PREFIX_DLL void ReadTest();
 PREFIX_DLL void WriteTest();
 
@@ -39,6 +43,8 @@ void FreeLink(Link* link);
 
 PREFIX_DLL void WalkThroughAllLinks(func);
 PREFIX_DLL int WalkThroughLinks(func);
+
+PREFIX_DLL Link* GetLink(uint64_t linkIndex); // из таблицы pointerToLinks
 
 PREFIX_DLL uint64_t GetSourceIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetTargetIndex(uint64_t linkIndex);

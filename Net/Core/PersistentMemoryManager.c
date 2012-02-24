@@ -14,6 +14,8 @@
 #include <errno.h>
 // mmap()...
 #include <sys/mman.h>
+// NULL
+#include <malloc.h>
 
 #endif
 
@@ -424,42 +426,37 @@ unsigned long ResetStorageFileMemoryMapping()
 
 /***  Работа с линками  ***/
 
-Link* AllocateFromUnusedLinks()
+uint64_t AllocateFromUnusedLinks()
 {
-	Link* unusedLink = pointerToUnusedMarker->FirstRefererByLinker;
-	DetachLinkFromMarker(unusedLink, pointerToUnusedMarker);
+	uint64_t unusedLink = pointerToUnusedMarker->ByLinkerIndex; // индекс вместо указателя Link *
+	DetachLinkFromUnusedMarker(unusedLink); // переименовали функцию, pointerToUnusedMarker уже не передаём
 	return unusedLink;
 }
 
 // пока что программа - однопоточная, не надо использовать mutex'и
-Link* AllocateFromFreeLinks()
+uint64_t AllocateFromFreeLinks()
 {
-	Link* freeLink;
-
-	if (*pointerToLinksMaxSize == *pointerToLinksSize)
+	if (*pointerToLinksMaxSize <= *pointerToLinksSize) // более корректно: <=
 		EnlargeStorageFile();
-
-	freeLink = pointerToLinks + *pointerToLinksSize;
-	++*pointerToLinksSize;
-	return freeLink;
+	return (*pointerToLinksSize)++; // после return - увеличиваем
 }
 
-Link* AllocateLink()
+uint64_t AllocateLink()
 {
-	if (pointerToUnusedMarker->FirstRefererByLinker != null)
+	if (pointerToUnusedMarker->ByLinker != 0)
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
-	return null;
 }
 
-void FreeLink(Link* link)
+void FreeLink(uint64_t linkIndex)
 {
-	DetachLink(link);
+	DetachLink(linkIndex);
 
-    while (link->FirstRefererBySource != null) FreeLink(link->FirstRefererBySource);
-    while (link->FirstRefererByLinker != null) FreeLink(link->FirstRefererByLinker);
-    while (link->FirstRefererByTarget != null) FreeLink(link->FirstRefererByTarget);
+	Link *link = GetLink(linkIndex);
+    while (link->BySource != 0) FreeLink(link->BySource);
+    while (link->ByLinker != 0) FreeLink(link->ByLinker);
+    while (link->ByTarget != 0) FreeLink(link->ByTarget);
 
 	{
 		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
@@ -517,20 +514,18 @@ int WalkThroughLinks(func func_)
 
 // работа с базовыми линками
 uint64_t GetBaseLink(int index)
-//Link* GetBaseLink(int index)
 {
 	if (index < *pointerToBaseLinksMaxSize)
 		return pointerToBaseLinks[index];
 	else
-		return null;
+		return 0; // вместо Link * == NULL
 }
 
 // базовых линков не должно быть много, поэтому - int
 void SetBaseLink(int index, uint64_t linkIndex)
-//void SetBaseLink(int index, Link* link)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		pointerToBaseLinks[index] = link;
+		pointerToBaseLinks[index] = linkIndex; // может быть 0 (соответствует NULL)
 }
 
 // работа с основными линками
@@ -539,24 +534,28 @@ Link* GetLink(uint64_t linkIndex)
 	if (linkIndex < *pointerToLinksMaxSize)
 		return &(pointerToLinks[linkIndex]);
 	else
-		return null;
+		return NULL; // корректный указатель из malloc.h
 }
+
 // SetLink, SetSource, ... не нужны - так как поломают целостность ассоц. сети
 
 // GetSource(0) == 0 - это очень важно
 // GetSource(X) == 0, где X - удаленная или неправильная связь - тоже очень важно
 uint64_t GetSourceIndex(uint64_t linkIndex)
 {
-	return null;
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->SourceIndex;
 }
 
 uint64_t GetTargetIndex(uint64_t linkIndex)
 {
-	return null;
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->TargetIndex;
 }
 
 // LinkerLink index
 uint64_t GetLinkerIndex(uint64_t linkIndex)
 {
-	return null;
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->LinkerIndex;
 }
