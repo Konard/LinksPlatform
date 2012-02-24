@@ -44,7 +44,8 @@ uint64_t		storageFileMinSizeInBytes;
 void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
 int*				pointerToBaseLinksMaxSize;
-Link**				pointerToPointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
+uint64_t*			pointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
+
 uint64_t*			pointerToLinksMaxSize;
 uint64_t*			pointerToLinksSize;
 
@@ -227,7 +228,7 @@ int SetStorageFileMemoryMapping()
 #endif
 
 	pointerToBaseLinksMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
-	pointerToPointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
+	pointerToBaseLinks = (uint64_t *)(pointerToMappedRegion + 8 + 4 + 4);
 
 	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
 	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
@@ -514,16 +515,48 @@ int WalkThroughLinks(func func_)
 	return true;
 }
 
-Link* GetMappedLink(int index)
+// работа с базовыми линками
+uint64_t GetBaseLink(int index)
+//Link* GetBaseLink(int index)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		return pointerToPointerToBaseLinks[index];
+		return pointerToBaseLinks[index];
 	else
 		return null;
 }
 
-void SetMappedLink(int index, Link* link)
+// базовых линков не должно быть много, поэтому - int
+void SetBaseLink(int index, uint64_t linkIndex)
+//void SetBaseLink(int index, Link* link)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		pointerToPointerToBaseLinks[index] = link;
+		pointerToBaseLinks[index] = link;
+}
+
+// работа с основными линками
+Link* GetLink(uint64_t linkIndex)
+{
+	if (linkIndex < *pointerToLinksMaxSize)
+		return &(pointerToLinks[linkIndex]);
+	else
+		return null;
+}
+// SetLink, SetSource, ... не нужны - так как поломают целостность ассоц. сети
+
+// GetSource(0) == 0 - это очень важно
+// GetSource(X) == 0, где X - удаленная или неправильная связь - тоже очень важно
+uint64_t GetSourceIndex(uint64_t linkIndex)
+{
+	return null;
+}
+
+uint64_t GetTargetIndex(uint64_t linkIndex)
+{
+	return null;
+}
+
+// LinkerLink index
+uint64_t GetLinkerIndex(uint64_t linkIndex)
+{
+	return null;
 }

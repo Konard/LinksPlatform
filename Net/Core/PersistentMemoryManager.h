@@ -40,6 +40,10 @@ void FreeLink(Link* link);
 PREFIX_DLL void WalkThroughAllLinks(func);
 PREFIX_DLL int WalkThroughLinks(func);
 
+PREFIX_DLL uint64_t GetSourceIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetTargetIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetLinkerIndex(uint64_t linkIndex); // LinkerLink index
+
 
 #if defined(__cplusplus)
 }
