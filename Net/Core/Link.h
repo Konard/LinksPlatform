@@ -80,7 +80,8 @@ void  PREFIX_DLL DeleteLink(uint64_t linkIndex);
 uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
 //Link* PREFIX_DLL ReplaceLink(Link* link, Link* replacement);
 
-uint64_t PREFIX_DLL SearchLink(uint64_t source, uint64_t linker, uint64_t target);
+//uint64_t PREFIX_DLL SearchLink(uint64_t source, uint64_t linker, uint64_t target);
+uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
 //Link* PREFIX_DLL SearchLink(Link* source, Link* linker, Link* target);
 
 uint64_t PREFIX_DLL GetLinkNumberOfReferersBySource(uint64_t linkIndex);

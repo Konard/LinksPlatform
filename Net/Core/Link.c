@@ -74,17 +74,19 @@ void DetachLinkFromUnusedMarker(Link* link) {
 }
 
 
-Link* _H SearchLink(Link* source, Link* linker, Link* target)
+//Link* _H SearchLink(Link* source, Link* linker, Link* target)
+uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
 {
-	if (GetLinkNumberOfReferersByTarget(target) <= GetLinkNumberOfReferersBySource(source))
-		return SearchRefererOfTarget(target, source, linker);
+	if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
+		return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
 	else
-		return SearchRefererOfSource(source, target, linker);
+		return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
 }
 
-Link* _H CreateLink(Link* source, Link* linker, Link* target)
+//Link* _H CreateLink(Link* source, Link* linker, Link* target)
+uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
 {
-    if (source != itself && linker != itself && target != itself)
+    if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
     {
         Link* link = SearchLink(source, linker, target);
         if (link == null)
@@ -114,9 +116,10 @@ Link* _H CreateLink(Link* source, Link* linker, Link* target)
 	}
 }
 
-Link* _H ReplaceLink(Link* link, Link* replacement)
+//Link* _H ReplaceLink(Link* link, Link* replacement)
+uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
 {
-	if (link != replacement)
+	if (linkIndex != replacementIndex)
 	{
 		Link* firstRefererBySource = link->FirstRefererBySource;
 		Link* firstRefererByLinker = link->FirstRefererByLinker;
@@ -144,15 +147,16 @@ Link* _H ReplaceLink(Link* link, Link* replacement)
 
 		replacement->Timestamp = GetTimestamp();
 	}
-	return replacement;
+	return replacementIndex;
 }
 
-Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
+uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+//Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
 {
-	if(link->Source == source && link->Linker == linker && link->Target == target)
-		return link;
+	if(GetSourceIndex(linkIndex) == sourceIndex && GetLinkerIndex(linkIndex) == linkerIndex && GetTargetIndex(linkIndex) == targetIndex)
+		return linkIndex;
 
-    if (source != itself && linker != itself && target != itself)
+    if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // ? itself -> LINK_0
     {
         Link* existingLink = SearchLink(source, linker, target);
         if (existingLink == null)
@@ -184,14 +188,14 @@ Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
 	}
 }
 
-void _H DeleteLink(Link* link)
+void _H DeleteLink(uint64_t linkIndex)
 {
-	FreeLink(link);
+	FreeLink(linkIndex);
 }
 
-uint64_t _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
-uint64_t _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
-uint64_t _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
+uint64_t _H GetLinkNumberOfReferersBySource(uint64_t linkIndex) { return GetNumberOfReferersBySource(linkIndex); }
+uint64_t _H GetLinkNumberOfReferersByLinker(uint64_t linkIndex) { return GetNumberOfReferersByLinker(linkIndex); }
+uint64_t _H GetLinkNumberOfReferersByTarget(uint64_t linkIndex) { return GetNumberOfReferersByTarget(linkIndex); }
 
 void WalkThroughAllReferersBySourceCore(uint64_t rootIndex, action action_)
 {
