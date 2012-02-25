@@ -193,23 +193,23 @@ uint64_t _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfRefe
 uint64_t _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
 uint64_t _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
 
-void WalkThroughAllReferersBySourceCore(Link* root, action a)
+void WalkThroughAllReferersBySourceCore(uint64_t rootIndex, action action_)
 {
-	if (root != null)
+	if (rootIndex != LINK_0)
 	{
-		WalkThroughAllReferersBySourceCore(root->PreviousSiblingRefererBySource, a);
-		a(root);
-		WalkThroughAllReferersBySourceCore(root->NextSiblingRefererBySource, a);
+		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->LeftBySourceIndex, action_);
+		action_(rootIndex);
+		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->RightBySourceIndex, action_);
 	}
 }
 
-int WalkThroughReferersBySourceCore(Link* root, func f)
+int WalkThroughReferersBySourceCore(uint64_t rootIndex, func func_)
 {
-	if (root != null)
+	if (rootIndex != LINK_0)
 	{
-		if(!WalkThroughReferersBySourceCore(root->PreviousSiblingRefererBySource, f)) return false;
-		if(!f(root)) return false;
-		if(!WalkThroughReferersBySourceCore(root->NextSiblingRefererBySource, f)) return false;
+		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->LeftBySourceIndex, func_)) return false;
+		if(!func_(rootIndex)) return false;
+		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->RightBySourceIndex, func_)) return false;
 	}
 	return true;
 }
