@@ -30,8 +30,8 @@ PREFIX_DLL unsigned long ShrinkStorageFile();
 PREFIX_DLL int SetStorageFileMemoryMapping();
 PREFIX_DLL unsigned long ResetStorageFileMemoryMapping();
 
-PREFIX_DLL uint64_t GetBaseLink(int index);
-PREFIX_DLL void SetBaseLink(int index, uint64_t linkIndex);
+PREFIX_DLL uint64_t GetBaseLink(uint32_t index);
+PREFIX_DLL void SetBaseLink(uint32_t index, uint64_t linkIndex);
 //PREFIX_DLL Link* GetMappedLink(int index);
 //PREFIX_DLL void SetMappedLink(int index, Link* link);
 

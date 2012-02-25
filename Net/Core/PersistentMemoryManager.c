@@ -45,7 +45,7 @@ uint64_t		storageFileMinSizeInBytes;
 
 void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
-int*				pointerToBaseLinksMaxSize;
+uint32_t*				pointerToBaseLinksMaxSize;
 uint64_t*			pointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
 
 uint64_t*			pointerToLinksMaxSize;
@@ -229,14 +229,16 @@ int SetStorageFileMemoryMapping()
 	}
 #endif
 
-	pointerToBaseLinksMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
-	pointerToBaseLinks = (uint64_t *)(pointerToMappedRegion + 8 + 4 + 4);
+	// pointer to bytes
+	pointerToBaseLinksMaxSize = (uint32_t*)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t));
+	pointerToBaseLinks = (uint64_t *)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint32_t));
 
-	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
-	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
+	pointerToLinksMaxSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes);
+	pointerToLinksSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(uint64_t));
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	pointerToUnusedMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
-	pointerToLinks = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+	pointerToUnusedMarker = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	pointerToLinks = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link)); // чтобы Links[0] == UnusedMarker
+//	pointerToLinks = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	printf("pointerToBaseLinksMaxSize = %d\n", *pointerToBaseLinksMaxSize);
 	printf("pointerToLinksMaxSize = %llu\n",
@@ -248,16 +250,17 @@ int SetStorageFileMemoryMapping()
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
 
 
-
+	// ? выяснить
 	if (*pointerToBaseLinksMaxSize == 0)
 		*pointerToBaseLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ? почему так
 
+	// Links == UnusedMarker
 	if (*pointerToLinksMaxSize == 0)
-		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link);
 		// <- число линков, после Marker, объем "памяти" (в линках)
 	// если переменная установлена неправильно, исправляем
-	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
-		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link))
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link);
 
 	// число линков почему-то превышает заданный размер (может быть, реакция должна быть не такой?)
 	if (*pointerToLinksSize > *pointerToLinksMaxSize)
@@ -463,15 +466,15 @@ void FreeLink(uint64_t linkIndex)
 
 		if (link < lastUsedLink)
 		{
-			AttachLinkToMarker(link, pointerToUnusedMarker);
+			AttachLinkToUnusedMarker(linkIndex); // убран указатель на Marker, так как функция принимала только такой аргумент (второй)
 		}
 		else if(link == lastUsedLink)
 		{
 			--*pointerToLinksSize;
 
-			while(GetLinkerIndex(--lastUsedLink) == LINK_0) // ?
+			while((--lastUsedLink)->LinkerIndex == LINK_0) // ?
 			{
-				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
+				DetachLinkFromUnusedMarker((lastUsedLink-pointerToLinks)/sizeof(Link)); // Link * -> uint64_t
 				--*pointerToLinksSize;
 			}
 
@@ -487,7 +490,7 @@ void WalkThroughAllLinks(func func_)
 
 	do
 	{
-		if (GetLinkerIndex(currentLink) != LINK_0) // ? корректна ли замена
+		if ((currentLink)->LinkerIndex != LINK_0) // ? корректна ли замена
 		{
 			func_(currentLink);
 		}
@@ -502,7 +505,7 @@ int WalkThroughLinks(func func_)
 
 	do
 	{
-		if (GetLinkerIndex(currentLink) != LINK_0) // ?
+		if ((currentLink)->LinkerIndex != LINK_0) // ?
 		{
 			if(!func_(currentLink)) return false;
 		}
@@ -513,7 +516,7 @@ int WalkThroughLinks(func func_)
 }
 
 // работа с базовыми линками
-uint64_t GetBaseLink(int index)
+uint64_t GetBaseLink(uint32_t index)
 {
 	if (index < *pointerToBaseLinksMaxSize)
 		return pointerToBaseLinks[index];
@@ -522,7 +525,7 @@ uint64_t GetBaseLink(int index)
 }
 
 // базовых линков не должно быть много, поэтому - int
-void SetBaseLink(int index, uint64_t linkIndex)
+void SetBaseLink(uint32_t index, uint64_t linkIndex)
 {
 	if (index < *pointerToBaseLinksMaxSize)
 		pointerToBaseLinks[index] = linkIndex; // может быть 0 (соответствует NULL)
