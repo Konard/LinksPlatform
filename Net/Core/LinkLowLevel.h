@@ -59,6 +59,7 @@
 #define __SetNumberOfReferersByTarget(linkIndex, newValue) _SetNumberOfReferersBy(TargetIndex, linkIndex, newValue)
 
 
+// +Index
 #define BeginWalkThroughReferersBySource(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(SourceIndex, linkIndex))
 #define EndWalkThroughReferersBySource(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererBySource)
 
@@ -68,16 +69,17 @@
 #define BeginWalkThroughReferersByTarget(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(TargetIndex, linkIndex))
 #define EndWalkThroughReferersByTarget(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererBySource)																													
 
-
+// +Index
 #define BeginWalkThroughLinksList(elementIndex, firstIndex)																		\
 {																														\
-	firstElementIndex = firstIndex;																							\
-	if (firstElement != 0) 																							\
+	uint64_t firstElementIndex = firstIndex;																							\
+	if (firstElement != LINK_0) 																							\
 	{																													\
-		elementIndex = firstElementIndex;																					\
+		uint64_t elementIndex = firstElementIndex;																					\
 		do																												\
 		{																												
 
+// +Index
 #define EndWalkThroughLinksList(elementIndex, nextSelector)																	\
 			elementIndex = nextSelector(elementIndex);																			\
 		}																												\
@@ -85,41 +87,43 @@
 	}																													\
 }
 
-#define UnSubscribeFromListOfReferersBy(that, link, previousValue) 																		\
+// +Index
+#define UnSubscribeFromListOfReferersBy(that, linkIndex, previousValue) 																		\
 {																														\
-	Link* nextReferer = _GetNextSiblingRefererBy(that,link);																\
+	uint64_t nextRefererIndex = _GetNextSiblingRefererBy(that,linkIndex);																\
 																														\
-	if (nextReferer != link)																							\
+	if (nextRefererIndex != link)																							\
 	{																													\
-		Link* previousReferer = _GetPreviousSiblingRefererBy(that,link);													\
+		uint64_t previousRefererIndex = _GetPreviousSiblingRefererBy(that,linkIndex);													\
 																														\
-		_SetPreviousSiblingRefererBy(that, of(nextReferer), to(previousReferer));										\
-		_SetNextSiblingRefererBy(that, of(previousReferer), to(nextReferer));											\
+		_SetPreviousSiblingRefererBy(that, of(nextRefererIndex), to(previousRefererIndex));										\
+		_SetNextSiblingRefererBy(that, of(previousRefererIndex), to(nextRefererIndex));											\
 																														\
-		if (_GetFirstRefererBy(that, of(previousValue)) == link)															\
-			_SetFirstRefererBy(that, of(previousValue), to(nextReferer));												\
+		if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)															\
+			_SetFirstRefererBy(that, of(previousValue), to(nextRefererIndex));												\
 	}																													\
-	else if (_GetFirstRefererBy(that, of(previousValue)) == link)														\
-		_SetFirstRefererBy(that, of(previousValue), to(null)); 															\
+	else if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)														\
+		_SetFirstRefererBy(that, of(previousValue), to(LINK_0)); 															\
 																														\
 	_DecrementNumberOfReferers(that, of(previousValue));																	 \
-	_SetNextSiblingRefererBy(that, of(link), to(null));																		  \
-	_SetPreviousSiblingRefererBy(that, of(link), to(null));																	  \
+	_SetNextSiblingRefererBy(that, of(linkIndex), to(LINK_0));																		  \
+	_SetPreviousSiblingRefererBy(that, of(linkIndex), to(LINK_0));																	  \
 }																														
 
-#define SubscribeToListOfReferersBy(that, link, newValue)																\
+// +Index
+#define SubscribeToListOfReferersBy(that, linkIndex, newValue)																\
 {																														\
-	Link* previousFirstReferer = _GetFirstRefererBy(that, of(newValue));												\
+	uint64_t previousFirstRefererIndex = _GetFirstRefererBy(that, of(newValue));												\
 																														\
-	if (previousFirstReferer != null)																					\
+	if (previousFirstRefererIndex != LINK_0)																					\
 	{																													\
-		Link* previousLastReferer = _GetPreviousSiblingRefererBy(that, of(previousFirstReferer));						\
+		uint64_t previousLastRefererIndex = _GetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex));						\
 																														\
-		_SetNextSiblingRefererBy(that, of(link), to(previousFirstReferer));												\
-		_SetPreviousSiblingRefererBy(that, of(previousFirstReferer), to(link));											\
+		_SetNextSiblingRefererBy(that, of(link), to(previousFirstRefererIndex));												\
+		_SetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex), to(link));											\
 																														\
-		_SetPreviousSiblingRefererBy(that, of(link), to(previousLastReferer));											\
-		_SetNextSiblingRefererBy(that, of(previousLastReferer), to(link));												\
+		_SetPreviousSiblingRefererBy(that, of(link), to(previousLastRefererIndex));											\
+		_SetNextSiblingRefererBy(that, of(previousLastRefererIndex), to(link));												\
 	}																													\
 	else																												\
 	{																													\
@@ -153,44 +157,48 @@
 #define IsRefererLessThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
 #define IsRefererGreaterThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
 
-
+// OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeLeftRotateMethod(referesToThat) \
 	DefineTreeLeftRotateMethod( \
-		Concat3(ReferersBy,referesToThat,TreeLeftRotate), \
+		Concat3(By,referesToThat,TreeLeftRotate), \
 		struct Link, \
 		Concat(__GetPreviousSiblingRefererBy,referesToThat),Concat(__SetPreviousSiblingRefererBy,referesToThat), \
 		Concat(__GetNextSiblingRefererBy,referesToThat),Concat(__SetNextSiblingRefererBy,referesToThat), \
 		Concat(__GetNumberOfReferersBy,referesToThat),Concat(__SetNumberOfReferersBy,referesToThat))
 
+// OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeRightRotateMethod(referesToThat) \
 	DefineTreeRightRotateMethod( \
-		Concat3(ReferersBy, referesToThat, TreeRightRotate), \
+		Concat3(By, referesToThat, TreeRightRotate), \
 		struct Link, \
 		Concat(__GetPreviousSiblingRefererBy, referesToThat), Concat(__SetPreviousSiblingRefererBy, referesToThat), \
 		Concat(__GetNextSiblingRefererBy, referesToThat), Concat(__SetNextSiblingRefererBy, referesToThat), \
 		Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat))
 
+// OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeMaintainMethod(referesToThat) \
 	DefineTreeMaintainMethods( \
-		Concat3(ReferersBy, referesToThat, TreeLeftMaintain), \
-		Concat3(ReferersBy, referesToThat, TreeRightMaintain), \
+		Concat3(By, referesToThat, TreeLeftMaintain), \
+		Concat3(By, referesToThat, TreeRightMaintain), \
 		struct Link, \
-		Concat3(ReferersBy, referesToThat, TreeLeftRotate), \
-		Concat3(ReferersBy, referesToThat, TreeRightRotate), \
+		Concat3(By, referesToThat, TreeLeftRotate), \
+		Concat3(By, referesToThat, TreeRightRotate), \
 		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
 		Concat(__GetNextSiblingRefererBy, referesToThat), \
 		Concat(__GetNumberOfReferersBy, referesToThat))
 
+// OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeInsertMethod(referesToThat) \
-	DefineTreeInsertMethod(Concat3(ReferersBy, referesToThat, TreeInsert), struct Link, \
-		Concat3(ReferersBy, referesToThat, TreeLeftMaintain), \
-		Concat3(ReferersBy, referesToThat, TreeRightMaintain), \
+	DefineTreeInsertMethod(Concat3(By, referesToThat, TreeInsert), struct Link, \
+		Concat3(By, referesToThat, TreeLeftMaintain), \
+		Concat3(By, referesToThat, TreeRightMaintain), \
 		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
 		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
 		Concat(__GetNextSiblingRefererBy, referesToThat), \
 		Concat(__GetNumberOfReferersBy, referesToThat), \
 		Concat(__SetNumberOfReferersBy, referesToThat))
 
+// OK
 #define DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
 	DefineUnsafeDetachFromTreeMethod(Concat(UnsafeDetachFromTreeOfReferersBy, referesToThat), struct Link, \
 		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
@@ -206,6 +214,7 @@
 	DefineReferersTreeInsertMethod(referesToThat) \
 	DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
 
+// OK
 #define DefineAllReferersBySourceTreeMethods() DefineAllReferersTreeMethods(Source)
 #define DefineAllReferersByLinkerTreeMethods() DefineAllReferersTreeMethods(Linker)
 #define DefineAllReferersByTargetTreeMethods() DefineAllReferersTreeMethods(Target)
@@ -233,89 +242,93 @@
 #define UnSubscribeFromLinker(link, newValue) UnSubscribeFromListOfReferersBy(Linker, link, newValue)
 #define UnSubscribeFromTarget(link, newValue) UnSubscribeFromTreeOfReferersBy(Target, link, newValue)
 
-#define GetNumberOfReferersInList(that, link) Concat3((link)->ReferersBy,that,Count)
+// ReferersBy -> By
+#define GetNumberOfReferersInList(that, link) GetLink(link)->Concat3(By,that,Count)
 #define GetNumberOfReferersInTree(that, link) _GetFirstRefererBy(that, of(link)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(link))) : 0
 
 #define GetNumberOfReferersBySource(link) GetNumberOfReferersInTree(Source, link)
 #define GetNumberOfReferersByLinker(link) GetNumberOfReferersInList(Linker, link)
 #define GetNumberOfReferersByTarget(link) GetNumberOfReferersInTree(Target, link)
 
+// Link * -> uint64_t
 #define DefineSearchInListOfReferersBySourceMethod()															 \
-Link *SearchRefererOfSource(Link *link, Link *refererTarget, Link* refererLinker)								 \
+uint64_t SearchRefererOfSource(uint64_t linkIndex, uint64_t refererTargetIndex, uint64_t refererLinkerIndex)								 \
 {																												 \
-	BeginWalkThroughReferersByTarget(referer, in(link))															 \
-		if (referer->Target == refererTarget && referer->Linker == refererLinker)								 \
+	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
+		if (GetTargetIndex(referer) == refererTargetIndex && GetLinkerIndex(referer) == refererLinkerIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
+// Link * -> uint64_t
 #define DefineSearchInListOfReferersByLinkerMethod()															 \
-Link *SearchRefererOfLinker(Link *link, Link *refererSource, Link* refererTarget)								 \
+uint64_t SearchRefererOfLinker(uint64_t linkIndex, uint64_t refererSourceIndex, uint64_t refererTargetIndex)								 \
 {																												 \
-	BeginWalkThroughReferersByTarget(referer, in(link))															 \
-		if (referer->Source == refererSource && referer->Target == refererTarget)								 \
+	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
+		if (GetSourceIndex(referer) == refererSourceIndex && GetTargetIndex(referer) == refererTargetIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
+// Link * -> uint64_t
 #define DefineSearchInListOfReferersByTargetMethod()															 \
-Link *SearchRefererOfTarget(Link *link, Link *refererSource, Link* refererLinker)								 \
+uint64_t SearchRefererOfTarget(uint64_t linkIndex, uint64_t refererSourceIndex, uint64_t refererLinkerIndex)								 \
 {																												 \
-	BeginWalkThroughReferersByTarget(referer, in(link))															 \
-		if (referer->Source == refererSource && referer->Linker == refererLinker)								 \
+	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
+		if (GetSourceIndex(referer) == refererSourceIndex && GetLinkerIndex(referer) == refererLinkerIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
 #define DefineSearchInTreeOfReferersBySourceMethod()															 \
-Link *SearchRefererOfSource(Link *link, Link *refererTarget, Link* refererLinker)								 \
+uint64_t SearchRefererOfSource(uint64_t linkIndex, uint64_t refererTargetIndex, uint64_t refererLinkerIndex)								 \
 {																												 \
-	Link *currentNode = _GetFirstRefererBy(Source, of(link));													 \
+	uint64_t currentNode = _GetFirstRefererBy(Source, of(linkIndex));													 \
 																												 \
 	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererBySourceCore(currentNode, refererLinker, refererTarget))			 \
+		if (IsRefererGreaterThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))			 \
 			currentNode = _GetPreviousSiblingRefererBy(Source, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererBySourceCore(currentNode, refererLinker, refererTarget))			 \
+		else if (IsRefererLessThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))			 \
 			currentNode = _GetNextSiblingRefererBy(Source, currentNode);										 \
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
 #define DefineSearchInTreeOfReferersByLinkerMethod()															 \
-Link *SearchRefererOfLinker(Link *link, Link *refererSource, Link* refererTarget)								 \
+uint64_t SearchRefererOfLinker(uint64_t linkIndex, uint64_t refererSourceIndex, uint64_t refererTargetIndex)								 \
 {																												 \
-	Link *currentNode = _GetFirstRefererBy(Linker, of(link));													 \
+	uint64_t currentNode = _GetFirstRefererBy(Linker, of(linkIndex));													 \
 																												 \
 	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererByLinkerCore(currentNode, refererSource, refererTarget))			 \
+		if (IsRefererGreaterThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))			 \
 			currentNode = _GetPreviousSiblingRefererBy(Linker, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererByLinkerCore(currentNode, refererSource, refererTarget))			 \
+		else if (IsRefererLessThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))			 \
 			currentNode = _GetNextSiblingRefererBy(Linker, currentNode);										 \
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
 #define DefineSearchInTreeOfReferersByTargetMethod()															 \
-Link *SearchRefererOfTarget(Link *link, Link *refererSource, Link* refererLinker)								 \
+uint64_t SearchRefererOfTarget(uint64_t linkIndex, uint64_t refererSourceIndex, uint64_t refererLinkerIndex)								 \
 {																												 \
-	Link *currentNode = _GetFirstRefererBy(Target, of(link));													 \
+	uint64_t currentNode = _GetFirstRefererBy(Target, of(linkIndex));													 \
 																												 \
 	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererByTargetCore(currentNode, refererLinker, refererSource))			 \
+		if (IsRefererGreaterThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))			 \
 			currentNode = _GetPreviousSiblingRefererBy(Target, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererByTargetCore(currentNode, refererLinker, refererSource))			 \
+		else if (IsRefererLessThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))			 \
 			currentNode = _GetNextSiblingRefererBy(Target, currentNode);										 \
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return null;																								 \
+	return LINK_0;																								 \
 }
 
 // OK

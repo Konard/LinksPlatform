@@ -1,9 +1,6 @@
 #ifndef __LINKS_LINK_H__
 #define __LINKS_LINK_H__
 
-// индекс линка unused
-#define LINK0 0
-
 #define itself 0
 
 #include "Common.h"

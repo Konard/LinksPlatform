@@ -39,9 +39,9 @@ void AttachLink(Link* link, Link* source, Link* linker, Link* target)
 
 void DetachLink(Link* link)
 {
-	UnSubscribeFromSource(link, link->Source);
-	UnSubscribeFromLinker(link, link->Linker);
-	UnSubscribeFromTarget(link, link->Target);
+	UnSubscribeFromSource(link, link->SourceIndex);
+	UnSubscribeFromLinker(link, link->LinkerIndex);
+	UnSubscribeFromTarget(link, link->TargetIndex);
 
 	link->Source = null;
 	link->Linker = null;

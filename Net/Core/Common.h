@@ -19,6 +19,9 @@
 #define true 1
 #define bool unsigned
 
+// индекс линка unused
+#define LINK_0 0
+
 #if defined(_MSC_VER) || defined(__MINGW32__)
 typedef __int32 int32_t;
 typedef unsigned __int32 uint32_t;
