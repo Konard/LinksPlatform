@@ -202,7 +202,7 @@ void WalkThroughAllReferersBySourceCore(Link* root, action a)
 		WalkThroughAllReferersBySourceCore(root->NextSiblingRefererBySource, a);
 	}
 }
-	
+
 int WalkThroughReferersBySourceCore(Link* root, func f)
 {
 	if (root != null)
@@ -214,59 +214,60 @@ int WalkThroughReferersBySourceCore(Link* root, func f)
 	return true;
 }
 
-void _H WalkThroughAllReferersBySource(Link* root, action a)
+void _H WalkThroughAllReferersBySource(uint64_t rootIndex, action action_)
 {
-	if (root != null) WalkThroughAllReferersBySourceCore(root->FirstRefererBySource, a);
+	if (rootIndex != LINK_0) WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->BySourceIndex, action_);
 }
-	
-int _H WalkThroughReferersBySource(Link* root, func f)
+
+int _H WalkThroughReferersBySource(uint64_t rootIndex, func func_)
 {
-	if (root != null) return WalkThroughReferersBySourceCore(root->FirstRefererBySource, f);
+	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLink(rootIndex)->BySourceIndex, func_);
 	else return true;
 }
 
-void _H WalkThroughAllReferersByLinker(Link* root, action a)
+void _H WalkThroughAllReferersByLinker(uint64_t rootIndex, action action_)
 {
-	if(root != null)
+	if(rootIndex != LINK_0)
 	{
-		BeginWalkThroughReferersByLinker(element, root)
+		BeginWalkThroughReferersByLinker(element, rootIndex)
 		{
-			a(element);
+			action_(element);
 		}
 		EndWalkThroughReferersByLinker(element);
 	}
 }
 
-int _H WalkThroughReferersByLinker(Link* root, func f)
+int _H WalkThroughReferersByLinker(uint64_t rootIndex, func func_)
 {
-	if(root != null)
+	if(rootIndex != LINK_0)
 	{
-		BeginWalkThroughReferersByLinker(element, root)
+		BeginWalkThroughReferersByLinker(element, rootIndex)
 		{
-			if(!f(element)) return false;
+			if(!func_(element)) return false;
 		}
 		EndWalkThroughReferersByLinker(element);
 	}
 	return true;
 }
 
-void WalkThroughAllReferersByTargetCore(Link* root, action a)
+void WalkThroughAllReferersByTargetCore(uint64_t rootIndex, action action_)
 {
-	if (root != null)
+	if (rootIndex != LINK_0)
 	{
-		WalkThroughAllReferersByTargetCore(root->PreviousSiblingRefererByTarget, a);
-		a(root);
-		WalkThroughAllReferersByTargetCore(root->NextSiblingRefererByTarget, a);
+		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->LeftByTargetIndex, action_);
+		action_(rootIndex);
+		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->RightByTargetIndex, action_);
 	}
 }
-	
-int WalkThroughReferersByTargetCore(Link* root, func f)
+
+// обход по дереву
+int WalkThroughReferersByTargetCore(uint64_t rootIndex, func func_)
 {
-	if(root != null)
+	if(rootIndex != LINK_0)
 	{
-		if(!WalkThroughReferersByTargetCore(root->PreviousSiblingRefererByTarget, f)) return false;
-		if(!f(root)) return false;
-		if(!WalkThroughReferersByTargetCore(root->NextSiblingRefererByTarget, f)) return false;
+		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->LeftByTargetIndex, func_)) return false;
+		if(!func_(rootIndex)) return false;
+		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->RightByTargetIndex, func_)) return false;
 	}
 	return true;
 }
