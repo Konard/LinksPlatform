@@ -140,7 +140,7 @@
 #define IsRefererLessThanOtherRefererBySourceCore(refererIndex, otherRefererLinkerIndex, otherRefererTargetIndex) (GetLinkerIndex(refererIndex) < (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetTargetIndex(refererIndex) < (otherRefererTargetIndex)))
 #define IsRefererGreaterThanOtherRefererBySourceCore(refererIndex, otherRefererLinkerIndex, otherRefererTargetIndex) (GetLinkerIndex(refererIndex) > (otherRefererLinkerIndex) || (GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && GetTargetIndex(refererIndex) > (otherRefererTargetIndex)))
 // +Index
-#define IsRefererLessThanOtherRefererBySource(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererBySourceCore(refererIndex, GetLinkerIndex(otherReferer), GetTargetIndex(otherRefererIndex))
+#define IsRefererLessThanOtherRefererBySource(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererBySourceCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetTargetIndex(otherRefererIndex))
 #define IsRefererGreaterThanOtherRefererBySource(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererBySourceCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetTargetIndex(otherRefererIndex))
 
 // +Index

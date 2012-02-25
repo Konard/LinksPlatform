@@ -271,13 +271,13 @@ int WalkThroughReferersByTargetCore(Link* root, func f)
 	return true;
 }
 
-void _H WalkThroughAllReferersByTarget(Link* root, action a)
+void _H WalkThroughAllReferersByTarget(uint64_t rootIndex, action action_)
 {
-	if (root != null) WalkThroughAllReferersByTargetCore(root->FirstRefererByTarget, a);
+	if (rootIndex != LINK_0) WalkThroughAllReferersByTargetCore(GetTargetIndex(rootIndex), action_);
 }
 	
-int _H WalkThroughReferersByTarget(Link* root, func f)
+int _H WalkThroughReferersByTarget(uint64_t rootIndex, func func_)
 {
-	if (root != null) return WalkThroughReferersByTargetCore(root->FirstRefererByTarget, f);
+	if (rootIndex != LINK_0) return WalkThroughReferersByTargetCore(GetTargetIndex(rootIndex), func_);
 	else return true;
 }

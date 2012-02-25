@@ -39,9 +39,9 @@ typedef struct Link
 	//struct Link *PreviousSiblingRefererByLinker; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве связи связки
 	//struct Link *PreviousSiblingRefererByTarget; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве конечной связи
 	
-	uint64_t BySourceCount;
-	uint64_t ByLinkerCount;
-	uint64_t ByTargetCount;
+	uint64_t BySourceIndexCount;
+	uint64_t ByLinkerIndexCount;
+	uint64_t ByTargetIndexCount;
 	//uint64_t ReferersBySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (количество элементов в дереве)
 	//uint64_t ReferersByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (количество элементов в дереве)
 	//uint64_t ReferersByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (количество элементов в дереве)
@@ -105,7 +105,7 @@ int PREFIX_DLL WalkThroughReferersByTarget(uint64_t rootLinkIndex, func);
 //void PREFIX_DLL WalkThroughAllReferersByTarget(Link* root, action);
 //int PREFIX_DLL WalkThroughReferersByTarget(Link* root, func);
 
-// not exported
+// not exported !!!
 
 void AttachLinkToUnusedMarker(uint64_t linkIndex);
 void DetachLinkFromUnusedMarker(uint64_t linkIndex);
