@@ -443,7 +443,7 @@ uint64_t AllocateFromFreeLinks()
 
 uint64_t AllocateLink()
 {
-	if (pointerToUnusedMarker->ByLinker != 0)
+	if (pointerToUnusedMarker->ByLinkerIndex != LINK_0) // можно ли использовать указатели?
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
@@ -454,12 +454,12 @@ void FreeLink(uint64_t linkIndex)
 	DetachLink(linkIndex);
 
 	Link *link = GetLink(linkIndex);
-    while (link->BySource != 0) FreeLink(link->BySource);
-    while (link->ByLinker != 0) FreeLink(link->ByLinker);
-    while (link->ByTarget != 0) FreeLink(link->ByTarget);
+    while (link->BySourceIndex != LINK_0) FreeLink(link->BySourceIndex);
+    while (link->ByLinkerIndex != LINK_0) FreeLink(link->ByLinkerIndex);
+    while (link->ByTargetIndex != LINK_0) FreeLink(link->ByTargetIndex);
 
 	{
-		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
+		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize; // pointerToLinks и так смещается на -1, поэтому -1 убираем
 
 		if (link < lastUsedLink)
 		{
@@ -469,7 +469,7 @@ void FreeLink(uint64_t linkIndex)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->Linker == pointerToUnusedMarker)
+			while(GetLinkerIndex(--lastUsedLink) == LINK_0) // ?
 			{
 				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
 				--*pointerToLinksSize;
@@ -483,11 +483,11 @@ void FreeLink(uint64_t linkIndex)
 void WalkThroughAllLinks(func func_)
 {
 	Link *currentLink = pointerToLinks;
-	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize; // аналогично
 
 	do
 	{
-		if (currentLink->Linker != pointerToUnusedMarker)
+		if (GetLinkerIndex(currentLink) != LINK_0) // ? корректна ли замена
 		{
 			func_(currentLink);
 		}
@@ -498,11 +498,11 @@ void WalkThroughAllLinks(func func_)
 int WalkThroughLinks(func func_)
 {
 	Link *currentLink = pointerToLinks;
-	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize;
 
 	do
 	{
-		if (currentLink->Linker != pointerToUnusedMarker)
+		if (GetLinkerIndex(currentLink) != LINK_0) // ?
 		{
 			if(!func_(currentLink)) return false;
 		}
