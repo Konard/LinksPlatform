@@ -9,39 +9,39 @@
 typedef struct Link
 {
 	// заменяем всё на индексы
-	uint64_t SourceIndex; // Индекс начала
-	uint64_t LinkerIndex; // Индекс связки
-	uint64_t TargetIndex; // Индекс конца
+	uint64_t Source; // Индекс начала
+	uint64_t Linker; // Индекс связки
+	uint64_t Target; // Индекс конца
 	//struct Link *SourceIndex; // Индекс начала
 	//struct Link *LinkerIndex; // Индекс связки
 	//struct Link *TargetIndex; // Индекс конца
 	
 	// ссылка на ссылающихся
-	uint64_t BySourceIndex;
-	uint64_t ByLinkerIndex;
-	uint64_t ByTargetIndex;
+	uint64_t BySource;
+	uint64_t ByLinker;
+	uint64_t ByTarget;
 	//struct Link *FirstRefererBySource; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве начальной связи
 	//struct Link *FirstRefererByLinker; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве связи связки
 	//struct Link *FirstRefererByTarget; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве конечной связи
 	
 	// структура дерева ссылающихся
-	uint64_t LeftBySourceIndex;
-	uint64_t LeftByLinkerIndex;
-	uint64_t LeftByTargetIndex;
+	uint64_t LeftBySource;
+	uint64_t LeftByLinker;
+	uint64_t LeftByTarget;
 	//struct Link *NextSiblingRefererBySource; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве начальной связи
 	//struct Link *NextSiblingRefererByLinker; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве связи связки
 	//struct Link *NextSiblingRefererByTarget; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве конечной связи
 	
-	uint64_t RightBySourceIndex;
-	uint64_t RightByLinkerIndex;
-	uint64_t RightByTargetIndex;
+	uint64_t RightBySource;
+	uint64_t RightByLinker;
+	uint64_t RightByTarget;
 	//struct Link *PreviousSiblingRefererBySource; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве начальной связи
 	//struct Link *PreviousSiblingRefererByLinker; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве связи связки
 	//struct Link *PreviousSiblingRefererByTarget; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве конечной связи
 	
-	uint64_t BySourceIndexCount;
-	uint64_t ByLinkerIndexCount;
-	uint64_t ByTargetIndexCount;
+	uint64_t BySourceCount;
+	uint64_t ByLinkerCount;
+	uint64_t ByTargetCount;
 	//uint64_t ReferersBySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (количество элементов в дереве)
 	//uint64_t ReferersByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (количество элементов в дереве)
 	//uint64_t ReferersByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (количество элементов в дереве)

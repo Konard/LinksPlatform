@@ -17,8 +17,8 @@
 #define _SetPreviousSiblingRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(LeftBy,byWhat) = newValue
 
 // ByLinker, например
-#define _GetFirstRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat3(By,byWhat,Index)
-#define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,byWhat,Index) = newValue
+#define _GetFirstRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(By,byWhat)
+#define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(By,byWhat) = newValue
 
 // BySourceCount, например
 #define _IncrementNumberOfReferers(whichRererersBy, linkIndex) Concat3(GetLink(linkIndex)->By,whichRererersBy,Count++)
@@ -29,34 +29,34 @@
 #define _SetNumberOfReferersBy(that, linkIndex, newValue) Concat3(GetLink(linkIndex)->By,that,Count) = newValue
 
 // заменены link на linkIndex, Source на SourceIndex и т.п.
-#define __GetNextSiblingRefererBySource(linkIndex) _GetNextSiblingRefererBy(SourceIndex, linkIndex)
-#define __GetNextSiblingRefererByLinker(linkIndex) _GetNextSiblingRefererBy(LinkerIndex, linkIndex)
-#define __GetNextSiblingRefererByTarget(linkIndex) _GetNextSiblingRefererBy(TargetIndex, linkIndex)
+#define __GetNextSiblingRefererBySource(linkIndex) _GetNextSiblingRefererBy(Source, linkIndex)
+#define __GetNextSiblingRefererByLinker(linkIndex) _GetNextSiblingRefererBy(Linker, linkIndex)
+#define __GetNextSiblingRefererByTarget(linkIndex) _GetNextSiblingRefererBy(Target, linkIndex)
 
 // заменены Source на SourceIndex и т.п.
-#define __SetNextSiblingRefererBySource(linkIndex, newValue) _SetNextSiblingRefererBy(SourceIndex, linkIndex, newValue)
-#define __SetNextSiblingRefererByLinker(linkIndex, newValue) _SetNextSiblingRefererBy(LinkerIndex, linkIndex, newValue)
-#define __SetNextSiblingRefererByTarget(linkIndex, newValue) _SetNextSiblingRefererBy(TargetIndex, linkIndex, newValue)
+#define __SetNextSiblingRefererBySource(linkIndex, newValue) _SetNextSiblingRefererBy(Source, linkIndex, newValue)
+#define __SetNextSiblingRefererByLinker(linkIndex, newValue) _SetNextSiblingRefererBy(Linker, linkIndex, newValue)
+#define __SetNextSiblingRefererByTarget(linkIndex, newValue) _SetNextSiblingRefererBy(Target, linkIndex, newValue)
 
 // заменены Source на SourceIndex и т.п.
-#define __GetPreviousSiblingRefererBySource(linkIndex) _GetPreviousSiblingRefererBy(SourceIndex, linkIndex)
-#define __GetPreviousSiblingRefererByLinker(linkIndex) _GetPreviousSiblingRefererBy(LinkerIndex, linkIndex)
-#define __GetPreviousSiblingRefererByTarget(linkIndex) _GetPreviousSiblingRefererBy(TargetIndex, linkIndex)
+#define __GetPreviousSiblingRefererBySource(linkIndex) _GetPreviousSiblingRefererBy(Source, linkIndex)
+#define __GetPreviousSiblingRefererByLinker(linkIndex) _GetPreviousSiblingRefererBy(Linker, linkIndex)
+#define __GetPreviousSiblingRefererByTarget(linkIndex) _GetPreviousSiblingRefererBy(Target, linkIndex)
 
 // заменены Source на SourceIndex и т.п.
-#define __SetPreviousSiblingRefererBySource(linkIndex, newValue) _SetPreviousSiblingRefererBy(SourceIndex, linkIndex, newValue)
-#define __SetPreviousSiblingRefererByLinker(linkIndex, newValue) _SetPreviousSiblingRefererBy(LinkerIndex, linkIndex, newValue)
-#define __SetPreviousSiblingRefererByTarget(linkIndex, newValue) _SetPreviousSiblingRefererBy(TargetIndex, linkIndex, newValue)
+#define __SetPreviousSiblingRefererBySource(linkIndex, newValue) _SetPreviousSiblingRefererBy(Source, linkIndex, newValue)
+#define __SetPreviousSiblingRefererByLinker(linkIndex, newValue) _SetPreviousSiblingRefererBy(Linker, linkIndex, newValue)
+#define __SetPreviousSiblingRefererByTarget(linkIndex, newValue) _SetPreviousSiblingRefererBy(Target, linkIndex, newValue)
 
 // +Index
-#define __GetNumberOfReferersBySource(linkIndex) _GetNumberOfReferersBy(SourceIndex, linkIndex)
-#define __GetNumberOfReferersByLinker(linkIndex) _GetNumberOfReferersBy(LinkerIndex, linkIndex)
-#define __GetNumberOfReferersByTarget(linkIndex) _GetNumberOfReferersBy(TargetIndex, linkIndex)
+#define __GetNumberOfReferersBySource(linkIndex) _GetNumberOfReferersBy(Source, linkIndex)
+#define __GetNumberOfReferersByLinker(linkIndex) _GetNumberOfReferersBy(Linker, linkIndex)
+#define __GetNumberOfReferersByTarget(linkIndex) _GetNumberOfReferersBy(Target, linkIndex)
 
 // +Index
-#define __SetNumberOfReferersBySource(linkIndex, newValue) _SetNumberOfReferersBy(SourceIndex, linkIndex, newValue)
-#define __SetNumberOfReferersByLinker(linkIndex, newValue) _SetNumberOfReferersBy(LinkerIndex, linkIndex, newValue)
-#define __SetNumberOfReferersByTarget(linkIndex, newValue) _SetNumberOfReferersBy(TargetIndex, linkIndex, newValue)
+#define __SetNumberOfReferersBySource(linkIndex, newValue) _SetNumberOfReferersBy(Source, linkIndex, newValue)
+#define __SetNumberOfReferersByLinker(linkIndex, newValue) _SetNumberOfReferersBy(Linker, linkIndex, newValue)
+#define __SetNumberOfReferersByTarget(linkIndex, newValue) _SetNumberOfReferersBy(Target, linkIndex, newValue)
 
 
 // +Index
