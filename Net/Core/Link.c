@@ -88,7 +88,8 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 {
     if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
     {
-        Link* link = SearchLink(source, linker, target);
+        uint64_t linkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
+		Link* link = GetLink(linkIndex);
         if (link == null)
         {
             link = AllocateLink();

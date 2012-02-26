@@ -562,3 +562,22 @@ uint64_t GetLinkerIndex(uint64_t linkIndex)
 	Link* link = GetLink(linkIndex);
 	return (link == null) ? 0 : link->LinkerIndex;
 }
+
+// By ...
+uint64_t GetBySourceIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->BySourceIndex;
+}
+
+uint64_t GetByTargetIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->ByTargetIndex;
+}
+
+uint64_t GetByLinkerIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == null) ? 0 : link->ByLinkerIndex;
+}

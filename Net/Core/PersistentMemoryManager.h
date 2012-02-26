@@ -51,6 +51,9 @@ PREFIX_DLL Link* GetLink(uint64_t linkIndex); // из таблицы pointerToLi
 PREFIX_DLL uint64_t GetSourceIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetTargetIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetLinkerIndex(uint64_t linkIndex); // LinkerLink index
+PREFIX_DLL uint64_t GetBySourceIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetByTargetIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetByLinkerIndex(uint64_t linkIndex);
 
 
 #if defined(__cplusplus)
