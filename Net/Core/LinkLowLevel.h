@@ -73,7 +73,7 @@
 #define BeginWalkThroughLinksList(elementIndex, firstIndex)																		\
 {																														\
 	uint64_t firstElementIndex = firstIndex;																							\
-	if (firstElement != LINK_0) 																							\
+	if (firstElementIndex != LINK_0) 																							\
 	{																													\
 		uint64_t elementIndex = firstElementIndex;																					\
 		do																												\

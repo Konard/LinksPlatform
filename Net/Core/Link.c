@@ -39,9 +39,9 @@ void AttachLink(Link* link, Link* source, Link* linker, Link* target)
 
 void DetachLink(Link* link)
 {
-	UnSubscribeFromSource(link, link->SourceIndex);
-	UnSubscribeFromLinker(link, link->LinkerIndex);
-	UnSubscribeFromTarget(link, link->TargetIndex);
+	UnSubscribeFromSource(link, link->Source);
+	UnSubscribeFromLinker(link, link->Linker);
+	UnSubscribeFromTarget(link, link->Target);
 
 	link->Source = null;
 	link->Linker = null;
@@ -122,26 +122,26 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
 {
 	if (linkIndex != replacementIndex)
 	{
-		Link* firstRefererBySource = link->FirstRefererBySource;
-		Link* firstRefererByLinker = link->FirstRefererByLinker;
-		Link* firstRefererByTarget = link->FirstRefererByTarget;
+		Link* firstRefererBySource = link->BySource;
+		Link* firstRefererByLinker = link->ByLinker;
+		Link* firstRefererByTarget = link->ByTarget;
 
 		while (firstRefererBySource != null)
 		{
 			UpdateLink(firstRefererBySource, replacement, firstRefererBySource->Linker, firstRefererBySource->Target);
-			firstRefererBySource = link->FirstRefererBySource;
+			firstRefererBySource = link->BySource;
 		}
 
 		while (firstRefererByLinker != null)
 		{
 			UpdateLink(firstRefererByLinker, firstRefererByLinker->Source, replacement, firstRefererByLinker->Target);
-			firstRefererByLinker = link->FirstRefererByLinker;
+			firstRefererByLinker = link->ByLinker;
 		}
 
 		while (firstRefererByTarget != null)
 		{
 			UpdateLink(firstRefererByTarget, firstRefererByTarget->Source, firstRefererByTarget->Linker, replacement);
-			firstRefererByTarget = link->FirstRefererByTarget;
+			firstRefererByTarget = link->ByTarget;
 		}
 
 		FreeLink(link);
