@@ -119,19 +119,19 @@
 	{																													\
 		uint64_t previousLastRefererIndex = _GetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex));						\
 																														\
-		_SetNextSiblingRefererBy(that, of(link), to(previousFirstRefererIndex));												\
-		_SetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex), to(link));											\
+		_SetNextSiblingRefererBy(that, of(linkIndex), to(previousFirstRefererIndex));												\
+		_SetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex), to(linkIndex));											\
 																														\
-		_SetPreviousSiblingRefererBy(that, of(link), to(previousLastRefererIndex));											\
-		_SetNextSiblingRefererBy(that, of(previousLastRefererIndex), to(link));												\
+		_SetPreviousSiblingRefererBy(that, of(linkIndex), to(previousLastRefererIndex));											\
+		_SetNextSiblingRefererBy(that, of(previousLastRefererIndex), to(linkIndex));												\
 	}																													\
 	else																												\
 	{																													\
-		_SetNextSiblingRefererBy(that, of(link), to(link));																\
-		_SetPreviousSiblingRefererBy(that, of(link), to(link));															\
+		_SetNextSiblingRefererBy(that, of(linkIndex), to(linkIndex));																\
+		_SetPreviousSiblingRefererBy(that, of(linkIndex), to(linkIndex));															\
 	}																													\
 																														\
-	_SetFirstRefererBy(that, of(newValue), to(link));																	\
+	_SetFirstRefererBy(that, of(newValue), to(linkIndex));																	\
 																														\
 	_IncrementNumberOfReferers(that, of(newValue));																		\
 }

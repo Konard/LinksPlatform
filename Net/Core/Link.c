@@ -37,9 +37,10 @@ void AttachLink(Link* link, Link* source, Link* linker, Link* target)
 	SubscribeAsRefererToTarget(link, target);
 }
 
-void DetachLink(uint64_t linkIndex)
+void DetachLink(Link* link)
+//void DetachLink(uint64_t linkIndex)
 {
-	Link* link = GetLink(linkIndex);
+//	Link* link = GetLink(linkIndex);
 	UnSubscribeFromSource(link, link->Source);
 	UnSubscribeFromLinker(link, link->Linker);
 	UnSubscribeFromTarget(link, link->Target);
@@ -51,9 +52,9 @@ void DetachLink(uint64_t linkIndex)
 
 void AttachLinkToUnusedMarker(uint64_t linkIndex)
 {
-	GetLink(linkIndex)->LinkerIndex = 0; // markerIndex == 0
+	GetLink(linkIndex)->Linker = LINK_0; // markerIndex == 0
 
-	SubscribeToListOfReferersBy(Linker, link, marker);
+	SubscribeToListOfReferersBy(Linker, linkIndex, LINK_0);
 }
 
 //void AttachLinkToUnusedMarker(Link *link) {
@@ -64,7 +65,7 @@ void AttachLinkToUnusedMarker(uint64_t linkIndex)
 
 void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 {
-	UnSubscribeFromListOfReferersBy(Linker, link, marker);
+	UnSubscribeFromListOfReferersBy(Linker, linkIndex, marker);
 
 	link->Linker = null;
 }
@@ -76,7 +77,7 @@ void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 
 
 //Link* _H SearchLink(Link* source, Link* linker, Link* target)
-uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
 	if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
 		return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
@@ -85,7 +86,7 @@ uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 }
 
 //Link* _H CreateLink(Link* source, Link* linker, Link* target)
-uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
     {
@@ -119,7 +120,7 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 }
 
 //Link* _H ReplaceLink(Link* link, Link* replacement)
-uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
+uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
 	if (linkIndex != replacementIndex)
 	{
@@ -152,7 +153,7 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
 	return replacementIndex;
 }
 
-uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 //Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
 {
 	if(GetSourceIndex(linkIndex) == sourceIndex && GetLinkerIndex(linkIndex) == linkerIndex && GetTargetIndex(linkIndex) == targetIndex)
