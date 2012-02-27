@@ -65,8 +65,9 @@ void AttachLinkToUnusedMarker(uint64_t linkIndex)
 
 void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 {
-	UnSubscribeFromListOfReferersBy(Linker, linkIndex, marker);
-
+//	UnSubscribeFromListOfReferersBy(Linker, linkIndex, marker);
+	UnSubscribeFromListOfReferersBy(Linker, linkIndex, LINK_0);
+	
 	link->Linker = null;
 }
 
