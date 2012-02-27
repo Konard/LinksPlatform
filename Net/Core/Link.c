@@ -131,9 +131,9 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 //Link* _H ReplaceLink(Link* link, Link* replacement)
 uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
-	uint64_t bySourceIndex = GetBySourceIndex(link);
-	uint64_t byLinkerIndex = GetByLinkerIndex(link);
-	uint64_t byTargetIndex = GetByTargetIndex(link);
+	uint64_t bySourceIndex = GetBySourceIndex(linkIndex);
+	uint64_t byLinkerIndex = GetByLinkerIndex(linkIndex);
+	uint64_t byTargetIndex = GetByTargetIndex(linkIndex);
 
 	if (linkIndex != replacementIndex)
 	{
@@ -141,22 +141,22 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 //		Link* firstRefererByLinker = link->ByLinker;
 //		Link* firstRefererByTarget = link->ByTarget;
 
-		while (BySourceIndex != LINK_0)
+		while (bySourceIndex != LINK_0)
 		{
-			UpdateLink(BySourceIndex, replacementIndex, GetLinkerIndex(BySourceIndex), GetTargetIndex(BySourceIndex));
-			BySourceIndex = GetBySourceIndex(linkIndex);
+			UpdateLink(bySourceIndex, replacementIndex, GetLinkerIndex(bySourceIndex), GetTargetIndex(bySourceIndex));
+			bySourceIndex = GetBySourceIndex(linkIndex);
 		}
 
-		while (ByLinkerIndex != LINK_0)
+		while (byLinkerIndex != LINK_0)
 		{
-			UpdateLink(ByLinkerIndex, GetSourceIndex(ByLinkerIndex), replacementIndex, GetTargetIndex(ByLinkerIndex));
-			ByLinkerIndex = GetByLinkerIndex(linkIndex);
+			UpdateLink(byLinkerIndex, GetSourceIndex(byLinkerIndex), replacementIndex, GetTargetIndex(byLinkerIndex));
+			byLinkerIndex = GetByLinkerIndex(linkIndex);
 		}
 
-		while (ByTargetIndex != LINK_0)
+		while (byTargetIndex != LINK_0)
 		{
-			UpdateLink(ByTargetIndex, GetSourceIndex(ByTargetIndex), GetLinkerIndex(ByTargetIndex), replacementIndex);
-			ByTargetIndex = GetByTargetIndex(linkIndex);
+			UpdateLink(byTargetIndex, GetSourceIndex(byTargetIndex), GetLinkerIndex(byTargetIndex), replacementIndex);
+			byTargetIndex = GetByTargetIndex(linkIndex);
 		}
 
 		Link *link = GetLink(linkIndex);
