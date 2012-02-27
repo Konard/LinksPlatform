@@ -92,7 +92,7 @@
 {																														\
 	uint64_t nextRefererIndex = _GetNextSiblingRefererBy(that,linkIndex);																\
 																														\
-	if (nextRefererIndex != link)																							\
+	if (nextRefererIndex != linkIndex)																							\
 	{																													\
 		uint64_t previousRefererIndex = _GetPreviousSiblingRefererBy(that,linkIndex);													\
 																														\
