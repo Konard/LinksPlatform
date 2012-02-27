@@ -89,34 +89,38 @@ uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 //Link* _H CreateLink(Link* source, Link* linker, Link* target)
 uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-    if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
+	Link* source = GetLink(sourceIndex);
+	Link* linker = GetLink(linkerIndex);
+	Link* target = GetLink(targetIndex);
+
+	if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
     {
         uint64_t linkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
 		Link* link = GetLink(linkIndex);
-        if (link == null)
+        if (link == NULL)
         {
             link = AllocateLink();
 			link->Timestamp = GetTimestamp();
-			if (link != null)
+			if (link != NULL)
 				AttachLink(link, source, linker, target);
         }
-        return link;
+        return linkIndex;
     }
     else
     {
         Link* link = AllocateLink();
 		link->Timestamp = GetTimestamp();
 
-		if (link != null)
+		if (link != NULL)
 		{
-			source = (source == itself ? link : source);
-			linker = (linker == itself ? link : linker);
-			target = (target == itself ? link : target);
+			source = (sourceIndex == LINK_0 ? link : source);
+			linker = (linkerIndex == LINK_0 ? link : linker);
+			target = (targetIndex == LINK_0 ? link : target);
 
 			AttachLink(link, source, linker, target);
 		}
 
-        return link;
+        return linkIndex;
 	}
 }
 
@@ -125,31 +129,36 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
 	if (linkIndex != replacementIndex)
 	{
-		Link* firstRefererBySource = link->BySource;
-		Link* firstRefererByLinker = link->ByLinker;
-		Link* firstRefererByTarget = link->ByTarget;
+//		Link* firstRefererBySource = link->BySource;
+//		Link* firstRefererByLinker = link->ByLinker;
+//		Link* firstRefererByTarget = link->ByTarget;
+		bySourceIndex = GetBySourceIndex(link);
+		byLinkerIndex = GetByLinkerIndex(link);
+		byTargetIndex = GetByTargetIndex(link);
 
-		while (firstRefererBySource != null)
+		while (BySourceIndex != LINK_0)
 		{
-			UpdateLink(firstRefererBySource, replacement, firstRefererBySource->Linker, firstRefererBySource->Target);
-			firstRefererBySource = link->BySource;
+			UpdateLink(BySourceIndex, replacementIndex, GetLinkerIndex(BySourceIndex), GetTargetIndex(BySourceIndex));
+			BySourceIndex = GetBySourceIndex(linkIndex);
 		}
 
-		while (firstRefererByLinker != null)
+		while (ByLinkerIndex != LINK_0)
 		{
-			UpdateLink(firstRefererByLinker, firstRefererByLinker->Source, replacement, firstRefererByLinker->Target);
-			firstRefererByLinker = link->ByLinker;
+			UpdateLink(ByLinkerIndex, GetSourceIndex(ByLinkerIndex), replacementIndex, GetTargetIndex(ByLinkerIndex));
+			ByLinkerIndex = GetByLinkerIndex(linkIndex);
 		}
 
-		while (firstRefererByTarget != null)
+		while (ByTargetIndex != LINK_0)
 		{
-			UpdateLink(firstRefererByTarget, firstRefererByTarget->Source, firstRefererByTarget->Linker, replacement);
-			firstRefererByTarget = link->ByTarget;
+			UpdateLink(ByTargetIndex, GetSourceIndex(ByTargetIndex), GetLinkerIndex(ByTargetIndex), replacementIndex);
+			ByTargetIndex = GetByTargetIndex(linkIndex);
 		}
 
+		Link *link = GetLink(linkIndex);
 		FreeLink(link);
 
-		replacement->Timestamp = GetTimestamp();
+		Link *replacement = GetLink(replacementIndex);
+		replacementIndex->Timestamp = GetTimestamp();
 	}
 	return replacementIndex;
 }
@@ -160,21 +169,26 @@ uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_
 	if(GetSourceIndex(linkIndex) == sourceIndex && GetLinkerIndex(linkIndex) == linkerIndex && GetTargetIndex(linkIndex) == targetIndex)
 		return linkIndex;
 
+	Link *link = GetLink(linkIndex);
+	Link *source = GetLink(sourceIndex);
+	Link *linker = GetLink(linkerIndex);
+	Link *target = GetLink(targetIndex);
     if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // ? itself -> LINK_0
     {
-        Link* existingLink = SearchLink(source, linker, target);
-        if (existingLink == null)
+        uint64_t existingLinkIndex = SearchLink(source, linker, target);
+        Link* existingLink = GetLink(existingLinkIndex);
+        if (existingLink == NULL)
         {
 			DetachLink(link);
 			AttachLink(link, source, linker, target);
 
 			link->Timestamp = GetTimestamp();
 
-			return link;
+			return linkIndex;
         }
 		else
 		{
-			return ReplaceLink(link, existingLink);
+			return ReplaceLink(linkIndex, existingLinkIndex);
 		}
     }
     else
@@ -188,7 +202,7 @@ uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_
 
 		link->Timestamp = GetTimestamp();
 
-        return link;
+        return linkIndex;
 	}
 }
 
