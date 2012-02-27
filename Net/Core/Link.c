@@ -110,7 +110,9 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
     }
     else
     {
-        Link* link = AllocateLink();
+        uint64_t linkIndex = AllocateLink();
+		Link* link = GetLink(linkIndex);
+
 		link->Timestamp = GetTimestamp();
 
 		if (link != NULL)
@@ -129,14 +131,15 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 //Link* _H ReplaceLink(Link* link, Link* replacement)
 uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
+	uint64_t bySourceIndex = GetBySourceIndex(link);
+	uint64_t byLinkerIndex = GetByLinkerIndex(link);
+	uint64_t byTargetIndex = GetByTargetIndex(link);
+
 	if (linkIndex != replacementIndex)
 	{
 //		Link* firstRefererBySource = link->BySource;
 //		Link* firstRefererByLinker = link->ByLinker;
 //		Link* firstRefererByTarget = link->ByTarget;
-		uint64_t bySourceIndex = GetBySourceIndex(link);
-		uint64_t byLinkerIndex = GetByLinkerIndex(link);
-		uint64_t byTargetIndex = GetByTargetIndex(link);
 
 		while (BySourceIndex != LINK_0)
 		{
@@ -160,7 +163,7 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 		FreeLink(link);
 
 		Link *replacement = GetLink(replacementIndex);
-		replacementIndex->Timestamp = GetTimestamp();
+		replacement->Timestamp = GetTimestamp();
 	}
 	return replacementIndex;
 }
