@@ -37,41 +37,42 @@ void AttachLink(Link* link, Link* source, Link* linker, Link* target)
 	SubscribeAsRefererToTarget(link, target);
 }
 
-void DetachLink(Link* link)
+void DetachLink(uint64_t linkIndex)
 {
+	Link* link = GetLink(linkIndex);
 	UnSubscribeFromSource(link, link->Source);
 	UnSubscribeFromLinker(link, link->Linker);
 	UnSubscribeFromTarget(link, link->Target);
 
-	link->Source = null;
+	link->Source = LINK_0;
+	link->Linker = LINK_0;
+	link->Target = LINK_0;
+}
+
+void AttachLinkToUnusedMarker(uint64_t linkIndex)
+{
+	GetLink(linkIndex)->LinkerIndex = 0; // markerIndex == 0
+
+	SubscribeToListOfReferersBy(Linker, link, marker);
+}
+
+//void AttachLinkToUnusedMarker(Link *link) {
+        //link->LinkerIndex = LINK_0;
+        //SubscribeToListOfReferersBy(Linker, link, pointerToUnusedMarker);
+//}
+
+
+void DetachLinkFromUnusedMarker(uint64_t linkIndex)
+{
+	UnSubscribeFromListOfReferersBy(Linker, link, marker);
+
 	link->Linker = null;
-	link->Target = null;
 }
 
-////void AttachLinkToUnusedMarker(uint64_t linkIndex)
-////{
-////	GetLink(linkIndex)->LinkerIndex = 0; // markerIndex == 0
-////
-////	SubscribeToListOfReferersBy(Linker, link, marker);
-////}
-
-void AttachLinkToUnusedMarker(Link *link) {
-        link->LinkerIndex = LINK_0;
-        SubscribeToListOfReferersBy(Linker, link, pointerToUnusedMarker);
-}
-
-
-////void DetachLinkFromUnusedMarker(uint64_t linkIndex)
-////{
-////	UnSubscribeFromListOfReferersBy(Linker, link, marker);
-////
-////	link->Linker = null;
-////}
-
-void DetachLinkFromUnusedMarker(Link* link) {
-        UnSubscribeFromListOfReferersBy(Linker, link, pointerToUnusedMarker);
-        link->LinkerIndex = LINK_0;
-}
+//void DetachLinkFromUnusedMarker(Link* link) {
+        //UnSubscribeFromListOfReferersBy(Linker, link, pointerToUnusedMarker);
+        //link->LinkerIndex = LINK_0;
+//}
 
 
 //Link* _H SearchLink(Link* source, Link* linker, Link* target)
@@ -202,9 +203,9 @@ void WalkThroughAllReferersBySourceCore(uint64_t rootIndex, action action_)
 {
 	if (rootIndex != LINK_0)
 	{
-		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->LeftBySourceIndex, action_);
+		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->LeftBySource, action_);
 		action_(rootIndex);
-		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->RightBySourceIndex, action_);
+		WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->RightBySource, action_);
 	}
 }
 
@@ -212,21 +213,21 @@ int WalkThroughReferersBySourceCore(uint64_t rootIndex, func func_)
 {
 	if (rootIndex != LINK_0)
 	{
-		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->LeftBySourceIndex, func_)) return false;
+		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->LeftBySource, func_)) return false;
 		if(!func_(rootIndex)) return false;
-		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->RightBySourceIndex, func_)) return false;
+		if(!WalkThroughReferersBySourceCore(GetLink(rootIndex)->RightBySource, func_)) return false;
 	}
 	return true;
 }
 
 void _H WalkThroughAllReferersBySource(uint64_t rootIndex, action action_)
 {
-	if (rootIndex != LINK_0) WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->BySourceIndex, action_);
+	if (rootIndex != LINK_0) WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->BySource, action_);
 }
 
 int _H WalkThroughReferersBySource(uint64_t rootIndex, func func_)
 {
-	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLink(rootIndex)->BySourceIndex, func_);
+	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLink(rootIndex)->BySource, func_);
 	else return true;
 }
 
@@ -259,9 +260,9 @@ void WalkThroughAllReferersByTargetCore(uint64_t rootIndex, action action_)
 {
 	if (rootIndex != LINK_0)
 	{
-		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->LeftByTargetIndex, action_);
+		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->LeftByTarget, action_);
 		action_(rootIndex);
-		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->RightByTargetIndex, action_);
+		WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->RightByTarget, action_);
 	}
 }
 
@@ -270,9 +271,9 @@ int WalkThroughReferersByTargetCore(uint64_t rootIndex, func func_)
 {
 	if(rootIndex != LINK_0)
 	{
-		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->LeftByTargetIndex, func_)) return false;
+		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->LeftByTarget, func_)) return false;
 		if(!func_(rootIndex)) return false;
-		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->RightByTargetIndex, func_)) return false;
+		if(!WalkThroughReferersByTargetCore(GetLink(rootIndex)->RightByTarget, func_)) return false;
 	}
 	return true;
 }
