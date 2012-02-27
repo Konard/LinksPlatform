@@ -9,6 +9,8 @@
 
 #include "LinkLowLevel.h"
 
+#include <malloc.h> // NULL
+
 #ifdef _WIN32
 #ifdef LINKS_DLL
 #define _H __stdcall
@@ -68,7 +70,7 @@ void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 //	UnSubscribeFromListOfReferersBy(Linker, linkIndex, marker);
 	UnSubscribeFromListOfReferersBy(Linker, linkIndex, LINK_0);
 	
-	link->Linker = null;
+	GetLink(linkIndex)->Linker = LINK_0;
 }
 
 //void DetachLinkFromUnusedMarker(Link* link) {
@@ -132,9 +134,9 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 //		Link* firstRefererBySource = link->BySource;
 //		Link* firstRefererByLinker = link->ByLinker;
 //		Link* firstRefererByTarget = link->ByTarget;
-		bySourceIndex = GetBySourceIndex(link);
-		byLinkerIndex = GetByLinkerIndex(link);
-		byTargetIndex = GetByTargetIndex(link);
+		uint64_t bySourceIndex = GetBySourceIndex(link);
+		uint64_t byLinkerIndex = GetByLinkerIndex(link);
+		uint64_t byTargetIndex = GetByTargetIndex(link);
 
 		while (BySourceIndex != LINK_0)
 		{
