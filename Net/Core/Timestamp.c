@@ -5,7 +5,7 @@
 
 int64_t LastTimestamp = 0;
 
-// Получить число 100-наносекундных интервалов от 1 января 1601 года.
+// Получить число 100-наносекундных интервалов от 1 января 1601 года. (+возможна небольшая коррекция +1 тик)
 
 #if defined(_MFC_VER) || defined(__MINGW32__)
 #include <windows.h>
@@ -15,7 +15,7 @@ int64_t GetTimestamp()
 
 	FILETIME fileTime;
 
-        // This structure is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601.
+	// This structure is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601.
 	// The actual resolution depends on the system, http://msdn.microsoft.com/en-us/library/windows/desktop/ms724397%28v=vs.85%29.aspx
 
 	GetSystemTimeAsFileTime(&fileTime);
