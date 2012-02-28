@@ -231,7 +231,7 @@
 #define BeginWalkThroughtTreeOfReferersByTarget(element, root) BeginWalkThroughtReferersTree(Target, element, root)
 #define EndWalkThroughtTreeOfReferersByTarget(element) EndWalkThroughtReferersTree(Target, element)
 
-#define SubscribeToTreeOfReferersBy(that, link, newValue) Concat3(ReferersBy, that, TreeInsert)(&_GetFirstRefererBy(that, of(newValue)), link)
+#define SubscribeToTreeOfReferersBy(that, link, newValue) Concat3(By, that, TreeInsert)(&_GetFirstRefererBy(that, of(newValue)), link)
 #define UnSubscribeFromTreeOfReferersBy(that, link, newValue) Concat(UnsafeDetachFromTreeOfReferersBy, that)(&_GetFirstRefererBy(that, of(newValue)), link)
 
 #define SubscribeAsRefererToSource(link, newValue) SubscribeToTreeOfReferersBy(Source, link, newValue)

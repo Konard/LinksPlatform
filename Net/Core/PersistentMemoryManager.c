@@ -431,7 +431,7 @@ unsigned long ResetStorageFileMemoryMapping()
 
 uint64_t AllocateFromUnusedLinks()
 {
-	uint64_t unusedLink = pointerToUnusedMarker->ByLinkerIndex; // индекс вместо указателя Link *
+	uint64_t unusedLink = pointerToUnusedMarker->ByLinker; // индекс вместо указателя Link *
 	DetachLinkFromUnusedMarker(unusedLink); // переименовали функцию, pointerToUnusedMarker уже не передаём
 	return unusedLink;
 }
@@ -446,7 +446,7 @@ uint64_t AllocateFromFreeLinks()
 
 uint64_t AllocateLink()
 {
-	if (pointerToUnusedMarker->ByLinkerIndex != LINK_0) // можно ли использовать указатели?
+	if (pointerToUnusedMarker->ByLinker != LINK_0) // можно ли использовать указатели?
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
@@ -457,9 +457,9 @@ void FreeLink(uint64_t linkIndex)
 	DetachLink(linkIndex);
 
 	Link *link = GetLink(linkIndex);
-    while (link->BySourceIndex != LINK_0) FreeLink(link->BySourceIndex);
-    while (link->ByLinkerIndex != LINK_0) FreeLink(link->ByLinkerIndex);
-    while (link->ByTargetIndex != LINK_0) FreeLink(link->ByTargetIndex);
+    while (link->BySource != LINK_0) FreeLink(link->BySource);
+    while (link->ByLinker != LINK_0) FreeLink(link->ByLinker);
+    while (link->ByTarget != LINK_0) FreeLink(link->ByTarget);
 
 	{
 		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize; // pointerToLinks и так смещается на -1, поэтому -1 убираем
@@ -472,7 +472,7 @@ void FreeLink(uint64_t linkIndex)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->LinkerIndex == LINK_0) // ?
+			while((--lastUsedLink)->Linker == LINK_0) // ?
 			{
 				DetachLinkFromUnusedMarker((lastUsedLink-pointerToLinks)/sizeof(Link)); // Link * -> uint64_t
 				--*pointerToLinksSize;
@@ -490,7 +490,7 @@ void WalkThroughAllLinks(func func_)
 
 	do
 	{
-		if ((currentLink)->LinkerIndex != LINK_0) // ? корректна ли замена
+		if ((currentLink)->Linker != LINK_0) // ? корректна ли замена
 		{
 			func_(currentLink);
 		}
@@ -505,7 +505,7 @@ int WalkThroughLinks(func func_)
 
 	do
 	{
-		if ((currentLink)->LinkerIndex != LINK_0) // ?
+		if ((currentLink)->Linker != LINK_0) // ?
 		{
 			if(!func_(currentLink)) return false;
 		}
