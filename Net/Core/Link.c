@@ -28,21 +28,23 @@ DefineAllReferersTreeMethods(Target)
 
 DefineAllSearchMethods()
 
-void AttachLink(Link* link, Link* source, Link* linker, Link* target)
+//void AttachLink(Link* link, Link* source, Link* linker, Link* target)
+void AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-	link->Source = source;
-	link->Linker = linker;
-	link->Target = target;
+	Link *link = GetLink(linkIndex);
+	link->Source = sourceIndex;
+	link->Linker = linkerIndex;
+	link->Target = targetIndex;
 
-	SubscribeAsRefererToSource(link, source);
-	SubscribeAsRefererToLinker(link, linker);
-	SubscribeAsRefererToTarget(link, target);
+	SubscribeAsRefererToSource(linkIndex, sourceIndex);
+	SubscribeAsRefererToLinker(linkIndex, linkerIndex);
+	SubscribeAsRefererToTarget(linkIndex, targetIndex);
 }
 
-void DetachLink(Link* link)
-//void DetachLink(uint64_t linkIndex)
+//void DetachLink(Link* link)
+void DetachLink(uint64_t linkIndex)
 {
-//	Link* link = GetLink(linkIndex);
+	Link* link = GetLink(linkIndex);
 	UnSubscribeFromSource(link, link->Source);
 	UnSubscribeFromLinker(link, link->Linker);
 	UnSubscribeFromTarget(link, link->Target);
@@ -180,12 +182,12 @@ uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_
 	Link *target = GetLink(targetIndex);
     if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // ? itself -> LINK_0
     {
-        uint64_t existingLinkIndex = SearchLink(source, linker, target);
+        uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
         Link* existingLink = GetLink(existingLinkIndex);
         if (existingLink == NULL)
         {
-			DetachLink(link);
-			AttachLink(link, source, linker, target);
+			DetachLink(linkIndex);
+			AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
 
 			link->Timestamp = GetTimestamp();
 

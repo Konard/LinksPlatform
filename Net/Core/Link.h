@@ -48,8 +48,10 @@ typedef struct Link
 	int64_t Timestamp; // Не использутся
 } Link;
 
-typedef int (*func)(Link *); // callback
-typedef void (*action)(Link *); // callback
+//typedef int (*func)(Link *); // callback
+//typedef void (*action)(Link *); // callback
+typedef int (*func)(uint64_t); // callback
+typedef void (*action)(uint64_t); // callback
 
 
 #if defined(__cplusplus)
@@ -108,13 +110,13 @@ int PREFIX_DLL WalkThroughReferersByTarget(uint64_t rootLinkIndex, func);
 
 // not exported !!!
 
-//void AttachLinkToUnusedMarker(uint64_t linkIndex);
-//void DetachLinkFromUnusedMarker(uint64_t linkIndex);
-void AttachLinkToMarker(Link *link, Link *marker);
-void DetachLinkFromMarker(Link* link, Link* marker);
+void AttachLinkToUnusedMarker(uint64_t linkIndex);
+void DetachLinkFromUnusedMarker(uint64_t linkIndex);
+//void AttachLinkToMarker(Link *link, Link *marker);
+//void DetachLinkFromMarker(Link* link, Link* marker);
 
-//void DetachLink(uint64_t linkIndex);
-void DetachLink(Link* link);
+void DetachLink(uint64_t linkIndex);
+//void DetachLink(Link* link);
 
 #if defined(__cplusplus)
 }

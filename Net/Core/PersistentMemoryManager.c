@@ -1,11 +1,11 @@
 #if defined(_MFC_VER) || defined(__MINGW32__)
 #include <windows.h>
-#elif defined(__GNUC__)
 
+// подключение необходимых заголовочных файлов для Linux
+#elif defined(__GNUC__)
 // for 64-bit files
 #define _XOPEN_SOURCE 700
 #include <unistd.h>
-
 // open()
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -16,45 +16,42 @@
 #include <sys/mman.h>
 // NULL
 #include <malloc.h>
-
 #endif
 
 #include <stdio.h>
-
-
 #include "Common.h"
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-// Дескриптор файла базы данных и дескриптор объекта отображения (map)
+// Дескриптор файла базы данных и дескриптор объекта отображения (mmap)
 #if defined(_MFC_VER) || defined(__MINGW32__)
-HANDLE			storageFileHandle;
-HANDLE			storageFileMappingHandle;
+HANDLE		storageFileHandle;
+HANDLE		storageFileMappingHandle;
 #elif defined(__GNUC__)
 int			storageFileHandle; // для open()
+// для mmap() под Linux дескриптор не используется, достаточно адреса + размера области
 #endif
-uint64_t		storageFileSizeInBytes; // <- off_t
+uint64_t	storageFileSizeInBytes; // <- off_t
 
 
 // Константы, рассчитываемые при запуске приложения
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
 int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
-int			baseLinksSizeInBytes;	
-uint64_t		baseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-uint64_t		storageFileMinSizeInBytes;
+int			baseLinksSizeInBytes;
+uint64_t	baseBlockSizeInBytes;		// Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t	storageFileMinSizeInBytes;
 
-void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
+void*		pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
-uint32_t*				pointerToBaseLinksMaxSize;
-uint64_t*			pointerToBaseLinks;	// инициализируется в SetStorageFileMemoryMapping()
+uint32_t*	pointerToBaseLinksMaxSize;
+uint64_t*	pointerToBaseLinks;			// инициализируется в SetStorageFileMemoryMapping()
 
-uint64_t*			pointerToLinksMaxSize;
-uint64_t*			pointerToLinksSize;
+uint64_t*	pointerToLinksMaxSize;
+uint64_t*	pointerToLinksSize;
 
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*				pointerToUnusedMarker;	// инициализируется в SetStorageFileMemoryMapping()
-Link*				pointerToLinks;		// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
-
+Link*		pointerToUnusedMarker;		// инициализируется в SetStorageFileMemoryMapping()
+Link*		pointerToLinks;				// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
 
 
 /***  Работа с памятью  ***/
@@ -485,6 +482,22 @@ void FreeLink(uint64_t linkIndex)
 
 void WalkThroughAllLinks(func func_)
 {
+	uint64_t currentLinkIndex = LINK_0 + 1; // ?
+	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize; // аналогично
+
+	do
+	{
+		if (GetLink(currentLinkIndex)->Linker != LINK_0) // ? корректна ли замена
+		{
+			func_(currentLinkIndex);
+		}
+	}
+	while(++currentLinkIndex <= lastLinkIndex);
+}
+
+/*
+void WalkThroughAllLinks(func func_)
+{
 	Link *currentLink = pointerToLinks;
 	Link* lastLink = pointerToLinks + *pointerToLinksSize; // аналогично
 
@@ -497,7 +510,26 @@ void WalkThroughAllLinks(func func_)
 	}
 	while(++currentLink <= lastLink);
 }
+*/
 
+int WalkThroughLinks(func func_)
+{
+	uint64_t currentLinkIndex = LINK_0 + 1; // ?
+	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize; // аналогично
+
+	do
+	{
+		if (GetLink(currentLinkIndex)->Linker != LINK_0) // ?
+		{
+			if(!func_(currentLinkIndex)) return false;
+		}
+	}
+	while(++currentLinkIndex <= lastLinkIndex);
+	
+	return true;
+}
+
+/*
 int WalkThroughLinks(func func_)
 {
 	Link *currentLink = pointerToLinks;
@@ -514,6 +546,7 @@ int WalkThroughLinks(func func_)
 	
 	return true;
 }
+*/
 
 // работа с базовыми линками
 uint64_t GetBaseLink(uint32_t index)
@@ -531,10 +564,11 @@ void SetBaseLink(uint32_t index, uint64_t linkIndex)
 		pointerToBaseLinks[index] = linkIndex; // может быть 0 (соответствует NULL)
 }
 
+
 // работа с основными линками
 Link* GetLink(uint64_t linkIndex)
 {
-	if (linkIndex < *pointerToLinksMaxSize)
+	if (linkIndex < *pointerToLinksMaxSize) // ? Почему -Max
 		return &(pointerToLinks[linkIndex]);
 	else
 		return NULL; // корректный указатель из malloc.h
@@ -547,37 +581,37 @@ Link* GetLink(uint64_t linkIndex)
 uint64_t GetSourceIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->Source;
+	return (link == NULL) ? 0 : link->Source;
 }
 
 uint64_t GetTargetIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->Target;
+	return (link == NULL) ? 0 : link->Target;
 }
 
 // LinkerLink index
 uint64_t GetLinkerIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->Linker;
+	return (link == NULL) ? 0 : link->Linker;
 }
 
 // By ...
 uint64_t GetBySourceIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->BySource;
+	return (link == NULL) ? 0 : link->BySource;
 }
 
 uint64_t GetByTargetIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->ByTarget;
+	return (link == NULL) ? 0 : link->ByTarget;
 }
 
 uint64_t GetByLinkerIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == null) ? 0 : link->ByLinker;
+	return (link == NULL) ? 0 : link->ByLinker;
 }
