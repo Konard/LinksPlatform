@@ -19,6 +19,8 @@
 #define true 1
 #define bool unsigned
 
+#define itself 0
+
 // индекс линка unused
 #define LINK_0 0
 

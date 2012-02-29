@@ -244,12 +244,12 @@
 
 // ReferersBy -> By
 ////
-//#define GetNumberOfReferersInList(that, link) GetLink(link)->Concat3(By,that,Count)
-//#define GetNumberOfReferersInTree(that, link) _GetFirstRefererBy(that, of(link)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(link))) : 0
+#define GetNumberOfReferersInList(that, link) GetLink(link)->Concat3(By,that,Count)
+#define GetNumberOfReferersInTree(that, link) _GetFirstRefererBy(that, of(link)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(link))) : 0
 
-//#define GetNumberOfReferersBySource(link) GetNumberOfReferersInTree(Source, link)
-//#define GetNumberOfReferersByLinker(link) GetNumberOfReferersInList(Linker, link)
-//#define GetNumberOfReferersByTarget(link) GetNumberOfReferersInTree(Target, link)
+#define GetNumberOfReferersBySource(link) GetNumberOfReferersInTree(Source, link)
+#define GetNumberOfReferersByLinker(link) GetNumberOfReferersInList(Linker, link)
+#define GetNumberOfReferersByTarget(link) GetNumberOfReferersInTree(Target, link)
 
 // Link * -> uint64_t
 #define DefineSearchInListOfReferersBySourceMethod()															 \
