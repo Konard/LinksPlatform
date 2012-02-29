@@ -426,9 +426,9 @@ unsigned long ResetStorageFileMemoryMapping()
 
 uint64_t AllocateFromUnusedLinks()
 {
-	uint64_t unusedLink = GetByLinkerIndex(LINK_0); // ??? правильно?
-	DetachLinkFromUnusedMarker(unusedLink); // переименовали функцию, pointerToUnusedMarker уже не передаём
-	return unusedLink;
+	uint64_t unusedLinkIndex = GetByLinkerIndex(LINK_0); // ??? правильно?
+	DetachLinkFromUnusedMarker(unusedLinkIndex); // переименовали функцию, pointerToUnusedMarker уже не передаём
+	return unusedLinkIndex;
 }
 
 // пока что программа - однопоточная, не надо использовать mutex'и
@@ -443,7 +443,7 @@ uint64_t AllocateFromFreeLinks()
 
 uint64_t AllocateLink()
 {
-	if (pointerToUnusedMarker->ByLinker != LINK_0) // можно ли использовать указатели?
+	if (GetByLinkerIndex(LINK_0) != LINK_0) // ??? корректно ли
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
@@ -453,25 +453,24 @@ void FreeLink(uint64_t linkIndex)
 {
 	DetachLink(linkIndex);
 
-	Link *link = GetLink(linkIndex);
-    while (link->BySource != LINK_0) FreeLink(link->BySource);
-    while (link->ByLinker != LINK_0) FreeLink(link->ByLinker);
-    while (link->ByTarget != LINK_0) FreeLink(link->ByTarget);
+    while (GetBySourceIndex(linkIndex) != LINK_0) FreeLink(GetBySourceIndex(linkIndex));
+    while (GetByLinkerIndex(linkIndex) != LINK_0) FreeLink(GetByLinkerIndex(linkIndex));
+    while (GetByTargetIndex(linkIndex) != LINK_0) FreeLink(GetByTargetIndex(linkIndex));
 
 	{
-		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize; // pointerToLinks и так смещается на -1, поэтому -1 убираем
+		uint64_t lastUsedLinkIndex = *pointerToLinksSize - 1; // pointerToLinks и так смещается на -1, поэтому -1 убираем
 
-		if (link < lastUsedLink)
+		if (linkIndex < lastUsedLinkIndex)
 		{
 			AttachLinkToUnusedMarker(linkIndex); // убран указатель на Marker, так как функция принимала только такой аргумент (второй)
 		}
-		else if(link == lastUsedLink)
+		else if(linkIndex == lastUsedLinkIndex)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->Linker == LINK_0) // ?
+			while(GetLinkerIndex(--lastUsedLinkIndex) == LINK_0) // ?
 			{
-				DetachLinkFromUnusedMarker((lastUsedLink-pointerToLinks)/sizeof(Link)); // Link * -> uint64_t
+				DetachLinkFromUnusedMarker(lastUsedLinkIndex);
 				--*pointerToLinksSize;
 			}
 
@@ -482,12 +481,12 @@ void FreeLink(uint64_t linkIndex)
 
 void WalkThroughAllLinks(func func_)
 {
-	uint64_t currentLinkIndex = LINK_0 + 1; // ?
-	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize; // аналогично
+	uint64_t currentLinkIndex = LINK_0; // ??? правильный ли старт
+	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (GetLink(currentLinkIndex)->Linker != LINK_0) // ? корректна ли замена
+		if (GetLinkerIndex(currentLinkIndex) != LINK_0) // ? корректна ли замена
 		{
 			func_(currentLinkIndex);
 		}
@@ -495,31 +494,14 @@ void WalkThroughAllLinks(func func_)
 	while(++currentLinkIndex <= lastLinkIndex);
 }
 
-/*
-void WalkThroughAllLinks(func func_)
-{
-	Link *currentLink = pointerToLinks;
-	Link* lastLink = pointerToLinks + *pointerToLinksSize; // аналогично
-
-	do
-	{
-		if ((currentLink)->Linker != LINK_0) // ? корректна ли замена
-		{
-			func_(currentLink);
-		}
-	}
-	while(++currentLink <= lastLink);
-}
-*/
-
 int WalkThroughLinks(func func_)
 {
-	uint64_t currentLinkIndex = LINK_0 + 1; // ?
-	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize; // аналогично
+	uint64_t currentLinkIndex = LINK_0; // ??? правильный ли старт
+	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (GetLink(currentLinkIndex)->Linker != LINK_0) // ?
+		if (GetLinkerIndex(currentLinkIndex) != LINK_0) // ?
 		{
 			if(!func_(currentLinkIndex)) return false;
 		}
@@ -529,32 +511,14 @@ int WalkThroughLinks(func func_)
 	return true;
 }
 
-/*
-int WalkThroughLinks(func func_)
-{
-	Link *currentLink = pointerToLinks;
-	Link* lastLink = pointerToLinks + *pointerToLinksSize;
-
-	do
-	{
-		if ((currentLink)->Linker != LINK_0) // ?
-		{
-			if(!func_(currentLink)) return false;
-		}
-	}
-	while(++currentLink <= lastLink);
-	
-	return true;
-}
-*/
 
 // работа с базовыми линками
 uint64_t GetBaseLink(uint32_t index)
 {
 	if (index < *pointerToBaseLinksMaxSize)
-		return pointerToBaseLinks[index];
+		return pointerToBaseLinks[index]; // возвращает индекс линка, linkIndex
 	else
-		return 0; // вместо Link * == NULL
+		return LINK_0; // вместо Link * == NULL
 }
 
 // базовых линков не должно быть много, поэтому - int
@@ -570,8 +534,10 @@ Link* GetLink(uint64_t linkIndex)
 {
 	if (linkIndex < *pointerToLinksMaxSize) // ? Почему -Max
 		return &(pointerToLinks[linkIndex]);
-	else
+	else {
+		printf("linkIndex = %llu\n", (long long unsigned int)linkIndex);
 		return NULL; // корректный указатель из malloc.h
+	}
 }
 
 // SetLink, SetSource, ... не нужны - так как поломают целостность ассоц. сети
@@ -581,37 +547,37 @@ Link* GetLink(uint64_t linkIndex)
 uint64_t GetSourceIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->Source;
+	return (link == NULL) ? LINK_0 : link->Source;
 }
 
 uint64_t GetTargetIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->Target;
+	return (link == NULL) ? LINK_0 : link->Target;
 }
 
 // LinkerLink index
 uint64_t GetLinkerIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->Linker;
+	return (link == NULL) ? LINK_0 : link->Linker;
 }
 
 // By ...
 uint64_t GetBySourceIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->BySource;
+	return (link == NULL) ? LINK_0 : link->BySource;
 }
 
 uint64_t GetByTargetIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->ByTarget;
+	return (link == NULL) ? LINK_0 : link->ByTarget;
 }
 
 uint64_t GetByLinkerIndex(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? 0 : link->ByLinker;
+	return (link == NULL) ? LINK_0 : link->ByLinker;
 }
