@@ -1,3 +1,5 @@
+#ifndef __LINKS_LINKLOWLEVEL_H__
+#define __LINKS_LINKLOWLEVEL_H__
 
 #define of(x) x
 #define to(x) x
@@ -21,12 +23,12 @@
 #define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(By,byWhat) = newValue
 
 // BySourceCount, например
-#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) Concat3(GetLink(linkIndex)->By,whichRererersBy,Count++)
-#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) Concat3(GetLink(linkIndex)->By,whichRererersBy,Count--)
+#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count++)
+#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count--)
 
 // ByLinkerCount, например
-#define _GetNumberOfReferersBy(that, linkIndex) Concat3(GetLink(linkIndex)->By,that,Count)
-#define _SetNumberOfReferersBy(that, linkIndex, newValue) Concat3(GetLink(linkIndex)->By,that,Count) = newValue
+#define _GetNumberOfReferersBy(that, linkIndex) GetLink(linkIndex)->Concat3(By,that,Count)
+#define _SetNumberOfReferersBy(that, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,that,Count) = newValue
 
 // заменены link на linkIndex, Source на SourceIndex и т.п.
 #define __GetNextSiblingRefererBySource(linkIndex) _GetNextSiblingRefererBy(Source, linkIndex)
@@ -231,25 +233,25 @@
 #define BeginWalkThroughtTreeOfReferersByTarget(element, root) BeginWalkThroughtReferersTree(Target, element, root)
 #define EndWalkThroughtTreeOfReferersByTarget(element) EndWalkThroughtReferersTree(Target, element)
 
-#define SubscribeToTreeOfReferersBy(that, link, newValue) Concat3(By, that, TreeInsert)(&_GetFirstRefererBy(that, of(newValue)), link)
-#define UnSubscribeFromTreeOfReferersBy(that, link, newValue) Concat(UnsafeDetachFromTreeOfReferersBy, that)(&_GetFirstRefererBy(that, of(newValue)), link)
+#define SubscribeToTreeOfReferersBy(that, linkIndex, newValue) Concat3(By, that, TreeInsert)(&_GetFirstRefererBy(that, of(newValue)), linkIndex)
+#define UnSubscribeFromTreeOfReferersBy(that, linkIndex, newValue) Concat(UnsafeDetachFromTreeOfReferersBy, that)(&_GetFirstRefererBy(that, of(newValue)), linkIndex)
 
-#define SubscribeAsRefererToSource(link, newValue) SubscribeToTreeOfReferersBy(Source, link, newValue)
-#define SubscribeAsRefererToLinker(link, newValue) SubscribeToListOfReferersBy(Linker, link, newValue)
-#define SubscribeAsRefererToTarget(link, newValue) SubscribeToTreeOfReferersBy(Target, link, newValue)
+#define SubscribeAsRefererToSource(linkIndex, newValue) SubscribeToTreeOfReferersBy(Source, linkIndex, newValue)
+#define SubscribeAsRefererToLinker(linkIndex, newValue) SubscribeToListOfReferersBy(Linker, linkIndex, newValue)
+#define SubscribeAsRefererToTarget(linkIndex, newValue) SubscribeToTreeOfReferersBy(Target, linkIndex, newValue)
 
-#define UnSubscribeFromSource(link, newValue) UnSubscribeFromTreeOfReferersBy(Source, link, newValue)
-#define UnSubscribeFromLinker(link, newValue) UnSubscribeFromListOfReferersBy(Linker, link, newValue)
-#define UnSubscribeFromTarget(link, newValue) UnSubscribeFromTreeOfReferersBy(Target, link, newValue)
+#define UnSubscribeFromSource(linkIndex, newValue) UnSubscribeFromTreeOfReferersBy(Source, linkIndex, newValue)
+#define UnSubscribeFromLinker(linkIndex, newValue) UnSubscribeFromListOfReferersBy(Linker, linkIndex, newValue)
+#define UnSubscribeFromTarget(linkIndex, newValue) UnSubscribeFromTreeOfReferersBy(Target, linkIndex, newValue)
 
 // ReferersBy -> By
 ////
-#define GetNumberOfReferersInList(that, link) GetLink(link)->Concat3(By,that,Count)
-#define GetNumberOfReferersInTree(that, link) _GetFirstRefererBy(that, of(link)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(link))) : 0
+#define GetNumberOfReferersInList(that, linkIndex) GetLink(linkIndex)->Concat3(By,that,Count)
+#define GetNumberOfReferersInTree(that, linkIndex) _GetFirstRefererBy(that, of(linkIndex)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(linkIndex))) : 0
 
-#define GetNumberOfReferersBySource(link) GetNumberOfReferersInTree(Source, link)
-#define GetNumberOfReferersByLinker(link) GetNumberOfReferersInList(Linker, link)
-#define GetNumberOfReferersByTarget(link) GetNumberOfReferersInTree(Target, link)
+#define GetNumberOfReferersBySource(linkIndex) GetNumberOfReferersInTree(Source, linkIndex)
+#define GetNumberOfReferersByLinker(linkIndex) GetNumberOfReferersInList(Linker, linkIndex)
+#define GetNumberOfReferersByTarget(linkIndex) GetNumberOfReferersInTree(Target, linkIndex)
 
 // Link * -> uint64_t
 #define DefineSearchInListOfReferersBySourceMethod()															 \
@@ -338,3 +340,4 @@ uint64_t SearchRefererOfTarget(uint64_t linkIndex, uint64_t refererSourceIndex, 
 	DefineSearchInListOfReferersByLinkerMethod() \
 	DefineSearchInTreeOfReferersByTargetMethod()
 
+#endif
