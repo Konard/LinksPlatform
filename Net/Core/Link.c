@@ -222,7 +222,7 @@ void _H WalkThroughAllReferersBySource(uint64_t rootIndex, action action_)
 
 int _H WalkThroughReferersBySource(uint64_t rootIndex, func func_)
 {
-	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLinkBySourceIndex(rootIndex), func_);
+	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetBySourceIndex(rootIndex), func_);
 	else return true;
 }
 
