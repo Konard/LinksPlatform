@@ -60,28 +60,16 @@ void AttachLinkToUnusedMarker(uint64_t linkIndex)
 	SubscribeToListOfReferersBy(Linker, linkIndex, LINK_0);
 }
 
-//void AttachLinkToUnusedMarker(Link *link) {
-        //link->LinkerIndex = LINK_0;
-        //SubscribeToListOfReferersBy(Linker, link, pointerToUnusedMarker);
-//}
-
 
 void DetachLinkFromUnusedMarker(uint64_t linkIndex)
 {
-//	UnSubscribeFromListOfReferersBy(Linker, linkIndex, marker);
 	UnSubscribeFromListOfReferersBy(Linker, linkIndex, LINK_0);
 	
 	GetLink(linkIndex)->Linker = LINK_0;
 }
 
-//void DetachLinkFromUnusedMarker(Link* link) {
-        //UnSubscribeFromListOfReferersBy(Linker, link, pointerToUnusedMarker);
-        //link->LinkerIndex = LINK_0;
-//}
 
-
-//Link* _H SearchLink(Link* source, Link* linker, Link* target)
-uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
 	if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
 		return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
@@ -89,17 +77,12 @@ uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 		return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
 }
 
-//Link* _H CreateLink(Link* source, Link* linker, Link* target)
-uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-//	Link* source = GetLink(sourceIndex);
-//	Link* linker = GetLink(linkerIndex);
-//	Link* target = GetLink(targetIndex);
 
 	if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // itself -> LINK_0
     {
         uint64_t linkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
-//		Link* link = GetLink(linkIndex);
         if (linkIndex == LINK_0)
         {
             linkIndex = AllocateLink();
@@ -112,9 +95,6 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
     else
     {
         uint64_t linkIndex = AllocateLink();
-//		Link* link = GetLink(linkIndex);
-
-//		link->Timestamp = GetTimestamp();
 		GetLink(linkIndex)->Timestamp = GetTimestamp();
 
 		if (linkIndex != LINK_0)
@@ -130,8 +110,7 @@ uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint6
 	}
 }
 
-//Link* _H ReplaceLink(Link* link, Link* replacement)
-uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
+uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
 	uint64_t bySourceIndex = GetBySourceIndex(linkIndex);
 	uint64_t byLinkerIndex = GetByLinkerIndex(linkIndex);
@@ -139,9 +118,6 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 
 	if (linkIndex != replacementIndex)
 	{
-//		Link* firstRefererBySource = link->BySource;
-//		Link* firstRefererByLinker = link->ByLinker;
-//		Link* firstRefererByTarget = link->ByTarget;
 
 		while (bySourceIndex != LINK_0)
 		{
@@ -161,35 +137,31 @@ uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 			byTargetIndex = GetByTargetIndex(linkIndex);
 		}
 
-//		Link *link = GetLink(linkIndex);
 		FreeLink(linkIndex);
 
-		Link *replacement = GetLink(replacementIndex);
-		replacement->Timestamp = GetTimestamp();
+		GetLink(replacementIndex)->Timestamp = GetTimestamp();
 	}
 	return replacementIndex;
 }
 
-uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
-//Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
+uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-	if(GetSourceIndex(linkIndex) == sourceIndex && GetLinkerIndex(linkIndex) == linkerIndex && GetTargetIndex(linkIndex) == targetIndex)
+	if(	(GetSourceIndex(linkIndex) == sourceIndex) &&
+		(GetLinkerIndex(linkIndex) == linkerIndex) &&
+		(GetTargetIndex(linkIndex) == targetIndex))
 		return linkIndex;
 
-	Link *link = GetLink(linkIndex);
-	Link *source = GetLink(sourceIndex);
-	Link *linker = GetLink(linkerIndex);
-	Link *target = GetLink(targetIndex);
-    if (sourceIndex != LINK_0 && linkerIndex != LINK_0 && targetIndex != LINK_0) // ? itself -> LINK_0
+	if ((sourceIndex != LINK_0) &&
+		(linkerIndex != LINK_0) &&
+		(targetIndex != LINK_0)) // ? itself -> LINK_0
     {
-        uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
-        Link* existingLink = GetLink(existingLinkIndex);
-        if (existingLink == NULL)
-        {
+		uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
+		if (existingLinkIndex == LINK_0)
+		{
 			DetachLink(linkIndex);
 			AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
 
-			link->Timestamp = GetTimestamp();
+			GetLink(linkIndex)->Timestamp = GetTimestamp();
 
 			return linkIndex;
         }
@@ -200,14 +172,14 @@ uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_
     }
     else
     {
-		source = (source == itself ? link : source);
-		linker = (linker == itself ? link : linker);
-		target = (target == itself ? link : target);
+		sourceIndex = (sourceIndex == LINK_0 ? linkIndex : sourceIndex);
+		linkerIndex = (linkerIndex == LINK_0 ? linkIndex : linkerIndex);
+		targetIndex = (targetIndex == LINK_0 ? linkIndex : targetIndex);
 
 		DetachLink(linkIndex);
 		AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
 
-		link->Timestamp = GetTimestamp();
+		GetLink(linkIndex)->Timestamp = GetTimestamp();
 
         return linkIndex;
 	}
@@ -245,12 +217,12 @@ int WalkThroughReferersBySourceCore(uint64_t rootIndex, func func_)
 
 void _H WalkThroughAllReferersBySource(uint64_t rootIndex, action action_)
 {
-	if (rootIndex != LINK_0) WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->BySource, action_);
+	if (rootIndex != LINK_0) WalkThroughAllReferersBySourceCore(GetBySourceIndex(rootIndex), action_);
 }
 
 int _H WalkThroughReferersBySource(uint64_t rootIndex, func func_)
 {
-	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLink(rootIndex)->BySource, func_);
+	if (rootIndex != LINK_0) return WalkThroughReferersBySourceCore(GetLinkBySourceIndex(rootIndex), func_);
 	else return true;
 }
 
