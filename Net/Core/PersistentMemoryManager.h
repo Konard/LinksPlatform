@@ -1,6 +1,8 @@
 #ifndef __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 #define __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 
+// PASSED
+
 #if defined(__cplusplus)
 extern "C" {
 #endif
@@ -32,19 +34,6 @@ PREFIX_DLL unsigned long ResetStorageFileMemoryMapping();
 
 PREFIX_DLL uint64_t GetBaseLink(uint32_t index);
 PREFIX_DLL void SetBaseLink(uint32_t index, uint64_t linkIndex);
-//PREFIX_DLL Link* GetMappedLink(int index);
-//PREFIX_DLL void SetMappedLink(int index, Link* link);
-
-PREFIX_DLL void ReadTest();
-PREFIX_DLL void WriteTest();
-
-uint64_t AllocateLink();
-void FreeLink(uint64_t);
-//Link* AllocateLink();
-//void FreeLink(Link* link);
-
-PREFIX_DLL void WalkThroughAllLinks(func);
-PREFIX_DLL int WalkThroughLinks(func);
 
 PREFIX_DLL Link* GetLink(uint64_t linkIndex); // из таблицы pointerToLinks
 
@@ -54,6 +43,15 @@ PREFIX_DLL uint64_t GetLinkerIndex(uint64_t linkIndex); // LinkerLink index
 PREFIX_DLL uint64_t GetBySourceIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetByTargetIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetByLinkerIndex(uint64_t linkIndex);
+
+PREFIX_DLL void ReadTest();
+PREFIX_DLL void WriteTest();
+
+uint64_t AllocateLink();
+void FreeLink(uint64_t);
+
+PREFIX_DLL void WalkThroughAllLinks(func);
+PREFIX_DLL int WalkThroughLinks(func);
 
 
 #if defined(__cplusplus)
