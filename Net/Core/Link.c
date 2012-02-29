@@ -28,8 +28,8 @@ DefineAllReferersTreeMethods(Target)
 
 DefineAllSearchMethods()
 
-//void AttachLink(Link* link, Link* source, Link* linker, Link* target)
-void AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+
+void _H AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
 	Link *link = GetLink(linkIndex);
 	link->Source = sourceIndex;
@@ -41,13 +41,12 @@ void AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, 
 	SubscribeAsRefererToTarget(linkIndex, targetIndex);
 }
 
-//void DetachLink(Link* link)
-void DetachLink(uint64_t linkIndex)
+void _H DetachLink(uint64_t linkIndex)
 {
 	Link* link = GetLink(linkIndex);
-	UnSubscribeFromSource(link, link->Source);
-	UnSubscribeFromLinker(link, link->Linker);
-	UnSubscribeFromTarget(link, link->Target);
+	UnSubscribeFromSource(linkIndex, link->Source);
+	UnSubscribeFromLinker(linkIndex, link->Linker);
+	UnSubscribeFromTarget(linkIndex, link->Target);
 
 	link->Source = LINK_0;
 	link->Linker = LINK_0;
