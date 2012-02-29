@@ -3,18 +3,18 @@
 
 // подключение необходимых заголовочных файлов для Linux
 #elif defined(__GNUC__)
-// for 64-bit files
+// for 64-bit files -- работать с большими файлами
 #define _XOPEN_SOURCE 700
 #include <unistd.h>
-// open()
+// open() -- открыть файл базы данных
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-// errno
+// errno -- откуда брать коды ошибок
 #include <errno.h>
-// mmap()...
+// mmap()... -- само собой разумеется
 #include <sys/mman.h>
-// NULL
+// NULL -- вместо неправильного, null
 #include <malloc.h>
 #endif
 
@@ -107,7 +107,7 @@ typedef struct _SYSTEM_INFO {
 
 #endif
 
-	baseLinksSizeInBytes = serviceBlockSizeInBytes - 12;
+	baseLinksSizeInBytes = serviceBlockSizeInBytes - 12; // ??? Почему так
 	baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
@@ -167,7 +167,7 @@ int OpenStorageFile(char *filename)
 
 	// по-крайней мере - минимальный блок для линков + сервисный блок
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes) {
-		printf("enlarge\n");
+		printf("enlarge storage file ...\n");
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 	}
 
@@ -228,7 +228,7 @@ int SetStorageFileMemoryMapping()
 
 	// pointer to bytes
 	pointerToBaseLinksMaxSize = (uint32_t*)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t));
-	pointerToBaseLinks = (uint64_t *)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint32_t));
+	pointerToBaseLinks = (uint64_t *)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint32_t)); // ??? правильное понимание этого указателя?
 
 	pointerToLinksMaxSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes);
 	pointerToLinksSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(uint64_t));
@@ -246,10 +246,8 @@ int SetStorageFileMemoryMapping()
 
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
 
-
-	// ? выяснить
 	if (*pointerToBaseLinksMaxSize == 0)
-		*pointerToBaseLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ? почему так
+		*pointerToBaseLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ??? выяснить - почему так
 
 	// Links == UnusedMarker
 	if (*pointerToLinksMaxSize == 0)
@@ -416,7 +414,7 @@ unsigned long ResetStorageFileMemoryMapping()
 	storageFileMappingHandle = INVALID_HANDLE_VALUE;
 #elif defined(__GNUC__)
 	munmap(pointerToMappedRegion, storageFileSizeInBytes);
-//	storageFileHandle = -1; // некорректно так делать
+//	storageFileHandle = -1; // некорректно так делать, а дескриптора для mmapped region нету
 #endif
 
 	printf("Memory mapping of storage file is reset.\n\n");
@@ -428,7 +426,7 @@ unsigned long ResetStorageFileMemoryMapping()
 
 uint64_t AllocateFromUnusedLinks()
 {
-	uint64_t unusedLink = pointerToUnusedMarker->ByLinker; // индекс вместо указателя Link *
+	uint64_t unusedLink = GetByLinkerIndex(LINK_0); // ??? правильно?
 	DetachLinkFromUnusedMarker(unusedLink); // переименовали функцию, pointerToUnusedMarker уже не передаём
 	return unusedLink;
 }
@@ -436,9 +434,11 @@ uint64_t AllocateFromUnusedLinks()
 // пока что программа - однопоточная, не надо использовать mutex'и
 uint64_t AllocateFromFreeLinks()
 {
-	if (*pointerToLinksMaxSize <= *pointerToLinksSize) // более корректно: <=
+	if (*pointerToLinksMaxSize <= *pointerToLinksSize) // более корректно: <=, чем ==
 		EnlargeStorageFile();
-	return (*pointerToLinksSize)++; // после return - увеличиваем
+	uint64_t freeLinkIndex = (*pointerToLinksSize); // первый свободный элемент в таблице
+	++(*pointerToLinksSize);
+	return freeLinkIndex; // после return - увеличиваем
 }
 
 uint64_t AllocateLink()
