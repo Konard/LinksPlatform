@@ -61,6 +61,7 @@ int SBT_Delete(TNumber n) {
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 	if ((_n_nodes <= 0) || (t < 0)) return; // выйти, если вершины нет
 	if (_nodes[t].left > 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
+	for (int i = 0; i < depth; i++) printf(" "); // отступ
 	printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING")\n", depth, t, (SBT_FORMAT_TYPE)_nodes[t].number); // иначе: напечатать "тело" узла
 	if (_nodes[t].right > 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
 }
