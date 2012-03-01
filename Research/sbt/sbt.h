@@ -6,8 +6,10 @@
 // см. http://compgroups.net/comp.lang.c/Explanation-needed-for-const-int-error-variably-modified-at-file-scope
 
 #include <stdint.h>
-typedef uint64_t TNumber;
-typedef uint64_t TNodeIndex;
+#define SBT_FORMAT_STRING "%lld"
+#define SBT_FORMAT_TYPE long long signed int
+typedef int64_t TNumber;
+typedef int64_t TNodeIndex;
 typedef uint64_t TNodeSize;
 
 typedef struct TNode {
@@ -17,9 +19,9 @@ typedef struct TNode {
 	TNodeSize size; // size в понимании SBT
 } TNode;
 
-int SBT_Add(TNumber n);
-int SBT_Delete(TNumber n);
-void SBT_PrintAllNodes_At(TNodeIndex t);
+int SBT_Add(TNumber number);
+int SBT_Delete(TNumber number);
+void SBT_PrintAllNodes_At(int depth, TNodeIndex t);
 void SBT_PrintAllNodes();
 
 #endif
