@@ -43,6 +43,12 @@ PREFIX_DLL uint64_t GetLinkerIndex(uint64_t linkIndex); // LinkerLink index
 PREFIX_DLL uint64_t GetBySourceIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetByTargetIndex(uint64_t linkIndex);
 PREFIX_DLL uint64_t GetByLinkerIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetLeftBySourceIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetLeftByTargetIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetLeftByLinkerIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetRightBySourceIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetRightByTargetIndex(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetRightByLinkerIndex(uint64_t linkIndex);
 
 PREFIX_DLL void ReadTest();
 PREFIX_DLL void WriteTest();

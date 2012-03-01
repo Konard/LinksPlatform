@@ -8,12 +8,41 @@
 #define Concat(a, b) a##b
 #define Concat3(a, b, c) a##b##c
 
-#define __GetLeftBy(byWhat, link) (link)->Concat(LeftBy,byWhat)
-#define __SetLeftBy(byWhat, link, value) (link)->Concat(LeftBy,byWhat) = value
-#define __GetRightBy(byWhat, link) (link)->Concat(RightBy,byWhat)
-#define __SetRightBy(byWhat, link, value) (link)->Concat(RightBy,byWhat) = value
-#define __GetCountBy(byWhat, link) (link)->Concat(CountBy,byWhat)
-#define __SetCountBy(byWhat, link, value) (link)->Concat(CountBy,byWhat) = value
+// Link * -> Index
+#define _GetLeftBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(LeftBy,byWhat)
+#define _SetLeftBy(byWhat, linkIndex, value) GetLink(linkIndex)->Concat(LeftBy,byWhat) = value
+#define _GetRightBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(RightBy,byWhat)
+#define _SetRightBy(byWhat, linkIndex, value) GetLink(linkIndex)->Concat(RightBy,byWhat) = value
+#define _GetCountBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(CountBy,byWhat)
+#define _SetCountBy(byWhat, linkIndex, value) GetLink(linkIndex)->Concat(CountBy,byWhat) = value
+
+// Get
+
+#define __GetLeftBySource(linkIndex) _GetLeftBy(Source, linkIndex)
+#define __GetLeftByLinker(linkIndex) _GetLeftBy(Linker, linkIndex)
+#define __GetLeftByTarget(linkIndex) _GetLeftBy(Target, linkIndex)
+
+#define __GetRightBySource(linkIndex) _GetRightBy(Source, linkIndex)
+#define __GetRightByLinker(linkIndex) _GetRightBy(Linker, linkIndex)
+#define __GetRightByTarget(linkIndex) _GetRightBy(Target, linkIndex)
+
+#define __GetCountBySource(linkIndex) _GetCountBy(Source, linkIndex)
+#define __GetCountByLinker(linkIndex) _GetCountBy(Linker, linkIndex)
+#define __GetCountByTarget(linkIndex) _GetCountBy(Target, linkIndex)
+
+// Set
+
+#define __SetLeftBySource(linkIndex, value) _SetLeftBy(Source, linkIndex, value)
+#define __SetLeftByLinker(linkIndex, value) _SetLeftBy(Linker, linkIndex, value)
+#define __SetLeftByTarget(linkIndex, value) _SetLeftBy(Target, linkIndex, value)
+
+#define __SetRightBySource(linkIndex, value) _SetRightBy(Source, linkIndex, value)
+#define __SetRightByLinker(linkIndex, value) _SetRightBy(Linker, linkIndex, value)
+#define __SetRightByTarget(linkIndex, value) _SetRightBy(Target, linkIndex, value)
+
+#define __SetCountBySource(linkIndex, value) _SetCountBy(Source, linkIndex, value)
+#define __SetCountByLinker(linkIndex, value) _SetCountBy(Linker, linkIndex, value)
+#define __SetCountByTarget(linkIndex, value) _SetCountBy(Target, linkIndex, value)
 
 
 // Заменил Next на Right
@@ -193,9 +222,9 @@
 		struct Link, \
 		Concat3(By, referesToThat, TreeLeftRotate), \
 		Concat3(By, referesToThat, TreeRightRotate), \
-		Concat(__GetLeftBy, referesToThat), \
-		Concat(__GetRightBy, referesToThat), \
-		Concat(__GetCountBy, referesToThat))
+		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
+		Concat(__GetNextSiblingRefererBy, referesToThat), \
+		Concat(__GetNumberOfReferersBy, referesToThat))
 
 // OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeInsertMethod(referesToThat) \
@@ -203,10 +232,10 @@
 		Concat3(By, referesToThat, TreeLeftMaintain), \
 		Concat3(By, referesToThat, TreeRightMaintain), \
 		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
-		Concat(__GetLeftBy, referesToThat), \
-		Concat(__GetRightBy, referesToThat), \
-		Concat(__GetCountBy, referesToThat), \
-		Concat(__SetCountBy, referesToThat))
+		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
+		Concat(__GetNextSiblingRefererBy, referesToThat), \
+		Concat(__GetNumberOfReferersBy, referesToThat), \
+		Concat(__SetNumberOfReferersBy, referesToThat))
 
 // OK
 #define DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \

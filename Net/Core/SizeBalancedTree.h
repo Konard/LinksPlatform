@@ -2,10 +2,10 @@
 #define __LINKS_SIZE_BALANCED_TREE_H__
 
 #define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
-void methodName(elementType **root)																												  \
+void methodName(elementType rootIndex)																												  \
 { 																																				  \
-	elementType *rightNode = GetRightNode(*root);																								  \
-	if (rightNode == 0) return; 																												  \
+	elementType rightNodeIndex = GetRightNode(rootIndex);																								  \
+	if (rightNode == NULL) return; 																												  \
 	SetRightNode(*root, GetLeftNode(rightNode)); 																								  \
 	SetLeftNode(rightNode, *root); 																											  \
 	SetNodeSize(rightNode, GetNodeSize(*root));																									  \
@@ -17,7 +17,7 @@ void methodName(elementType **root)																												  \
 void methodName(elementType **root)																												  \
 { 																																				  \
 	elementType *leftNode = GetLeftNode(*root);																									  \
-	if(leftNode == 0) return;																													  \
+	if(leftNode == NULL) return;																													  \
 	SetLeftNode(*root, GetRightNode(leftNode));																									  \
 	SetRightNode(leftNode, *root);																												  \
 	SetNodeSize(leftNode, GetNodeSize(*root));																									  \

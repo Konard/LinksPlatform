@@ -581,3 +581,41 @@ uint64_t GetByLinkerIndex(uint64_t linkIndex)
 	Link* link = GetLink(linkIndex);
 	return (link == NULL) ? LINK_0 : link->ByLinker;
 }
+
+// LeftBy ...
+uint64_t GetLeftBySourceIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->LeftBySource;
+}
+
+uint64_t GetLeftByTargetIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->LeftByTarget;
+}
+
+uint64_t GetLeftByLinkerIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->LeftByLinker;
+}
+
+// RightBy ...
+uint64_t GetRightBySourceIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->RightBySource;
+}
+
+uint64_t GetRightByTargetIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->RightByTarget;
+}
+
+uint64_t GetRightByLinkerIndex(uint64_t linkIndex)
+{
+	Link* link = GetLink(linkIndex);
+	return (link == NULL) ? LINK_0 : link->RightByLinker;
+}
