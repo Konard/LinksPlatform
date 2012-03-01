@@ -8,7 +8,17 @@ TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 
 int SBT_Add(TNumber n) {
+	return 0;
+}
+
+int SBT_Delete(TNumber n) {
+	return 0;
+}
+
+void SBT_PrintAllNodes_At(TNodeIndex t) {
+	
 }
 
 void SBT_PrintAllNodes() {
+	SBT_PrintAllNodes_At(_root_index);
 }
