@@ -8,6 +8,14 @@
 #define Concat(a, b) a##b
 #define Concat3(a, b, c) a##b##c
 
+#define __GetLeftBy(byWhat, link) (link)->Concat(LeftBy,byWhat)
+#define __SetLeftBy(byWhat, link, value) (link)->Concat(LeftBy,byWhat) = value
+#define __GetRightBy(byWhat, link) (link)->Concat(RightBy,byWhat)
+#define __SetRightBy(byWhat, link, value) (link)->Concat(RightBy,byWhat) = value
+#define __GetCountBy(byWhat, link) (link)->Concat(CountBy,byWhat)
+#define __SetCountBy(byWhat, link, value) (link)->Concat(CountBy,byWhat) = value
+
+
 // Заменил Next на Right
 // Аргумент byWhat == SourceIndex, например
 // newValue - это уже индекс, а не ссылка
@@ -23,12 +31,12 @@
 #define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(By,byWhat) = newValue
 
 // BySourceCount, например
-#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count++)
-#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count--)
+#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat(CountBy,whichRererersBy)++
+#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat(CountBy,whichRererersBy)--
 
 // ByLinkerCount, например
-#define _GetNumberOfReferersBy(that, linkIndex) GetLink(linkIndex)->Concat3(By,that,Count)
-#define _SetNumberOfReferersBy(that, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,that,Count) = newValue
+#define _GetNumberOfReferersBy(that, linkIndex) GetLink(linkIndex)->Concat(CountBy,that)
+#define _SetNumberOfReferersBy(that, linkIndex, newValue) GetLink(linkIndex)->Concat(CountBy,that) = newValue
 
 // заменены link на linkIndex, Source на SourceIndex и т.п.
 #define __GetNextSiblingRefererBySource(linkIndex) _GetNextSiblingRefererBy(Source, linkIndex)
@@ -159,23 +167,23 @@
 #define IsRefererLessThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererLessThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
 #define IsRefererGreaterThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererByTargetCore(refererIndex, GetLinkerIndex(otherRefererIndex), GetSourceIndex(otherRefererIndex))
 
-// OK, Concat3(ReferersBy -> Concat3(By
+// method(Source,Linker,Target)
 #define DefineReferersTreeLeftRotateMethod(referesToThat) \
 	DefineTreeLeftRotateMethod( \
 		Concat3(By,referesToThat,TreeLeftRotate), \
 		struct Link, \
-		Concat(__GetPreviousSiblingRefererBy,referesToThat),Concat(__SetPreviousSiblingRefererBy,referesToThat), \
-		Concat(__GetNextSiblingRefererBy,referesToThat),Concat(__SetNextSiblingRefererBy,referesToThat), \
-		Concat(__GetNumberOfReferersBy,referesToThat),Concat(__SetNumberOfReferersBy,referesToThat))
+		Concat(__GetLeftBy,referesToThat),Concat(__SetLeftBy,referesToThat), \
+		Concat(__GetRightBy,referesToThat),Concat(__SetRightBy,referesToThat), \
+		Concat(__GetCountBy,referesToThat),Concat(__SetCountBy,referesToThat))
 
 // OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeRightRotateMethod(referesToThat) \
 	DefineTreeRightRotateMethod( \
 		Concat3(By, referesToThat, TreeRightRotate), \
 		struct Link, \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), Concat(__SetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), Concat(__SetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat))
+		Concat(__GetLeftBy, referesToThat), Concat(__SetLeftBy, referesToThat), \
+		Concat(__GetRightBy, referesToThat), Concat(__SetRightBy, referesToThat), \
+		Concat(__GetCountBy, referesToThat), Concat(__SetCountBy, referesToThat))
 
 // OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeMaintainMethod(referesToThat) \
@@ -246,7 +254,7 @@
 
 // ReferersBy -> By
 ////
-#define GetNumberOfReferersInList(that, linkIndex) GetLink(linkIndex)->Concat3(By,that,Count)
+#define GetNumberOfReferersInList(that, linkIndex) GetLink(linkIndex)->Concat(CountBy,that)
 #define GetNumberOfReferersInTree(that, linkIndex) _GetFirstRefererBy(that, of(linkIndex)) ? _GetNumberOfReferersBy(that, _GetFirstRefererBy(that, of(linkIndex))) : 0
 
 #define GetNumberOfReferersBySource(linkIndex) GetNumberOfReferersInTree(Source, linkIndex)

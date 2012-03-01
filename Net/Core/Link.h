@@ -26,9 +26,9 @@ typedef struct Link
 	uint64_t RightByLinker; // правое поддерево связей (использующих данную в качестве Linker)
 	uint64_t RightByTarget; // правое поддерево связей (использующих данную в качестве Target)
 	
-	uint64_t BySourceCount; // Число связей, использующих данную в качестве Source
-	uint64_t ByLinkerCount; // Число связей, использующих данную в качестве Linker
-	uint64_t ByTargetCount; // Число связей, использующих данную в качестве Target
+	uint64_t CountBySource; // Число связей, использующих данную в качестве Source
+	uint64_t CountByLinker; // Число связей, использующих данную в качестве Linker
+	uint64_t CountByTarget; // Число связей, использующих данную в качестве Target
 	
 	int64_t Timestamp; // используется :)
 } Link;
