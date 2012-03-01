@@ -10,6 +10,18 @@ TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
 
+inline int SBT_LeftRotate(TNodeIndex t) {
+	return 0;
+}
+
+inline int SBT_RightRotate(TNodeIndex t) {
+	return 0;
+}
+
+int SBT_Maintain(TNodeIndex t, int flag) {
+	return 0;
+}
+
 int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	_nodes[_n_nodes].number = number;
 	if (_n_nodes <= 0) {
@@ -50,6 +62,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			}
 		}
 	}
+	SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 	return 0;
 }
 
