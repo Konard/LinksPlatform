@@ -193,9 +193,9 @@
 		struct Link, \
 		Concat3(By, referesToThat, TreeLeftRotate), \
 		Concat3(By, referesToThat, TreeRightRotate), \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat))
+		Concat(__GetLeftBy, referesToThat), \
+		Concat(__GetRightBy, referesToThat), \
+		Concat(__GetCountBy, referesToThat))
 
 // OK, Concat3(ReferersBy -> Concat3(By
 #define DefineReferersTreeInsertMethod(referesToThat) \
@@ -203,10 +203,10 @@
 		Concat3(By, referesToThat, TreeLeftMaintain), \
 		Concat3(By, referesToThat, TreeRightMaintain), \
 		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat), \
-		Concat(__SetNumberOfReferersBy, referesToThat))
+		Concat(__GetLeftBy, referesToThat), \
+		Concat(__GetRightBy, referesToThat), \
+		Concat(__GetCountBy, referesToThat), \
+		Concat(__SetCountBy, referesToThat))
 
 // OK
 #define DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
