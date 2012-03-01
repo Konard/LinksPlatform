@@ -10,9 +10,10 @@ TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
 
-int SBT_Add_At(TNumber number, TNodeIndex t) {
+int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	_nodes[_n_nodes].number = number;
 	if (_n_nodes <= 0) {
+		_nodes[_n_nodes].parent = parent;
 		_nodes[_n_nodes].left = -1;
 		_nodes[_n_nodes].right = -1;
 		_nodes[_n_nodes].size = 1;
@@ -24,26 +25,28 @@ int SBT_Add_At(TNumber number, TNodeIndex t) {
 			if(_nodes[t].left == -1) {
 				_nodes[t].left = _n_nodes;
 				_nodes[_n_nodes].number = number;
+				_nodes[_n_nodes].parent = parent;
 				_nodes[_n_nodes].left = -1;
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
 			}
 			else {
-				SBT_Add_At(number, _nodes[t].left);
+				SBT_Add_At(number, _nodes[t].left, t);
 			}
 		}
 		else {
 			if(_nodes[t].right == -1) {
 				_nodes[t].right = _n_nodes;
 				_nodes[_n_nodes].number = number;
+				_nodes[_n_nodes].parent = parent;
 				_nodes[_n_nodes].left = -1;
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
 			}
 			else {
-				SBT_Add_At(number, _nodes[t].right);
+				SBT_Add_At(number, _nodes[t].right, t);
 			}
 		}
 	}
@@ -51,7 +54,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t) {
 }
 
 int SBT_Add(TNumber number) {
-	return SBT_Add_At(number, _root_index);
+	return SBT_Add_At(number, _root_index, -1);
 }
 
 int SBT_Delete(TNumber n) {

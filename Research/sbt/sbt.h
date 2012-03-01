@@ -14,6 +14,7 @@ typedef uint64_t TNodeSize;
 
 typedef struct TNode {
 	TNumber number;
+	TNodeIndex parent; // уровень выше
 	TNodeIndex left;  // служебные поля,
 	TNodeIndex right; //  = -1, если нет дочерних вершин
 	TNodeSize size; // size в понимании SBT
