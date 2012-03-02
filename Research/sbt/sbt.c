@@ -104,6 +104,50 @@ int SBT_RightRotate(TNodeIndex t) {
 	return 0;
 }
 
+TNodeSize SBT_Left_Left_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex l = _nodes[t].left;
+	if (l == -1) return 0;
+	TNodeIndex ll = _nodes[l].left;
+	return ((ll == -1) ? 0 : _nodes[ll].size);
+}
+
+TNodeSize SBT_Left_Right_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex l = _nodes[t].left;
+	if (l == -1) return 0;
+	TNodeIndex lr = _nodes[l].right;
+	return ((lr == -1) ? 0 : _nodes[lr].size);
+}
+
+TNodeSize SBT_Right_Right_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex r = _nodes[t].right;
+	if (r == -1) return 0;
+	TNodeIndex rr = _nodes[r].right;
+	return ((rr == -1) ? 0 : _nodes[rr].size);
+}
+
+TNodeSize SBT_Right_Left_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex r = _nodes[t].right;
+	if (r == -1) return 0;
+	TNodeIndex rl = _nodes[r].left;
+	return ((rl == -1) ? 0 : _nodes[rl].size);
+}
+
+TNodeSize SBT_Right_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex r = _nodes[t].right;
+	return ((r == -1) ? 0 : _nodes[r].size);
+}
+
+TNodeSize SBT_Left_size(TNodeIndex t) {
+	if (t == -1) return 0;
+	TNodeIndex l = _nodes[t].left;
+	return ((l == -1) ? 0 : _nodes[l].size);
+}
+
 int SBT_Maintain(TNodeIndex t, int flag) {
 	if ((t >= 0) && (t < _n_nodes)) return 0;
 	if (flag == 0) {
