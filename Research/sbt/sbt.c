@@ -28,10 +28,16 @@ int SBT_LeftRotate(TNodeIndex t) {
 	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
 	_nodes[t].size = s_l + s_r + 1;
 
+	TNodeIndex p = _nodes[t].parent;
 	// меняем трёх предков
+	// 1. t.right.parent = t
+	// 2. k.parent = t.parent
+	// 3. t.parent = k
+	if (_nodes[t].right != -1) _nodes[_nodes[t].right].parent = t;
+	_nodes[k].parent = _nodes[t].parent;
+	_nodes[t].parent = k;
 
 	// меняем корень, parent -> t, k
-	TNodeIndex p = _nodes[t].parent;
 	printf("  p = %lld (вверх)\n", p);
 	if (p == -1) { // это root
 		_root_index = k;
@@ -71,8 +77,16 @@ int SBT_RightRotate(TNodeIndex t) {
 	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
 	_nodes[t].size = s_l + s_r + 1;
 
-	// меняем корень, parent -> t, k
 	TNodeIndex p = _nodes[t].parent;
+	// меняем трёх предков
+	// 1. t.left.parent = t
+	// 2. k.parent = t.parent
+	// 3. t.parent = k
+	if (_nodes[t].left != -1) _nodes[_nodes[t].left].parent = t;
+	_nodes[k].parent = _nodes[t].parent;
+	_nodes[t].parent = k;
+
+	// меняем корень, parent -> t, k
 	printf("  p = %lld (вверх)\n", p);
 	if (p == -1) { // это root
 		printf("_root_index: %lld -> %lld\n", _root_index, k);
