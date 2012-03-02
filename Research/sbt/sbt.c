@@ -10,27 +10,67 @@ TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
 
+// t - слева, перевешиваем туда
 int SBT_LeftRotate(TNodeIndex t) {
+	if (t < 0) return 0;
+	TNodeIndex k = _nodes[t].right;
+	if (k < 0) return 0;
+
+	// поворачиваем ребро дерева
+	_nodes[t].right = _nodes[k].left;
+	_nodes[k].left = t;
+
+	// корректируем size
+	_nodes[k].size = _nodes[t].size;
+	TNodeIndex n_l = _nodes[t].left;
+	TNodeIndex n_r = _nodes[t].right;
+	TNodeSize s_l = ((n_l != -1) ? _nodes[n_l].size : 0);
+	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
+	_nodes[t].size = s_l + s_r + 1;
+
+	// меняем трёх предков
+
+	// меняем корень, parent -> t, k
+	TNodeIndex p = _nodes[t].parent;
+	printf("  p = %lld (вверх)\n", p);
+	if (p == -1) { // это root
+		_root_index = k;
+	}
+	else {
+		if (_nodes[p].left == t) {
+			_nodes[p].left = k;
+		}
+		else
+		if (_nodes[p].right == t) { // вторую проверку можно не делать
+			_nodes[p].right = k;
+		}
+	}
 	return 0;
 }
 
+// t - справа, перевешиваем туда
 int SBT_RightRotate(TNodeIndex t) {
 	if (t < 0) return 0;
 	printf("+ rotate t = %lld\n", t);
 	printf("  t = %lld (вершина), value = %lld\n", t, _nodes[t].number);
-	TNodeIndex k = _nodes[t].left; 
+	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
 	printf("  k = %lld (левая вершина), value = %lld\n", k, _nodes[k].number);
 	printf("(продолжение)\n");
+
 	// поворачиваем ребро дерева
 	_nodes[t].left = _nodes[k].right;
 	printf("k.right: %lld -> %lld\n", _nodes[k].right, t);
 	_nodes[k].right = t;
+
 	// корректируем size
 	_nodes[k].size = _nodes[t].size;
-	_nodes[t].size =
-		_nodes[_nodes[t].left].size +
-		_nodes[_nodes[t].right].size + 1;
+	TNodeIndex n_l = _nodes[t].left;
+	TNodeIndex n_r = _nodes[t].right;
+	TNodeSize s_l = ((n_l != -1) ? _nodes[n_l].size : 0);
+	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
+	_nodes[t].size = s_l + s_r + 1;
+
 	// меняем корень, parent -> t, k
 	TNodeIndex p = _nodes[t].parent;
 	printf("  p = %lld (вверх)\n", p);
@@ -92,7 +132,8 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	printf("+ add t = %lld, value = %lld\n", t, number);
 	// позже
 	// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_RightRotate(_root_index);
+	//SBT_RightRotate(_root_index);
+	SBT_LeftRotate(_root_index);
 	}
 	else {
 		if(number < _nodes[t].number) {
@@ -108,7 +149,8 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	printf("+ add t = %lld, value = %lld\n", t, number);
 	// позже
 	// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_RightRotate(_root_index);
+	//SBT_RightRotate(_root_index);
+	SBT_LeftRotate(_root_index);
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].left, t);
@@ -127,7 +169,8 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	printf("+ add t = %lld, value = %lld\n", t, number);
 	// позже
 	// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_RightRotate(_root_index);
+	//SBT_RightRotate(_root_index);
+	SBT_LeftRotate(_root_index);
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].right, t);
