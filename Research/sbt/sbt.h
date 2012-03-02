@@ -18,7 +18,14 @@ typedef struct TNode {
 	TNodeIndex left;  // служебные поля,
 	TNodeIndex right; //  = -1, если нет дочерних вершин
 	TNodeSize size; // size в понимании SBT
+	// Основной момент в самобалансирующихся деревьях - это критерий "вращений" (rotates).
+	// В случае Size Balanced Trees (SBT), балансировка производится на основе вычислений
+	// "размеров" (size) некоторых вершин, близких к "корню" балансировки (t)
 } TNode;
+
+// для внутреннего использования или экспериментов
+int SBT_LeftRotate(TNodeIndex t);
+int SBT_RightRotate(TNodeIndex t);
 
 int SBT_Add(TNumber number);
 int SBT_Delete(TNumber number);
