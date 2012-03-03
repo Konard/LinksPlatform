@@ -1,0 +1,13 @@
+Иллюстрация вращений поисковых деревьев в виде OpenGL-программы.
+
+В планах:
+1. Size Binary Tree (SBT)
+2. AVL-tree
+
+Ссылки:
+1. Двоичное дерево поиска, http://ru.wikipedia.org/wiki/%D0%94%D0%B2%D0%BE%D0%B8%D1%87%D0%BD%D0%BE%D0%B5_%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BE_%D0%BF%D0%BE%D0%B8%D1%81%D0%BA%D0%B0
+2. Красно-чёрное дерево, http://ru.wikipedia.org/wiki/%D0%9A%D1%80%D0%B0%D1%81%D0%BD%D0%BE-%D1%87%D0%B5%D1%80%D0%BD%D0%BE%D0%B5_%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BE
+3. АВЛ-дерево, http://ru.wikipedia.org/wiki/%D0%90%D0%92%D0%9B-%D0%B4%D0%B5%D1%80%D0%B5%D0%B2%D0%BE
+4. Двоичные деревья (начальные сведения), http://algolist.manual.ru/ds/btree.php
+5. Двоичные деревья поиска (RSDN), http://www.rsdn.ru/article/alg/binstree.xml
+
