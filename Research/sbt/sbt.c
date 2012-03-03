@@ -38,7 +38,6 @@ int SBT_LeftRotate(TNodeIndex t) {
 	_nodes[t].parent = k;
 
 	// меняем корень, parent -> t, k
-	printf("  p = %lld (вверх)\n", p);
 	if (p == -1) { // это root
 		_root_index = k;
 	}
@@ -57,16 +56,11 @@ int SBT_LeftRotate(TNodeIndex t) {
 // t - справа, перевешиваем туда
 int SBT_RightRotate(TNodeIndex t) {
 	if (t < 0) return 0;
-	printf("+ rotate t = %lld\n", t);
-	printf("  t = %lld (вершина), value = %lld\n", t, _nodes[t].number);
 	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
-	printf("  k = %lld (левая вершина), value = %lld\n", k, _nodes[k].number);
-	printf("(продолжение)\n");
 
 	// поворачиваем ребро дерева
 	_nodes[t].left = _nodes[k].right;
-	printf("k.right: %lld -> %lld\n", _nodes[k].right, t);
 	_nodes[k].right = t;
 
 	// корректируем size
@@ -87,9 +81,7 @@ int SBT_RightRotate(TNodeIndex t) {
 	_nodes[t].parent = k;
 
 	// меняем корень, parent -> t, k
-	printf("  p = %lld (вверх)\n", p);
 	if (p == -1) { // это root
-		printf("_root_index: %lld -> %lld\n", _root_index, k);
 		_root_index = k;
 	}
 	else {
@@ -186,7 +178,6 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_nodes[_n_nodes].size = 1;
 		_root_index = 0;
 		_n_nodes++;
-	//printf("+ add t = %lld, value = %lld\n", t, number);
 	// позже
 	SBT_PrintAllNodes();
 	printf("MAINTAIN\n");
