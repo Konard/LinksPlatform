@@ -10,8 +10,8 @@
 #include <GL/freeglut_ext.h> // вместо atexit()
 
 
-int WINDOW_W = 1280;
-int WINDOW_H = 1024;
+int WINDOW_W = 1000;
+int WINDOW_H = 800;
 
 void reshapeWindow(int w, int h) {
   // настройка системы координат
