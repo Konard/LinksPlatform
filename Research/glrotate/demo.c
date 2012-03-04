@@ -1,17 +1,21 @@
 
 #include <stdio.h> // printf()
 #include <stdlib.h> // exit()
+#include <math.h> // nearbyint()
 
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <GL/glu.h>
-#define GLUT_DISABLE_ATEXIT_HACK
+//#define GLUT_DISABLE_ATEXIT_HACK
 #include <GL/glut.h>
 #include <GL/freeglut_ext.h> // вместо atexit()
 
 
 int WINDOW_W = 1000;
 int WINDOW_H = 800;
+
+double r = 45.0;
+double angle = 0.0;
 
 void reshapeWindow(int w, int h) {
   // настройка системы координат
@@ -26,16 +30,39 @@ void reshapeWindow(int w, int h) {
 const char *filename_font1 = "LinLibertine_Re-4.7.5.ttf";
 
 void drawWindow() {
+
+  // очистка
+  glColor4f(0.0, 0.0, 0.0, 0.0);
+  glClear(GL_COLOR_BUFFER_BIT);
+
   // рисование
-  glColor3f(0.0,0.0,0.0);
-  glLineStipple(1,0xAAAA);
+  glColor4f(1.0, 1.0, 1.0, 0.0);
+  glLineStipple(1, 0xAAAA);
   glEnable(GL_LINE_STIPPLE);
-  glBegin(GL_LINES);
-    glVertex2i ( 0, 0 );
-    glVertex2i ( 0, 10);
+  glBegin(GL_LINE_LOOP);
     glVertex2i ( 10, 10 );
-    glVertex2i ( 10, 0 );
+    glVertex2i ( 10, 100 );
+    glVertex2i ( 100, 100 );
+    glVertex2i ( 100, 10 );
   glEnd();
+  glDisable(GL_LINE_STIPPLE);
+
+  glColor4f(1.0, 1.0, 1.0, 0.0);
+  glEnable(GL_POINT_SMOOTH);
+  glPointSize(7.0); // does not work
+  glBegin(GL_LINE_STRIP);
+    glVertex2i ( 50, 50 );
+    glVertex2i (
+      50 + (int)nearbyint(r*cos(angle)),
+      50 + (int)nearbyint(r*sin(angle))
+    );
+  glEnd();
+  glDisable(GL_POINT_SMOOTH);
+
+  printf("%d %d\n",
+      50 + (int)nearbyint(r*cos(angle)),
+      50 + (int)nearbyint(r*sin(angle))
+  );
 
   glFlush();
   glutSwapBuffers();
@@ -87,6 +114,7 @@ void visibleWindow(int v) {
 void Timer(int extra) {
   glutPostRedisplay();
   glutTimerFunc(50,Timer,0);
+  angle += 0.01; // в радианах
 }
 
 
@@ -98,7 +126,7 @@ int main (int argc, char **argv) {
 
   // инициализация библиотеки
   glutInit(&argc,argv);
-  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB);
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGBA);
 
   // создание окна
   glutInitWindowPosition(50, 50);
