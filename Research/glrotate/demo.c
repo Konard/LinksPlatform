@@ -119,6 +119,9 @@ void Timer(int extra) {
   angle += 0.01; // в радианах
 }
 
+int onRotate(TNodeIndex *pointerToNodeIndex1, TNodeIndex *pointerToNodeIndex2) {
+	return 0;
+}
 
 int main (int argc, char **argv) {
   if(argc < 1) {
@@ -127,6 +130,7 @@ int main (int argc, char **argv) {
   }
 
 	// построение необходимых структур данных
+	SBT_SetCallback_OnRotate(onRotate);
 	SBT_Add(1);
 	SBT_Add(2);
 	SBT_Add(3);

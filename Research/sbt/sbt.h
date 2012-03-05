@@ -23,6 +23,10 @@ typedef struct TNode {
 	// "размеров" (size) некоторых вершин, близких к "корню" балансировки (t)
 } TNode;
 
+typedef int (*FuncOnRotate)(TNodeIndex *pointerToNodeIndex1, TNodeIndex *pointerToNodeIndex2);
+
+int SBT_SetCallback_OnRotate(FuncOnRotate func_);
+
 // для внутреннего использования или экспериментов
 int SBT_LeftRotate(TNodeIndex t);
 int SBT_RightRotate(TNodeIndex t);

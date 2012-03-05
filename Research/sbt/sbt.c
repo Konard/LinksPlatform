@@ -9,6 +9,11 @@ pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
 TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
+FuncOnRotate funcOnRotate;
+
+int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
+	funcOnRotate = func_;
+}
 
 // t - слева, перевешиваем туда
 int SBT_LeftRotate(TNodeIndex t) {
