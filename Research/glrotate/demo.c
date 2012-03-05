@@ -188,6 +188,14 @@ int onRotate(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAct
 	return 0;
 }
 
+int onWalk(TNodeIndex nodeIndex, const char *stringAction) {
+	printf("node = %lld, event = %s\n",
+		(long long int)nodeIndex,
+		stringAction
+	);
+	return 0;
+}
+
 int main (int argc, char **argv) {
   if(argc < 1) {
     printf("Need arguments\n");
@@ -196,12 +204,19 @@ int main (int argc, char **argv) {
 
 	// построение необходимых структур данных
 	SBT_SetCallback_OnRotate(onRotate);
-	SBT_Add(1);
-	SBT_Add(2);
-	SBT_Add(3);
-	SBT_Add(4);
-	SBT_Add(5);
+	SBT_SetCallback_OnWalk(onWalk);
 
+	SBT_WalkAllNodes();
+	SBT_Add(1);
+	SBT_WalkAllNodes();
+	SBT_Add(2);
+	SBT_WalkAllNodes();
+	SBT_Add(3);
+	SBT_WalkAllNodes();
+	SBT_Add(4);
+	SBT_WalkAllNodes();
+	SBT_Add(5);
+	SBT_WalkAllNodes();
 
   // инициализация библиотеки
   glutInit(&argc,argv);

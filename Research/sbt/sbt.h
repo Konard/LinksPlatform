@@ -28,9 +28,14 @@ typedef struct TNode {
 //	SBT_ACTION_RIGHT_ROTATE
 //} TTreeAction;
 
+// LEFT_ROTATE, RIGHT_ROTATE
 typedef int (*FuncOnRotate)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction);
 
+// WALK_DOWN, WALK_UP, WALK_NODE
+typedef int (*FuncOnWalk)(TNodeIndex nodeIndex, const char *stringAction);
+
 int SBT_SetCallback_OnRotate(FuncOnRotate func_);
+int SBT_SetCallback_OnWalk(FuncOnWalk func_);
 
 // для внутреннего использования или экспериментов
 int SBT_LeftRotate(TNodeIndex t);
@@ -40,5 +45,8 @@ int SBT_Add(TNumber number);
 int SBT_Delete(TNumber number);
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t);
 void SBT_PrintAllNodes();
+
+void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
+void SBT_WalkAllNodes();
 
 #endif

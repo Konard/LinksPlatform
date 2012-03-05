@@ -9,10 +9,16 @@ pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
 TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
+
 FuncOnRotate funcOnRotate = NULL;
+FuncOnWalk funcOnWalk = NULL;
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
 	funcOnRotate = func_;
+}
+
+int SBT_SetCallback_OnWalk(FuncOnWalk func_) {
+	funcOnWalk = func_;
 }
 
 // t - слева, перевешиваем туда
@@ -269,4 +275,26 @@ void SBT_PrintAllNodes() {
 	printf("_n_nodes = "SBT_FORMAT_STRING"\n", _n_nodes);
 	SBT_PrintAllNodes_At(0, _root_index);
 	printf("---\n");
+}
+
+void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
+	if ((_n_nodes <= 0) || (t < 0)) return; // выйти, если вершины нет
+
+	// снизу - меньшие
+	if (_nodes[t].left >= 0) {
+		funcOnWalk(t, "WALK_DOWN_LEFT");
+		SBT_WalkAllNodes_At(depth + 1, _nodes[t].left);
+	}
+	funcOnWalk(t, "WALK_NODE");
+	// сверху - большие вершины
+	if (_nodes[t].right >= 0) {
+		funcOnWalk(t, "WALK_DOWN_RIGHT");
+		SBT_WalkAllNodes_At(depth + 1, _nodes[t].right);
+	}
+	funcOnWalk(t, "WALK_UP");
+
+}
+
+void SBT_WalkAllNodes() {
+	SBT_WalkAllNodes_At(0, _root_index);
 }
