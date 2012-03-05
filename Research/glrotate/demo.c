@@ -10,6 +10,8 @@
 #include <GL/glut.h>
 #include <GL/freeglut_ext.h> // вместо atexit()
 
+#include "sbt.h"
+
 
 int WINDOW_W = 1000;
 int WINDOW_H = 800;
@@ -41,9 +43,9 @@ void drawWindow() {
   glEnable(GL_LINE_STIPPLE);
   glBegin(GL_LINE_LOOP);
     glVertex2i ( 10, 10 );
-    glVertex2i ( 10, 100 );
-    glVertex2i ( 100, 100 );
-    glVertex2i ( 100, 10 );
+    glVertex2i ( 10, 110 );
+    glVertex2i ( 110, 110 );
+    glVertex2i ( 110, 10 );
   glEnd();
   glDisable(GL_LINE_STIPPLE);
 
@@ -51,10 +53,10 @@ void drawWindow() {
   glEnable(GL_POINT_SMOOTH);
   glPointSize(7.0); // does not work
   glBegin(GL_LINE_STRIP);
-    glVertex2i ( 50, 50 );
+    glVertex2i ( 10+50, 10+50 );
     glVertex2i (
-      50 + (int)nearbyint(r*cos(angle)),
-      50 + (int)nearbyint(r*sin(angle))
+      10+50 + (int)nearbyint(r*cos(angle)),
+      10+50 + (int)nearbyint(r*sin(angle))
     );
   glEnd();
   glDisable(GL_POINT_SMOOTH);
@@ -123,6 +125,14 @@ int main (int argc, char **argv) {
     printf("Need arguments\n");
     return -1;
   }
+
+	// построение необходимых структур данных
+	SBT_Add(1);
+	SBT_Add(2);
+	SBT_Add(3);
+	SBT_Add(4);
+	SBT_Add(5);
+
 
   // инициализация библиотеки
   glutInit(&argc,argv);
