@@ -278,7 +278,10 @@ void SBT_PrintAllNodes() {
 }
 
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
-	if ((_n_nodes <= 0) || (t < 0)) return; // выйти, если вершины нет
+	if ((_n_nodes <= 0) || (t < 0)) {
+		funcOnWalk(t, "WALK_UP");
+		return; // выйти, если вершины нет
+	}
 
 	// снизу - меньшие
 	if (_nodes[t].left >= 0) {
