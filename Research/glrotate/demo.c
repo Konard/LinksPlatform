@@ -188,11 +188,26 @@ int onRotate(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAct
 	return 0;
 }
 
-int onWalk(TNodeIndex nodeIndex, const char *stringAction) {
-	printf("node = %lld, event = %s\n",
-		(long long int)nodeIndex,
-		stringAction
-	);
+int onWalk(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction) {
+	if ((!strcmp(stringAction, "WALK_STARTS"))) {
+	}
+	else
+	if ((!strcmp(stringAction, "WALK_DOWN_LEFT")) ||
+	    (!strcmp(stringAction, "WALK_DOWN_RIGHT")))
+		printf("node: %lld - %lld, event = %s\n",
+			(long long int)nodeIndex1,
+			(long long int)nodeIndex2,
+			stringAction
+		);
+	else
+	if ((!strcmp(stringAction, "WALK_NODE")))
+		printf("node: %lld, event = %s\n",
+			(long long int)nodeIndex1,
+			stringAction
+		);
+	else
+	if ((!strcmp(stringAction, "WALK_FINISH"))) {
+	}
 	return 0;
 }
 

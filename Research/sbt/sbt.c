@@ -279,25 +279,31 @@ void SBT_PrintAllNodes() {
 
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
 	if ((_n_nodes <= 0) || (t < 0)) {
-		funcOnWalk(t, "WALK_UP");
+		funcOnWalk(t, -1, "WALK_UP");
 		return; // выйти, если вершины нет
 	}
 
 	// снизу - меньшие
 	if (_nodes[t].left >= 0) {
-		funcOnWalk(t, "WALK_DOWN_LEFT");
+		funcOnWalk(t, _nodes[t].left, "WALK_DOWN_LEFT");
 		SBT_WalkAllNodes_At(depth + 1, _nodes[t].left);
 	}
-	funcOnWalk(t, "WALK_NODE");
+	funcOnWalk(t, t, "WALK_NODE");
 	// сверху - большие вершины
 	if (_nodes[t].right >= 0) {
-		funcOnWalk(t, "WALK_DOWN_RIGHT");
+		funcOnWalk(t, _nodes[t].right, "WALK_DOWN_RIGHT");
 		SBT_WalkAllNodes_At(depth + 1, _nodes[t].right);
 	}
-	funcOnWalk(t, "WALK_UP");
+	funcOnWalk(t, -1, "WALK_UP");
 
 }
 
 void SBT_WalkAllNodes() {
+	funcOnWalk(-1, -1, "WALK_STARTS");
 	SBT_WalkAllNodes_At(0, _root_index);
+	funcOnWalk(-1, -1, "WALK_FINISH");
+}
+
+TNode *GetNode(TNodeIndex t) {
+	return &(_nodes[t]);
 }
