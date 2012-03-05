@@ -9,7 +9,7 @@ pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
 TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
-FuncOnRotate funcOnRotate;
+FuncOnRotate funcOnRotate = NULL;
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
 	funcOnRotate = func_;
@@ -20,6 +20,7 @@ int SBT_LeftRotate(TNodeIndex t) {
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].right;
 	if (k < 0) return 0;
+	if (funcOnRotate != NULL) funcOnRotate(k, t, "LEFT_ROTATE");
 
 	// поворачиваем ребро дерева
 	_nodes[t].right = _nodes[k].left;
@@ -63,6 +64,7 @@ int SBT_RightRotate(TNodeIndex t) {
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
+	if (funcOnRotate != NULL) funcOnRotate(k, t, "RIGHT_ROTATE");
 
 	// поворачиваем ребро дерева
 	_nodes[t].left = _nodes[k].right;
@@ -183,14 +185,14 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_nodes[_n_nodes].size = 1;
 		_root_index = 0;
 		_n_nodes++;
-	// позже
-	SBT_PrintAllNodes();
-	printf("MAINTAIN\n");
-	SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_PrintAllNodes();
-	//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	//SBT_RightRotate(_root_index);
-	//SBT_LeftRotate(_root_index);
+		// позже
+		SBT_PrintAllNodes();
+		printf("MAINTAIN\n");
+		//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
+		//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+		//SBT_RightRotate(_root_index);
+		SBT_LeftRotate(_root_index);
+		SBT_PrintAllNodes();
 	}
 	else {
 		if(number < _nodes[t].number) {
@@ -202,16 +204,15 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
-	//SBT_PrintAllNodes();
-	//printf("+ add t = %lld, value = %lld\n", t, number);
-	// позже
-	SBT_PrintAllNodes();
-	printf("MAINTAIN\n");
-	SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_PrintAllNodes();
-	//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	//SBT_RightRotate(_root_index);
-	//SBT_LeftRotate(_root_index);
+				//printf("+ add t = %lld, value = %lld\n", t, number);
+				// позже
+				SBT_PrintAllNodes();
+				printf("MAINTAIN\n");
+				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
+				//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+				//SBT_RightRotate(_root_index);
+				SBT_LeftRotate(_root_index);
+				SBT_PrintAllNodes();
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].left, t);
@@ -226,16 +227,14 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
-	//SBT_PrintAllNodes();
-	//printf("+ add t = %lld, value = %lld\n", t, number);
-	// позже
-	SBT_PrintAllNodes();
-	printf("MAINTAIN\n");
-	SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-	SBT_PrintAllNodes();
-	//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-	//SBT_RightRotate(_root_index);
-	//SBT_LeftRotate(_root_index);
+				// позже
+				SBT_PrintAllNodes();
+				printf("MAINTAIN\n");
+				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
+				//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+				//SBT_RightRotate(_root_index);
+				SBT_LeftRotate(_root_index);
+				SBT_PrintAllNodes();
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].right, t);
@@ -255,10 +254,15 @@ int SBT_Delete(TNumber n) {
 
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 	if ((_n_nodes <= 0) || (t < 0)) return; // выйти, если вершины нет
-	if (_nodes[t].left >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
+
+	// сверху - большие вершины
+	if (_nodes[t].right >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
+
 	for (int i = 0; i < depth; i++) printf(" "); // отступ
 	printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING")\n", depth, t, (SBT_FORMAT_TYPE)_nodes[t].number); // иначе: напечатать "тело" узла
-	if (_nodes[t].right >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
+
+	// снизу - меньшие
+	if (_nodes[t].left >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
 }
 
 void SBT_PrintAllNodes() {

@@ -23,7 +23,12 @@ typedef struct TNode {
 	// "размеров" (size) некоторых вершин, близких к "корню" балансировки (t)
 } TNode;
 
-typedef int (*FuncOnRotate)(TNodeIndex *pointerToNodeIndex1, TNodeIndex *pointerToNodeIndex2);
+//typedef enum TTreeAction {
+//	SBT_ACTION_LEFT_ROTATE,
+//	SBT_ACTION_RIGHT_ROTATE
+//} TTreeAction;
+
+typedef int (*FuncOnRotate)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction);
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_);
 
