@@ -154,7 +154,8 @@ TNodeSize SBT_Left_size(TNodeIndex t) {
 }
 
 int SBT_Maintain(TNodeIndex t, int flag) {
-//	if ((t >= 0) && (t < _n_nodes)) return 0;
+
+	// поместили слева, flag == 0
 	if (flag == 0) {
 		if (SBT_Left_Left_size(t) > SBT_Right_size(t)) {
 			SBT_RightRotate(t);
@@ -165,6 +166,7 @@ int SBT_Maintain(TNodeIndex t, int flag) {
 		}
 		else { return 0; }
 	}
+	// поместили справа, flag == 1
 	else {
 		if (SBT_Right_Right_size(t) > SBT_Left_size(t)) {
 			SBT_LeftRotate(t);
@@ -175,10 +177,12 @@ int SBT_Maintain(TNodeIndex t, int flag) {
 		}
 		else { return 0; }
 	}
+
 	SBT_Maintain(_nodes[t].left, 0); // false
 	SBT_Maintain(_nodes[t].right, 1); // true
 	SBT_Maintain(t, 0); // false
 	SBT_Maintain(t, 1); // true
+
 	return 0;
 }
 
@@ -197,7 +201,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
 		//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 		//SBT_RightRotate(_root_index);
-		SBT_LeftRotate(_root_index);
+		//SBT_LeftRotate(_root_index);
 		SBT_PrintAllNodes();
 	}
 	else {
@@ -215,9 +219,9 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				SBT_PrintAllNodes();
 				printf("MAINTAIN\n");
 				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-				//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+				SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 				//SBT_RightRotate(_root_index);
-				SBT_LeftRotate(_root_index);
+				//SBT_LeftRotate(_root_index);
 				SBT_PrintAllNodes();
 			}
 			else {
@@ -237,9 +241,9 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				SBT_PrintAllNodes();
 				printf("MAINTAIN\n");
 				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-				//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+				SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 				//SBT_RightRotate(_root_index);
-				SBT_LeftRotate(_root_index);
+				//SBT_LeftRotate(_root_index);
 				SBT_PrintAllNodes();
 			}
 			else {
