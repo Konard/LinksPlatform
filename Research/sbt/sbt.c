@@ -187,6 +187,7 @@ int SBT_Maintain(TNodeIndex t, int flag) {
 }
 
 int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
+	_nodes[t].size++;
 	_nodes[_n_nodes].number = number;
 	if (_n_nodes <= 0) {
 		_nodes[_n_nodes].parent = parent;
@@ -199,7 +200,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		SBT_PrintAllNodes();
 		printf("MAINTAIN\n");
 		//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-		//SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0);
+		// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0); // по-идее, это не нужно
 		//SBT_RightRotate(_root_index);
 		//SBT_LeftRotate(_root_index);
 		SBT_PrintAllNodes();
@@ -269,7 +270,12 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 	if (_nodes[t].right >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
 
 	for (int i = 0; i < depth; i++) printf(" "); // отступ
-	printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING")\n", depth, t, (SBT_FORMAT_TYPE)_nodes[t].number); // иначе: напечатать "тело" узла
+	printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING"), size = %lld\n",
+		depth,
+		t,
+		(SBT_FORMAT_TYPE)_nodes[t].number,
+		(SBT_FORMAT_TYPE)_nodes[t].size
+	); // иначе: напечатать "тело" узла
 
 	// снизу - меньшие
 	if (_nodes[t].left >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
