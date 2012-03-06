@@ -198,7 +198,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_n_nodes++;
 		// позже
 		SBT_PrintAllNodes();
-		printf("MAINTAIN\n");
+		//printf("MAINTAIN\n");
 		//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
 		// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0); // по-идее, это не нужно
 		//SBT_RightRotate(_root_index);
@@ -316,4 +316,38 @@ void SBT_WalkAllNodes() {
 
 TNode *GetNode(TNodeIndex t) {
 	return &(_nodes[t]);
+}
+
+void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return; // выйти, если вершины нет
+	}
+
+	// снизу - меньшие
+	if (_nodes[t].left >= 0) {
+		SBT_CheckAllNodes_At(depth + 1, _nodes[t].left);
+	}
+	// проверить
+	if ((SBT_Left_Left_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
+		printf("ERROR %lld LL > R\n", t);
+	}
+	if ((SBT_Left_Right_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
+		printf("ERROR %lld LR > R\n", t);
+	}
+	if ((SBT_Right_Right_size(t) > SBT_Left_size(t)) && (SBT_Left_size(t) > 0)) {
+		printf("ERROR %lld RR > L (%d > %d)\n", (int)t, (int)SBT_Right_Right_size(t), (int)SBT_Left_size(t));
+	}
+	if ((SBT_Right_Left_size(t) > SBT_Left_size(t)) && (SBT_Left_size(t) > 0)) {
+		printf("ERROR %lld RL > L\n", t);
+	}
+	
+	// сверху - большие вершины
+	if (_nodes[t].right >= 0) {
+		SBT_CheckAllNodes_At(depth + 1, _nodes[t].right);
+	}
+
+}
+
+void SBT_CheckAllNodes() {
+	SBT_CheckAllNodes_At(0, _root_index);
 }

@@ -26,6 +26,7 @@ int main() {
 		SBT_Add((rnd)&0x000000FF);
 		SBT_PrintAllNodes();
 	}
+	SBT_CheckAllNodes();
 
 /*
 	// второй пример

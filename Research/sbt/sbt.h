@@ -49,6 +49,9 @@ void SBT_PrintAllNodes();
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
 void SBT_WalkAllNodes();
 
+void SBT_CheckAllNodes_At(int depth, TNodeIndex t);
+void SBT_CheckAllNodes();
+
 TNode *GetNode(TNodeIndex t);
 
 #endif
