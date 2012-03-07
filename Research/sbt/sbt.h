@@ -54,4 +54,6 @@ void SBT_CheckAllNodes();
 
 TNode *GetNode(TNodeIndex t);
 
+void SBT_DumpAllNodes();
+
 #endif

@@ -23,10 +23,13 @@ int SBT_SetCallback_OnWalk(FuncOnWalk func_) {
 
 // t - слева, перевешиваем туда
 int SBT_LeftRotate(TNodeIndex t) {
+	printf("LEFT_ROTATE %lld\n", t);
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].right;
 	if (k < 0) return 0;
 	if (funcOnRotate != NULL) funcOnRotate(k, t, "LEFT_ROTATE");
+
+	TNodeIndex p = _nodes[t].parent;
 
 	// поворачиваем ребро дерева
 	_nodes[t].right = _nodes[k].left;
@@ -40,7 +43,6 @@ int SBT_LeftRotate(TNodeIndex t) {
 	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
 	_nodes[t].size = s_l + s_r + 1;
 
-	TNodeIndex p = _nodes[t].parent;
 	// меняем трёх предков
 	// 1. t.right.parent = t
 	// 2. k.parent = t.parent
@@ -67,10 +69,14 @@ int SBT_LeftRotate(TNodeIndex t) {
 
 // t - справа, перевешиваем туда
 int SBT_RightRotate(TNodeIndex t) {
+	printf("RIGHT_ROTATE %lld\n", t);
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
+	printf("k = %lld\n", k);
 	if (funcOnRotate != NULL) funcOnRotate(k, t, "RIGHT_ROTATE");
+
+	TNodeIndex p = _nodes[t].parent;
 
 	// поворачиваем ребро дерева
 	_nodes[t].left = _nodes[k].right;
@@ -84,7 +90,6 @@ int SBT_RightRotate(TNodeIndex t) {
 	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
 	_nodes[t].size = s_l + s_r + 1;
 
-	TNodeIndex p = _nodes[t].parent;
 	// меняем трёх предков
 	// 1. t.left.parent = t
 	// 2. k.parent = t.parent
@@ -215,8 +220,6 @@ int SBT_Maintain(TNodeIndex t) {
 	    else at_left = 0; // "справа" от родителя
 	}
 
-//	TNodeIndex t0 = t;
-
 #define CALC_T0 \
 	TNodeIndex t0 = -1; \
 	if (parent == -1) t0 = _root_index; \
@@ -248,22 +251,21 @@ int SBT_Maintain(TNodeIndex t) {
 		SBT_Maintain(t0);
 	}
 	else if (SBT_Right_Left_size(t) > SBT_Left_size(t)) {
+	SBT_DumpAllNodes();
 		SBT_RightRotate(_nodes[t].right);
+	SBT_PrintAllNodes();
+	SBT_DumpAllNodes();
 		SBT_LeftRotate(t);
 		CALC_T0
 		SBT_Maintain(_nodes[t0].left);
 		SBT_Maintain(_nodes[t0].right);
 		SBT_Maintain(t0);
 	}
-/*
-	SBT_Maintain(_nodes[t0].left, 0); // false
-	SBT_Maintain(_nodes[t0].right, 1); // true
-	SBT_Maintain(t0, 0); // false
-	SBT_Maintain(t0, 1); // true
-*/
+
 	return 0;
 }
 
+// родительская у t - parent
 int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	_nodes[t].size++;
 	_nodes[_n_nodes].number = number;
@@ -283,7 +285,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			if(_nodes[t].left == -1) {
 				_nodes[t].left = _n_nodes;
 				_nodes[_n_nodes].number = number;
-				_nodes[_n_nodes].parent = parent;
+				_nodes[_n_nodes].parent = t;
 				_nodes[_n_nodes].left = -1;
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
@@ -305,7 +307,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			if(_nodes[t].right == -1) {
 				_nodes[t].right = _n_nodes;
 				_nodes[_n_nodes].number = number;
-				_nodes[_n_nodes].parent = parent;
+				_nodes[_n_nodes].parent = t;
 				_nodes[_n_nodes].left = -1;
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
@@ -422,4 +424,17 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 
 void SBT_CheckAllNodes() {
 	SBT_CheckAllNodes_At(0, _root_index);
+}
+
+void SBT_DumpAllNodes() {
+	for (uint64_t i = 0; i < _n_nodes; i++) {
+		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld\n",
+			i,
+			_nodes[i].number,
+			_nodes[i].size,
+			_nodes[i].left,
+			_nodes[i].right,
+			_nodes[i].parent
+		);
+	}
 }

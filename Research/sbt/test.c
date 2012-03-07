@@ -8,6 +8,7 @@
 int main() {
 
 /*
+	// первый пример
 	srandom(time(NULL)%1000);
 	for(int i = 0; i < 50; i++) {
 		SBT_Add(random() % 1000);
@@ -15,7 +16,9 @@ int main() {
 	}
 */
 
+
 /*
+	// третий пример
 #define RND_SEED 100
 #define RND_A 9
 #define RND_B 9
@@ -31,6 +34,7 @@ int main() {
 	SBT_CheckAllNodes();
 */
 
+/*
 	// второй пример
 	SBT_Add(1);
 	SBT_Add(2);
@@ -41,6 +45,18 @@ int main() {
 	SBT_Add(7);
 	SBT_Add(8);
 	SBT_Add(9);
+	SBT_Add(10);
+	SBT_Add(11);
+	SBT_Add(12);
+	SBT_CheckAllNodes();
+*/
+
+	// четвертый пример
+	SBT_Add(15);
+	SBT_Add(25);
+	SBT_Add(20);
+	SBT_CheckAllNodes();
+	SBT_DumpAllNodes();
 
 	return 0;
 }
