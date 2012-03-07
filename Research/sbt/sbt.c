@@ -205,7 +205,7 @@ int SBT_Maintain_Simpler(TNodeIndex t, int flag) {
 int SBT_Maintain(TNodeIndex t) {
 
 	if (t < 0) return 0;
-/*
+
 	TNodeIndex parent = _nodes[t].parent; // есть "родитель"
 	int at_left = 0;
 	if (parent == -1) { // t - корень дерева, он изменяется; запоминать нужно не индекс, а "топологию"
@@ -214,18 +214,28 @@ int SBT_Maintain(TNodeIndex t) {
 	    if (_nodes[parent].left == t) at_left = 1; // "слева" от родителя - индекс родителя не изменился
 	    else at_left = 0; // "справа" от родителя
 	}
-*/
-	TNodeIndex t0 = t;
+
+//	TNodeIndex t0 = t;
+
+#define CALC_T0 \
+	TNodeIndex t0 = -1; \
+	if (parent == -1) t0 = _root_index; \
+	else { \
+	    if (at_left) t0 = _nodes[parent].left; \
+	    else t0 = _nodes[parent].right; \
+	}
 
 	// поместили слева (?)
 	if (SBT_Left_Left_size(t) > SBT_Right_size(t)) {
 		SBT_RightRotate(t);
+		CALC_T0
 		SBT_Maintain(_nodes[t0].right);
 		SBT_Maintain(t0);
 	}
 	else if (SBT_Left_Right_size(t) > SBT_Right_size(t)) {
 		SBT_LeftRotate(_nodes[t].left);
 		SBT_RightRotate(t);
+		CALC_T0
 		SBT_Maintain(_nodes[t0].left);
 		SBT_Maintain(_nodes[t0].right);
 		SBT_Maintain(t0);
@@ -233,23 +243,19 @@ int SBT_Maintain(TNodeIndex t) {
 	// поместили справа (?)
 	else if (SBT_Right_Right_size(t) > SBT_Left_size(t)) {
 		SBT_LeftRotate(t);
+		CALC_T0
 		SBT_Maintain(_nodes[t0].left);
 		SBT_Maintain(t0);
 	}
 	else if (SBT_Right_Left_size(t) > SBT_Left_size(t)) {
 		SBT_RightRotate(_nodes[t].right);
 		SBT_LeftRotate(t);
+		CALC_T0
 		SBT_Maintain(_nodes[t0].left);
 		SBT_Maintain(_nodes[t0].right);
 		SBT_Maintain(t0);
 	}
 /*
-	TNodeIndex t0 = -1;
-	if (parent == -1) t0 = _root_index;
-	else {
-	    if (at_left) t0 = _nodes[parent].left;
-	    else t0 = _nodes[parent].right;
-	}
 	SBT_Maintain(_nodes[t0].left, 0); // false
 	SBT_Maintain(_nodes[t0].right, 1); // true
 	SBT_Maintain(t0, 0); // false
@@ -269,12 +275,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_root_index = 0;
 		_n_nodes++;
 		// позже
-		SBT_PrintAllNodes();
-		//printf("MAINTAIN\n");
-		//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
-		// SBT_Maintain(_root_index, (number >= _nodes[t].number) ? 1 : 0); // по-идее, это не нужно
-		//SBT_RightRotate(_root_index);
-		//SBT_LeftRotate(_root_index);
+		printf("BEGIN\n");
 		SBT_PrintAllNodes();
 	}
 	else {
@@ -287,11 +288,9 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
-				//printf("+ add t = %lld, value = %lld\n", t, number);
 				// позже
 				SBT_PrintAllNodes();
 				printf("MAINTAIN\n");
-				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
 				SBT_Maintain(_root_index);
 				//SBT_Maintain_Simpler(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 				//SBT_RightRotate(_root_index);
@@ -314,7 +313,6 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				// позже
 				SBT_PrintAllNodes();
 				printf("MAINTAIN\n");
-				//SBT_Maintain(parent, (number >= _nodes[t].number) ? 1 : 0);
 				SBT_Maintain(_root_index);
 				//SBT_Maintain_Simpler(_root_index, (number >= _nodes[t].number) ? 1 : 0);
 				//SBT_RightRotate(_root_index);
