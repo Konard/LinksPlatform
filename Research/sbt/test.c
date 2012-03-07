@@ -34,7 +34,7 @@ int main() {
 	SBT_CheckAllNodes();
 */
 
-/*
+
 	// второй пример
 	SBT_Add(1);
 	SBT_Add(2);
@@ -48,15 +48,22 @@ int main() {
 	SBT_Add(10);
 	SBT_Add(11);
 	SBT_Add(12);
-	SBT_CheckAllNodes();
-*/
 
+	SBT_Add(5);
+	SBT_Add(6);
+	SBT_Add(7);
+	SBT_CheckAllNodes();
+
+/*
 	// четвертый пример
 	SBT_Add(15);
 	SBT_Add(25);
 	SBT_Add(20);
+	SBT_Add(22);
+	SBT_Add(19);
 	SBT_CheckAllNodes();
 	SBT_DumpAllNodes();
+*/
 
 	return 0;
 }
