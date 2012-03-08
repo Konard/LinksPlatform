@@ -17,14 +17,13 @@ int main() {
 */
 
 
-/*
 	// третий пример
 #define RND_SEED 100
 #define RND_A 9
 #define RND_B 9
 #define RND_C 7
 	int rnd = RND_SEED;
-	for(int i = 0; i < 50; i++) {
+	for(int i = 0; i < 1000; i++) {
 		rnd ^= (rnd << RND_A);
 		rnd ^= (rnd >> RND_B);
 		rnd ^= (rnd << RND_C);
@@ -32,9 +31,8 @@ int main() {
 		SBT_PrintAllNodes();
 	}
 	SBT_CheckAllNodes();
-*/
 
-
+/*
 	// второй пример
 	SBT_Add(1);
 	SBT_Add(2);
@@ -53,6 +51,7 @@ int main() {
 	SBT_Add(6);
 	SBT_Add(7);
 	SBT_CheckAllNodes();
+*/
 
 /*
 	// четвертый пример
