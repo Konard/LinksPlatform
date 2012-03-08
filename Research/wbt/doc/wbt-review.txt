@@ -1,0 +1,33 @@
+-----
+Статья "Balancing weight-balanced trees"
+(авторы: Yoichi Hirai, Kazuhiko Yamamoto; Япония)
+Cambridge University Press, 2011 год
+URL: http://hagi.is.s.u-tokyo.ac.jp/~yh/bst.pdf
+
+Статья "Size Balanced Tree"
+(автор: Chen Quifeng; Китай)
+Zhongshan Memorial Middle School, Guangdong, China, декабрь 2006 года
+URL: http://yaoziyuan.googlepages.com/SizeBalancedTree.zip
+
+-----
+
+Плюсы для статьи японцев:
+
+1. В терминологии Yoichi Hirai и Kazuhiko Yamamoto (Japan), weight-balanced trees (WBT)
+   - тоже самое, что и size balanced trees (SBT) в терминологии Chen Quifeng (China).
+
+2. Weight-balanced trees используются в функциональных языках программирования -
+   в Haskell, Scheme (MIT Scheme).
+
+
+Минусы для статьи школьника:
+
+1. Для баланса по weight (size) здесь [в статье японцев] требуется (в отличие от AVL/SBT)
+   - не одно "вращение" (rotation), а два : rotation + double rotation.
+
+2. Рассматривается _не_ 4 случая взаимного расположения вершин + размеров (весов),
+   как в статье китайского школьника, а 14 случаев.
+
+3. Со времени публикации школьником его статьи (2006 год), на  него не было практически
+   ни одной серьезной ссылки. Разве что - термин "size balanced" он один из первых
+   использовал, поэтому в Google - на первой странице поиска.
