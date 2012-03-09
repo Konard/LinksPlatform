@@ -17,7 +17,7 @@ URL: http://yaoziyuan.googlepages.com/SizeBalancedTree.zip
    - тоже самое, что и size balanced trees (SBT) в терминологии Chen Quifeng (China).
 
 2. Weight-balanced trees используются в функциональных языках программирования -
-   в Haskell, Scheme (например, реализованы в трансляторе MIT Scheme).
+   в Haskell, Scheme (например, реализованы в трансляторе MIT/GNU Scheme).
 
 
 Минусы для статьи школьника:
@@ -33,4 +33,25 @@ URL: http://yaoziyuan.googlepages.com/SizeBalancedTree.zip
 3. Со времени публикации школьником его статьи (2006 год), на него не было практически
    ни одной серьезной ссылки. Разве что - термин "size balanced" он один из первых
    использовал, поэтому в Google - на первой странице поиска.
+
+
+Итак, дерево балансируется с помощью single rotation и double rotation.
+Балансировка зависит от "весов" поддеревьев, и коэффициентов \Delta и \Gamma.
+
+Ключевые функции для Variant balancing method (variant WBT):
+
+isBalanced :: Set a -> Set a -> Bool
+isBalanced a b = x + y <= 1 || delta * x >= y
+  where x = size a
+        y = size b
+
+isSingle :: Set a -> Set a -> Bool
+isSingle a b = size a < gamma * size b
+
+Параметр delta определяет - выполнять ли вращения.
+Параметр gamma определяет - какое из вращений выполнять (single или double).
+
+...
+
+Существуют также другие WBT-алгоритмы. Например, Logarithmic BST.
 
