@@ -16,7 +16,6 @@ int main() {
 	}
 */
 
-/*
 	// третий пример
 #define RND_SEED 100
 #define RND_A 9
@@ -31,7 +30,8 @@ int main() {
 		SBT_PrintAllNodes();
 	}
 	SBT_CheckAllNodes();
-*/
+	SBT_PrintAllNodes();
+	SBT_DumpAllNodes();
 
 /*
 	// второй пример
@@ -52,9 +52,11 @@ int main() {
 	SBT_Add(6);
 	SBT_Add(7);
 	SBT_CheckAllNodes();
+	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 */
 
+/*
 	// четвертый пример
 	SBT_Add(15);
 	SBT_Add(25);
@@ -62,7 +64,9 @@ int main() {
 	SBT_Add(22);
 	SBT_Add(19);
 	SBT_CheckAllNodes();
+	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
+*/
 
 	return 0;
 }
