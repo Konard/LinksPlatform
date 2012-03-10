@@ -29,7 +29,7 @@ int main() {
 		SBT_Add((rnd)&0x000000FF);
 //		SBT_PrintAllNodes();
 	}
-//	SBT_CheckAllNodes();
+	SBT_CheckAllNodes();
 //	SBT_PrintAllNodes();
 //	SBT_DumpAllNodes();
 

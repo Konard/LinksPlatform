@@ -251,10 +251,7 @@ int SBT_Maintain(TNodeIndex t) {
 		SBT_Maintain(t0);
 	}
 	else if (SBT_Right_Left_size(t) > SBT_Left_size(t)) {
-//	SBT_DumpAllNodes();
 		SBT_RightRotate(_nodes[t].right);
-//	SBT_PrintAllNodes();
-//	SBT_DumpAllNodes();
 		SBT_LeftRotate(t);
 		CALC_T0
 		SBT_Maintain(_nodes[t0].left);
@@ -276,9 +273,6 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_nodes[_n_nodes].size = 1;
 		_root_index = 0;
 		_n_nodes++;
-		// позже
-//		printf("BEGIN\n");
-//		SBT_PrintAllNodes();
 	}
 	else {
 		if(number < _nodes[t].number) {
@@ -290,14 +284,6 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
-				// позже
-				// SBT_PrintAllNodes();
-				// printf("MAINTAIN\n");
-				// SBT_Maintain(_root_index); // !!!
-				//SBT_Maintain_Simpler(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-				//SBT_RightRotate(_root_index);
-				//SBT_LeftRotate(_root_index);
-				// SBT_PrintAllNodes();
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].left, t);
@@ -312,21 +298,14 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_nodes[_n_nodes].right = -1;
 				_nodes[_n_nodes].size = 1;
 				_n_nodes++;
-				// позже
-				// SBT_PrintAllNodes();
-				// printf("MAINTAIN\n");
-				//SBT_Maintain(_root_index); // !!!
-				//SBT_Maintain_Simpler(_root_index, (number >= _nodes[t].number) ? 1 : 0);
-				//SBT_RightRotate(_root_index);
-				//SBT_LeftRotate(_root_index);
-				// SBT_PrintAllNodes();
 			}
 			else {
 				SBT_Add_At(number, _nodes[t].right, t);
 			}
 		}
 	}
-	SBT_Maintain(t);
+	//SBT_Maintain(t);
+	SBT_Maintain_Simpler(t, (number >= _nodes[t].number) ? 1 : 0);
 	return 0;
 }
 
