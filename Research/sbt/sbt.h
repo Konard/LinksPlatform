@@ -34,8 +34,13 @@ typedef int (*FuncOnRotate)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const 
 // WALK_DOWN, WALK_UP, WALK_NODE
 typedef int (*FuncOnWalk)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction);
 
+// FOUND
+typedef int (*FuncOnFind)(TNodeIndex nodeIndex, const char *stringAction);
+
+
 int SBT_SetCallback_OnRotate(FuncOnRotate func_);
 int SBT_SetCallback_OnWalk(FuncOnWalk func_);
+int SBT_SetCallback_OnFind(FuncOnFind func_);
 
 // для внутреннего использования или экспериментов
 int SBT_LeftRotate(TNodeIndex t);
@@ -43,17 +48,30 @@ int SBT_RightRotate(TNodeIndex t);
 
 int SBT_Add(TNumber number);
 int SBT_Delete(TNumber number);
-void SBT_PrintAllNodes_At(int depth, TNodeIndex t);
-void SBT_PrintAllNodes();
 
-void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
-void SBT_WalkAllNodes();
+// Dump & Check
 
 void SBT_CheckAllNodes_At(int depth, TNodeIndex t);
 void SBT_CheckAllNodes();
 
-TNode *GetNode(TNodeIndex t);
+void SBT_PrintAllNodes_At(int depth, TNodeIndex t);
+void SBT_PrintAllNodes();
 
 void SBT_DumpAllNodes();
+
+// Search & Walk
+
+TNodeIndex SBT_FindFirstNode_At(int depth, TNodeIndex t);
+TNodeIndex SBT_FindFirstNode();
+
+void SBT_FindAllNodes_At(int depth, TNodeIndex t);
+void SBT_FindAllNodes();
+
+void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
+void SBT_WalkAllNodes();
+
+// Get
+
+TNode *GetNode(TNodeIndex t);
 
 #endif

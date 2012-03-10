@@ -10,8 +10,11 @@ TNodeIndex _root_index = -1;
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0;
 
+// Event-driven technique
+
 FuncOnRotate funcOnRotate = NULL;
 FuncOnWalk funcOnWalk = NULL;
+FuncOnFind funcOnFind = NULL;
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
 	funcOnRotate = func_;
@@ -20,6 +23,12 @@ int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
 int SBT_SetCallback_OnWalk(FuncOnWalk func_) {
 	funcOnWalk = func_;
 }
+
+int SBT_SetCallback_OnFind(FuncOnFind func_) {
+	funcOnFind = func_;
+}
+
+// Rotate, Maintain & Add, Delete
 
 // t - слева, перевешиваем туда
 int SBT_LeftRotate(TNodeIndex t) {
@@ -313,8 +322,12 @@ int SBT_Add(TNumber number) {
 	return SBT_Add_At(number, _root_index, -1);
 }
 
-int SBT_Delete(TNumber n) {
+int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	return 0;
+}
+
+int SBT_Delete(TNumber number) {
+	return SBT_Delete_At(number, _root_index, -1);
 }
 
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
@@ -367,6 +380,27 @@ void SBT_WalkAllNodes() {
 	SBT_WalkAllNodes_At(0, _root_index);
 	funcOnWalk(-1, -1, "WALK_FINISH");
 }
+
+
+
+TNodeIndex SBT_FindFirstNode_At(int depth, TNodeIndex t) {
+	return -1;
+}
+
+TNodeIndex SBT_FindFirstNode() {
+	return SBT_FindFirstNode_At(0, _root_index);
+}
+
+
+
+void SBT_FindAllNodes_At(int depth, TNodeIndex t) {
+}
+
+void SBT_FindAllNodes() {
+	return SBT_FindAllNodes_At(0, _root_index);
+}
+
+
 
 TNode *GetNode(TNodeIndex t) {
 	return &(_nodes[t]);

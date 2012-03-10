@@ -16,6 +16,7 @@ int main() {
 	}
 */
 
+/*
 	// третий пример
 #define RND_SEED 100
 #define RND_A 9
@@ -32,6 +33,7 @@ int main() {
 	SBT_CheckAllNodes();
 //	SBT_PrintAllNodes();
 //	SBT_DumpAllNodes();
+*/
 
 /*
 	// второй пример
@@ -67,6 +69,13 @@ int main() {
 	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 */
+
+	for (int i = 0; i < 100; i++)
+	    SBT_Add(i);
+	SBT_CheckAllNodes();
+	for (int i = 0; i < 100; i++)
+	    SBT_Delete(i);
+	SBT_CheckAllNodes();
 
 	return 0;
 }
