@@ -383,21 +383,41 @@ void SBT_WalkAllNodes() {
 
 
 
-TNodeIndex SBT_FindFirstNode_At(int depth, TNodeIndex t) {
-	return -1;
+TNodeIndex SBT_FindFirstNode_At(TNumber number, TNodeIndex t) {
+
+	if (t < 0) return -1; // ответ: "Не найден"
+
+	if (number == _nodes[t].number) {
+		// Среагировать на найденный элемент
+		return t;
+	}
+	else if (number < _nodes[t].number) {
+		// влево
+		return SBT_FindFirstNode_At(number, _nodes[t].left);
+	}
+	// можно не делать это сравнение для целых чисел
+	else 
+	// if (number > _nodes[t].number)
+	{
+		// вправо
+		return SBT_FindFirstNode_At(number, _nodes[t].right);
+	}
+
+	// не выполняется
+	return -1; // "не найден"
 }
 
-TNodeIndex SBT_FindFirstNode() {
-	return SBT_FindFirstNode_At(0, _root_index);
+TNodeIndex SBT_FindFirstNode(TNumber number) {
+	return SBT_FindFirstNode_At(number, _root_index);
 }
 
 
 
-void SBT_FindAllNodes_At(int depth, TNodeIndex t) {
+void SBT_FindAllNodes_At(TNumber number, TNodeIndex t) {
 }
 
-void SBT_FindAllNodes() {
-	return SBT_FindAllNodes_At(0, _root_index);
+void SBT_FindAllNodes(TNumber number) {
+	return SBT_FindAllNodes_At(number, _root_index);
 }
 
 

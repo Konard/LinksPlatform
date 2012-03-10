@@ -70,9 +70,14 @@ int main() {
 	SBT_DumpAllNodes();
 */
 
-	for (int i = 0; i < 100; i++)
-	    SBT_Add(i);
+	for (int i = 0; i < 10; i++)
+	    SBT_Add(i*2);
+	SBT_PrintAllNodes();
 	SBT_CheckAllNodes();
+	
+	TNumber n = SBT_FindFirstNode(2);
+	printf("%lld\n", n);
+	
 	for (int i = 0; i < 100; i++)
 	    SBT_Delete(i);
 	SBT_CheckAllNodes();
