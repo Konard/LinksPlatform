@@ -17,25 +17,6 @@ int main() {
 */
 
 /*
-	// третий пример
-#define RND_SEED 100
-#define RND_A 9
-#define RND_B 9
-#define RND_C 7
-	int rnd = RND_SEED;
-	for(int i = 0; i < 1000000; i++) {
-		rnd ^= (rnd << RND_A);
-		rnd ^= (rnd >> RND_B);
-		rnd ^= (rnd << RND_C);
-		SBT_Add((rnd)&0x000000FF);
-//		SBT_PrintAllNodes();
-	}
-	SBT_CheckAllNodes();
-//	SBT_PrintAllNodes();
-//	SBT_DumpAllNodes();
-*/
-
-/*
 	// второй пример
 	SBT_Add(1);
 	SBT_Add(2);
@@ -58,6 +39,23 @@ int main() {
 	SBT_DumpAllNodes();
 */
 
+	// третий пример
+#define RND_SEED 100
+#define RND_A 9
+#define RND_B 9
+#define RND_C 7
+	int rnd = RND_SEED;
+	for(int i = 0; i < 1000000; i++) {
+		rnd ^= (rnd << RND_A);
+		rnd ^= (rnd >> RND_B);
+		rnd ^= (rnd << RND_C);
+		SBT_AddUniq((rnd)&0x000000FF);
+//		SBT_PrintAllNodes();
+	}
+	SBT_CheckAllNodes();
+//	SBT_PrintAllNodes();
+	SBT_DumpAllNodes();
+
 /*
 	// четвертый пример
 	SBT_Add(15);
@@ -70,17 +68,38 @@ int main() {
 	SBT_DumpAllNodes();
 */
 
+/*
+	// пятый пример
 	for (int i = 0; i < 10; i++)
-	    SBT_Add(i*2);
+	    SBT_AddUniq(i*2);
+	for (int i = 0; i < 10; i++)
+	    SBT_AddUniq(i*2 + 1);
+	for (int i = 0; i < 10; i++)
+	    SBT_AddUniq(i*2 + 1); // fail
+
 	SBT_PrintAllNodes();
 	SBT_CheckAllNodes();
 	
-	TNumber n = SBT_FindFirstNode(2);
+	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
 	printf("%lld\n", n);
 	
 	for (int i = 0; i < 100; i++)
 	    SBT_Delete(i);
 	SBT_CheckAllNodes();
+*/
+
+/*
+	// шестой пример
+//	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
+//	printf("n = %lld\n", n);
+	SBT_AddUniq(2);
+	SBT_AddUniq(1);
+	SBT_AddUniq(2);
+	SBT_AddUniq(1);
+	SBT_DumpAllNodes();
+	SBT_PrintAllNodes();
+	SBT_CheckAllNodes();
+*/
 
 	return 0;
 }

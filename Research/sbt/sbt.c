@@ -322,11 +322,26 @@ int SBT_Add(TNumber number) {
 	return SBT_Add_At(number, _root_index, -1);
 }
 
+// Uniq
+
+int SBT_AddUniq(TNumber number) {
+	int result = SBT_FindFirstNode(number); // fail, если вершина с таким number уже существует
+//	printf("%d\n", result);
+	if (result == -1) {
+		SBT_Add(number);
+	}
+	return result;
+}
+
 int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	return 0;
 }
 
 int SBT_Delete(TNumber number) {
+	return SBT_Delete_At(number, _root_index, -1);
+}
+
+int SBT_DeleteAll(TNumber number) {
 	return SBT_Delete_At(number, _root_index, -1);
 }
 
@@ -408,6 +423,8 @@ TNodeIndex SBT_FindFirstNode_At(TNumber number, TNodeIndex t) {
 }
 
 TNodeIndex SBT_FindFirstNode(TNumber number) {
+	if (_n_nodes <= 0) return -1;
+//	printf("root = %lld\n", _root_index);
 	return SBT_FindFirstNode_At(number, _root_index);
 }
 
