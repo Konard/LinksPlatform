@@ -51,6 +51,9 @@ int SBT_AddUniq(TNumber number);
 int SBT_Delete(TNumber number); // -1, если нет такого узла в дереве
 int SBT_DeleteAll(TNumber number); // для неуникального ключа
 
+TNodeIndex SBT_AllocateNode();
+int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалить ... (в данной реализации - всегда = 0)
+
 // Dump & Check
 
 void SBT_CheckAllNodes_At(int depth, TNodeIndex t);
