@@ -97,12 +97,17 @@ int main() {
 	SBT_AddUniq(1);
 	SBT_AddUniq(2);
 	SBT_AddUniq(1);
-	SBT_Delete(1);
-	SBT_Delete(2);
 
-	SBT_DumpAllNodes();
 	SBT_PrintAllNodes();
+
+	printf("delete 1: %d\n", SBT_Delete(1));
+	printf("root index = %lld\n", GetRootIndex());
+	printf("delete 2: %d\n", SBT_Delete(2));
+	printf("root index = %lld\n", GetRootIndex());
+
 	SBT_CheckAllNodes();
+	SBT_PrintAllNodes();
+//	SBT_DumpAllNodes();
 
 	return 0;
 }

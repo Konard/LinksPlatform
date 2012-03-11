@@ -335,26 +335,90 @@ int SBT_AddUniq(TNumber number) {
 
 int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 
+	int result = -1;
 	if (t < 0) return -1; // ответ: "Не найден"
 
 	if (number == _nodes[t].number) {
+//		printf("delete %lld\n", t);
+//		SBT_PrintAllNodes();
+
 		// Среагировать на найденный элемент
-		return t;
+		if (parent == -1) {
+		    if (_nodes[t].left != -1) {
+			_root_index = _nodes[t].left;
+
+			// TNodeIndex 
+			_nodes[_root_index].parent = -1;
+			_nodes[_root_index].right = _nodes[t].right;
+			if (_nodes[t].right != -1) {
+				_nodes[_nodes[t].right].parent = _root_index;
+			}
+		    }
+		    else if (_nodes[t].right != -1) {
+			_root_index = _nodes[t].right;
+
+			// TNodeIndex 
+			_nodes[_root_index].parent = -1;
+			_nodes[_root_index].left = _nodes[t].left;
+			if (_nodes[t].left != -1) {
+				_nodes[_nodes[t].left].parent = _root_index;
+			}
+		    }
+		    else {
+			printf("delete root\n");
+			_root_index = -1;
+		    }
+		}
+		else {
+			int at_left = 0;
+			if (_nodes[parent].left == t) at_left = 1;
+			else at_left = 0;
+
+
+		    if (_nodes[t].left != -1) {
+
+			// ссылка от parent != -1
+			if (at_left == 1) _nodes[parent].left = _nodes[t].left;
+			else _nodes[parent].right = _nodes[t].left;
+
+			_nodes[_nodes[t].left].parent = parent; // новый корень, .left
+			_nodes[_nodes[t].left].right = _nodes[t].right; // перевешиваем вершину
+			if (_nodes[t].right != -1) {
+				_nodes[_nodes[t].right].parent = _nodes[t].left;
+			}
+		    }
+		    else if (_nodes[t].right != -1) {
+
+			// ссылка от parent != -1
+			if (at_left == 1) _nodes[parent].left = _nodes[t].right;
+			else _nodes[parent].right = _nodes[t].right;
+
+			_nodes[_nodes[t].right].parent = parent; // новый корень, .right
+			_nodes[_nodes[t].right].left = _nodes[t].left; // перевешиваем вершину
+			if (_nodes[t].left != -1) {
+				_nodes[_nodes[t].left].parent = _nodes[t].right;
+			}
+		    }
+
+		}
+		result = t;
 	}
 	else if (number < _nodes[t].number) {
 		// влево
-		return SBT_Delete_At(number, _nodes[t].left, t);
+		result = SBT_Delete_At(number, _nodes[t].left, t);
 	}
 	// можно не делать это сравнение для целых чисел
 	else 
 	// if (number > _nodes[t].number)
 	{
 		// вправо
-		return SBT_Delete_At(number, _nodes[t].right, t);
+		result = SBT_Delete_At(number, _nodes[t].right, t);
 	}
+	SBT_Maintain(t);
+//	SBT_Maintain(t, (number < _nodes[t].number) ? 1: 0);
 
 	// не выполняется
-	return -1; // "не найден"
+	return result; // "не найден"
 }
 
 int SBT_Delete(TNumber number) {
@@ -385,6 +449,7 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 }
 
 void SBT_PrintAllNodes() {
+	printf("---\n");
 	printf("_n_nodes = "SBT_FORMAT_STRING"\n", _n_nodes);
 	SBT_PrintAllNodes_At(0, _root_index);
 	printf("---\n");
@@ -460,10 +525,6 @@ void SBT_FindAllNodes(TNumber number) {
 
 
 
-TNode *GetNode(TNodeIndex t) {
-	return &(_nodes[t]);
-}
-
 void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 	if ((_n_nodes <= 0) || (t < 0)) {
 		return; // выйти, если вершины нет
@@ -509,4 +570,12 @@ void SBT_DumpAllNodes() {
 			_nodes[i].parent
 		);
 	}
+}
+
+TNode *GetNode(TNodeIndex t) {
+	return &(_nodes[t]);
+}
+
+TNodeIndex GetRootIndex() {
+	return _root_index;
 }
