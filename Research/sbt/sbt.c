@@ -610,8 +610,9 @@ TNodeIndex SBT_AllocateNode() {
 		// выделить из списка
 		TNodeIndex t = _tree_unused;
 		_tree_unused = _nodes[t].right;
+		_nodes[t].left = _nodes[_tree_unused].left;
 		_nodes[_tree_unused].left = -1; // теперь - первый элемент
-		// на всякий случай - обнуляем
+		// на всякий случай - обнуляем (дополнительная очистка)
 		_nodes[t].left = -1;
 		_nodes[t].right = -1;
 		_nodes[t].parent = -1;
@@ -631,5 +632,24 @@ TNodeIndex SBT_AllocateNode() {
 	}
 }
 
+// небезопасная функция ! следите за целостностью дерева самостоятельно !
+// подключение в "кольцевой буфер"
 int SBT_FreeNode(TNodeIndex t) {
+	// переместить в unused-пространство
+	if (_tree_unused == -1) {
+		_tree_unused = t;
+		_nodes[t].left = t;
+		_nodes[t].right = t;
+		_nodes[t].parent = -1;
+		_nodes[t].size = 0;
+		_nodes[t].number = 0;
+	}
+	else {
+		_nodes[t].left = _nodes[_tree_unused].left;
+		_nodes[_tree_unused].left = t;
+		_nodes[t].right = _tree_unused;
+		_nodes[t].parent = -1;
+		_nodes[t].size = 0;
+		_nodes[t].number = 0;
+	}
 }
