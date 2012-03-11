@@ -371,10 +371,11 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		    }
 		}
 		else {
+			printf("parent != -1\n");
 
-		    int at_left = 0;
-		    if (_nodes[parent].left == t) at_left = 1;
-		    else at_left = 0;
+			int at_left = 0;
+			if (_nodes[parent].left == t) at_left = 1;
+			else at_left = 0;
 
 
 		    if (_nodes[t].left != -1) {
@@ -402,12 +403,18 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			}
 		    }
 		    else {
+//			printf("> удаление единицы, parent = %lld\n", parent);
 			// удалить соответствующее направление у parent
+//			SBT_DumpAllNodes();
 			if (at_left == 1) _nodes[parent].left = -1;
 			else _nodes[parent].right = -1;
+//			SBT_PrintAllNodes();
 		    }
 
 		}
+		_nodes[t].parent = -1;
+		_nodes[t].left = -1;
+		_nodes[t].right = -1;
 		result = t;
 	}
 	else if (number < _nodes[t].number) {
@@ -421,7 +428,7 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		// вправо
 		result = SBT_Delete_At(number, _nodes[t].right, t);
 	}
-	SBT_Maintain(t);
+	if (parent != -1) SBT_Maintain(parent);
 //	SBT_Maintain(t, (number < _nodes[t].number) ? 1: 0);
 
 	// не выполняется
@@ -445,13 +452,15 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 	// сверху - большие вершины
 	if (_nodes[t].right >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
 
-	for (int i = 0; i < depth; i++) printf(" "); // отступ
-	printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING"), size = %lld\n",
-		depth,
-		t,
-		(SBT_FORMAT_TYPE)_nodes[t].number,
-		(SBT_FORMAT_TYPE)_nodes[t].size
-	); // иначе: напечатать "тело" узла
+	if (!((_nodes[t].parent == -1) && (_nodes[t].left == -1) && (_nodes[t].right == -1)) || (t == _root_index)) {
+		for (int i = 0; i < depth; i++) printf(" "); // отступ
+		printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING"), size = %lld\n",
+		    depth,
+		    t,
+		    (SBT_FORMAT_TYPE)_nodes[t].number,
+		    (SBT_FORMAT_TYPE)_nodes[t].size
+		); // иначе: напечатать "тело" узла
+	}
 
 	// снизу - меньшие
 	if (_nodes[t].left >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
