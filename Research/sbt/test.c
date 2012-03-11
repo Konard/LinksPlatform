@@ -39,6 +39,7 @@ int main() {
 	SBT_DumpAllNodes();
 */
 
+/*
 	// третий пример
 #define RND_SEED 100
 #define RND_A 9
@@ -55,6 +56,7 @@ int main() {
 	SBT_CheckAllNodes();
 //	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
+*/
 
 /*
 	// четвертый пример
@@ -88,7 +90,6 @@ int main() {
 	SBT_CheckAllNodes();
 */
 
-/*
 	// шестой пример
 //	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
 //	printf("n = %lld\n", n);
@@ -96,10 +97,12 @@ int main() {
 	SBT_AddUniq(1);
 	SBT_AddUniq(2);
 	SBT_AddUniq(1);
+	SBT_Delete(1);
+	SBT_Delete(2);
+
 	SBT_DumpAllNodes();
 	SBT_PrintAllNodes();
 	SBT_CheckAllNodes();
-*/
 
 	return 0;
 }

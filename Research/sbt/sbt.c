@@ -334,11 +334,32 @@ int SBT_AddUniq(TNumber number) {
 }
 
 int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
-	return 0;
+
+	if (t < 0) return -1; // ответ: "Не найден"
+
+	if (number == _nodes[t].number) {
+		// Среагировать на найденный элемент
+		return t;
+	}
+	else if (number < _nodes[t].number) {
+		// влево
+		return SBT_Delete_At(number, _nodes[t].left, t);
+	}
+	// можно не делать это сравнение для целых чисел
+	else 
+	// if (number > _nodes[t].number)
+	{
+		// вправо
+		return SBT_Delete_At(number, _nodes[t].right, t);
+	}
+
+	// не выполняется
+	return -1; // "не найден"
 }
 
 int SBT_Delete(TNumber number) {
-	return SBT_Delete_At(number, _root_index, -1);
+	TNodeIndex t = SBT_Delete_At(number, _root_index, -1);
+	return t;
 }
 
 int SBT_DeleteAll(TNumber number) {
