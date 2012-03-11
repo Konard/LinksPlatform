@@ -342,8 +342,9 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 //		printf("delete %lld\n", t);
 //		SBT_PrintAllNodes();
 
-		// Среагировать на найденный элемент
-		if (parent == -1) {
+		// Вершину нашли,
+		// среагировать на найденный элемент
+		if (parent == -1) { // если это - корень дерева
 		    if (_nodes[t].left != -1) {
 			_root_index = _nodes[t].left;
 
@@ -365,14 +366,15 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			}
 		    }
 		    else {
-			printf("delete root\n");
+//			printf("delete root\n");
 			_root_index = -1;
 		    }
 		}
 		else {
-			int at_left = 0;
-			if (_nodes[parent].left == t) at_left = 1;
-			else at_left = 0;
+
+		    int at_left = 0;
+		    if (_nodes[parent].left == t) at_left = 1;
+		    else at_left = 0;
 
 
 		    if (_nodes[t].left != -1) {
@@ -398,6 +400,11 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 			if (_nodes[t].left != -1) {
 				_nodes[_nodes[t].left].parent = _nodes[t].right;
 			}
+		    }
+		    else {
+			// удалить соответствующее направление у parent
+			if (at_left == 1) _nodes[parent].left = -1;
+			else _nodes[parent].right = -1;
 		    }
 
 		}

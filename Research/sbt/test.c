@@ -90,6 +90,7 @@ int main() {
 	SBT_CheckAllNodes();
 */
 
+/*
 	// шестой пример
 //	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
 //	printf("n = %lld\n", n);
@@ -97,17 +98,25 @@ int main() {
 	SBT_AddUniq(1);
 	SBT_AddUniq(2);
 	SBT_AddUniq(1);
-
+	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
 
 	printf("delete 1: %d\n", SBT_Delete(1));
 	printf("root index = %lld\n", GetRootIndex());
+	SBT_PrintAllNodes();
+
 	printf("delete 2: %d\n", SBT_Delete(2));
 	printf("root index = %lld\n", GetRootIndex());
-
-	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
+
 //	SBT_DumpAllNodes();
+*/
+
+	// седьмой пример
+	for (int i = 0; i < 1000000; i++)
+	    SBT_AddUniq(i);
+//	for (int i = 0; i < 1000000; i++)
+//	    SBT_Delete(i);
 
 	return 0;
 }
