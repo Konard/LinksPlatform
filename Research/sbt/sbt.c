@@ -434,7 +434,9 @@ int SBT_Delete(TNumber number) {
 }
 
 int SBT_DeleteAll(TNumber number) {
-	return SBT_Delete_At(number, _root_index, -1);
+	int result = -1;
+	while ((result = SBT_Delete_At(number, _root_index, -1)) != -1);
+	return result;
 }
 
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {

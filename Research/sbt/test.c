@@ -115,8 +115,9 @@ int main() {
 	// седьмой пример
 	for (int i = 0; i < 1000000; i++)
 	    SBT_AddUniq(i);
-//	for (int i = 0; i < 1000000; i++)
-//	    SBT_Delete(i);
+	for (int i = 0; i < 1000000; i++)
+	    SBT_DeleteAll(i);
+	SBT_PrintAllNodes();
 
 	return 0;
 }
