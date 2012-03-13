@@ -1,16 +1,14 @@
-
 NAME = test
 OPTS = -O3 -std=c99 -I..
 SRCS = $(wildcard *.c)
 OBJS = $(subst ,,$(SRCS:.c=.o))
-BINS = $(subst ,,$(SRCS:.c=))
 
-tests:		$(BINS)
+all:		$(OBJS)
 
-$(BINS):	$(OBJS)
-		gcc -o $@ $< ../sbt.o
+%.o:		%.c
+		gcc -c $(OPTS) $<
+		gcc -o $* $*.o ../sbt.o
 
-$(OBJS):	$(SRCS)
-		gcc ${OPTS} -c -o $@ $<
 clean:
-	rm -f $(OBJS)
+		rm -f $(BINS)
+		rm -f $(OBJS)

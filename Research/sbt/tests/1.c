@@ -13,6 +13,7 @@ int main() {
 		SBT_Add(random() % 1000);
 		SBT_PrintAllNodes();
 	}
+	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 
