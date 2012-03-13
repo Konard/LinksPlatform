@@ -6,8 +6,7 @@
 // см. http://compgroups.net/comp.lang.c/Explanation-needed-for-const-int-error-variably-modified-at-file-scope
 
 #include <stdint.h>
-#define SBT_FORMAT_STRING "%lld"
-#define SBT_FORMAT_TYPE long long signed int
+
 typedef int64_t TNumber;
 typedef int64_t TNodeIndex;
 typedef uint64_t TNodeSize;

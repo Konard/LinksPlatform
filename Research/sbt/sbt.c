@@ -460,11 +460,11 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 
 	if (!((_nodes[t].parent == -1) && (_nodes[t].left == -1) && (_nodes[t].right == -1)) || (t == _tree_root)) {
 		for (int i = 0; i < depth; i++) printf(" "); // отступ
-		printf("depth = %d, node = "SBT_FORMAT_STRING": ("SBT_FORMAT_STRING"), size = %lld\n",
-		    depth,
-		    t,
-		    (SBT_FORMAT_TYPE)_nodes[t].number,
-		    (SBT_FORMAT_TYPE)_nodes[t].size
+		printf("depth = %d, node = %lld: (%lld), size = %lld\n",
+			depth,
+			(long long int)t,
+			(long long int)_nodes[t].number,
+			(long long int)_nodes[t].size
 		); // иначе: напечатать "тело" узла
 	}
 
@@ -474,7 +474,9 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 
 void SBT_PrintAllNodes() {
 	printf("---\n");
-	printf("_n_nodes = "SBT_FORMAT_STRING"\n", _n_nodes);
+	printf("_n_nodes = %lld\n",
+		(long long int)_n_nodes
+	);
 	SBT_PrintAllNodes_At(0, _tree_root);
 	printf("---\n");
 }
@@ -560,16 +562,32 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 	}
 	// проверить
 	if ((SBT_Left_Left_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
-		printf("ERROR %lld LL > R\n", t);
+		printf("ERROR %lld LL > R\n",
+			(long long int)t,
+			(long long int)SBT_Left_Left_size(t),
+			(long long int)SBT_Right_size(t)
+		);
 	}
 	if ((SBT_Left_Right_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
-		printf("ERROR %lld LR > R\n", t);
+		printf("ERROR %lld LR > R\n",
+			(long long int)t,
+			(long long int)SBT_Left_Right_size(t),
+			(long long int)SBT_Right_size(t)
+		);
 	}
 	if ((SBT_Right_Right_size(t) > SBT_Left_size(t)) && (SBT_Left_size(t) > 0)) {
-		printf("ERROR %lld RR > L (%lld > %lld)\n", t, SBT_Right_Right_size(t), SBT_Left_size(t));
+		printf("ERROR %lld RR > L (%lld > %lld)\n",
+			(long long int)t,
+			(long long int)SBT_Right_Right_size(t),
+			(long long int)SBT_Left_size(t)
+		);
 	}
 	if ((SBT_Right_Left_size(t) > SBT_Left_size(t)) && (SBT_Left_size(t) > 0)) {
-		printf("ERROR %lld RL > L\n", t);
+		printf("ERROR %lld RL > L\n",
+			(long long int)t,
+			(long long int)SBT_Right_Left_size(t),
+			(long long int)SBT_Left_size(t)
+		);
 	}
 	
 	// сверху - большие вершины
