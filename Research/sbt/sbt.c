@@ -377,7 +377,7 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		    }
 		}
 		else {
-			printf("parent != -1\n");
+//			printf("parent != -1\n");
 
 			int at_left = 0;
 			if (_nodes[parent].left == t) at_left = 1;
