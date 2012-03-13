@@ -586,12 +586,12 @@ void SBT_CheckAllNodes() {
 void SBT_DumpAllNodes() {
 	for (uint64_t i = 0; i < _n_nodes; i++) {
 		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld\n",
-			i,
-			_nodes[i].number,
-			_nodes[i].size,
-			_nodes[i].left,
-			_nodes[i].right,
-			_nodes[i].parent
+			(long long int)i,
+			(long long int)_nodes[i].number,
+			(long long int)_nodes[i].size,
+			(long long int)_nodes[i].left,
+			(long long int)_nodes[i].right,
+			(long long int)_nodes[i].parent
 		);
 	}
 }
