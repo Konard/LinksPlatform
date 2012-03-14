@@ -4,9 +4,9 @@ SRCS = $(wildcard *.c)
 OBJS = $(subst ,,$(SRCS:.c=.o))
 BINS = $(subst ,,$(SRCS:.c=))
 
-all:		$(OBJS) ../sbt.o
+all:		$(OBJS)
 
-%.o:		%.c
+%.o:		%.c ../sbt.o
 		gcc -c $(OPTS) $<
 		gcc -o $* $*.o ../sbt.o
 

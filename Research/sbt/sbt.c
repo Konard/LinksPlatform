@@ -8,10 +8,10 @@
 pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
 
 TNode _nodes[SBT_MAX_NODES];
-TNodeIndex _n_nodes = 0;
-TNodeIndex _tree_root = -1;
-TNodeIndex _tree_unused = -1; // список
-TNodeIndex _n_clean = SBT_MAX_NODES;
+TNodeIndex _n_nodes = 0; // число вершин в дереве
+TNodeIndex _tree_root = -1; // дерево
+TNodeIndex _tree_unused = -1; // список неиспользованных
+TNodeIndex _n_clean = SBT_MAX_NODES; // хвост "чистых"
 
 
 // Event-driven technique
@@ -280,25 +280,26 @@ int SBT_Maintain(TNodeIndex t) {
 // родительская у t - parent
 int SBT_AddNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	_nodes[t].size++;
-	_nodes[_n_nodes].number = number;
 	if (_n_nodes <= 0) {
-		_nodes[_n_nodes].parent = parent;
-		_nodes[_n_nodes].left = -1;
-		_nodes[_n_nodes].right = -1;
-		_nodes[_n_nodes].size = 1;
+		TNodeIndex t_new = SBT_AllocateNode();
+		_nodes[t_new].number = number;
+		_nodes[t_new].parent = parent;
+		_nodes[t_new].left = -1;
+		_nodes[t_new].right = -1;
+		_nodes[t_new].size = 1;
 		_tree_root = 0;
-		_n_nodes++;
 	}
 	else {
 		if(number < _nodes[t].number) {
 			if(_nodes[t].left == -1) {
+				TNodeIndex t_new = SBT_AllocateNode();
 				_nodes[t].left = _n_nodes;
-				_nodes[_n_nodes].number = number;
-				_nodes[_n_nodes].parent = t;
-				_nodes[_n_nodes].left = -1;
-				_nodes[_n_nodes].right = -1;
-				_nodes[_n_nodes].size = 1;
-				_n_nodes++;
+				_nodes[t_new].number = number;
+				_nodes[t_new].number = number;
+				_nodes[t_new].parent = t;
+				_nodes[t_new].left = -1;
+				_nodes[t_new].right = -1;
+				_nodes[t_new].size = 1;
 			}
 			else {
 				SBT_AddNode_At(number, _nodes[t].left, t);
@@ -306,13 +307,14 @@ int SBT_AddNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		}
 		else {
 			if(_nodes[t].right == -1) {
+				TNodeIndex t_new = SBT_AllocateNode();
 				_nodes[t].right = _n_nodes;
-				_nodes[_n_nodes].number = number;
-				_nodes[_n_nodes].parent = t;
-				_nodes[_n_nodes].left = -1;
-				_nodes[_n_nodes].right = -1;
-				_nodes[_n_nodes].size = 1;
-				_n_nodes++;
+				_nodes[t_new].number = number;
+				_nodes[t_new].number = number;
+				_nodes[t_new].parent = t;
+				_nodes[t_new].left = -1;
+				_nodes[t_new].right = -1;
+				_nodes[t_new].size = 1;
 			}
 			else {
 				SBT_AddNode_At(number, _nodes[t].right, t);
@@ -438,6 +440,7 @@ int SBT_DeleteNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 //	SBT_Maintain(t, (number < _nodes[t].number) ? 1: 0);
 
 	// не выполняется
+	if (result != -1) SBT_FreeNode(result);
 	return result; // "не найден"
 }
 
@@ -636,12 +639,17 @@ TNodeIndex SBT_AllocateNode() {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].number = 0;
+		// счетчика _n_unused нет (но можно добавить)
+		_n_nodes++;
 		return t;
 	}
 	else {
 		// выделить из чистого списка
 		if (_n_clean > 0) {
 			t = SBT_MAX_NODES - _n_clean;
+			printf("clean: %lld\n", (long long int)t);
+			_n_clean--;
+			_n_nodes++;
 		}
 		else {
 			t = -1;
@@ -661,6 +669,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].number = 0;
+		// счетчика _n_unused нет
 	}
 	else {
 		_nodes[t].left = _nodes[_tree_unused].left;
@@ -669,5 +678,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].number = 0;
+		// счетчика _n_unused нет
 	}
+	_n_nodes--;
 }
