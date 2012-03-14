@@ -8,22 +8,22 @@
 int main() {
 
 	// второй пример
-	SBT_Add(1);
-	SBT_Add(2);
-	SBT_Add(3);
-	SBT_Add(4);
-	SBT_Add(5);
-	SBT_Add(6);
-	SBT_Add(7);
-	SBT_Add(8);
-	SBT_Add(9);
-	SBT_Add(10);
-	SBT_Add(11);
-	SBT_Add(12);
+	SBT_AddNode(1);
+	SBT_AddNode(2);
+	SBT_AddNode(3);
+	SBT_AddNode(4);
+	SBT_AddNode(5);
+	SBT_AddNode(6);
+	SBT_AddNode(7);
+	SBT_AddNode(8);
+	SBT_AddNode(9);
+	SBT_AddNode(10);
+	SBT_AddNode(11);
+	SBT_AddNode(12);
 
-	SBT_Add(5);
-	SBT_Add(6);
-	SBT_Add(7);
+	SBT_AddNode(5);
+	SBT_AddNode(6);
+	SBT_AddNode(7);
 	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();

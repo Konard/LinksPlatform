@@ -17,7 +17,7 @@ int main() {
 		rnd ^= (rnd << RND_A);
 		rnd ^= (rnd >> RND_B);
 		rnd ^= (rnd << RND_C);
-		SBT_AddUniq((rnd)&0x000000FF);
+		SBT_AddNodeUniq((rnd)&0x000000FF);
 	}
 	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();

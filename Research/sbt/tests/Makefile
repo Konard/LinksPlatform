@@ -3,7 +3,7 @@ OPTS = -O3 -std=c99 -I..
 SRCS = $(wildcard *.c)
 OBJS = $(subst ,,$(SRCS:.c=.o))
 
-all:		$(OBJS)
+all:		$(OBJS) ../sbt.o
 
 %.o:		%.c
 		gcc -c $(OPTS) $<

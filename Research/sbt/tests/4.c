@@ -8,14 +8,11 @@
 int main() {
 
 	// четвертый пример
-	SBT_Add(15);
-	SBT_Add(25);
-	SBT_Add(20);
-	SBT_Add(22);
-	SBT_Add(19);
-	SBT_CheckAllNodes();
-	SBT_PrintAllNodes();
-	SBT_DumpAllNodes();
+	SBT_AddNode(15);
+	SBT_AddNode(25);
+	SBT_AddNode(20);
+	SBT_AddNode(22);
+	SBT_AddNode(19);
 	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();

@@ -45,10 +45,10 @@ int SBT_SetCallback_OnFind(FuncOnFind func_);
 int SBT_LeftRotate(TNodeIndex t);
 int SBT_RightRotate(TNodeIndex t);
 
-int SBT_Add(TNumber number); // для неуникального ключа
-int SBT_AddUniq(TNumber number);
-int SBT_Delete(TNumber number); // -1, если нет такого узла в дереве
-int SBT_DeleteAll(TNumber number); // для неуникального ключа
+int SBT_AddNode(TNumber number); // для неуникального ключа
+int SBT_AddNodeUniq(TNumber number);
+int SBT_DeleteNode(TNumber number); // -1, если нет такого узла в дереве
+int SBT_DeleteNodeAll(TNumber number); // для неуникального ключа
 
 TNodeIndex SBT_AllocateNode();
 int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалить ... (в данной реализации - всегда = 0)

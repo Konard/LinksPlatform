@@ -278,7 +278,7 @@ int SBT_Maintain(TNodeIndex t) {
 }
 
 // родительская у t - parent
-int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
+int SBT_AddNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	_nodes[t].size++;
 	_nodes[_n_nodes].number = number;
 	if (_n_nodes <= 0) {
@@ -301,7 +301,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_n_nodes++;
 			}
 			else {
-				SBT_Add_At(number, _nodes[t].left, t);
+				SBT_AddNode_At(number, _nodes[t].left, t);
 			}
 		}
 		else {
@@ -315,7 +315,7 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 				_n_nodes++;
 			}
 			else {
-				SBT_Add_At(number, _nodes[t].right, t);
+				SBT_AddNode_At(number, _nodes[t].right, t);
 			}
 		}
 	}
@@ -324,22 +324,22 @@ int SBT_Add_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	return 0;
 }
 
-int SBT_Add(TNumber number) {
-	return SBT_Add_At(number, _tree_root, -1);
+int SBT_AddNode(TNumber number) {
+	return SBT_AddNode_At(number, _tree_root, -1);
 }
 
 // Uniq
 
-int SBT_AddUniq(TNumber number) {
+int SBT_AddNodeUniq(TNumber number) {
 	int result = SBT_FindFirstNode(number); // fail, если вершина с таким number уже существует
 //	printf("%d\n", result);
 	if (result == -1) {
-		SBT_Add(number);
+		SBT_AddNode(number);
 	}
 	return result;
 }
 
-int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
+int SBT_DeleteNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 
 	int result = -1;
 	if (t < 0) return -1; // ответ: "Не найден"
@@ -425,14 +425,14 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	}
 	else if (number < _nodes[t].number) {
 		// влево
-		result = SBT_Delete_At(number, _nodes[t].left, t);
+		result = SBT_DeleteNode_At(number, _nodes[t].left, t);
 	}
 	// можно не делать это сравнение для целых чисел
 	else 
 	// if (number > _nodes[t].number)
 	{
 		// вправо
-		result = SBT_Delete_At(number, _nodes[t].right, t);
+		result = SBT_DeleteNode_At(number, _nodes[t].right, t);
 	}
 	if (parent != -1) SBT_Maintain(parent);
 //	SBT_Maintain(t, (number < _nodes[t].number) ? 1: 0);
@@ -441,14 +441,14 @@ int SBT_Delete_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 	return result; // "не найден"
 }
 
-int SBT_Delete(TNumber number) {
-	TNodeIndex t = SBT_Delete_At(number, _tree_root, -1);
+int SBT_DeleteNode(TNumber number) {
+	TNodeIndex t = SBT_DeleteNode_At(number, _tree_root, -1);
 	return t;
 }
 
 int SBT_DeleteAll(TNumber number) {
 	int result = -1;
-	while ((result = SBT_Delete_At(number, _tree_root, -1)) != -1);
+	while ((result = SBT_DeleteNode_At(number, _tree_root, -1)) != -1);
 	return result;
 }
 
