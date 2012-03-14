@@ -18,7 +18,7 @@ int main() {
 	printf("в начале\n");
 	SBT_PrintAllNodes();
 
-	printf("delete 1: %d\n", SBT_Delete(1));
+	printf("delete 1: %d\n", SBT_DeleteNode(1));
 //	printf("root index = %lld\n", GetRootIndex());
 	printf("после удаления единицы:\n");
 	SBT_PrintAllNodes();

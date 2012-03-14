@@ -9,11 +9,11 @@ int main() {
 
 	// пятый пример
 	for (int i = 0; i < 10; i++)
-	    SBT_AddUniq(i*2);
+	    SBT_AddNodeUniq(i*2);
 	for (int i = 0; i < 10; i++)
-	    SBT_AddUniq(i*2 + 1);
+	    SBT_AddNodeUniq(i*2 + 1);
 	for (int i = 0; i < 10; i++)
-	    SBT_AddUniq(i*2 + 1); // fail
+	    SBT_AddNodeUniq(i*2 + 1); // fail
 
 	SBT_PrintAllNodes();
 	SBT_CheckAllNodes();
@@ -22,7 +22,7 @@ int main() {
 	printf("%lld\n", (long long int)n);
 	
 	for (int i = 0; i < 100; i++)
-	    SBT_Delete(i);
+	    SBT_DeleteNode(i);
 
 	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
