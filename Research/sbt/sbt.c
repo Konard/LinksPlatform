@@ -11,7 +11,7 @@ TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0; // число вершин в дереве
 TNodeIndex _tree_root = -1; // дерево
 TNodeIndex _tree_unused = -1; // список неиспользованных
-TNodeIndex _n_clean = SBT_MAX_NODES; // хвост "чистых"
+TNodeIndex _n_clean = SBT_MAX_NODES; // хвост "чистых"; только уменьшается - использованные вершины перемещаются в список unused
 
 
 // Event-driven technique
@@ -605,14 +605,15 @@ void SBT_CheckAllNodes() {
 }
 
 void SBT_DumpAllNodes() {
-	for (uint64_t i = 0; i < _n_nodes; i++) {
-		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld\n",
+	for (uint64_t i = 0; i < SBT_MAX_NODES - _n_clean; i++) {
+		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld (unused = %d)\n",
 			(long long int)i,
 			(long long int)_nodes[i].value,
 			(long long int)_nodes[i].size,
 			(long long int)_nodes[i].left,
 			(long long int)_nodes[i].right,
-			(long long int)_nodes[i].parent
+			(long long int)_nodes[i].parent,
+			(int)_nodes[i].unused
 		);
 	}
 }
@@ -639,6 +640,7 @@ TNodeIndex SBT_AllocateNode() {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].value = 0;
+		_nodes[t].unused = 0;
 		// счетчика _n_unused нет (но можно добавить)
 		_n_nodes++;
 		return t;
@@ -646,10 +648,17 @@ TNodeIndex SBT_AllocateNode() {
 	else {
 		// выделить из чистого списка
 		if (_n_clean > 0) {
+			
 			t = SBT_MAX_NODES - _n_clean;
 			printf("clean: %lld\n", (long long int)t);
 			_n_clean--;
 			_n_nodes++;
+			_nodes[t].left = -1;
+			_nodes[t].right = -1;
+			_nodes[t].parent = -1;
+			_nodes[t].size = 0;
+			_nodes[t].value = 0;
+			_nodes[t].unused = 0;
 		}
 		else {
 			t = -1;
@@ -669,6 +678,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].value = 0;
+		_nodes[t].unused = 1;
 		// счетчика _n_unused нет
 	}
 	else {
@@ -678,6 +688,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
 		_nodes[t].value = 0;
+		_nodes[t].unused = 1;
 		// счетчика _n_unused нет
 	}
 	_n_nodes--;
