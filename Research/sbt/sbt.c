@@ -278,11 +278,11 @@ int SBT_Maintain(TNodeIndex t) {
 }
 
 // родительская у t - parent
-int SBT_AddNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
+int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	_nodes[t].size++;
 	if (_n_nodes <= 0) {
 		TNodeIndex t_new = SBT_AllocateNode();
-		_nodes[t_new].number = number;
+		_nodes[t_new].value = value;
 		_nodes[t_new].parent = parent;
 		_nodes[t_new].left = -1;
 		_nodes[t_new].right = -1;
@@ -290,63 +290,63 @@ int SBT_AddNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_tree_root = 0;
 	}
 	else {
-		if(number < _nodes[t].number) {
+		if(value < _nodes[t].value) {
 			if(_nodes[t].left == -1) {
 				TNodeIndex t_new = SBT_AllocateNode();
 				_nodes[t].left = _n_nodes;
-				_nodes[t_new].number = number;
-				_nodes[t_new].number = number;
+				_nodes[t_new].value = value;
+				_nodes[t_new].value = value;
 				_nodes[t_new].parent = t;
 				_nodes[t_new].left = -1;
 				_nodes[t_new].right = -1;
 				_nodes[t_new].size = 1;
 			}
 			else {
-				SBT_AddNode_At(number, _nodes[t].left, t);
+				SBT_AddNode_At(value, _nodes[t].left, t);
 			}
 		}
 		else {
 			if(_nodes[t].right == -1) {
 				TNodeIndex t_new = SBT_AllocateNode();
 				_nodes[t].right = _n_nodes;
-				_nodes[t_new].number = number;
-				_nodes[t_new].number = number;
+				_nodes[t_new].value = value;
+				_nodes[t_new].value = value;
 				_nodes[t_new].parent = t;
 				_nodes[t_new].left = -1;
 				_nodes[t_new].right = -1;
 				_nodes[t_new].size = 1;
 			}
 			else {
-				SBT_AddNode_At(number, _nodes[t].right, t);
+				SBT_AddNode_At(value, _nodes[t].right, t);
 			}
 		}
 	}
 	//SBT_Maintain(t);
-	SBT_Maintain_Simpler(t, (number >= _nodes[t].number) ? 1 : 0);
+	SBT_Maintain_Simpler(t, (value >= _nodes[t].value) ? 1 : 0);
 	return 0;
 }
 
-int SBT_AddNode(TNumber number) {
-	return SBT_AddNode_At(number, _tree_root, -1);
+int SBT_AddNode(TNumber value) {
+	return SBT_AddNode_At(value, _tree_root, -1);
 }
 
 // Uniq
 
-int SBT_AddNodeUniq(TNumber number) {
-	int result = SBT_FindFirstNode(number); // fail, если вершина с таким number уже существует
+int SBT_AddNodeUniq(TNumber value) {
+	int result = SBT_FindFirstNode(value); // fail, если вершина с таким value уже существует
 //	printf("%d\n", result);
 	if (result == -1) {
-		SBT_AddNode(number);
+		SBT_AddNode(value);
 	}
 	return result;
 }
 
-int SBT_DeleteNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
+int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 	int result = -1;
 	if (t < 0) return -1; // ответ: "Не найден"
 
-	if (number == _nodes[t].number) {
+	if (value == _nodes[t].value) {
 //		printf("delete %lld\n", t);
 //		SBT_PrintAllNodes();
 
@@ -425,33 +425,33 @@ int SBT_DeleteNode_At(TNumber number, TNodeIndex t, TNodeIndex parent) {
 		_nodes[t].right = -1;
 		result = t;
 	}
-	else if (number < _nodes[t].number) {
+	else if (value < _nodes[t].value) {
 		// влево
-		result = SBT_DeleteNode_At(number, _nodes[t].left, t);
+		result = SBT_DeleteNode_At(value, _nodes[t].left, t);
 	}
 	// можно не делать это сравнение для целых чисел
 	else 
-	// if (number > _nodes[t].number)
+	// if (value > _nodes[t].value)
 	{
 		// вправо
-		result = SBT_DeleteNode_At(number, _nodes[t].right, t);
+		result = SBT_DeleteNode_At(value, _nodes[t].right, t);
 	}
 	if (parent != -1) SBT_Maintain(parent);
-//	SBT_Maintain(t, (number < _nodes[t].number) ? 1: 0);
+//	SBT_Maintain(t, (value < _nodes[t].value) ? 1: 0);
 
 	// не выполняется
 	if (result != -1) SBT_FreeNode(result);
 	return result; // "не найден"
 }
 
-int SBT_DeleteNode(TNumber number) {
-	TNodeIndex t = SBT_DeleteNode_At(number, _tree_root, -1);
+int SBT_DeleteNode(TNumber value) {
+	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
 	return t;
 }
 
-int SBT_DeleteAll(TNumber number) {
+int SBT_DeleteAll(TNumber value) {
 	int result = -1;
-	while ((result = SBT_DeleteNode_At(number, _tree_root, -1)) != -1);
+	while ((result = SBT_DeleteNode_At(value, _tree_root, -1)) != -1);
 	return result;
 }
 
@@ -466,7 +466,7 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 		printf("depth = %d, node = %lld: (%lld), size = %lld\n",
 			depth,
 			(long long int)t,
-			(long long int)_nodes[t].number,
+			(long long int)_nodes[t].value,
 			(long long int)_nodes[t].size
 		); // иначе: напечатать "тело" узла
 	}
@@ -513,43 +513,43 @@ void SBT_WalkAllNodes() {
 
 
 
-TNodeIndex SBT_FindFirstNode_At(TNumber number, TNodeIndex t) {
+TNodeIndex SBT_FindFirstNode_At(TNumber value, TNodeIndex t) {
 
 	if (t < 0) return -1; // ответ: "Не найден"
 
-	if (number == _nodes[t].number) {
+	if (value == _nodes[t].value) {
 		// Среагировать на найденный элемент
 		return t;
 	}
-	else if (number < _nodes[t].number) {
+	else if (value < _nodes[t].value) {
 		// влево
-		return SBT_FindFirstNode_At(number, _nodes[t].left);
+		return SBT_FindFirstNode_At(value, _nodes[t].left);
 	}
 	// можно не делать это сравнение для целых чисел
 	else 
-	// if (number > _nodes[t].number)
+	// if (value > _nodes[t].value)
 	{
 		// вправо
-		return SBT_FindFirstNode_At(number, _nodes[t].right);
+		return SBT_FindFirstNode_At(value, _nodes[t].right);
 	}
 
 	// не выполняется
 	return -1; // "не найден"
 }
 
-TNodeIndex SBT_FindFirstNode(TNumber number) {
+TNodeIndex SBT_FindFirstNode(TNumber value) {
 	if (_n_nodes <= 0) return -1;
 //	printf("root = %lld\n", _tree_root);
-	return SBT_FindFirstNode_At(number, _tree_root);
+	return SBT_FindFirstNode_At(value, _tree_root);
 }
 
 
 
-void SBT_FindAllNodes_At(TNumber number, TNodeIndex t) {
+void SBT_FindAllNodes_At(TNumber value, TNodeIndex t) {
 }
 
-void SBT_FindAllNodes(TNumber number) {
-	return SBT_FindAllNodes_At(number, _tree_root);
+void SBT_FindAllNodes(TNumber value) {
+	return SBT_FindAllNodes_At(value, _tree_root);
 }
 
 
@@ -608,7 +608,7 @@ void SBT_DumpAllNodes() {
 	for (uint64_t i = 0; i < _n_nodes; i++) {
 		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld\n",
 			(long long int)i,
-			(long long int)_nodes[i].number,
+			(long long int)_nodes[i].value,
 			(long long int)_nodes[i].size,
 			(long long int)_nodes[i].left,
 			(long long int)_nodes[i].right,
@@ -638,7 +638,7 @@ TNodeIndex SBT_AllocateNode() {
 		_nodes[t].right = -1;
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
-		_nodes[t].number = 0;
+		_nodes[t].value = 0;
 		// счетчика _n_unused нет (но можно добавить)
 		_n_nodes++;
 		return t;
@@ -668,7 +668,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].right = t;
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
-		_nodes[t].number = 0;
+		_nodes[t].value = 0;
 		// счетчика _n_unused нет
 	}
 	else {
@@ -677,7 +677,7 @@ int SBT_FreeNode(TNodeIndex t) {
 		_nodes[t].right = _tree_unused;
 		_nodes[t].parent = -1;
 		_nodes[t].size = 0;
-		_nodes[t].number = 0;
+		_nodes[t].value = 0;
 		// счетчика _n_unused нет
 	}
 	_n_nodes--;

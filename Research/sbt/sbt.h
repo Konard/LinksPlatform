@@ -12,7 +12,7 @@ typedef int64_t TNodeIndex;
 typedef uint64_t TNodeSize;
 
 typedef struct TNode {
-	TNumber number;
+	TNumber value;
 	TNodeIndex parent; // уровень выше
 	TNodeIndex left;  // служебные поля,
 	TNodeIndex right; //  = -1, если нет дочерних вершин
@@ -45,10 +45,10 @@ int SBT_SetCallback_OnFind(FuncOnFind func_);
 int SBT_LeftRotate(TNodeIndex t);
 int SBT_RightRotate(TNodeIndex t);
 
-int SBT_AddNode(TNumber number); // для неуникального ключа
-int SBT_AddNodeUniq(TNumber number);
-int SBT_DeleteNode(TNumber number); // -1, если нет такого узла в дереве
-int SBT_DeleteAll(TNumber number); // для неуникального ключа
+int SBT_AddNode(TNumber value); // для неуникального ключа
+int SBT_AddNodeUniq(TNumber value);
+int SBT_DeleteNode(TNumber value); // -1, если нет такого узла в дереве
+int SBT_DeleteAll(TNumber value); // для неуникального ключа
 
 TNodeIndex SBT_AllocateNode();
 int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалить ... (в данной реализации - всегда = 0)
@@ -65,11 +65,11 @@ void SBT_DumpAllNodes();
 
 // Search & Walk
 
-TNodeIndex SBT_FindFirstNode_At(TNumber number, TNodeIndex t);
-TNodeIndex SBT_FindFirstNode(TNumber number);
+TNodeIndex SBT_FindFirstNode_At(TNumber value, TNodeIndex t);
+TNodeIndex SBT_FindFirstNode(TNumber value);
 
-void SBT_FindAllNodes_At(TNumber number, TNodeIndex t);
-void SBT_FindAllNodes(TNumber number);
+void SBT_FindAllNodes_At(TNumber value, TNodeIndex t);
+void SBT_FindAllNodes(TNumber value);
 
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
 void SBT_WalkAllNodes();
