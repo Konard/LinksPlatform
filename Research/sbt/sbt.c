@@ -295,7 +295,7 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		if(value < _nodes[t].value) {
 			if(_nodes[t].left == -1) {
 				TNodeIndex t_new = SBT_AllocateNode();
-				_nodes[t].left = _n_nodes;
+				_nodes[t].left = t_new;
 				_nodes[t_new].value = value;
 				_nodes[t_new].value = value;
 				_nodes[t_new].parent = t;
@@ -310,7 +310,7 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		else {
 			if(_nodes[t].right == -1) {
 				TNodeIndex t_new = SBT_AllocateNode();
-				_nodes[t].right = _n_nodes;
+				_nodes[t].right = t_new;
 				_nodes[t_new].value = value;
 				_nodes[t_new].value = value;
 				_nodes[t_new].parent = t;
@@ -323,8 +323,8 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 		}
 	}
-	SBT_Maintain(t);
-	//SBT_Maintain_Simpler(t, (value >= _nodes[t].value) ? 1 : 0);
+	//SBT_Maintain(t);
+	SBT_Maintain_Simpler(t, (value >= _nodes[t].value) ? 1 : 0);
 	return 0;
 }
 
@@ -438,8 +438,8 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		// вправо
 		result = SBT_DeleteNode_At(value, _nodes[t].right, t);
 	}
-	if (parent != -1) SBT_Maintain(parent);
-//	SBT_Maintain(t, (value < _nodes[t].value) ? 1: 0);
+//	if (parent != -1) SBT_Maintain(parent);
+	if (parent != -1) SBT_Maintain_Simpler(parent, (value < _nodes[t].value) ? 1: 0);
 
 	// не выполняется
 	if (result != -1) SBT_FreeNode(result);
@@ -652,6 +652,7 @@ TNodeIndex SBT_AllocateNode() {
 		if (_n_clean > 0) {
 			
 			t = SBT_MAX_NODES - _n_clean;
+/*
 			printf("clean: %lld\n", (long long int)t);
 			_n_clean--;
 			_n_nodes++;
@@ -661,6 +662,7 @@ TNodeIndex SBT_AllocateNode() {
 			_nodes[t].size = 0;
 			_nodes[t].value = 0;
 			_nodes[t].unused = 0;
+*/
 		}
 		else {
 			t = -1;

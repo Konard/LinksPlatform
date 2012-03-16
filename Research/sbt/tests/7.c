@@ -10,8 +10,8 @@ int main() {
 	// седьмой пример
 	for (int i = 0; i < 1000000; i++)
 	    SBT_AddNodeUniq(i);
-	for (int i = 0; i < 1000000; i++)
-	    SBT_DeleteAll(i);
+//	for (int i = 0; i < 1000000; i++)
+//	    SBT_DeleteAll(i);
 	SBT_PrintAllNodes();
 
 	return 0;

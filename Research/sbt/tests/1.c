@@ -9,12 +9,13 @@ int main() {
 
 	// первый пример
 	srandom(time(NULL)%1000);
-	for(int i = 0; i < 50; i++) {
+	for(int i = 0; i < 5; i++) {
 		SBT_AddNode(random() % 1000);
+		SBT_DumpAllNodes();
 		SBT_PrintAllNodes();
 	}
 	SBT_CheckAllNodes();
-	SBT_PrintAllNodes();
+//	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 
 	return 0;
