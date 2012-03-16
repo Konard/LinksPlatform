@@ -3,9 +3,11 @@
 
 #include <stdio.h> // printf
 
+#ifdef __LINUX__
 #include <pthread.h> // pthread_mutex_*
 // узкое место при доступе из многих потоков - глобальная блокировка таблицы _nodes
 pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
+#endif
 
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0; // число вершин в дереве
