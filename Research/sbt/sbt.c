@@ -321,8 +321,8 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 		}
 	}
-	//SBT_Maintain(t);
-	SBT_Maintain_Simpler(t, (value >= _nodes[t].value) ? 1 : 0);
+	SBT_Maintain(t);
+	//SBT_Maintain_Simpler(t, (value >= _nodes[t].value) ? 1 : 0);
 	return 0;
 }
 

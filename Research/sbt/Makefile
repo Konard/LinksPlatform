@@ -1,4 +1,4 @@
-OPTS=-O3 -std=c99
+OPTS=-O3 -std=c99 -g
 
 sbt.o:		sbt.c sbt.h
 		gcc ${OPTS} -c -o sbt.o sbt.c
