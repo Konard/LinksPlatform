@@ -1,5 +1,5 @@
 OPTS = -O3 -I..
-LIBS = -lboost
+LIBS = 
 SRCS = $(wildcard *.cpp)
 OBJS = $(subst ,,$(SRCS:.cpp=.o))
 BINS = $(subst ,,$(SRCS:.cpp=))
