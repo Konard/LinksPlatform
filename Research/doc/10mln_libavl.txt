@@ -1,0 +1,7 @@
+
+10 000 000, avl_insert
+
+real    0m1.246s
+user    0m1.060s
+sys     0m0.148s
+

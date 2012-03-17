@@ -1,0 +1,12 @@
+
+10 000 000, AddNodeUniq
+
+real    0m0.206s
+user    0m0.200s
+sys     0m0.000s
+
+10 000 000, AddNode
+
+real    0m0.192s
+user    0m0.188s
+sys     0m0.000s

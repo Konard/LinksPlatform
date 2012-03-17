@@ -1,0 +1,6 @@
+
+10 000 000, boost::intrusive, std::vector push_back()
+
+real    0m3.825s
+user    0m2.764s
+sys     0m0.732s
