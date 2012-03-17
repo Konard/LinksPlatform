@@ -4,3 +4,10 @@
 real    0m3.825s
 user    0m2.764s
 sys     0m0.732s
+
+1 000 000, boost::intrusive, std::vector push_back()
+
+real    0m0.299s
+user    0m0.216s
+sys     0m0.048s
+
