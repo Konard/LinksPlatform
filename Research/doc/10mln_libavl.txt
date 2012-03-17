@@ -1,3 +1,4 @@
+----
 
 10 000 000, avl_insert
 
@@ -10,4 +11,3 @@ sys     0m0.148s
 real    0m0.127s
 user    0m0.120s
 sys     0m0.004s
-
