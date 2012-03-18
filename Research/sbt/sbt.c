@@ -310,7 +310,7 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		else {
 			if(_nodes[t].right == -1) {
 				TNodeIndex t_new = SBT_AllocateNode();
-				_nodes[t].right = t_new;
+				_nodes[t].right = t_new; // по-умолчанию, добавляем вправо (поэтому "левых" вращений больше)
 				_nodes[t_new].value = value;
 				_nodes[t_new].value = value;
 				_nodes[t_new].parent = t;
