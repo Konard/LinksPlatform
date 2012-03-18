@@ -465,7 +465,7 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 
 	if (!((_nodes[t].parent == -1) && (_nodes[t].left == -1) && (_nodes[t].right == -1)) || (t == _tree_root)) {
 		for (int i = 0; i < depth; i++) printf(" "); // отступ
-		printf("depth = %d, node = %lld: (%lld), size = %lld\n",
+		printf("+%d, id = %lld, value = %lld, size = %lld\n",
 			depth,
 			(long long int)t,
 			(long long int)_nodes[t].value,
@@ -478,12 +478,8 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 }
 
 void SBT_PrintAllNodes() {
-	printf("---\n");
-	printf("_n_nodes = %lld\n",
-		(long long int)_n_nodes
-	);
+	printf("n_nodes = %lld\n", (long long int)_n_nodes);
 	SBT_PrintAllNodes_At(0, _tree_root);
-	printf("---\n");
 }
 
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
@@ -654,6 +650,7 @@ TNodeIndex SBT_AllocateNode() {
 			t = SBT_MAX_NODES - _n_clean;
 /*
 			printf("clean: %lld\n", (long long int)t);
+*/
 			_n_clean--;
 			_n_nodes++;
 			_nodes[t].left = -1;
@@ -662,7 +659,6 @@ TNodeIndex SBT_AllocateNode() {
 			_nodes[t].size = 0;
 			_nodes[t].value = 0;
 			_nodes[t].unused = 0;
-*/
 		}
 		else {
 			t = -1;

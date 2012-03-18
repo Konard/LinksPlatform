@@ -1,7 +1,7 @@
 #ifndef __SBT_H__
 #define __SBT_H__
 
-#define SBT_MAX_NODES 1000000
+#define SBT_MAX_NODES 10000000
 // C language does not mean constant, const int SBT_MAX_NODES = 1000000; // 1 млн. узлов
 // см. http://compgroups.net/comp.lang.c/Explanation-needed-for-const-int-error-variably-modified-at-file-scope
 
