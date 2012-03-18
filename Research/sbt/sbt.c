@@ -426,6 +426,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		_nodes[t].left = -1;
 		_nodes[t].right = -1;
 		result = t;
+	// не выполняется
+	if (result != -1) SBT_FreeNode(result);
+
 	}
 	else if (value < _nodes[t].value) {
 		// влево
@@ -438,11 +441,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		// вправо
 		result = SBT_DeleteNode_At(value, _nodes[t].right, t);
 	}
+
 //	if (parent != -1) SBT_Maintain(parent);
 	if (parent != -1) SBT_Maintain_Simpler(parent, (value < _nodes[t].value) ? 1: 0);
 
-	// не выполняется
-	if (result != -1) SBT_FreeNode(result);
 	return result; // "не найден"
 }
 

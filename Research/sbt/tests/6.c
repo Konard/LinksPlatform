@@ -8,29 +8,27 @@
 int main() {
 
 	// шестой пример
-//	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
-//	printf("n = %lld\n", n);
-	SBT_AddNodeUniq(2);
-	SBT_AddNodeUniq(1);
-	SBT_AddNodeUniq(2);
-	SBT_AddNodeUniq(1);
-	SBT_CheckAllNodes();
-	printf("в начале\n");
-	SBT_PrintAllNodes();
+	TNumber idx = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
+	printf("idx(2) = %lld\n", (long long int)idx);
 
-	printf("delete 1: %d\n", SBT_DeleteNode(1));
-//	printf("root index = %lld\n", GetRootIndex());
+	SBT_AddNodeUniq(2);
+	SBT_AddNodeUniq(1);
+	SBT_AddNodeUniq(2); // fail
+	SBT_AddNodeUniq(1); // fail
+	SBT_CheckAllNodes();
+	printf("в начале:\n");
+	SBT_PrintAllNodes();
+	SBT_DumpAllNodes();
+
+	printf("delete idx(1) = %d\n", SBT_DeleteNode(1));
 	printf("после удаления единицы:\n");
 	SBT_PrintAllNodes();
-//	SBT_DumpAllNodes();
+	SBT_DumpAllNodes();
 
-	printf("delete 2: %d\n", SBT_DeleteNode(2));
-//	printf("root index = %lld\n", GetRootIndex());
+	printf("delete idx(2) = %d\n", SBT_DeleteNode(2));
 	printf("после удаления двойки:\n");
 	SBT_PrintAllNodes();
-
-//	SBT_DumpAllNodes();
-
+	SBT_DumpAllNodes();
 
 	return 0;
 }

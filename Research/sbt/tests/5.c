@@ -15,17 +15,17 @@ int main() {
 	for (int i = 0; i < 10; i++)
 	    SBT_AddNodeUniq(i*2 + 1); // fail
 
-	SBT_PrintAllNodes();
 	SBT_CheckAllNodes();
+	SBT_PrintAllNodes();
 	
-	TNumber n = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
-	printf("%lld\n", (long long int)n);
+	TNumber idx = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
+	printf("idx(2) = %lld\n", (long long int)idx);
 	
 	for (int i = 0; i < 100; i++)
 	    SBT_DeleteNode(i);
 
 	SBT_CheckAllNodes();
-	SBT_PrintAllNodes();
+//	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 
 	return 0;
