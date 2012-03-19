@@ -628,24 +628,18 @@ TNodeIndex GetRootIndex() {
 
 TNodeIndex SBT_AllocateNode() {
 
-	TNodeIndex t = -1;
+	TNodeIndex t = -1; // нет ноды
 
-	//
+	// выделить из UNUSED-области (списка)
 	if (_tree_unused != -1) {
-		// выделить из списка
-		TNodeIndex t = _tree_unused;
-		_tree_unused = _nodes[t].right;
-		_nodes[t].left = _nodes[_tree_unused].left;
-		_nodes[_tree_unused].left = -1; // теперь - первый элемент
-		// на всякий случай - обнуляем (дополнительная очистка)
-		_nodes[t].left = -1;
-		_nodes[t].right = -1;
-		_nodes[t].parent = -1;
-		_nodes[t].size = 0;
-		_nodes[t].value = 0;
-		_nodes[t].unused = 0;
-		// счетчика _n_unused нет (но можно добавить)
-		_n_nodes++;
+		// вершины в списке есть
+		TNodeIndex t = _tree_unused; // берем из начала
+		_tree_unused = _nodes[t].right; // перемещаем указатель на следующий элемент списка
+
+		TNodeIndex last = _nodes[t].left;
+		// теперь first.right - первый элемент, на него ссылается last
+		_nodes[_tree_unused].left = t;
+		_nodes[last].right = _tree_unused;
 	}
 
 	// выделить из CLEAN-области (чистые ячейки)
@@ -653,22 +647,24 @@ TNodeIndex SBT_AllocateNode() {
 		if (_n_clean > 0) {
 			
 			t = SBT_MAX_NODES - _n_clean;
-/*
-			printf("clean: %lld\n", (long long int)t);
-*/
 			_n_clean--;
-			_n_nodes++;
-			_nodes[t].left = -1;
-			_nodes[t].right = -1;
-			_nodes[t].parent = -1;
-			_nodes[t].size = 0;
-			_nodes[t].value = 0;
-			_nodes[t].unused = 0;
 		}
 		else {
 			t = -1; // память закончилась
+			return t;
 		}
 	}
+
+	// дополнительная очистка
+	_nodes[t].left = -1;
+	_nodes[t].right = -1;
+	_nodes[t].parent = -1;
+	_nodes[t].size = 0;
+	_nodes[t].value = 0;
+	_nodes[t].unused = 0;
+	// счетчика _n_unused нет (но можно добавить)
+	_n_nodes++;
+
 	return t; // результат (нода)
 }
 
