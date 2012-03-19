@@ -1,5 +1,5 @@
 libsbt.odt
-libsbt.pdf
+libsbt.pdf  - основные сведения по libSBT (назначение функций)
 
 sbt_a4_rotate_diagram.tif   - Повороты (Right rotate, Left Rotate); Функция Maintain
 sbt_amd64_opt_task.txt      - тех.задание на оптимизацию sbt (неполное)
