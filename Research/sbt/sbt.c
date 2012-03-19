@@ -514,14 +514,16 @@ void SBT_WalkAllNodes() {
 	funcOnWalk(-1, -1, "WALK_FINISH");
 }
 
+// Найти значение value в поддереве t (корректно при использовании AddNodeUniq)
 
+TNodeIndex SBT_FindNode_At(TNumber value, TNodeIndex t) {
 
-TNodeIndex SBT_FindFirstNode_At(TNumber value, TNodeIndex t) {
-
-	if (t < 0) return -1; // ответ: "Не найден"
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return -1; // ответ: "Не найден"
+	}
 
 	if (value == _nodes[t].value) {
-		// Среагировать на найденный элемент
+		// Среагировать на найденный элемент, вернуть индекс этой ноды
 		return t;
 	}
 	else if (value < _nodes[t].value) {
@@ -540,15 +542,15 @@ TNodeIndex SBT_FindFirstNode_At(TNumber value, TNodeIndex t) {
 	return -1; // "не найден"
 }
 
-TNodeIndex SBT_FindFirstNode(TNumber value) {
+TNodeIndex SBT_FindNode(TNumber value) {
 	if (_n_nodes <= 0) return -1;
 //	printf("root = %lld\n", _tree_root);
-	return SBT_FindFirstNode_At(value, _tree_root);
+	return SBT_FindNode_At(value, _tree_root);
 }
 
 
-
 void SBT_FindAllNodes_At(TNumber value, TNodeIndex t) {
+	return;
 }
 
 void SBT_FindAllNodes(TNumber value) {
@@ -556,8 +558,10 @@ void SBT_FindAllNodes(TNumber value) {
 }
 
 
+// Проверка дерева на SBT-корректность, начиная с ноды t
 
 void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
+
 	if ((_n_nodes <= 0) || (t < 0)) {
 		return; // выйти, если вершины нет
 	}
@@ -603,6 +607,8 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 
 }
 
+// Проверить всё дерево на SBT-корректность (начиная с корневой ноды)
+
 void SBT_CheckAllNodes() {
 	SBT_CheckAllNodes_At(0, _tree_root);
 }
@@ -631,6 +637,7 @@ TNodeIndex GetRootIndex() {
 }
 
 
+// выделение памяти из кольцевого FIFO-буфера (UNUSED-нодов), иначе - из массива CLEAN-нодов
 TNodeIndex SBT_AllocateNode() {
 
 	TNodeIndex t = -1; // нет ноды
