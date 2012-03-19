@@ -12,7 +12,7 @@ typedef int64_t TNodeIndex;
 typedef uint64_t TNodeSize;
 
 typedef struct TNode {
-	TNumber value;
+	TNumber value; // значение, привязанное к ноде
 	TNodeIndex parent; // уровень выше
 	TNodeIndex left;  // служебные поля,
 	TNodeIndex right; //  = -1, если нет дочерних вершин
@@ -23,20 +23,13 @@ typedef struct TNode {
 	int unused; // можно использовать и для других флагов
 } TNode;
 
-//typedef enum TTreeAction {
-//	SBT_ACTION_LEFT_ROTATE,
-//	SBT_ACTION_RIGHT_ROTATE
-//} TTreeAction;
+// типы функций - обработчиков событий
 
-// LEFT_ROTATE, RIGHT_ROTATE
-typedef int (*FuncOnRotate)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction);
+typedef int (*FuncOnRotate)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction); // LEFT_ROTATE, RIGHT_ROTATE
+typedef int (*FuncOnWalk)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction); // WALK_DOWN, WALK_UP, WALK_NODE
+typedef int (*FuncOnFind)(TNodeIndex nodeIndex, const char *stringAction); // FOUND
 
-// WALK_DOWN, WALK_UP, WALK_NODE
-typedef int (*FuncOnWalk)(TNodeIndex nodeIndex1, TNodeIndex nodeIndex2, const char *stringAction);
-
-// FOUND
-typedef int (*FuncOnFind)(TNodeIndex nodeIndex, const char *stringAction);
-
+// для оповещения о событиях
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_);
 int SBT_SetCallback_OnWalk(FuncOnWalk func_);
@@ -46,6 +39,8 @@ int SBT_SetCallback_OnFind(FuncOnFind func_);
 int SBT_LeftRotate(TNodeIndex t);
 int SBT_RightRotate(TNodeIndex t);
 
+// Основные функции
+
 int SBT_AddNode(TNumber value); // для неуникального ключа
 int SBT_AddNodeUniq(TNumber value);
 int SBT_DeleteNode(TNumber value); // -1, если нет такого узла в дереве
@@ -54,7 +49,7 @@ int SBT_DeleteAll(TNumber value); // для неуникального ключ�
 TNodeIndex SBT_AllocateNode();
 int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалить ... (в данной реализации - всегда = 0)
 
-// Dump & Check
+// Print, Dump & Check
 
 void SBT_CheckAllNodes_At(int depth, TNodeIndex t);
 void SBT_CheckAllNodes();

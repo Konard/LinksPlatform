@@ -9,6 +9,8 @@
 pthread_mutex_t _lock_nodes = PTHREAD_MUTEX_INITIALIZER;
 #endif
 
+// переменные модуля
+
 TNode _nodes[SBT_MAX_NODES];
 TNodeIndex _n_nodes = 0; // число вершин в дереве
 TNodeIndex _tree_root = -1; // дерево
@@ -16,7 +18,7 @@ TNodeIndex _tree_unused = -1; // список неиспользованных
 TNodeIndex _n_clean = SBT_MAX_NODES; // хвост "чистых"; только уменьшается - использованные вершины перемещаются в список unused
 
 
-// Event-driven technique
+// Event-driven technique, функции для оповещения о событиях
 
 FuncOnRotate funcOnRotate = NULL;
 FuncOnWalk funcOnWalk = NULL;
@@ -37,10 +39,11 @@ int SBT_SetCallback_OnFind(FuncOnFind func_) {
 	return 0;
 }
 
-// Rotate, Maintain & Add, Delete
 
-// t - слева, перевешиваем туда
-// вершины не пропадают, _n_nodes сохраняет значение
+// Функции Rotate, Maintain & Add, Delete //
+
+// Вращение влево, t - слева, перевешиваем туда (вершины не пропадают, _n_nodes сохраняет значение)
+
 int SBT_LeftRotate(TNodeIndex t) {
 
 	if (t < 0) return 0;
@@ -86,8 +89,8 @@ int SBT_LeftRotate(TNodeIndex t) {
 	return 0;
 }
 
-// t - справа, перевешиваем туда
-// вершины не пропадают, _n_nodes сохраняет значение
+// Вращение вправо, t - справа, перевешиваем туда (вершины не пропадают, _n_nodes сохраняет значение)
+
 int SBT_RightRotate(TNodeIndex t) {
 
 	if (t < 0) return 0;
@@ -132,6 +135,8 @@ int SBT_RightRotate(TNodeIndex t) {
 	}
 	return 0;
 }
+
+// Размеры для вершин, size
 
 TNodeSize SBT_Left_Left_size(TNodeIndex t) {
 	if (t == -1) return 0;
