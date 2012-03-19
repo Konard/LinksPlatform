@@ -627,7 +627,10 @@ TNodeIndex GetRootIndex() {
 }
 
 TNodeIndex SBT_AllocateNode() {
+
 	TNodeIndex t = -1;
+
+	//
 	if (_tree_unused != -1) {
 		// выделить из списка
 		TNodeIndex t = _tree_unused;
@@ -643,10 +646,10 @@ TNodeIndex SBT_AllocateNode() {
 		_nodes[t].unused = 0;
 		// счетчика _n_unused нет (но можно добавить)
 		_n_nodes++;
-		return t;
 	}
+
+	// выделить из CLEAN-области (чистые ячейки)
 	else {
-		// выделить из чистого списка
 		if (_n_clean > 0) {
 			
 			t = SBT_MAX_NODES - _n_clean;
@@ -663,10 +666,10 @@ TNodeIndex SBT_AllocateNode() {
 			_nodes[t].unused = 0;
 		}
 		else {
-			t = -1;
+			t = -1; // память закончилась
 		}
-		return t;
 	}
+	return t; // результат (нода)
 }
 
 // небезопасная функция ! следите за целостностью дерева самостоятельно !
@@ -682,13 +685,14 @@ int SBT_FreeNode(TNodeIndex t) {
 
 	// UNUSED уже частично или полностью заполнен, добавить в unused-пространство
 	else {
-		// левая сторона от t
-		_nodes[t].left = _nodes[_tree_unused].left;
-		if (_nodes[_tree_unused].left != -1) _nodes[_nodes[_tree_unused].left].right = t; // ? на всякий случай, хотя не может такого быть чтобы [last].left == -1
-		// правая сторона от t
+		TNodeIndex last = _nodes[_tree_unused].left; // так как существует root-вершина (first), то и last <> -1
+		// ссылки внутри
+		_nodes[t].left = last;
+		_nodes[last].right = t;
+		// ссылки снаружи
 		_nodes[_tree_unused].left = t;
 		_nodes[t].right = _tree_unused;
-		_tree_unused = t;
+		// _tree_unused не изменяется
 	}
 	_nodes[t].parent = -1;
 	_nodes[t].size = 0;
