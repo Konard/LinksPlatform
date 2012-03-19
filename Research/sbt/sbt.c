@@ -24,14 +24,17 @@ FuncOnFind funcOnFind = NULL;
 
 int SBT_SetCallback_OnRotate(FuncOnRotate func_) {
 	funcOnRotate = func_;
+	return 0;
 }
 
 int SBT_SetCallback_OnWalk(FuncOnWalk func_) {
 	funcOnWalk = func_;
+	return 0;
 }
 
 int SBT_SetCallback_OnFind(FuncOnFind func_) {
 	funcOnFind = func_;
+	return 0;
 }
 
 // Rotate, Maintain & Add, Delete
@@ -565,14 +568,14 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 	}
 	// проверить
 	if ((SBT_Left_Left_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
-		printf("ERROR %lld LL > R\n",
+		printf("ERROR %lld LL > R (%lld > %lld)\n",
 			(long long int)t,
 			(long long int)SBT_Left_Left_size(t),
 			(long long int)SBT_Right_size(t)
 		);
 	}
 	if ((SBT_Left_Right_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
-		printf("ERROR %lld LR > R\n",
+		printf("ERROR %lld LR > R (%lld > %lld)\n",
 			(long long int)t,
 			(long long int)SBT_Left_Right_size(t),
 			(long long int)SBT_Right_size(t)
@@ -586,7 +589,7 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 		);
 	}
 	if ((SBT_Right_Left_size(t) > SBT_Left_size(t)) && (SBT_Left_size(t) > 0)) {
-		printf("ERROR %lld RL > L\n",
+		printf("ERROR %lld RL > L (%lld > %lld)\n",
 			(long long int)t,
 			(long long int)SBT_Right_Left_size(t),
 			(long long int)SBT_Left_size(t)
@@ -618,7 +621,7 @@ void SBT_DumpAllNodes() {
 	}
 }
 
-TNode *GetNode(TNodeIndex t) {
+TNode *GetPointerToNode(TNodeIndex t) {
 	return &(_nodes[t]);
 }
 
@@ -696,4 +699,6 @@ int SBT_FreeNode(TNodeIndex t) {
 	_nodes[t].unused = 1;
 	// счетчика _n_unused нет
 	_n_nodes--; // условный счетчик (вспомогательный): эти вершины можно пересчитать в WORK-пространстве
+
+	return 0;
 }
