@@ -5,3 +5,5 @@ sbt_a4_rotate_diagram.tif   - Повороты (Right rotate, Left Rotate); Фу
 sbt_amd64_opt_task.txt      - тех.задание на оптимизацию sbt (неполное)
 sbt_tree_h_layers.tif       - принцип балансировки (основные неравенства)
 sbt_tree_node_sizes.tif     - Что такое размер (size) для sbt
+SBT_FreeNode_description.png  - описание процесса освобождения вершины
+SBT_mm.png                  - распределение памяти в модуле SBT
