@@ -451,10 +451,14 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	return result; // "не найден"
 }
 
+// Удалить первую попавшуюся вершину по значению value
+
 int SBT_DeleteNode(TNumber value) {
 	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
 	return t;
 }
+
+// Удалить все вершины с данным значением (value)
 
 int SBT_DeleteAll(TNumber value) {
 	int result = -1;
@@ -462,8 +466,13 @@ int SBT_DeleteAll(TNumber value) {
 	return result;
 }
 
+// Напечатать вершины в поддереве t
+
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
-	if ((_n_nodes <= 0) || (t < 0)) return; // выйти, если вершины нет
+
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return; // выйти, если вершины нет
+	}
 
 	// сверху - большие вершины
 	if (_nodes[t].right >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].right);
@@ -482,12 +491,17 @@ void SBT_PrintAllNodes_At(int depth, TNodeIndex t) {
 	if (_nodes[t].left >= 0) SBT_PrintAllNodes_At(depth + 1, _nodes[t].left);
 }
 
+// Напечатать все вершины, начиная от корня дерева
+
 void SBT_PrintAllNodes() {
 	printf("n_nodes = %lld\n", (long long int)_n_nodes);
 	SBT_PrintAllNodes_At(0, _tree_root);
 }
 
+// Пройтись с вершины t (по поддереву)
+
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
+
 	if ((_n_nodes <= 0) || (t < 0)) {
 		funcOnWalk(t, -1, "WALK_UP");
 		return; // выйти, если вершины нет
@@ -498,15 +512,20 @@ void SBT_WalkAllNodes_At(int depth, TNodeIndex t) {
 		funcOnWalk(t, _nodes[t].left, "WALK_DOWN_LEFT");
 		SBT_WalkAllNodes_At(depth + 1, _nodes[t].left);
 	}
+
 	funcOnWalk(t, t, "WALK_NODE");
+
 	// сверху - большие вершины
 	if (_nodes[t].right >= 0) {
 		funcOnWalk(t, _nodes[t].right, "WALK_DOWN_RIGHT");
 		SBT_WalkAllNodes_At(depth + 1, _nodes[t].right);
 	}
+
 	funcOnWalk(t, -1, "WALK_UP");
 
 }
+
+// Пройтись по всем вершинам, сгенерировать события WALK_ (посылаются в зарегистрированные перед этим обработчики событий)
 
 void SBT_WalkAllNodes() {
 	funcOnWalk(-1, -1, "WALK_STARTS");
