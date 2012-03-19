@@ -1,0 +1,7 @@
+libsbt.odt
+libsbt.pdf
+
+sbt_a4_rotate_diagram.tif   - Повороты (Right rotate, Left Rotate); Функция Maintain
+sbt_amd64_opt_task.txt      - тех.задание на оптимизацию sbt (неполное)
+sbt_tree_h_layers.tif       - принцип балансировки (основные неравенства)
+sbt_tree_node_sizes.tif     - Что такое размер (size) для sbt
