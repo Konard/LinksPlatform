@@ -607,16 +607,17 @@ void SBT_CheckAllNodes() {
 	SBT_CheckAllNodes_At(0, _tree_root);
 }
 
+// распечатка WORK- и UNUSED- nodes (всё, что до CLEAN-)
 void SBT_DumpAllNodes() {
 	for (uint64_t i = 0; i < SBT_MAX_NODES - _n_clean; i++) {
-		printf("idx = %lld, numb = %lld, size = %lld, left = %lld, right = %lld, parent = %lld (unused = %d)\n",
+		printf("idx = %lld, value = %lld [unused = %d], left = %lld, right = %lld, parent = %lld, size = %lld\n",
 			(long long int)i,
 			(long long int)_nodes[i].value,
-			(long long int)_nodes[i].size,
+			(int)_nodes[i].unused,
 			(long long int)_nodes[i].left,
 			(long long int)_nodes[i].right,
 			(long long int)_nodes[i].parent,
-			(int)_nodes[i].unused
+			(long long int)_nodes[i].size
 		);
 	}
 }
