@@ -77,7 +77,7 @@ void SBT_WalkAllNodes();
 
 // Get
 
-TNode *GetNode(TNodeIndex t);
+TNode *GetPointerToNode(TNodeIndex t);
 TNodeIndex GetRootIndex();
 
 #endif

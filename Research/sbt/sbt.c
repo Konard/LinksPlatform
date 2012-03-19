@@ -629,6 +629,7 @@ TNodeIndex GetRootIndex() {
 	return _tree_root;
 }
 
+
 TNodeIndex SBT_AllocateNode() {
 
 	TNodeIndex t = -1; // нет ноды
@@ -638,7 +639,6 @@ TNodeIndex SBT_AllocateNode() {
 		// вершины в списке есть
 		TNodeIndex t = _tree_unused; // берем из начала
 		_tree_unused = _nodes[t].right; // перемещаем указатель на следующий элемент списка
-
 		TNodeIndex last = _nodes[t].left;
 		// теперь first.right - первый элемент, на него ссылается last
 		_nodes[_tree_unused].left = t;
