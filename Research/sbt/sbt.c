@@ -42,7 +42,7 @@ int SBT_SetCallback_OnFind(FuncOnFind func_) {
 // t - слева, перевешиваем туда
 // вершины не пропадают, _n_nodes сохраняет значение
 int SBT_LeftRotate(TNodeIndex t) {
-//	printf("LEFT_ROTATE %lld\n", t);
+
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].right;
 	if (k < 0) return 0;
@@ -89,11 +89,10 @@ int SBT_LeftRotate(TNodeIndex t) {
 // t - справа, перевешиваем туда
 // вершины не пропадают, _n_nodes сохраняет значение
 int SBT_RightRotate(TNodeIndex t) {
-//	printf("RIGHT_ROTATE %lld\n", t);
+
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
-//	printf("k = %lld\n", k);
 	if (funcOnRotate != NULL) funcOnRotate(k, t, "RIGHT_ROTATE");
 
 	TNodeIndex p = _nodes[t].parent;
@@ -178,6 +177,8 @@ TNodeSize SBT_Left_size(TNodeIndex t) {
 	return ((l == -1) ? 0 : _nodes[l].size);
 }
 
+// Сбалансировать дерево (более быстрый алгоритм)
+
 int SBT_Maintain_Simpler(TNodeIndex t, int flag) {
 
 	if (t < 0) return 0;
@@ -226,6 +227,8 @@ int SBT_Maintain_Simpler(TNodeIndex t, int flag) {
 
 	return 0;
 }
+
+// Сбалансировать дерево ("тупой" алгоритм)
 
 int SBT_Maintain(TNodeIndex t) {
 
@@ -282,7 +285,9 @@ int SBT_Maintain(TNodeIndex t) {
 	return 0;
 }
 
-// родительская у t - parent
+
+// Добавить вершину в поддерево t, без проверки уникальности (куда - t, родительская - parent)
+
 int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	_nodes[t].size++;
 	if (_n_nodes <= 0) {
@@ -331,20 +336,24 @@ int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	return 0;
 }
 
+// Добавить вершину без проверки уникальности value
+
 int SBT_AddNode(TNumber value) {
 	return SBT_AddNode_At(value, _tree_root, -1);
 }
 
-// Uniq
+// Добавление вершины только если такой же (с таким же значением) в дереве нет
 
 int SBT_AddNodeUniq(TNumber value) {
+
 	int result = SBT_FindFirstNode(value); // fail, если вершина с таким value уже существует
-//	printf("%d\n", result);
 	if (result == -1) {
 		SBT_AddNode(value);
 	}
 	return result;
 }
+
+// Удалить вершину, в дереве t
 
 int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
@@ -352,8 +361,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	if (t < 0) return -1; // ответ: "Не найден"
 
 	if (value == _nodes[t].value) {
-//		printf("delete %lld\n", t);
-//		SBT_PrintAllNodes();
 
 		// Вершину нашли,
 		// среагировать на найденный элемент
@@ -379,13 +386,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 		    }
 		    else {
-//			printf("delete root\n");
 			_tree_root = -1;
 		    }
 		}
 		else {
-//			printf("parent != -1\n");
-
 			int at_left = 0;
 			if (_nodes[parent].left == t) at_left = 1;
 			else at_left = 0;
@@ -416,12 +420,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 		    }
 		    else {
-//			printf("> удаление единицы, parent = %lld\n", parent);
 			// удалить соответствующее направление у parent
-//			SBT_DumpAllNodes();
 			if (at_left == 1) _nodes[parent].left = -1;
 			else _nodes[parent].right = -1;
-//			SBT_PrintAllNodes();
 		    }
 
 		}
@@ -561,16 +562,20 @@ TNodeIndex SBT_FindNode_At(TNumber value, TNodeIndex t) {
 	return -1; // "не найден"
 }
 
+// Найти вершину от корня
+
 TNodeIndex SBT_FindNode(TNumber value) {
 	if (_n_nodes <= 0) return -1;
-//	printf("root = %lld\n", _tree_root);
 	return SBT_FindNode_At(value, _tree_root);
 }
 
+// (не реализовано)
 
 void SBT_FindAllNodes_At(TNumber value, TNodeIndex t) {
 	return;
 }
+
+// (не реализовано)
 
 void SBT_FindAllNodes(TNumber value) {
 	return SBT_FindAllNodes_At(value, _tree_root);
