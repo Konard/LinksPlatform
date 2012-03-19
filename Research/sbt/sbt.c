@@ -672,27 +672,28 @@ TNodeIndex SBT_AllocateNode() {
 // небезопасная функция ! следите за целостностью дерева самостоятельно !
 // подключение в "кольцевой буфер"
 int SBT_FreeNode(TNodeIndex t) {
-	// переместить в unused-пространство
+
+	// UNUSED пуст, сделать первым элементом в unused-пространстве
 	if (_tree_unused == -1) {
-		_tree_unused = t;
 		_nodes[t].left = t;
 		_nodes[t].right = t;
-		_nodes[t].parent = -1;
-		_nodes[t].size = 0;
-		_nodes[t].value = 0;
-		_nodes[t].unused = 1;
-		// счетчика _n_unused нет
+		_tree_unused = t;
 	}
+
+	// UNUSED уже частично или полностью заполнен, добавить в unused-пространство
 	else {
+		// левая сторона от t
 		_nodes[t].left = _nodes[_tree_unused].left;
-		if (_nodes[_tree_unused].left != -1) _nodes[_nodes[_tree_unused].left].right = t;
+		if (_nodes[_tree_unused].left != -1) _nodes[_nodes[_tree_unused].left].right = t; // ? на всякий случай, хотя не может такого быть чтобы [last].left == -1
+		// правая сторона от t
 		_nodes[_tree_unused].left = t;
 		_nodes[t].right = _tree_unused;
-		_nodes[t].parent = -1;
-		_nodes[t].size = 0;
-		_nodes[t].value = 0;
-		_nodes[t].unused = 1;
-		// счетчика _n_unused нет
+		_tree_unused = t;
 	}
-	_n_nodes--;
+	_nodes[t].parent = -1;
+	_nodes[t].size = 0;
+	_nodes[t].value = 0;
+	_nodes[t].unused = 1;
+	// счетчика _n_unused нет
+	_n_nodes--; // условный счетчик (вспомогательный): эти вершины можно пересчитать в WORK-пространстве
 }
