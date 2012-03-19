@@ -685,6 +685,7 @@ int SBT_FreeNode(TNodeIndex t) {
 	}
 	else {
 		_nodes[t].left = _nodes[_tree_unused].left;
+		if (_nodes[_tree_unused].left != -1) _nodes[_nodes[_tree_unused].left].right = t;
 		_nodes[_tree_unused].left = t;
 		_nodes[t].right = _tree_unused;
 		_nodes[t].parent = -1;
