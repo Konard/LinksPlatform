@@ -18,7 +18,7 @@ int main() {
 	SBT_CheckAllNodes();
 	SBT_PrintAllNodes();
 	
-	TNumber idx = SBT_FindFirstNode(2); // = обычный Find для уникального ключа (number)
+	TNumber idx = SBT_FindNode(2); // = обычный Find для уникального ключа (number)
 	printf("idx(2) = %lld\n", (long long int)idx);
 	
 	for (int i = 0; i < 100; i++)

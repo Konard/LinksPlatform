@@ -61,8 +61,8 @@ void SBT_DumpAllNodes();
 
 // Search & Walk
 
-TNodeIndex SBT_FindFirstNode_At(TNumber value, TNodeIndex t);
-TNodeIndex SBT_FindFirstNode(TNumber value);
+TNodeIndex SBT_FindNode_At(TNumber value, TNodeIndex t);
+TNodeIndex SBT_FindNode(TNumber value);
 
 void SBT_FindAllNodes_At(TNumber value, TNodeIndex t);
 void SBT_FindAllNodes(TNumber value);

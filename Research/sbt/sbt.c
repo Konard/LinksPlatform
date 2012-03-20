@@ -351,7 +351,7 @@ int SBT_AddNode(TNumber value) {
 
 int SBT_AddNodeUniq(TNumber value) {
 
-	int result = SBT_FindFirstNode(value); // fail, если вершина с таким value уже существует
+	int result = SBT_FindNode(value); // fail, если вершина с таким value уже существует
 	if (result == -1) {
 		SBT_AddNode(value);
 	}
@@ -362,98 +362,75 @@ int SBT_AddNodeUniq(TNumber value) {
 
 int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return -1; // ответ: "Не найден"
+	}
+
 	int result = -1;
-	if (t < 0) return -1; // ответ: "Не найден"
 
+	// Вершину нашли, среагировать на найденный элемент t
 	if (value == _nodes[t].value) {
-
-		// Вершину нашли,
-		// среагировать на найденный элемент
-		if (parent == -1) { // если это - корень дерева
-		    if (_nodes[t].left != -1) {
-			_tree_root = _nodes[t].left;
-
-			// TNodeIndex 
-			_nodes[_tree_root].parent = -1;
-			_nodes[_tree_root].right = _nodes[t].right;
-			if (_nodes[t].right != -1) {
-				_nodes[_nodes[t].right].parent = _tree_root;
+		TNodeIndex left = _nodes[t].left;
+		TNodeIndex right = _nodes[t].right;
+		// если это - корень дерева
+		if (parent == -1) {
+			// можно сделать проверку на left.size <?> right.size => удалять с перевесом в соответствующую сторону
+			if (left != -1) {
+				_tree_root = left;
+				_nodes[left].parent = -1;
+				_nodes[left].right = right;
+				if (right != -1) _nodes[right].parent = left;
 			}
-		    }
-		    else if (_nodes[t].right != -1) {
-			_tree_root = _nodes[t].right;
-
-			// TNodeIndex 
-			_nodes[_tree_root].parent = -1;
-			_nodes[_tree_root].left = _nodes[t].left;
-			if (_nodes[t].left != -1) {
-				_nodes[_nodes[t].left].parent = _tree_root;
+			else if (right != -1) {
+				_tree_root = right;
+				_nodes[right].parent = -1;
+				_nodes[right].left = left;
+				if (left != -1) _nodes[left].parent = right;
 			}
-		    }
-		    else {
-			_tree_root = -1;
-		    }
+			else _tree_root = -1;
 		}
+		// не корень дерева
 		else {
 			int at_left = 0;
-			if (_nodes[parent].left == t) at_left = 1;
-			else at_left = 0;
-
-
-		    if (_nodes[t].left != -1) {
-
-			// ссылка от parent != -1
-			if (at_left == 1) _nodes[parent].left = _nodes[t].left;
-			else _nodes[parent].right = _nodes[t].left;
-
-			_nodes[_nodes[t].left].parent = parent; // новый корень, .left
-			_nodes[_nodes[t].left].right = _nodes[t].right; // перевешиваем вершину
-			if (_nodes[t].right != -1) {
-				_nodes[_nodes[t].right].parent = _nodes[t].left;
+			if (_nodes[parent].left == t) at_left = 1; // else делать не нужно, = 0 by-default
+			// ссылка от parent налево != -1
+			if (left != -1) {
+				if (at_left == 1) _nodes[parent].left = left;
+				else _nodes[parent].right = left;
+				_nodes[left].parent = parent; // новый корень, .left
+				_nodes[left].right = right; // перевешиваем вершину
+				if (right != -1) _nodes[right].parent = left;
 			}
-		    }
-		    else if (_nodes[t].right != -1) {
-
-			// ссылка от parent != -1
-			if (at_left == 1) _nodes[parent].left = _nodes[t].right;
-			else _nodes[parent].right = _nodes[t].right;
-
-			_nodes[_nodes[t].right].parent = parent; // новый корень, .right
-			_nodes[_nodes[t].right].left = _nodes[t].left; // перевешиваем вершину
-			if (_nodes[t].left != -1) {
-				_nodes[_nodes[t].left].parent = _nodes[t].right;
+			// ссылка от parent направо != -1
+			else if (right != -1) {
+				if (at_left == 1) _nodes[parent].left = right;
+				else _nodes[parent].right = right;
+				_nodes[right].parent = parent; // новый корень, .right
+				_nodes[right].left = left; // перевешиваем вершину
+				if (left != -1) _nodes[left].parent = right;
 			}
-		    }
-		    else {
-			// удалить соответствующее направление у parent
-			if (at_left == 1) _nodes[parent].left = -1;
-			else _nodes[parent].right = -1;
-		    }
-
+			else {
+				// удалить соответствующее направление у parent
+				if (at_left == 1) _nodes[parent].left = -1;
+				else _nodes[parent].right = -1;
+			}
 		}
-		_nodes[t].parent = -1;
-		_nodes[t].left = -1;
-		_nodes[t].right = -1;
+		// parent/left/right = -1: делает процедура освобождения ячейки, FreeNode?
 		result = t;
-	// не выполняется
-	if (result != -1) SBT_FreeNode(result);
-
+		SBT_FreeNode(result);
 	}
 	else if (value < _nodes[t].value) {
 		// влево
 		result = SBT_DeleteNode_At(value, _nodes[t].left, t);
 	}
-	// можно не делать это сравнение для целых чисел
 	else 
-	// if (value > _nodes[t].value)
+	// это не обязательно if (value > _nodes[t].value) # (можно не делать это сравнение для целых чисел)
 	{
 		// вправо
 		result = SBT_DeleteNode_At(value, _nodes[t].right, t);
 	}
-
 //	if (parent != -1) SBT_Maintain(parent);
 	if (parent != -1) SBT_Maintain_Simpler(parent, (value < _nodes[t].value) ? 1: 0);
-
 	return result; // "не найден"
 }
 
@@ -553,14 +530,14 @@ TNodeIndex SBT_FindNode_At(TNumber value, TNodeIndex t) {
 	}
 	else if (value < _nodes[t].value) {
 		// влево
-		return SBT_FindFirstNode_At(value, _nodes[t].left);
+		return SBT_FindNode_At(value, _nodes[t].left);
 	}
 	// можно не делать это сравнение для целых чисел
 	else 
 	// if (value > _nodes[t].value)
 	{
 		// вправо
-		return SBT_FindFirstNode_At(value, _nodes[t].right);
+		return SBT_FindNode_At(value, _nodes[t].right);
 	}
 
 	// не выполняется
@@ -643,6 +620,7 @@ void SBT_CheckAllNodes() {
 }
 
 // распечатка WORK- и UNUSED- nodes (всё, что до CLEAN-)
+
 void SBT_DumpAllNodes() {
 	for (uint64_t i = 0; i < SBT_MAX_NODES - _n_clean; i++) {
 		printf("idx = %lld, value = %lld [unused = %d], left = %lld, right = %lld, parent = %lld, size = %lld\n",
@@ -666,7 +644,11 @@ TNodeIndex GetRootIndex() {
 }
 
 
+// memory management, эти функции ничего не должны знать о _структуру_ дерева
+// значения .left/.right и т.п. они используют лишь для выстраивания элементов в список
+
 // выделение памяти из кольцевого FIFO-буфера (UNUSED-нодов), иначе - из массива CLEAN-нодов
+
 TNodeIndex SBT_AllocateNode() {
 
 	TNodeIndex t = -1; // нет ноды
@@ -710,6 +692,8 @@ TNodeIndex SBT_AllocateNode() {
 
 // небезопасная функция ! следите за целостностью дерева самостоятельно !
 // подключение в "кольцевой буфер"
+// в плане методики, FreeNode не знает ничего о структуре дерева, она работает с ячейками, управляя только ссылками .left и .right
+
 int SBT_FreeNode(TNodeIndex t) {
 
 	// UNUSED пуст, сделать первым элементом в unused-пространстве
