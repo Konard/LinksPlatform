@@ -752,5 +752,24 @@ TNodeIndex SBT_FindNode_NearestAndLesser(TNumber value) {
 
 TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value) {
 	TNodeIndex t = SBT_FindNode(value);
+	if (t != -1) {
+		TNodeIndex right = _nodes[t].right;
+		if (right == -1) {
+			t = -1;
+		}
+		else {
+			TNodeIndex parent = t;
+			TNodeIndex left = right;
+			while (left != -1) {
+				parent = left;
+				left = _nodes[left].left;
+			}
+			t = parent; // if parent != t[value]
+		}
+	}
 	return t;
+}
+
+TNumber GetValueByIndex(TNodeIndex t) {
+	return (t != 1) ? _nodes[t].value : INT64_MAX;
 }

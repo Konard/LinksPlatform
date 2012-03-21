@@ -77,5 +77,6 @@ TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value);
 
 TNode *GetPointerToNode(TNodeIndex t);
 TNodeIndex GetRootIndex();
+TNumber GetValueByIndex(TNodeIndex t);
 
 #endif
