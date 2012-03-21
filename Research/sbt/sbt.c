@@ -728,3 +728,29 @@ int SBT_FreeNode(TNodeIndex t) {
 
 	return 0;
 }
+
+TNodeIndex SBT_FindNode_NearestAndLesser(TNumber value) {
+	TNodeIndex t = SBT_FindNode(value);
+	if (t != -1) {
+		TNodeIndex left = _nodes[t].left;
+		if (left == -1) {
+			t = -1;
+		}
+		else {
+			TNodeIndex parent = t;
+			TNodeIndex right = left;
+			while (right != -1) {
+				parent = right;
+				right = _nodes[right].right;
+			}
+			t = parent; // if parent != t[value]
+		}
+	}
+	// else not found, = -1
+	return t;
+}
+
+TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value) {
+	TNodeIndex t = SBT_FindNode(value);
+	return t;
+}

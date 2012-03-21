@@ -70,6 +70,9 @@ void SBT_FindAllNodes(TNumber value);
 void SBT_WalkAllNodes_At(int depth, TNodeIndex t);
 void SBT_WalkAllNodes();
 
+TNodeIndex SBT_FindNode_NearestAndLesser(TNumber value);
+TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value);
+
 // Get
 
 TNode *GetPointerToNode(TNodeIndex t);
