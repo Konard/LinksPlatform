@@ -19,14 +19,14 @@ int main() {
 	SBT_AddNode(0);
 	
 	TNodeIndex t;
-	t = SBT_FindNode_NearestAndLesser(7);
+	t = SBT_FindNode_NearestAndLesser_ByValue(7);
 	printf("find < 7: idx = %lld, value = %lld\n", (long long int)t, (long long int)GetValueByIndex(t));
-	t = SBT_FindNode_NearestAndLesser(4);
+	t = SBT_FindNode_NearestAndLesser_ByValue(4);
 	printf("find < 4: idx = %lld, value = %lld\n", (long long int)t, (long long int)GetValueByIndex(t));
 
-	t = SBT_FindNode_NearestAndGreater(7);
+	t = SBT_FindNode_NearestAndGreater_ByValue(7);
 	printf("find > 7: idx = %lld, value = %lld\n", (long long int)t, (long long int)GetValueByIndex(t));
-	t = SBT_FindNode_NearestAndGreater(4);
+	t = SBT_FindNode_NearestAndGreater_ByValue(4);
 	printf("find > 4: idx = %lld, value = %lld\n", (long long int)t, (long long int)GetValueByIndex(t));
 
 	// распечатать результат

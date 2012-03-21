@@ -729,10 +729,9 @@ int SBT_FreeNode(TNodeIndex t) {
 	return 0;
 }
 
-// Найти самый близкий по значению элемент в "левом" поддереве
+// Найти самый близкий по значению элемент в "левом" поддереве, by Index
 
-TNodeIndex SBT_FindNode_NearestAndLesser(TNumber value) {
-	TNodeIndex t = SBT_FindNode(value);
+TNodeIndex SBT_FindNode_NearestAndLesser_ByIndex(TNodeIndex t) {
 	if (t != -1) {
 		TNodeIndex left = _nodes[t].left;
 		if (left == -1) {
@@ -752,10 +751,9 @@ TNodeIndex SBT_FindNode_NearestAndLesser(TNumber value) {
 	return t;
 }
 
-// Найти самый близкий по значению элемент в "правом" поддереве
+// Найти самый близкий по значению элемент в "правом" поддереве, by Index
 
-TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value) {
-	TNodeIndex t = SBT_FindNode(value);
+TNodeIndex SBT_FindNode_NearestAndGreater_ByIndex(TNodeIndex t) {
 	if (t != -1) {
 		TNodeIndex right = _nodes[t].right;
 		if (right == -1) {
@@ -772,6 +770,18 @@ TNodeIndex SBT_FindNode_NearestAndGreater(TNumber value) {
 		}
 	}
 	return t;
+}
+
+// Найти самый близкий по значению элемент в "левом" поддереве
+
+TNodeIndex SBT_FindNode_NearestAndLesser_ByValue(TNumber value) {
+	return SBT_FindNode_NearestAndLesser_ByIndex(SBT_FindNode(value));
+}
+
+// Найти самый близкий по значению элемент в "правом" поддереве
+
+TNodeIndex SBT_FindNode_NearestAndGreater_ByValue(TNumber value) {
+	return SBT_FindNode_NearestAndGreater_ByIndex(SBT_FindNode(value));
 }
 
 // INT64_MAX, если не можем найти элемент по индексу
