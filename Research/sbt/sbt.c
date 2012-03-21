@@ -359,6 +359,11 @@ int SBT_AddNodeUniq(TNumber value) {
 }
 
 // Удалить вершину, в дереве t
+// Алгоритм (взят из статьи про AVL на Википедии) :
+// 1. Ищем вершину на удаление,
+// 2. Ищем ей замену, спускаясь по левой ветке (value-),
+// 3. Перевешиваем замену на место удаленной,
+// 4. Выполняем балансировку вверх от родителя места, где находилась замена (от parent замены).
 
 int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
@@ -389,7 +394,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 			else _tree_root = -1;
 		}
-		// не корень дерева
+		// не _корень_ дерева
 		else {
 			int at_left = 0;
 			if (_nodes[parent].left == t) at_left = 1; // else делать не нужно, = 0 by-default
@@ -410,7 +415,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				if (left != -1) _nodes[left].parent = right;
 			}
 			else {
-				// удалить соответствующее направление у parent
+				// нечего подвешивать - удалить соответствующие направления у parent
 				if (at_left == 1) _nodes[parent].left = -1;
 				else _nodes[parent].right = -1;
 			}
@@ -431,7 +436,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	}
 //	if (parent != -1) SBT_Maintain(parent);
 	if (parent != -1) SBT_Maintain_Simpler(parent, (value < _nodes[t].value) ? 1: 0);
-	return result; // "не найден"
+	return result; // "не найден?"
 }
 
 // Удалить первую попавшуюся вершину по значению value
