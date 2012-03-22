@@ -404,39 +404,34 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				(long long int)GetValueByIndex(l)
 			);
 			TNodeIndex l_p = _nodes[l].parent;
-			TNodeIndex l1 = _nodes[l].left; // l.right == -1
+			TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
+			TNodeIndex d_r = _nodes[d].right;
 			
-			// меняем слева : заменить t_d_p ("parent" для удаляемой, t_d) на "parent" для l_d - l_d_p
-			if (d_p == -1){
-
-/*
-				if (_nodes[l_p].left == l) {
-					// меняем ссылки на низлежащие вершины, l_p <-> l (2)
-					// меняем ссылки на низлежащие вершины, l_p <-> l0 (3)
-					// меняем l <-> root = t_d_p = -1 (1)
-				}
-				else {
-					// меняем ссылки на низлежащие вершины, l_p <-> l (2)
-					_nodes[l].left = l_p;
-					if (l_p != -1) _nodes[l_p].parent = l;
-					// меняем ссылки на низлежащие вершины, l_p <-> l0 (3)
-					if (l_p != -1) _nodes[l_p].right = l0;
-					if (l0 != -1) _nodes[l0].parent = l_p;
-					// меняем l <-> root = t_d_p = -1 (1)
-					_tree_root = l;
-					_nodes[l].parent = -1;
-				}
-*/
+			// меняем правую часть l
+			_nodes[l].right = d_r;
+			if (d_r != -1) _nodes[d_r].parent = l;
+			
+			// меняем левую часть l
+			if (l_p != d) {
+				_nodes[l].left = l_p;
+				_nodes[l_p].left = l;
 			}
 			else {
-
-/*
-				// меняем l <-> root = t_d_p != -1
-				_nodes[t_d_p].left = l;
-				_nodes[l].parent = t_d_p;
-				// меняем ссылки на низлежащие вершины
-*/
+				// не надо менять левую часть
 			}
+
+			// меняем ссылку на корень
+			if (d_p == -1){
+				// меняем l <-> root = t_d_p = -1 (1)
+				_tree_root = l;
+				_nodes[l].parent = -1;
+			}
+			else {
+				// меняем l <-> root = t_d_p != -1
+				_nodes[d_p].left = l;
+				_nodes[l].parent = d_p;
+			}
+
 		}
 	}
 
