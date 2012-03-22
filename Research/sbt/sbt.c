@@ -366,6 +366,53 @@ int SBT_AddNodeUniq(TNumber value) {
 // 4. Выполняем балансировку вверх от родителя места, где находилась замена (от parent замены).
 
 int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return -1; // ответ: "Не найден"
+	}
+
+	int result = -1;
+	TNodeIndex t_d = SBT_FindNode(value);
+	// надо ли что-то делать? (вершину нашли?)
+	if (t_d != -1) {
+		TNodeIndex t_d_p = (t_d != -1) ? _nodes[t_d].parent : -1;
+		TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(t);
+		// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
+		// в таком случае - просто удаляем t_d (без перевешивания)
+		if (l == -1) {
+			TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(t);
+			if (r == -1) {
+				// вершина t_d была единственной, корнем
+				_tree_root = -1;
+				SBT_FreeNode(t_d);
+			}
+			else {
+				// меняем справа
+				if (t_d_p == -1){
+					// меняем root
+					//if (
+					//_tree_root = ;
+				}
+				else {
+				}
+			}
+		}
+		else {
+			// меняем слева
+			// заменить t_d_p ("parent" для удаляемой, t_d) на "parent" для l_d - l_d_p
+			if (t_d_p == -1){
+				// меняем root
+				//if (
+				//_tree_root = ;
+			}
+			else {
+			}
+		}
+	}
+
+	return t;
+}
+
+int SBT_DeleteNode_At_Old(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 	if ((_n_nodes <= 0) || (t < 0)) {
 		return -1; // ответ: "Не найден"
@@ -448,7 +495,7 @@ int SBT_DeleteNode(TNumber value) {
 
 // Удалить все вершины с данным значением (value)
 
-int SBT_DeleteAll(TNumber value) {
+int SBT_DeleteAllNodes(TNumber value) {
 	int result = -1;
 	while ((result = SBT_DeleteNode_At(value, _tree_root, -1)) != -1);
 	return result;

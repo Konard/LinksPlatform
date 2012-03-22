@@ -44,7 +44,7 @@ int SBT_RightRotate(TNodeIndex t);
 int SBT_AddNode(TNumber value); // для неуникального ключа
 int SBT_AddNodeUniq(TNumber value);
 int SBT_DeleteNode(TNumber value); // -1, если нет такого узла в дереве
-int SBT_DeleteAll(TNumber value); // для неуникального ключа
+int SBT_DeleteAllNodes(TNumber value); // для неуникального ключа
 
 TNodeIndex SBT_AllocateNode();
 int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалить ... (в данной реализации - всегда = 0)
