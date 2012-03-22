@@ -370,39 +370,68 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		return -1; // ответ: "Не найден"
 	}
 
-	int result = -1;
+//	int result = -1;
 	TNodeIndex d = SBT_FindNode(value);
+	printf("idx(d) = %lld\n", (long long int)d);
 	// надо ли что-то делать? (вершину нашли?)
 	if (d != -1) {
 		TNodeIndex d_p = (d != -1) ? _nodes[d].parent : -1;
-		TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(t);
+		printf("idx(d_p) = %lld\n", (long long int)d_p);
+		TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(d);
+		printf("idx(l) = %lld\n", (long long int)l);
 		// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 		// в таком случае - просто удаляем t_d (без перевешивания)
+		
 		if (l == -1) {
-			TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(t);
+			TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(d);
+			printf("idx(r) = %lld\n", (long long int)r);
+			// (Diagram No.3)
 			if (r == -1) {
-				// вершина t_d была единственной, корнем
-				_tree_root = -1;
-				SBT_FreeNode(d);
+				// вершина d является листом
+				// меняем ссылку на корень
+				if (d_p == -1) _tree_root = -1;
+				else {
+					if (_nodes[d_p].left == d) _nodes[d_p].left = -1;
+					else _nodes[d_p].right = -1;
+				}
+				_nodes[d].parent = -1;
+				// больше ничего делать не надо
 			}
-			// r != -1
+			// r != -1 (Diagram No.2)
 			else {
 				// меняем справа
-				if (d_p == -1){
-					// меняем root
-					//if (
-					//_tree_root = ;
+
+				TNodeIndex r_p = _nodes[r].parent;
+				TNodeIndex r_r = _nodes[r].right; // r_l = r.left == -1
+				TNodeIndex d_l = _nodes[d].left;
+				
+				// меняем правую часть l
+				_nodes[r].left = d_l;
+				if (d_l != -1) _nodes[d_l].parent = r;
+				
+				// меняем левую часть l
+				if (r_p != d) {
+					_nodes[r].right = r_p;
+						_nodes[r_p].left = r_r;
 				}
 				else {
+					// не надо менять левую часть
+				}
+				// меняем ссылку на корень
+				if (d_p == -1){
+					// меняем l <-> root = t_d_p = -1 (1)
+					_tree_root = l;
+					_nodes[r].parent = -1;
+				}
+				else {
+					// меняем l <-> root = t_d_p != -1
+					_nodes[d_p].left = r;
+					_nodes[r].parent = d_p;
 				}
 			}
 		}
 		// l != -1 (Diagram No.1)
 		else {
-			printf("idx(l) = %lld, value(l) = %lld\n",
-				(long long int)l,
-				(long long int)GetValueByIndex(l)
-			);
 			TNodeIndex l_p = _nodes[l].parent;
 			TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 			TNodeIndex d_r = _nodes[d].right;
@@ -414,7 +443,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			// меняем левую часть l
 			if (l_p != d) {
 				_nodes[l].left = l_p;
-				_nodes[l_p].left = l;
+				_nodes[l_p].right = l_l;
 			}
 			else {
 				// не надо менять левую часть
@@ -433,6 +462,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 
 		}
+		SBT_FreeNode(d);
 	}
 
 	return t;
