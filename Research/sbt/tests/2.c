@@ -27,12 +27,11 @@ int main() {
 	SBT_AddNode(5);
 	SBT_AddNode(6);
 	SBT_AddNode(7);
-	SBT_DeleteNode(6);
 
-	// распечатать результат
-	SBT_CheckAllNodes();
-	SBT_PrintAllNodes();
-	SBT_DumpAllNodes();
+	SBT_CheckAllNodes(); SBT_PrintAllNodes(); SBT_DumpAllNodes(); // распечатать результат
+//	SBT_DeleteNode(6);
+	SBT_DeleteNode(8);
+	SBT_CheckAllNodes(); SBT_PrintAllNodes(); SBT_DumpAllNodes(); // распечатать результат
 
 	return 0;
 }

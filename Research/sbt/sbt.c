@@ -404,6 +404,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				TNodeIndex r_p = _nodes[r].parent;
 				TNodeIndex r_r = _nodes[r].right; // r_l = r.left == -1
 				TNodeIndex d_l = _nodes[d].left;
+				printf("idx(r_p) = %lld\n", (long long int)r_p);
+				printf("idx(r_r) = %lld\n", (long long int)r_r);
+				printf("idx(d_l) = %lld\n", (long long int)d_l);
 				
 				// меняем правую часть l
 				_nodes[r].left = d_l;
@@ -420,7 +423,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				// меняем ссылку на корень
 				if (d_p == -1){
 					// меняем l <-> root = t_d_p = -1 (1)
-					_tree_root = l;
+					_tree_root = r;
 					_nodes[r].parent = -1;
 				}
 				else {
@@ -435,6 +438,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			TNodeIndex l_p = _nodes[l].parent;
 			TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 			TNodeIndex d_r = _nodes[d].right;
+			printf("idx(l_p) = %lld\n", (long long int)l_p);
+			printf("idx(l_l) = %lld\n", (long long int)l_l);
+			printf("idx(d_r) = %lld\n", (long long int)d_r);
 			
 			// меняем правую часть l
 			_nodes[l].right = d_r;
@@ -442,12 +448,20 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			
 			// меняем левую часть l
 			if (l_p != d) {
-				_nodes[l].left = l_p;
+				// l_p <-> d.left
+				TNodeIndex d_l = _nodes[d].left;
+				if (d_l != -1) {
+					_nodes[l].left = d_l;
+					_nodes[d_l].parent = l;
+				}
+				// l_p <-> l_l
 				_nodes[l_p].right = l_l;
+				if (l_l != -1) _nodes[l_l].parent = l_p;
 			}
 			else {
 				// не надо менять левую часть
 			}
+			printf("*\n");
 
 			// меняем ссылку на корень
 			if (d_p == -1){
@@ -457,7 +471,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 			else {
 				// меняем l <-> root = t_d_p != -1
-				_nodes[d_p].left = l;
+				_nodes[d_p].right = l;
 				_nodes[l].parent = d_p;
 			}
 
