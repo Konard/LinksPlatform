@@ -371,10 +371,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	}
 
 	int result = -1;
-	TNodeIndex t_d = SBT_FindNode(value);
+	TNodeIndex d = SBT_FindNode(value);
 	// надо ли что-то делать? (вершину нашли?)
-	if (t_d != -1) {
-		TNodeIndex t_d_p = (t_d != -1) ? _nodes[t_d].parent : -1;
+	if (d != -1) {
+		TNodeIndex d_p = (d != -1) ? _nodes[d].parent : -1;
 		TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(t);
 		// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 		// в таком случае - просто удаляем t_d (без перевешивания)
@@ -383,11 +383,12 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			if (r == -1) {
 				// вершина t_d была единственной, корнем
 				_tree_root = -1;
-				SBT_FreeNode(t_d);
+				SBT_FreeNode(d);
 			}
+			// r != -1
 			else {
 				// меняем справа
-				if (t_d_p == -1){
+				if (d_p == -1){
 					// меняем root
 					//if (
 					//_tree_root = ;
@@ -396,15 +397,45 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				}
 			}
 		}
+		// l != -1 (Diagram No.1)
 		else {
-			// меняем слева
-			// заменить t_d_p ("parent" для удаляемой, t_d) на "parent" для l_d - l_d_p
-			if (t_d_p == -1){
-				// меняем root
-				//if (
-				//_tree_root = ;
+			printf("idx(l) = %lld, value(l) = %lld\n",
+				(long long int)l,
+				(long long int)GetValueByIndex(l)
+			);
+			TNodeIndex l_p = _nodes[l].parent;
+			TNodeIndex l1 = _nodes[l].left; // l.right == -1
+			
+			// меняем слева : заменить t_d_p ("parent" для удаляемой, t_d) на "parent" для l_d - l_d_p
+			if (d_p == -1){
+
+/*
+				if (_nodes[l_p].left == l) {
+					// меняем ссылки на низлежащие вершины, l_p <-> l (2)
+					// меняем ссылки на низлежащие вершины, l_p <-> l0 (3)
+					// меняем l <-> root = t_d_p = -1 (1)
+				}
+				else {
+					// меняем ссылки на низлежащие вершины, l_p <-> l (2)
+					_nodes[l].left = l_p;
+					if (l_p != -1) _nodes[l_p].parent = l;
+					// меняем ссылки на низлежащие вершины, l_p <-> l0 (3)
+					if (l_p != -1) _nodes[l_p].right = l0;
+					if (l0 != -1) _nodes[l0].parent = l_p;
+					// меняем l <-> root = t_d_p = -1 (1)
+					_tree_root = l;
+					_nodes[l].parent = -1;
+				}
+*/
 			}
 			else {
+
+/*
+				// меняем l <-> root = t_d_p != -1
+				_nodes[t_d_p].left = l;
+				_nodes[l].parent = t_d_p;
+				// меняем ссылки на низлежащие вершины
+*/
 			}
 		}
 	}
