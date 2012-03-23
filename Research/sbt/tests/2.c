@@ -30,7 +30,8 @@ int main() {
 
 	SBT_CheckAllNodes(); SBT_PrintAllNodes(); SBT_DumpAllNodes(); // распечатать результат
 //	SBT_DeleteNode(6);
-	SBT_DeleteNode(8);
+//	SBT_DeleteNode(8);
+	SBT_DeleteNode(11);
 	SBT_CheckAllNodes(); SBT_PrintAllNodes(); SBT_DumpAllNodes(); // распечатать результат
 
 	return 0;
