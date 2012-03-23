@@ -21,8 +21,9 @@ int main() {
 	TNumber idx = SBT_FindNode(2); // = обычный Find для уникального ключа (number)
 	printf("idx(2) = %lld\n", (long long int)idx);
 	
-	for (int i = 0; i < 100; i++)
-	    SBT_DeleteNode(i);
+//	for (int i = 0; i < 100; i++)
+//	    SBT_DeleteNode(i);
+	    SBT_DeleteNode(0);
 
 	SBT_CheckAllNodes();
 //	SBT_PrintAllNodes();

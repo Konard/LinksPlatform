@@ -34,7 +34,7 @@ int main() {
 	SBT_PrintAllNodes();
 	SBT_DumpAllNodes();
 
-	SBT_DeleteNode(4);
+	SBT_DeleteNode(2);
 
 	// распечатать результат
 	SBT_CheckAllNodes();
