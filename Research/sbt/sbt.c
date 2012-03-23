@@ -392,7 +392,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			// можно не делать: _nodes[d].parent = -1;
 			// больше ничего делать не надо
 			TNodeIndex q = d_p;
-			printf("[-] q = %lld\n", (long long int)q);
+//			printf("[-] q = %lld\n", (long long int)q);
 			while(q != -1) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
@@ -437,12 +437,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 
 			TNodeIndex q;// = r_p;
-			if (r_p == r) q = r;
+			if (r_p == d) q = r;
 			else q = r_p;
-//			if (r_r == -1) q = r_p;
-//			else q = r_r;
-//			if (q == d) q = r_r;
-			printf("[r] q = %lld\n", (long long int)q);
+
+//			printf("[r] q = %lld\n", (long long int)q);
 			while(q != -1) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
@@ -485,12 +483,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		}
 
 		TNodeIndex q;// = l_p;
-		if (l_p == l) q = l;
+		if (l_p == d) q = l;
 		else q = l_p;
-//		if (l_l == -1) q = l_p;
-//		else q = l_l;
-//		if (q == d) q = l_l;
-		printf("[l] q = %lld\n", (long long int)q);
+
+//		printf("[l] q = %lld\n", (long long int)q);
 		while(q != -1) {
 			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 			q = _nodes[q].parent;

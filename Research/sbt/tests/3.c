@@ -37,11 +37,12 @@ int main() {
 		rnd ^= (rnd >> RND_B);
 		rnd ^= (rnd << RND_C);
 //		SBT_PrintAllNodes();
-		printf("удаление idx = %d\n", (rnd)&0x000000FF);
+//		printf("удаление idx = %d\n", (rnd)&0x000000FF);
 		SBT_DeleteNode((rnd)&0x000000FF); // вставка без отказов
-		SBT_CheckAllNodesSize();
+//		SBT_CheckAllNodesSize();
 	}
 	SBT_PrintAllNodes();
+	SBT_CheckAllNodesSize();
 
 	return 0;
 }
