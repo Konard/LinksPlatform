@@ -369,25 +369,17 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	if ((_n_nodes <= 0) || (t < 0)) {
 		return -1; // ответ: "Не найден"
 	}
-//	printf("delete value = %lld\n", (long long int)value);
-
-//	int result = -1;
 	TNodeIndex d = SBT_FindNode(value);
-//	printf("idx(d) = %lld\n", (long long int)d);
 	// надо ли что-то делать? (вершину нашли?)
 	if (d == -1) return -1;
-
 	// d != -1
 	TNodeIndex d_p = (d != -1) ? _nodes[d].parent : -1;
-	printf("idx(d_p) = %lld\n", (long long int)d_p);
 	TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(d); // d.left -> right
-	printf("idx(l) = %lld\n", (long long int)l);
 	// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 	// в таком случае - просто удаляем t_d (без перевешивания)
 	
 	if (l == -1) {
 		TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(d); // d.right -> left
-		printf("idx(r) = %lld\n", (long long int)r);
 		// (Diagram No.3)
 		if (r == -1) {
 			// вершина d является листом
@@ -403,24 +395,16 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		// r != -1 (Diagram No.2)
 		else {
 			// меняем справа
-
 			TNodeIndex r_p = _nodes[r].parent;
 			TNodeIndex r_r = _nodes[r].right; // r_l = r.left == -1
 			TNodeIndex d_l = _nodes[d].left; // == -1 всегда?
-			printf("idx(r_p) = %lld\n", (long long int)r_p);
-			printf("idx(r_r) = %lld\n", (long long int)r_r);
-			printf("idx(d_l) = %lld\n", (long long int)d_l);
-			
 			// меняем левую часть r <-> d_l
 			_nodes[r].left = d_l;
 			if (d_l != -1) _nodes[d_l].parent = r;
-			
-			if (r_p == d) {
-				// правую часть менять не надо, r_r
+			if (r_p == d) { // правую часть менять не надо, r_r
 			}
 			else {
 				TNodeIndex d_r = _nodes[d].right; // != -1 всегда?
-				printf("idx(d_r) = %lld\n", (long long int)d_r);
 				// меняем верхнюю часть
 				_nodes[r_p].left = r_r;
 				_nodes[r_r].parent = r_p;
@@ -449,21 +433,14 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		TNodeIndex l_p = _nodes[l].parent;
 		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 		TNodeIndex d_r = _nodes[d].right;
-		printf("idx(l_p) = %lld\n", (long long int)l_p);
-		printf("idx(l_l) = %lld\n", (long long int)l_l);
-		printf("idx(d_r) = %lld\n", (long long int)d_r); // == -1 всегда?
-		
 		// меняем правую часть l
 		_nodes[l].right = d_r;
 		if (d_r != -1) _nodes[d_r].parent = l;
-		
 		// меняем левую часть l
-		if (l_p == d) {
-			// не надо менять левую часть и l_p
+		if (l_p == d) { // не надо менять левую часть и l_p
 		}
 		else {
 			TNodeIndex d_l = _nodes[d].left;
-			printf("idx(d_l) = %lld\n", (long long int)d_l); // != -1 всегда
 			// меняем верхнюю часть
 			_nodes[l_p].right = l_l;
 			_nodes[l_l].parent = l_p;
@@ -484,86 +461,11 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			else _nodes[d_p].right = l; // ?
 			_nodes[l].parent = d_p;
 		}
-
 	}
 	SBT_FreeNode(d);
-
 	return t;
 }
 
-int SBT_DeleteNode_At_Old(TNumber value, TNodeIndex t, TNodeIndex parent) {
-
-	if ((_n_nodes <= 0) || (t < 0)) {
-		return -1; // ответ: "Не найден"
-	}
-
-	int result = -1;
-
-	// Вершину нашли, среагировать на найденный элемент t
-	if (value == _nodes[t].value) {
-		TNodeIndex left = _nodes[t].left;
-		TNodeIndex right = _nodes[t].right;
-		// если это - корень дерева
-		if (parent == -1) {
-			// можно сделать проверку на left.size <?> right.size => удалять с перевесом в соответствующую сторону
-			if (left != -1) {
-				_tree_root = left;
-				_nodes[left].parent = -1;
-				_nodes[left].right = right;
-				if (right != -1) _nodes[right].parent = left;
-			}
-			else if (right != -1) {
-				_tree_root = right;
-				_nodes[right].parent = -1;
-				_nodes[right].left = left;
-				if (left != -1) _nodes[left].parent = right;
-			}
-			else _tree_root = -1;
-		}
-		// не _корень_ дерева
-		else {
-			int at_left = 0;
-			if (_nodes[parent].left == t) at_left = 1; // else делать не нужно, = 0 by-default
-			// ссылка от parent налево != -1
-			if (left != -1) {
-				if (at_left == 1) _nodes[parent].left = left;
-				else _nodes[parent].right = left;
-				_nodes[left].parent = parent; // новый корень, .left
-				_nodes[left].right = right; // перевешиваем вершину
-				if (right != -1) _nodes[right].parent = left;
-			}
-			// ссылка от parent направо != -1
-			else if (right != -1) {
-				if (at_left == 1) _nodes[parent].left = right;
-				else _nodes[parent].right = right;
-				_nodes[right].parent = parent; // новый корень, .right
-				_nodes[right].left = left; // перевешиваем вершину
-				if (left != -1) _nodes[left].parent = right;
-			}
-			else {
-				// нечего подвешивать - удалить соответствующие направления у parent
-				if (at_left == 1) _nodes[parent].left = -1;
-				else _nodes[parent].right = -1;
-			}
-		}
-		// parent/left/right = -1: делает процедура освобождения ячейки, FreeNode?
-		result = t;
-		SBT_FreeNode(result);
-	}
-	else if (value < _nodes[t].value) {
-		// влево
-		result = SBT_DeleteNode_At(value, _nodes[t].left, t);
-	}
-	else 
-	// это не обязательно if (value > _nodes[t].value) # (можно не делать это сравнение для целых чисел)
-	{
-		// вправо
-		result = SBT_DeleteNode_At(value, _nodes[t].right, t);
-	}
-//	if (parent != -1) SBT_Maintain(parent);
-	if (parent != -1) SBT_Maintain_Simpler(parent, (value < _nodes[t].value) ? 1: 0);
-	return result; // "не найден?"
-}
 
 // Удалить первую попавшуюся вершину по значению value
 
