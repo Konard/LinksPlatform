@@ -391,6 +391,11 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 			// можно не делать: _nodes[d].parent = -1;
 			// больше ничего делать не надо
+			TNodeIndex q = d_p;
+			while(q != -1) {
+				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+				q = _nodes[q].parent;
+			}
 		}
 		// r != -1 (Diagram No.2)
 		else {
@@ -427,6 +432,8 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 
 			TNodeIndex q = r_p;
+//			if (r_r == -1) q = r_p;
+//			else q = r_r;
 			while(q != -1) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
@@ -469,6 +476,8 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		}
 
 		TNodeIndex q = l_p;
+//		if (l_l == -1) q = l_p;
+//		else q = l_l;
 		while(q != -1) {
 			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 			q = _nodes[q].parent;
@@ -685,6 +694,9 @@ void SBT_CheckAllNodesSize_At(int depth, TNodeIndex t) {
 			(long long int)SBT_Left_size(t),
 			(long long int)SBT_Right_size(t)
 		);
+		printf("----\n");
+		SBT_PrintAllNodes();
+		printf("----\n");
 	}
 
 	// сверху - большие вершины
