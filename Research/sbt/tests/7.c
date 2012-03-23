@@ -8,6 +8,7 @@
 int main() {
 
 #define N 10000000
+//#define N 1000
 	// седьмой пример
 	printf("добавление ...\n");
 	for (int i = 0; i < N; i++) {
@@ -26,6 +27,7 @@ int main() {
 //		SBT_CheckAllNodesSize();
 	}
 	SBT_CheckAllNodesSize();
+//	SBT_CheckAllNodesBalance();
 
 //	    SBT_DeleteAllNodes(i);
 //	SBT_DumpAllNodes();

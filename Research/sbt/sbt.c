@@ -400,14 +400,14 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		}
 		// r != -1 (Diagram No.2)
 		else {
-			printf("r = %lld\n", (long long int)r);
+//			printf("r = %lld\n", (long long int)r);
 			// меняем справа
 			TNodeIndex r_p = _nodes[r].parent;
 			TNodeIndex r_r = _nodes[r].right; // r_l = r.left == -1
 			TNodeIndex d_l = _nodes[d].left; // == -1 всегда?
-			printf("r_p = %lld\n", (long long int)r_p);
-			printf("r_r = %lld\n", (long long int)r_r);
-			printf("d_l = %lld\n", (long long int)d_l);
+//			printf("r_p = %lld\n", (long long int)r_p);
+//			printf("r_r = %lld\n", (long long int)r_r);
+//			printf("d_l = %lld\n", (long long int)d_l);
 			// меняем левую часть r <-> d_l
 			_nodes[r].left = d_l;
 			if (d_l != -1) _nodes[d_l].parent = r;
@@ -436,7 +436,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				_nodes[r].parent = d_p;
 			}
 
-			TNodeIndex q;// = r_p;
+			TNodeIndex q;
 			if (r_p == d) q = r;
 			else q = r_p;
 
@@ -482,7 +482,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			_nodes[l].parent = d_p;
 		}
 
-		TNodeIndex q;// = l_p;
+		TNodeIndex q;
 		if (l_p == d) q = l;
 		else q = l_p;
 
