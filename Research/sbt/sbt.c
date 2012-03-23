@@ -425,6 +425,12 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				else _nodes[d_p].left = r;
 				_nodes[r].parent = d_p;
 			}
+
+			TNodeIndex q = r_p;
+			while(q != -1) {
+				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+				q = _nodes[q].parent;
+			}
 		}
 	}
 
@@ -460,6 +466,12 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			if (_nodes[d_p].left == d) _nodes[d_p].left = l; // ?
 			else _nodes[d_p].right = l; // ?
 			_nodes[l].parent = d_p;
+		}
+
+		TNodeIndex q = l_p;
+		while(q != -1) {
+			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+			q = _nodes[q].parent;
 		}
 	}
 	SBT_FreeNode(d);
@@ -599,7 +611,7 @@ void SBT_FindAllNodes(TNumber value) {
 
 // Проверка дерева на SBT-корректность, начиная с ноды t
 
-void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
+void SBT_CheckAllNodesBalance_At(int depth, TNodeIndex t) {
 
 	if ((_n_nodes <= 0) || (t < 0)) {
 		return; // выйти, если вершины нет
@@ -607,7 +619,7 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 
 	// снизу - меньшие
 	if (_nodes[t].left >= 0) {
-		SBT_CheckAllNodes_At(depth + 1, _nodes[t].left);
+		SBT_CheckAllNodesBalance_At(depth + 1, _nodes[t].left);
 	}
 	// проверить
 	if ((SBT_Left_Left_size(t) > SBT_Right_size(t)) && (SBT_Right_size(t) > 0)) {
@@ -641,15 +653,56 @@ void SBT_CheckAllNodes_At(int depth, TNodeIndex t) {
 	
 	// сверху - большие вершины
 	if (_nodes[t].right >= 0) {
-		SBT_CheckAllNodes_At(depth + 1, _nodes[t].right);
+		SBT_CheckAllNodesBalance_At(depth + 1, _nodes[t].right);
 	}
 
 }
 
 // Проверить всё дерево на SBT-корректность (начиная с корневой ноды)
 
+void SBT_CheckAllNodesBalance() {
+	SBT_CheckAllNodesBalance_At(0, _tree_root);
+}
+
+// Проверка дерева на SBT-корректность (sizes), начиная с ноды t
+
+void SBT_CheckAllNodesSize_At(int depth, TNodeIndex t) {
+
+	if ((_n_nodes <= 0) || (t < 0)) {
+		return; // выйти, если вершины нет
+	}
+
+	// снизу - меньшие
+	if (_nodes[t].left >= 0) {
+		SBT_CheckAllNodesSize_At(depth + 1, _nodes[t].left);
+	}
+
+	// проверить
+	if (_nodes[t].size !=  SBT_Left_size(t) + SBT_Right_size(t) + 1) {
+		printf("size error: %lld (%lld <> %lld + %lld + 1)\n",
+			(long long int)t,
+			(long long int)_nodes[t].size,
+			(long long int)SBT_Left_size(t),
+			(long long int)SBT_Right_size(t)
+		);
+	}
+
+	// сверху - большие вершины
+	if (_nodes[t].right >= 0) {
+		SBT_CheckAllNodesSize_At(depth + 1, _nodes[t].right);
+	}
+
+}
+
+// Проверить всё дерево на SBT-корректность (sizes) (начиная с корневой ноды)
+
+void SBT_CheckAllNodesSize() {
+	SBT_CheckAllNodesSize_At(0, _tree_root);
+}
+
 void SBT_CheckAllNodes() {
-	SBT_CheckAllNodes_At(0, _tree_root);
+	SBT_CheckAllNodesBalance();
+	SBT_CheckAllNodesSize();
 }
 
 // распечатка WORK- и UNUSED- nodes (всё, что до CLEAN-)

@@ -7,14 +7,20 @@
 
 int main() {
 
+#define N 10000
 	// седьмой пример
-	for (int i = 0; i < 10000; i++)
-	    SBT_AddNodeUniq(i);
-	for (int i = 0; i < 10000; i++)
-	    SBT_DeleteNode(i);
+	for (int i = 0; i < N; i++) {
+		SBT_AddNodeUniq(i);
+		SBT_CheckAllNodesSize();
+	}
+	for (int i = 0; i < N; i++) {
+		SBT_DeleteNode(i);
+		SBT_CheckAllNodesSize();
+	}
+
 //	    SBT_DeleteAllNodes(i);
-	SBT_DumpAllNodes();
-	SBT_PrintAllNodes();
+//	SBT_DumpAllNodes();
+//	SBT_PrintAllNodes();
 
 	return 0;
 }

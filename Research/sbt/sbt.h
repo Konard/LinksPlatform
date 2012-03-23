@@ -51,8 +51,13 @@ int SBT_FreeNode(TNodeIndex t); // -1, если не удается удалит
 
 // Print, Dump & Check
 
-void SBT_CheckAllNodes_At(int depth, TNodeIndex t);
-void SBT_CheckAllNodes();
+void SBT_CheckAllNodesBalance_At(int depth, TNodeIndex t);
+void SBT_CheckAllNodesBalance();
+
+void SBT_CheckAllNodesSize_At(int depth, TNodeIndex t);
+void SBT_CheckAllNodesSize();
+
+void SBT_CheckAllNodes(); // balance + size
 
 void SBT_PrintAllNodes_At(int depth, TNodeIndex t);
 void SBT_PrintAllNodes();
