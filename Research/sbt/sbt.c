@@ -290,6 +290,63 @@ int SBT_Maintain(TNodeIndex t) {
 	return 0;
 }
 
+// Сбалансировать дерево после удаления вершины ("тупой" алгоритм)
+
+int SBT_MaintainAfterDelete(TNodeIndex t) {
+
+	if (t < 0) return 0;
+
+	TNodeIndex parent = _nodes[t].parent; // есть "родитель"
+	int at_left = 0;
+	if (parent == -1) { // t - корень дерева, он изменяется; запоминать нужно не индекс, а "топологию"
+	}
+	else {
+	    if (_nodes[parent].left == t) at_left = 1; // "слева" от родителя - индекс родителя не изменился
+	    else at_left = 0; // "справа" от родителя
+	}
+
+#define CALC_T0 \
+	TNodeIndex t0 = -1; \
+	if (parent == -1) t0 = _tree_root; \
+	else { \
+	    if (at_left) t0 = _nodes[parent].left; \
+	    else t0 = _nodes[parent].right; \
+	}
+
+	// поместили слева (?)
+	if (SBT_Left_Left_size(t) > SBT_Right_size(t)) {
+		SBT_RightRotate(t);
+		CALC_T0
+		SBT_Maintain(_nodes[t0].right);
+		SBT_Maintain(t0);
+	}
+	else if (SBT_Left_Right_size(t) > SBT_Right_size(t)) {
+		SBT_LeftRotate(_nodes[t].left);
+		SBT_RightRotate(t);
+		CALC_T0
+		SBT_Maintain(_nodes[t0].left);
+		SBT_Maintain(_nodes[t0].right);
+		SBT_Maintain(t0);
+	}
+	// поместили справа (?)
+	else if (SBT_Right_Right_size(t) > SBT_Left_size(t)) {
+		SBT_LeftRotate(t);
+		CALC_T0
+		SBT_Maintain(_nodes[t0].left);
+		SBT_Maintain(t0);
+	}
+	else if (SBT_Right_Left_size(t) > SBT_Left_size(t)) {
+		SBT_RightRotate(_nodes[t].right);
+		SBT_LeftRotate(t);
+		CALC_T0
+		SBT_Maintain(_nodes[t0].left);
+		SBT_Maintain(_nodes[t0].right);
+		SBT_Maintain(t0);
+	}
+
+	return 0;
+}
+
 
 // Добавить вершину в поддерево t, без проверки уникальности (куда - t, родительская - parent)
 
@@ -380,7 +437,8 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	
 
 	// l != -1 (Diagram No.1)
-	if ((l != -1) && (SBT_Left_size(d) >= SBT_Right_size(d))) {
+//	if ((l != -1) && (SBT_Left_size(d) >= SBT_Right_size(d))) {
+	if (l != -1) {
 		TNodeIndex l_p = _nodes[l].parent;
 		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 		TNodeIndex d_r = _nodes[d].right;
@@ -424,15 +482,17 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		}
 //		if (l_p == d) q = l;
 //		else q = l_p;
-/*
+
 		q = l_l;
 		while(q != -1) {
 			//_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
-			SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+//			SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+			SBT_MaintainAfterDelete(q);
 			q = _nodes[q].parent;
 		}
 //		SBT_Maintain_Simpler(l, 0);
-*/
+
+//		SBT_MaintainAfterDelete(l);
 	}
 
 	else {
@@ -454,13 +514,14 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
 			}
-/*
+
 			q = d_p;
 			while(q != -1) {
-				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+				SBT_MaintainAfterDelete(q);
 				q = _nodes[q].parent;
 			}
-*/
+
+//			SBT_MaintainAfterDelete(d_p);
 		}
 		// r != -1 (Diagram No.2)
 		else {
@@ -509,7 +570,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
 			}
-/*
+
 //			if (r_p == d) q = r;
 //			else q = r_p;
 			q = r_r;
@@ -517,10 +578,12 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 //			SBT_Maintain_Simpler(r, 0);
 			while(q != -1) {
 			//	_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
-				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+//				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+				SBT_MaintainAfterDelete(q);
 				q = _nodes[q].parent;
 			}
-*/
+
+			SBT_MaintainAfterDelete(r);
 		}
 	}
 
@@ -534,6 +597,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 int SBT_DeleteNode(TNumber value) {
 	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
 //	SBT_Maintain_Simpler(t, 0);
+	SBT_MaintainAfterDelete(_tree_root);
 	return t;
 }
 
