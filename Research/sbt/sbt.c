@@ -378,7 +378,64 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 	// в таком случае - просто удаляем t_d (без перевешивания)
 	
-	if (l == -1) {
+
+	// l != -1 (Diagram No.1)
+	if ((l != -1) && (SBT_Left_size(d) >= SBT_Right_size(d))) {
+		TNodeIndex l_p = _nodes[l].parent;
+		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
+		TNodeIndex d_r = _nodes[d].right;
+		// меняем правую часть l
+		_nodes[l].right = d_r;
+		if (d_r != -1) _nodes[d_r].parent = l;
+		// меняем левую часть l
+		if (l_p == d) { // не надо менять левую часть и l_p
+		}
+		else {
+			TNodeIndex d_l = _nodes[d].left;
+			// меняем верхнюю часть
+			_nodes[l_p].right = l_l;
+			_nodes[l_l].parent = l_p;
+			// меняем левую часть l
+			_nodes[l].left = d_l;
+			_nodes[d_l].parent = l;
+		}
+		
+		// меняем ссылку на корень
+		if (d_p == -1){
+			// меняем l <-> root = t_d_p = -1 (1)
+			_tree_root = l;
+			_nodes[l].parent = -1;
+		}
+		else {
+			// меняем l <-> root = t_d_p != -1
+			if (_nodes[d_p].left == d) _nodes[d_p].left = l; // ?
+			else _nodes[d_p].right = l; // ?
+			_nodes[l].parent = d_p;
+		}
+
+		TNodeIndex q;
+		if (l_p == d) q = l;
+		else q = l_p;
+
+//		printf("[l] q = %lld\n", (long long int)q);
+		while(q != -1) {
+			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+			q = _nodes[q].parent;
+		}
+//		if (l_p == d) q = l;
+//		else q = l_p;
+/*
+		q = l_l;
+		while(q != -1) {
+			//_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+			SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+			q = _nodes[q].parent;
+		}
+//		SBT_Maintain_Simpler(l, 0);
+*/
+	}
+
+	else {
 		TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(d); // d.right -> left
 		// (Diagram No.3)
 		if (r == -1) {
@@ -397,6 +454,13 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
 			}
+/*
+			q = d_p;
+			while(q != -1) {
+				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+				q = _nodes[q].parent;
+			}
+*/
 		}
 		// r != -1 (Diagram No.2)
 		else {
@@ -445,55 +509,23 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
 			}
+/*
+//			if (r_p == d) q = r;
+//			else q = r_p;
+			q = r_r;
+//			SBT_Maintain_Simpler(q, 0);
+//			SBT_Maintain_Simpler(r, 0);
+			while(q != -1) {
+			//	_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
+				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
+				q = _nodes[q].parent;
+			}
+*/
 		}
 	}
 
-	// l != -1 (Diagram No.1)
-	else {
-		TNodeIndex l_p = _nodes[l].parent;
-		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
-		TNodeIndex d_r = _nodes[d].right;
-		// меняем правую часть l
-		_nodes[l].right = d_r;
-		if (d_r != -1) _nodes[d_r].parent = l;
-		// меняем левую часть l
-		if (l_p == d) { // не надо менять левую часть и l_p
-		}
-		else {
-			TNodeIndex d_l = _nodes[d].left;
-			// меняем верхнюю часть
-			_nodes[l_p].right = l_l;
-			_nodes[l_l].parent = l_p;
-			// меняем левую часть l
-			_nodes[l].left = d_l;
-			_nodes[d_l].parent = l;
-		}
-		
-		// меняем ссылку на корень
-		if (d_p == -1){
-			// меняем l <-> root = t_d_p = -1 (1)
-			_tree_root = l;
-			_nodes[l].parent = -1;
-		}
-		else {
-			// меняем l <-> root = t_d_p != -1
-			if (_nodes[d_p].left == d) _nodes[d_p].left = l; // ?
-			else _nodes[d_p].right = l; // ?
-			_nodes[l].parent = d_p;
-		}
-
-		TNodeIndex q;
-		if (l_p == d) q = l;
-		else q = l_p;
-
-//		printf("[l] q = %lld\n", (long long int)q);
-		while(q != -1) {
-			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
-			q = _nodes[q].parent;
-		}
-	}
 	SBT_FreeNode(d);
-	return t;
+	return d;
 }
 
 
@@ -501,6 +533,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 int SBT_DeleteNode(TNumber value) {
 	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
+//	SBT_Maintain_Simpler(t, 0);
 	return t;
 }
 

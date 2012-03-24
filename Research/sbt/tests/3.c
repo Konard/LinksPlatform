@@ -9,7 +9,7 @@ int main() {
 
 	// третий пример
 	// генерация псевдослучайных чисел
-#define N 12
+#define N 120
 #define RND_SEED 100
 #define RND_A 9
 #define RND_B 9
@@ -37,12 +37,15 @@ int main() {
 		rnd ^= (rnd >> RND_B);
 		rnd ^= (rnd << RND_C);
 //		SBT_PrintAllNodes();
-//		printf("удаление idx = %d\n", (rnd)&0x000000FF);
+		printf("удаление idx = %d\n", (rnd)&0x000000FF);
 		SBT_DeleteNode((rnd)&0x000000FF); // вставка без отказов
 //		SBT_CheckAllNodesSize();
+//		SBT_CheckAllNodes();
+		SBT_CheckAllNodesBalance();
 	}
 	SBT_PrintAllNodes();
-	SBT_CheckAllNodesSize();
+//	SBT_CheckAllNodesSize();
+	SBT_CheckAllNodes();
 
 	return 0;
 }
