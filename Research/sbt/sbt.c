@@ -434,6 +434,8 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(d); // d.left -> right
 	// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 	// в таком случае - просто удаляем t_d (без перевешивания)
+//	printf("l = %lld\n", (long long int)l);
+//	printf("d_p = %lld\n", (long long int)d_p);
 	
 
 	// l != -1 (Diagram No.1)
@@ -442,6 +444,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		TNodeIndex l_p = _nodes[l].parent;
 		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 		TNodeIndex d_r = _nodes[d].right;
+//		printf("l_p = %lld\n", (long long int)l_p);
+//		printf("l_l = %lld\n", (long long int)l_l);
+//		printf("d_r = %lld\n", (long long int)d_r);
+
 		// меняем правую часть l
 		_nodes[l].right = d_r;
 		if (d_r != -1) _nodes[d_r].parent = l;
@@ -483,20 +489,26 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 //		if (l_p == d) q = l;
 //		else q = l_p;
 
-		q = l_l;
+
+		if (l_l != -1) q = l_l;
+		else q = l_p;
+
 		while(q != -1) {
 			//_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 //			SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
-			SBT_MaintainAfterDelete(q);
+			SBT_Maintain(q);
 			q = _nodes[q].parent;
 		}
 //		SBT_Maintain_Simpler(l, 0);
 
 //		SBT_MaintainAfterDelete(l);
+
+
 	}
 
 	else {
 		TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(d); // d.right -> left
+//		printf("r = %lld\n", (long long int)r);
 		// (Diagram No.3)
 		if (r == -1) {
 			// вершина d является листом
@@ -517,11 +529,13 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 			q = d_p;
 			while(q != -1) {
-				SBT_MaintainAfterDelete(q);
+				SBT_Maintain(q);
 				q = _nodes[q].parent;
 			}
 
 //			SBT_MaintainAfterDelete(d_p);
+
+
 		}
 		// r != -1 (Diagram No.2)
 		else {
@@ -571,19 +585,25 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
+
 //			if (r_p == d) q = r;
 //			else q = r_p;
-			q = r_r;
+
+			if (r_r != -1) q = r_r;
+			else q = r_p;
+
 //			SBT_Maintain_Simpler(q, 0);
 //			SBT_Maintain_Simpler(r, 0);
+
 			while(q != -1) {
 			//	_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 //				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
-				SBT_MaintainAfterDelete(q);
+				SBT_Maintain(q);
 				q = _nodes[q].parent;
 			}
 
 			SBT_MaintainAfterDelete(r);
+
 		}
 	}
 
@@ -595,9 +615,25 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 // Удалить первую попавшуюся вершину по значению value
 
 int SBT_DeleteNode(TNumber value) {
+/*
+	printf("перед удалением (value = %lld)\n",
+		(long long int)value
+	);
+	SBT_PrintAllNodes();
+	SBT_CheckAllNodesBalance();
+*/
 	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
 //	SBT_Maintain_Simpler(t, 0);
 	SBT_MaintainAfterDelete(_tree_root);
+
+/*
+	printf("после удаления idx = %lld (value = %lld)\n",
+		(long long int)t,
+		(long long int)value
+	);
+	SBT_PrintAllNodes();
+	SBT_CheckAllNodesBalance();
+*/
 	return t;
 }
 

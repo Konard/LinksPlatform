@@ -1,15 +1,17 @@
 #include <stdio.h> // printf
 #define __USE_XOPEN_EXTENDED
-#include <stdlib.h> // random
+#include <stdlib.h> // random, atoi
 #include <time.h> // time
 
 #include "sbt.h"
 
-int main() {
+int main(int argc, char **argv) {
 
 	// третий пример
 	// генерация псевдослучайных чисел
-#define N 120
+	if (argc < 2) return 0;
+	int N = atoi(argv[1]);
+//#define N 3
 #define RND_SEED 100
 #define RND_A 9
 #define RND_B 9
@@ -37,7 +39,7 @@ int main() {
 		rnd ^= (rnd >> RND_B);
 		rnd ^= (rnd << RND_C);
 //		SBT_PrintAllNodes();
-		printf("удаление idx = %d\n", (rnd)&0x000000FF);
+//		printf("удаление idx = %d\n", (rnd)&0x000000FF);
 		SBT_DeleteNode((rnd)&0x000000FF); // вставка без отказов
 //		SBT_CheckAllNodesSize();
 //		SBT_CheckAllNodes();
@@ -45,7 +47,7 @@ int main() {
 	}
 	SBT_PrintAllNodes();
 //	SBT_CheckAllNodesSize();
-	SBT_CheckAllNodes();
+//	SBT_CheckAllNodes();
 
 	return 0;
 }
