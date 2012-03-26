@@ -81,6 +81,8 @@ TNodeIndex SBT_FindNode_NearestAndGreater_ByIndex(TNodeIndex t);
 TNodeIndex SBT_FindNode_NearestAndLesser_ByValue(TNumber value);
 TNodeIndex SBT_FindNode_NearestAndGreater_ByValue(TNumber value);
 
+TNodeIndex SBT_FindNextUsedNode(TNodeIndex s);
+
 // Get
 
 TNode *GetPointerToNode(TNodeIndex t);

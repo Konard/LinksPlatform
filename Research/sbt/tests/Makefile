@@ -1,5 +1,5 @@
 NAME = test
-OPTS = -O3 -std=c99 -I.. -Wall
+OPTS = -O3 -std=c99 -I.. -Wall -g
 SRCS = $(wildcard *.c)
 OBJS = $(subst ,,$(SRCS:.c=.o))
 BINS = $(subst ,,$(SRCS:.c=))

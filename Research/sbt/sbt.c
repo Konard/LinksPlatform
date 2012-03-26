@@ -503,6 +503,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 //		SBT_MaintainAfterDelete(l);
 
+		SBT_FreeNode(d);
 
 	}
 
@@ -534,6 +535,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			}
 
 //			SBT_MaintainAfterDelete(d_p);
+			SBT_FreeNode(d);
 
 
 		}
@@ -602,12 +604,12 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
-			SBT_MaintainAfterDelete(r);
+//			SBT_MaintainAfterDelete(r);
+			SBT_FreeNode(d);
 
 		}
 	}
 
-	SBT_FreeNode(d);
 	return d;
 }
 
@@ -936,6 +938,9 @@ TNodeIndex SBT_AllocateNode() {
 
 int SBT_FreeNode(TNodeIndex t) {
 
+	if (_n_nodes <= 0) return 0;
+	if (_nodes[t].unused == 1) return 0;
+
 	// UNUSED пуст, сделать первым элементом в unused-пространстве
 	if (_tree_unused == -1) {
 		_nodes[t].left = t;
@@ -961,7 +966,7 @@ int SBT_FreeNode(TNodeIndex t) {
 	// счетчика _n_unused нет
 	_n_nodes--; // условный счетчик (вспомогательный): эти вершины можно пересчитать в WORK-пространстве
 
-	return 0;
+	return 1;
 }
 
 // Найти самый близкий по значению элемент в "левом" поддереве, by Index
@@ -1017,6 +1022,23 @@ TNodeIndex SBT_FindNode_NearestAndLesser_ByValue(TNumber value) {
 
 TNodeIndex SBT_FindNode_NearestAndGreater_ByValue(TNumber value) {
 	return SBT_FindNode_NearestAndGreater_ByIndex(SBT_FindNode(value));
+}
+
+TNodeIndex SBT_FindNextUsedNode(TNodeIndex s) {
+	int f = 0;
+	long long int t = 0;
+	// ищем от указанной позиции
+	for(t = s; t <  SBT_MAX_NODES - _n_clean; t++)
+		if (_nodes[t].unused == 0) { f = 1; break; }
+
+	// если ещё не найдена использующаяся ячейка:
+	if (!f) {
+		// ищем от начала
+		for(t = 0; t <  s; t++)
+			if (_nodes[t].unused == 0) { f = 1; break; }
+	}
+	if (f) return t;
+	else return -1;
 }
 
 // INT64_MAX, если не можем найти элемент по индексу
