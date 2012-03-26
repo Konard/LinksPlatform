@@ -585,25 +585,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 // Удалить первую попавшуюся вершину по значению value
 
 int SBT_DeleteNode(TNumber value) {
-/*
-	printf("перед удалением (value = %lld)\n",
-		(long long int)value
-	);
-	SBT_PrintAllNodes();
-	SBT_CheckAllNodesBalance();
-*/
-	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
-//	SBT_Maintain_Simpler(t, 0);
-	SBT_MaintainAfterDelete(_tree_root);
 
-/*
-	printf("после удаления idx = %lld (value = %lld)\n",
-		(long long int)t,
-		(long long int)value
-	);
-	SBT_PrintAllNodes();
-	SBT_CheckAllNodesBalance();
-*/
+	TNodeIndex t = SBT_DeleteNode_At(value, _tree_root, -1);
+
 	return t;
 }
 
@@ -1004,9 +988,7 @@ TNodeIndex SBT_FindNextUsedNode(TNodeIndex s) {
 	long long int t = 0;
 	// ищем от указанной позиции
 	for(t = s; t < SBT_MAX_NODES - _n_clean; t++)
-		if (_nodes[t].unused == 0) { f = 1;
-		printf("%lld\n", (long long int)t);
-		break; }
+		if (_nodes[t].unused == 0) { f = 1; break; }
 
 	// если ещё не найдена использующаяся ячейка:
 	if (!f) {

@@ -30,13 +30,13 @@ int main(int argc, char **argv) {
 		TNodeIndex t = SBT_FindNextUsedNode(0);
 
 		TNumber v = GetValueByIndex(t);
-		printf("t = %lld, v = %lld\n", (long long int)t, (long long int)v);
+//		printf("t = %lld, v = %lld\n", (long long int)t, (long long int)v);
 
-		SBT_PrintAllNodes();
+//		SBT_PrintAllNodes();
 		if (t != -1)
 			SBT_DeleteNode(v); // вставка без отказов
-		else 
-		printf("[2]\n");
+//		else 
+//		printf("[2]\n");
 	}
 
 	// результат работы

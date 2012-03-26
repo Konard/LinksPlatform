@@ -12,10 +12,10 @@ int main() {
 	// седьмой пример
 	printf("добавление ...\n");
 	for (int i = 0; i < N; i++) {
-		SBT_AddNodeUniq(i);
+		SBT_AddNode(i);
 //		SBT_CheckAllNodesSize();
 	}
-	return 0;
+//	return 0;
 
 	printf("удаление ...\n");
 	for (int i = 0; i < N; i++) {
