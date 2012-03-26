@@ -434,8 +434,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 	TNodeIndex l = SBT_FindNode_NearestAndLesser_ByIndex(d); // d.left -> right
 	// l == -1, только если у t_d нет дочерних вершин слева (хотя бы одной, <= t_d),
 	// в таком случае - просто удаляем t_d (без перевешивания)
-//	printf("l = %lld\n", (long long int)l);
-//	printf("d_p = %lld\n", (long long int)d_p);
 	
 
 	// l != -1 (Diagram No.1)
@@ -444,9 +442,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		TNodeIndex l_p = _nodes[l].parent;
 		TNodeIndex l_l = _nodes[l].left; // l_r = l.right == -1
 		TNodeIndex d_r = _nodes[d].right;
-//		printf("l_p = %lld\n", (long long int)l_p);
-//		printf("l_l = %lld\n", (long long int)l_l);
-//		printf("d_r = %lld\n", (long long int)d_r);
 
 		// меняем правую часть l
 		_nodes[l].right = d_r;
@@ -480,28 +475,19 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 		TNodeIndex q;
 		if (l_p == d) q = l;
 		else q = l_p;
-
-//		printf("[l] q = %lld\n", (long long int)q);
 		while(q != -1) {
 			_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 			q = _nodes[q].parent;
 		}
-//		if (l_p == d) q = l;
-//		else q = l_p;
 
 
 		if (l_l != -1) q = l_l;
 		else q = l_p;
-
 		while(q != -1) {
 			//_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
-//			SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
 			SBT_Maintain(q);
 			q = _nodes[q].parent;
 		}
-//		SBT_Maintain_Simpler(l, 0);
-
-//		SBT_MaintainAfterDelete(l);
 
 		SBT_FreeNode(d);
 
@@ -509,7 +495,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 
 	else {
 		TNodeIndex r = SBT_FindNode_NearestAndGreater_ByIndex(d); // d.right -> left
-//		printf("r = %lld\n", (long long int)r);
 		// (Diagram No.3)
 		if (r == -1) {
 			// вершина d является листом
@@ -522,7 +507,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			// можно не делать: _nodes[d].parent = -1;
 			// больше ничего делать не надо
 			TNodeIndex q = d_p;
-//			printf("[-] q = %lld\n", (long long int)q);
 			while(q != -1) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
@@ -534,21 +518,17 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
-//			SBT_MaintainAfterDelete(d_p);
 			SBT_FreeNode(d);
 
 
 		}
 		// r != -1 (Diagram No.2)
 		else {
-//			printf("r = %lld\n", (long long int)r);
 			// меняем справа
 			TNodeIndex r_p = _nodes[r].parent;
 			TNodeIndex r_r = _nodes[r].right; // r_l = r.left == -1
 			TNodeIndex d_l = _nodes[d].left; // == -1 всегда?
-//			printf("r_p = %lld\n", (long long int)r_p);
-//			printf("r_r = %lld\n", (long long int)r_r);
-//			printf("d_l = %lld\n", (long long int)d_l);
+
 			// меняем левую часть r <-> d_l
 			_nodes[r].left = d_l;
 			if (d_l != -1) _nodes[d_l].parent = r;
@@ -580,31 +560,19 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			TNodeIndex q;
 			if (r_p == d) q = r;
 			else q = r_p;
-
-//			printf("[r] q = %lld\n", (long long int)q);
 			while(q != -1) {
 				_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
 				q = _nodes[q].parent;
 			}
 
 
-//			if (r_p == d) q = r;
-//			else q = r_p;
-
 			if (r_r != -1) q = r_r;
 			else q = r_p;
-
-//			SBT_Maintain_Simpler(q, 0);
-//			SBT_Maintain_Simpler(r, 0);
-
 			while(q != -1) {
-			//	_nodes[q].size =  SBT_Left_size(q) + SBT_Right_size(q) + 1;
-//				SBT_Maintain_Simpler(q, (value >= _nodes[q].value) ? 0 : 1);
 				SBT_Maintain(q);
 				q = _nodes[q].parent;
 			}
 
-//			SBT_MaintainAfterDelete(r);
 			SBT_FreeNode(d);
 
 		}
@@ -893,21 +861,10 @@ TNodeIndex GetRootIndex() {
 
 TNodeIndex SBT_AllocateNode() {
 
-	TNodeIndex t = -1; // нет ноды
-
-	// выделить из UNUSED-области (списка)
-	if (_tree_unused != -1) {
-		// вершины в списке есть
-		TNodeIndex t = _tree_unused; // берем из начала
-		_tree_unused = _nodes[t].right; // перемещаем указатель на следующий элемент списка
-		TNodeIndex last = _nodes[t].left;
-		// теперь first.right - первый элемент, на него ссылается last
-		_nodes[_tree_unused].left = t;
-		_nodes[last].right = _tree_unused;
-	}
+	TNodeIndex t = 0; // нет ноды
 
 	// выделить из CLEAN-области (чистые ячейки)
-	else {
+	if (_tree_unused == -1) {
 		if (_n_clean > 0) {
 			
 			t = SBT_MAX_NODES - _n_clean;
@@ -916,6 +873,23 @@ TNodeIndex SBT_AllocateNode() {
 		else {
 			t = -1; // память закончилась
 			return t;
+		}
+	}
+
+	// выделить из UNUSED-области (списка)
+	else {
+		// вершины в списке есть
+		TNodeIndex t = _tree_unused; // берем из начала
+		if (_nodes[t].right == t) {
+			// нет больше элементов
+			_tree_unused = -1;
+		}
+		else {
+			_tree_unused = _nodes[t].right; // перемещаем указатель на следующий элемент списка
+			TNodeIndex last = _nodes[t].left;
+			// теперь first.right - первый элемент, на него ссылается last
+			_nodes[_tree_unused].left = last;
+			_nodes[last].right = _tree_unused;
 		}
 	}
 
@@ -938,8 +912,9 @@ TNodeIndex SBT_AllocateNode() {
 
 int SBT_FreeNode(TNodeIndex t) {
 
-	if (_n_nodes <= 0) return 0;
-	if (_nodes[t].unused == 1) return 0;
+	if (_n_nodes <= 0) return 0; // нечего удалять, >0 нам нужно
+	if (t < 0) return 0;
+	if (_nodes[t].unused == 1) return 0; // уже удалено
 
 	// UNUSED пуст, сделать первым элементом в unused-пространстве
 	if (_tree_unused == -1) {
@@ -1028,13 +1003,15 @@ TNodeIndex SBT_FindNextUsedNode(TNodeIndex s) {
 	int f = 0;
 	long long int t = 0;
 	// ищем от указанной позиции
-	for(t = s; t <  SBT_MAX_NODES - _n_clean; t++)
-		if (_nodes[t].unused == 0) { f = 1; break; }
+	for(t = s; t < SBT_MAX_NODES - _n_clean; t++)
+		if (_nodes[t].unused == 0) { f = 1;
+		printf("%lld\n", (long long int)t);
+		break; }
 
 	// если ещё не найдена использующаяся ячейка:
 	if (!f) {
 		// ищем от начала
-		for(t = 0; t <  s; t++)
+		for(t = 0; t < s; t++)
 			if (_nodes[t].unused == 0) { f = 1; break; }
 	}
 	if (f) return t;
