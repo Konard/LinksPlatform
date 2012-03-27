@@ -46,47 +46,39 @@ int SBT_SetCallback_OnFind(FuncOnFind func_) {
 
 int SBT_LeftRotate(TNodeIndex t) {
 
-	if (t < 0) return 0;
-	TNodeIndex k = _nodes[t].right;
-	if (k < 0) return 0;
-	if (funcOnRotate != NULL) funcOnRotate(k, t, "LEFT_ROTATE");
+        if (t < 0) return 0;
+        TNodeIndex k = _nodes[t].right;
+        if (k < 0) return 0;
+        TNodeIndex p = _nodes[t].parent;
+//	if (funcOnRotate != NULL) funcOnRotate(k, t, "LEFT_ROTATE");
 
-	TNodeIndex p = _nodes[t].parent;
+        // поворачиваем ребро дерева
+        _nodes[t].right = _nodes[k].left;
+        _nodes[k].left = t;
 
-	// поворачиваем ребро дерева
-	_nodes[t].right = _nodes[k].left;
-	_nodes[k].left = t;
+        // корректируем size
+        _nodes[k].size = _nodes[t].size;
+        TNodeIndex n_l = _nodes[t].left;
+        TNodeIndex n_r = _nodes[t].right; // для ускорения — выборку из кэша
+        TNodeSize s_l = ((n_l != -1) ? _nodes[n_l].size : 0);
+        TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
+        _nodes[t].size = s_l + s_r + 1;
 
-	// корректируем size
-	_nodes[k].size = _nodes[t].size;
-	TNodeIndex n_l = _nodes[t].left;
-	TNodeIndex n_r = _nodes[t].right;
-	TNodeSize s_l = ((n_l != -1) ? _nodes[n_l].size : 0);
-	TNodeSize s_r = ((n_r != -1) ? _nodes[n_r].size : 0);
-	_nodes[t].size = s_l + s_r + 1;
+        // меняем трёх предков
+        // 1. t.right.parent = t
+        // 2. k.parent = t.parent
+        // 3. t.parent = k
+        if (_nodes[t].right != -1) _nodes[_nodes[t].right].parent = t; // из кэша
+        _nodes[k].parent = p;
+        _nodes[t].parent = k;
 
-	// меняем трёх предков
-	// 1. t.right.parent = t
-	// 2. k.parent = t.parent
-	// 3. t.parent = k
-	if (_nodes[t].right != -1) _nodes[_nodes[t].right].parent = t;
-	_nodes[k].parent = _nodes[t].parent;
-	_nodes[t].parent = k;
-
-	// меняем корень, parent -> t, k
-	if (p == -1) { // это root
-		_tree_root = k;
-	}
-	else {
-		if (_nodes[p].left == t) {
-			_nodes[p].left = k;
-		}
-		else
-		if (_nodes[p].right == t) { // вторую проверку можно не делать
-			_nodes[p].right = k;
-		}
-	}
-	return 0;
+        // меняем корень, parent -> t, k
+        if (p == -1) _tree_root = k; // это root
+        else {
+                if (_nodes[p].left == t) _nodes[p].left = k;
+                else _nodes[p].right = k; // вторую проверку можно не делать
+        }
+        return 1;
 }
 
 // Вращение вправо, t - справа, перевешиваем туда (вершины не пропадают, _n_nodes сохраняет значение)
@@ -96,9 +88,8 @@ int SBT_RightRotate(TNodeIndex t) {
 	if (t < 0) return 0;
 	TNodeIndex k = _nodes[t].left;
 	if (k < 0) return 0;
-	if (funcOnRotate != NULL) funcOnRotate(k, t, "RIGHT_ROTATE");
-
 	TNodeIndex p = _nodes[t].parent;
+//	if (funcOnRotate != NULL) funcOnRotate(k, t, "RIGHT_ROTATE");
 
 	// поворачиваем ребро дерева
 	_nodes[t].left = _nodes[k].right;
@@ -117,23 +108,16 @@ int SBT_RightRotate(TNodeIndex t) {
 	// 2. k.parent = t.parent
 	// 3. t.parent = k
 	if (_nodes[t].left != -1) _nodes[_nodes[t].left].parent = t;
-	_nodes[k].parent = _nodes[t].parent;
+	_nodes[k].parent = p;
 	_nodes[t].parent = k;
 
 	// меняем корень, parent -> t, k
-	if (p == -1) { // это root
-		_tree_root = k;
-	}
+	if (p == -1) _tree_root = k; // это root
 	else {
-		if (_nodes[p].left == t) {
-			_nodes[p].left = k;
-		}
-		else
-		if (_nodes[p].right == t) { // вторую проверку можно не делать
-			_nodes[p].right = k;
-		}
+		if (_nodes[p].left == t) _nodes[p].left = k;
+		else _nodes[p].right = k; // вторую проверку можно не делать
 	}
-	return 0;
+	return 1;
 }
 
 // Размеры для вершин, size
