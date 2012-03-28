@@ -274,64 +274,6 @@ int SBT_Maintain(TNodeIndex t) {
 	return 0;
 }
 
-// Сбалансировать дерево после удаления вершины ("тупой" алгоритм)
-
-int SBT_MaintainAfterDelete(TNodeIndex t) {
-
-	if (t < 0) return 0;
-
-	TNodeIndex parent = _nodes[t].parent; // есть "родитель"
-	int at_left = 0;
-	if (parent == -1) { // t - корень дерева, он изменяется; запоминать нужно не индекс, а "топологию"
-	}
-	else {
-	    if (_nodes[parent].left == t) at_left = 1; // "слева" от родителя - индекс родителя не изменился
-	    else at_left = 0; // "справа" от родителя
-	}
-
-#define CALC_T0 \
-	TNodeIndex t0 = -1; \
-	if (parent == -1) t0 = _tree_root; \
-	else { \
-	    if (at_left) t0 = _nodes[parent].left; \
-	    else t0 = _nodes[parent].right; \
-	}
-
-	// поместили слева (?)
-	if (SBT_Left_Left_size(t) > SBT_Right_size(t)) {
-		SBT_RightRotate(t);
-		CALC_T0
-		SBT_Maintain(_nodes[t0].right);
-		SBT_Maintain(t0);
-	}
-	else if (SBT_Left_Right_size(t) > SBT_Right_size(t)) {
-		SBT_LeftRotate(_nodes[t].left);
-		SBT_RightRotate(t);
-		CALC_T0
-		SBT_Maintain(_nodes[t0].left);
-		SBT_Maintain(_nodes[t0].right);
-		SBT_Maintain(t0);
-	}
-	// поместили справа (?)
-	else if (SBT_Right_Right_size(t) > SBT_Left_size(t)) {
-		SBT_LeftRotate(t);
-		CALC_T0
-		SBT_Maintain(_nodes[t0].left);
-		SBT_Maintain(t0);
-	}
-	else if (SBT_Right_Left_size(t) > SBT_Left_size(t)) {
-		SBT_RightRotate(_nodes[t].right);
-		SBT_LeftRotate(t);
-		CALC_T0
-		SBT_Maintain(_nodes[t0].left);
-		SBT_Maintain(_nodes[t0].right);
-		SBT_Maintain(t0);
-	}
-
-	return 0;
-}
-
-
 // Добавить вершину в поддерево t, без проверки уникальности (куда - t, родительская - parent)
 
 int SBT_AddNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
@@ -473,7 +415,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			q = _nodes[q].parent;
 		}
 
-		SBT_FreeNode(d);
 
 	}
 
@@ -501,8 +442,6 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				SBT_Maintain(q);
 				q = _nodes[q].parent;
 			}
-
-			SBT_FreeNode(d);
 
 
 		}
@@ -557,10 +496,9 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
-			SBT_FreeNode(d);
-
 		}
 	}
+	SBT_FreeNode(d);
 
 	return d;
 }
