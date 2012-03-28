@@ -415,6 +415,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 			q = _nodes[q].parent;
 		}
 
+		SBT_FreeNode(d);
 
 	}
 
@@ -443,6 +444,7 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
+			SBT_FreeNode(d);
 
 		}
 		// r != -1 (Diagram No.2)
@@ -496,9 +498,10 @@ int SBT_DeleteNode_At(TNumber value, TNodeIndex t, TNodeIndex parent) {
 				q = _nodes[q].parent;
 			}
 
+			SBT_FreeNode(d);
+
 		}
 	}
-	SBT_FreeNode(d);
 
 	return d;
 }
