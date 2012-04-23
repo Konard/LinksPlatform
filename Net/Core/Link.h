@@ -37,33 +37,34 @@ extern "C" {
 // see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 #if defined(_WIN32)
 #if defined(LINKS_DLL)
-#define PREFIX_DLL __stdcall __declspec(dllexport)
+#define PREFIX_DLL __declspec(dllexport)
 #else
-#define PREFIX_DLL __stdcall __declspec(dllimport)
+#define PREFIX_DLL __declspec(dllimport)
 #endif
 // Linux,Unix
 #else
 #define PREFIX_DLL 
 #endif
 
-Link* PREFIX_DLL CreateLink(Link* source, Link* linker, Link* target);
-Link* PREFIX_DLL UpdateLink(Link* link, Link* source, Link* linker, Link* target);
-void  PREFIX_DLL DeleteLink(Link* link);
-Link* PREFIX_DLL ReplaceLink(Link* link, Link* replacement);
-Link* PREFIX_DLL SearchLink(Link* source, Link* linker, Link* target);
+PREFIX_DLL Link* CreateLink(Link* source, Link* linker, Link* target);
+//Link* PREFIX_DLL CreateLink(Link* source, Link* linker, Link* target);
+PREFIX_DLL Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target);
+PREFIX_DLL void  DeleteLink(Link* link);
+PREFIX_DLL Link* ReplaceLink(Link* link, Link* replacement);
+PREFIX_DLL Link* SearchLink(Link* source, Link* linker, Link* target);
 
-uint64_t PREFIX_DLL GetLinkNumberOfReferersBySource(Link *link);
-uint64_t PREFIX_DLL GetLinkNumberOfReferersByLinker(Link *link);
-uint64_t PREFIX_DLL GetLinkNumberOfReferersByTarget(Link *link);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersBySource(Link *link);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersByLinker(Link *link);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersByTarget(Link *link);
 
-void PREFIX_DLL WalkThroughAllReferersBySource(Link* root, action);
-int PREFIX_DLL WalkThroughReferersBySource(Link* root, func);
+PREFIX_DLL void WalkThroughAllReferersBySource(Link* root, action);
+PREFIX_DLL int WalkThroughReferersBySource(Link* root, func);
 
-void PREFIX_DLL WalkThroughAllReferersByLinker(Link* root, action);
-int PREFIX_DLL WalkThroughReferersByLinker(Link* root, func);
+PREFIX_DLL void WalkThroughAllReferersByLinker(Link* root, action);
+PREFIX_DLL int WalkThroughReferersByLinker(Link* root, func);
 
-void PREFIX_DLL WalkThroughAllReferersByTarget(Link* root, action);
-int PREFIX_DLL WalkThroughReferersByTarget(Link* root, func);
+PREFIX_DLL void WalkThroughAllReferersByTarget(Link* root, action);
+PREFIX_DLL int WalkThroughReferersByTarget(Link* root, func);
 
 // not exported
 

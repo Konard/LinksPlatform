@@ -8,9 +8,9 @@ extern "C" {
 // see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 #if defined(_WIN32)
 #if defined(LINKS_DLL)
-#define PREFIX_DLL __stdcall __declspec(dllexport)
+#define PREFIX_DLL __declspec(dllexport)
 #else
-#define PREFIX_DLL __stdcall __declspec(dllimport)
+#define PREFIX_DLL __declspec(dllimport)
 #endif
 // Linux,Unix
 #else
@@ -18,10 +18,11 @@ extern "C" {
 #endif
 
 
-#if defined(_MFC_VER)
+#if defined(_MSC_VER)
 #elif defined(__GNUC__)
 #endif
 
+//void InitPersistentMemoryManager();
 PREFIX_DLL void InitPersistentMemoryManager();
 PREFIX_DLL int OpenStorageFile(char *filename);
 PREFIX_DLL int CloseStorageFile();

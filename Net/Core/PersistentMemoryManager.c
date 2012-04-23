@@ -1,4 +1,4 @@
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <windows.h>
 #elif defined(__GNUC__)
 
@@ -226,14 +226,14 @@ int SetStorageFileMemoryMapping()
 	}
 #endif
 
-	pointerToBaseLinksMaxSize = (int*)(pointerToMappedRegion + 8 + 4);
-	pointerToPointerToBaseLinks = (Link**)(pointerToMappedRegion + 8 + 4 + 4);
+	pointerToBaseLinksMaxSize = (int*)((unsigned char *)pointerToMappedRegion + 8 + 4);
+	pointerToPointerToBaseLinks = (Link**)((unsigned char *)pointerToMappedRegion + 8 + 4 + 4);
 
-	pointerToLinksMaxSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes);
-	pointerToLinksSize = (uint64_t *)(pointerToMappedRegion + serviceBlockSizeInBytes + 8);
+	pointerToLinksMaxSize = (uint64_t *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes);
+	pointerToLinksSize = (uint64_t *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	pointerToUnusedMarker = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
-	pointerToLinks = (Link*)(pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+	pointerToUnusedMarker = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	pointerToLinks = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
 	printf("pointerToBaseLinksMaxSize = %d\n", *pointerToBaseLinksMaxSize);
 	printf("pointerToLinksMaxSize = %llu\n",

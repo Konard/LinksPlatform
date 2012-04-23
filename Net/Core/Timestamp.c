@@ -7,7 +7,7 @@ int64_t LastTimestamp = 0;
 
 // Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__MINGW32__)
 #include <windows.h>
 
 int64_t GetTimestamp()
@@ -21,7 +21,7 @@ int64_t GetTimestamp()
 	GetSystemTimeAsFileTime(&fileTime);
 
 	{
-		int64_t = (((int64_t) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
+		int64_t time = (((int64_t) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
 
 		if (time <= LastTimestamp)
 			return ++LastTimestamp;
