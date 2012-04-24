@@ -11,7 +11,7 @@
 // see http://stackoverflow.com/questions/163058/how-can-i-detect-if-im-compiling-for-a-64bits-architecture-in-c
 #if defined(_LP64) || defined(__amd64__) || defined(_M_X64)
 #else
-#warning "Links platform needs 64-bit CPU architecture."
+//#warning "Links platform needs 64-bit CPU architecture."
 #endif
 
 #define null 0
