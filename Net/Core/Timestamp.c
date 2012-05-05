@@ -37,7 +37,7 @@ int64_t GetTimestamp()
 
 // для линукса: получения ./.o/.so:
 
-#elif defined(__GLIBC__)
+#elif defined(__linux__)
 
 #include <stdint.h>
 #include <time.h>

@@ -1,9 +1,8 @@
+
 // Менеджер памяти (memory manager).
 
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
-
 #include <windows.h>
-
 #elif defined(__linux__)
 
 // for 64-bit files
@@ -28,7 +27,7 @@
 #include "PersistentMemoryManager.h"
 
 // Дескриптор файла базы данных и дескриптор объекта отображения (map)
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 HANDLE			storageFileHandle;
 HANDLE			storageFileMappingHandle;
 #elif defined(__linux__)
@@ -61,7 +60,7 @@ Link*				pointerToLinks;		// здесь хранятся линки, иници�
 
 void PrintLinksTableSize()
 {
-#if defined(_MFC_VER)
+#if defined(_MSC_VER)
 	printf("Links table size: %I64d links, %I64d bytes.\n",
           *pointerToLinksSize,
           *pointerToLinksSize * sizeof(Link));
@@ -75,7 +74,7 @@ void PrintLinksTableSize()
 void InitPersistentMemoryManager()
 {
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 
 /* 
 typedef struct _SYSTEM_INFO {
@@ -120,7 +119,7 @@ typedef struct _SYSTEM_INFO {
 	printf("storageFileMinSizeInBytes = %llu\n",
 	       (long long unsigned int)storageFileMinSizeInBytes);
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	storageFileHandle = INVALID_HANDLE_VALUE;
 #elif defined(__linux__)
 	storageFileHandle = -1;
@@ -133,7 +132,7 @@ int OpenStorageFile(char *filename)
 {
 	printf("Opening file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	// см. MSDN "CreateFile function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v=vs.85%29.aspx
 	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
@@ -196,7 +195,7 @@ int SetStorageFileMemoryMapping()
 {
 	printf("Setting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	// см. MSDN "CreateFileMapping function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366537%28v=vs.85%29.aspx
 	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
 	if (storageFileMappingHandle == NULL)
@@ -288,7 +287,7 @@ int CloseStorageFile()
 	// При освобождении лишнего места, можно уменьшать размер файла, для этого используется функция SetEndOfFile(fh); 
 	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
 	{
 		// убрал принудительный выход, так как даже в случае неправильного дескриптора, его можно попытаться закрыть
@@ -319,7 +318,7 @@ int CloseStorageFile()
 
 unsigned long EnlargeStorageFile()
 {
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
 #elif defined(__linux__)
 	if (storageFileHandle == -1)
@@ -351,7 +350,7 @@ unsigned long EnlargeStorageFile()
 
 unsigned long ShrinkStorageFile()
 {
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
 #elif defined(__linux__)
 	if (storageFileHandle == -1)
@@ -373,7 +372,7 @@ unsigned long ShrinkStorageFile()
 			if(error != 0)
 				return error;
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 			{
 				LARGE_INTEGER distanceToMoveFilePointer;
 				distanceToMoveFilePointer.QuadPart = -((long long)baseBlockSizeInBytes);
@@ -402,7 +401,7 @@ unsigned long ResetStorageFileMemoryMapping()
 {
 	printf("Resetting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
 #elif defined(__linux__)
 	if (storageFileHandle == -1)
@@ -415,7 +414,7 @@ unsigned long ResetStorageFileMemoryMapping()
 
 	PrintLinksTableSize();
 
-#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	UnmapViewOfFile (pointerToMappedRegion);
 	CloseHandle(storageFileMappingHandle);
 	storageFileMappingHandle = INVALID_HANDLE_VALUE;

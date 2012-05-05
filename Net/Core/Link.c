@@ -7,13 +7,13 @@
 #include "PersistentMemoryManager.h"
 
 //#ifdef _WIN32
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #ifdef LINKS_DLL_EXPORT
 #define _H __stdcall
 #else
 #define _H 
 #endif
-#else
+#elif defined(__linux__)
 #define _H 
 #endif
 

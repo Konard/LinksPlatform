@@ -34,13 +34,13 @@ extern "C" {
 
 // see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
 //#if defined(_WIN32)
-#if defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #if defined(LINKS_DLL_EXPORT)
 #define PREFIX_DLL __declspec(dllexport)
 #else
 #define PREFIX_DLL __declspec(dllimport)
 #endif
-#else
+#elif defined(__linux__)
 // Linux,Unix
 #define PREFIX_DLL 
 #endif

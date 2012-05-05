@@ -18,7 +18,7 @@ extern "C" {
 #else
 #define PREFIX_DLL __declspec(dllimport)
 #endif
-#elif defined(__GLIBC__)
+#elif defined(__linux__)
 // for Linux,Unix?
 #define PREFIX_DLL 
 #endif
