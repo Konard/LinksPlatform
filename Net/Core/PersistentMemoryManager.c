@@ -1,66 +1,71 @@
-#if defined(_MFC_VER) || defined(__MINGW32__)
+// Менеджер памяти (memory manager).
+
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+
 #include <windows.h>
 
-// подключение необходимых заголовочных файлов для Linux
-#elif defined(__GNUC__)
-// for 64-bit files -- работать с большими файлами
+#elif defined(__linux__)
+
+// for 64-bit files
 #define _XOPEN_SOURCE 700
 #include <unistd.h>
-// open() -- открыть файл базы данных
+
+// open()
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-// errno -- откуда брать коды ошибок
+// errno
 #include <errno.h>
-// mmap()... -- само собой разумеется
+// mmap()...
 #include <sys/mman.h>
-// NULL -- вместо неправильного, null
-#include <malloc.h>
+
 #endif
 
 #include <stdio.h>
+
 #include "Common.h"
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-// Дескриптор файла базы данных и дескриптор объекта отображения (mmap)
-#if defined(_MFC_VER) || defined(__MINGW32__)
-HANDLE		storageFileHandle;
-HANDLE		storageFileMappingHandle;
-#elif defined(__GNUC__)
+// Дескриптор файла базы данных и дескриптор объекта отображения (map)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+HANDLE			storageFileHandle;
+HANDLE			storageFileMappingHandle;
+#elif defined(__linux__)
 int			storageFileHandle; // для open()
-// для mmap() под Linux дескриптор не используется, достаточно адреса + размера области
 #endif
-uint64_t	storageFileSizeInBytes; // <- off_t
+uint64_t		storageFileSizeInBytes; // <- off_t
 
 
 // Константы, рассчитываемые при запуске приложения
 int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
 int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
-int			baseLinksSizeInBytes;
-uint64_t	baseBlockSizeInBytes;		// Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-uint64_t	storageFileMinSizeInBytes;
+int			baseLinksSizeInBytes;	
+uint64_t		baseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t		storageFileMinSizeInBytes;
 
-void*		pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
+void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
 
-uint32_t*	pointerToBaseLinksMaxSize;
-uint64_t*	pointerToBaseLinks;			// инициализируется в SetStorageFileMemoryMapping()
-
-uint64_t*	pointerToLinksMaxSize;
-uint64_t*	pointerToLinksSize;
+int*				pointerToMappingLinksMaxSize;
+Link**			pointerToPointerToMappingLinks;	// инициализируется в SetStorageFileMemoryMapping()
+uint64_t*			pointerToLinksMaxSize;
+uint64_t*			pointerToLinksSize;
 
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*		pointerToUnusedMarker;		// инициализируется в SetStorageFileMemoryMapping()
-Link*		pointerToLinks;				// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
+Link*				pointerToUnusedMarker;	// инициализируется в SetStorageFileMemoryMapping()
+Link*				pointerToLinks;		// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
+
 
 
 /***  Работа с памятью  ***/
 
 void PrintLinksTableSize()
 {
-#if defined(_MFC_VER) || defined(__MINGW32__)
-	printf("Links table size: %I64d links, %I64d bytes.\n", *pointerToLinksSize, *pointerToLinksSize * sizeof(Link));
-#elif defined(__GNUC__)
+#if defined(_MFC_VER)
+	printf("Links table size: %I64d links, %I64d bytes.\n",
+          *pointerToLinksSize,
+          *pointerToLinksSize * sizeof(Link));
+#elif defined(__MINGW32__) || defined(__MINGW64__) || defined(__linux__)
 	printf("Links table size: %llu links, %llu bytes.\n",
 	  (long long unsigned int)(*pointerToLinksSize),
 	  (long long unsigned int)(*pointerToLinksSize * sizeof(Link)));
@@ -70,7 +75,7 @@ void PrintLinksTableSize()
 void InitPersistentMemoryManager()
 {
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 
 /* 
 typedef struct _SYSTEM_INFO {
@@ -98,7 +103,7 @@ typedef struct _SYSTEM_INFO {
 	currentMemoryPageSizeInBytes = info.dwPageSize;
 	serviceBlockSizeInBytes = info.dwPageSize * 2;
 
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 
 	long sz = sysconf(_SC_PAGESIZE);
 	currentMemoryPageSizeInBytes = sz; // ? привести к одному типу
@@ -107,7 +112,7 @@ typedef struct _SYSTEM_INFO {
 
 #endif
 
-	baseLinksSizeInBytes = serviceBlockSizeInBytes - 12; // ??? Почему так
+	baseLinksSizeInBytes = serviceBlockSizeInBytes - 12;
 	baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 
 	storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
@@ -115,9 +120,9 @@ typedef struct _SYSTEM_INFO {
 	printf("storageFileMinSizeInBytes = %llu\n",
 	       (long long unsigned int)storageFileMinSizeInBytes);
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	storageFileHandle = INVALID_HANDLE_VALUE;
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	storageFileHandle = -1;
 #endif
 	return;
@@ -128,9 +133,9 @@ int OpenStorageFile(char *filename)
 {
 	printf("Opening file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	// см. MSDN "CreateFile function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v=vs.85%29.aspx
-	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, NULL, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+	storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
 	{
 		// см. MSDN "GetLastError function", http://msdn.microsoft.com/en-us/library/windows/desktop/ms679360%28v=vs.85%29.aspx
@@ -139,6 +144,9 @@ int OpenStorageFile(char *filename)
 		return error;
 	}
 	// см. MSDN "GetFileSize function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa364955%28v=vs.85%29.aspx
+        // не знаю, как поправить здесь:
+        // warning: dereferencing type-punned pointer will break strict-aliasing rules
+
 	*((LPDWORD)&storageFileSizeInBytes) = GetFileSize(storageFileHandle, (LPDWORD)&storageFileSizeInBytes + 1);
 	if (storageFileSizeInBytes == INVALID_FILE_SIZE)
 	{
@@ -147,7 +155,7 @@ int OpenStorageFile(char *filename)
 		return error;
 	}
 
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	storageFileHandle = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	if (storageFileHandle == -1) {
 		int error = errno;
@@ -167,7 +175,7 @@ int OpenStorageFile(char *filename)
 
 	// по-крайней мере - минимальный блок для линков + сервисный блок
 	if (storageFileSizeInBytes < storageFileMinSizeInBytes) {
-		printf("enlarge storage file ...\n");
+		printf("enlarge\n");
 		storageFileSizeInBytes = storageFileMinSizeInBytes;
 	}
 
@@ -188,7 +196,7 @@ int SetStorageFileMemoryMapping()
 {
 	printf("Setting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	// см. MSDN "CreateFileMapping function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366537%28v=vs.85%29.aspx
 	storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
 	if (storageFileMappingHandle == NULL)
@@ -209,7 +217,7 @@ int SetStorageFileMemoryMapping()
 		printf("Mapping view set failed. Error code: %lu.\n\n", error);
 		return error;
 	}
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	// см. также под Linux, MAP_POPULATE
 	// см. также mmap64() (size_t?)
 	ftruncate(storageFileHandle, storageFileSizeInBytes);
@@ -226,18 +234,16 @@ int SetStorageFileMemoryMapping()
 	}
 #endif
 
-	// pointer to bytes
-	pointerToBaseLinksMaxSize = (uint32_t*)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t));
-	pointerToBaseLinks = (uint64_t *)((char *)pointerToMappedRegion + sizeof(uint64_t) + sizeof(uint32_t) + sizeof(uint32_t)); // ??? правильное понимание этого указателя?
+	pointerToMappingLinksMaxSize = (int*)((unsigned char *)pointerToMappedRegion + 8 + 4);
+	pointerToPointerToMappingLinks = (Link**)((unsigned char *)pointerToMappedRegion + 8 + 4 + 4);
 
-	pointerToLinksMaxSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes);
-	pointerToLinksSize = (uint64_t *)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(uint64_t));
+	pointerToLinksMaxSize = (uint64_t *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes);
+	pointerToLinksSize = (uint64_t *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 8);
 	/* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-	pointerToUnusedMarker = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
-	pointerToLinks = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link)); // чтобы Links[0] == UnusedMarker
-//	pointerToLinks = (Link*)((char *)pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+	pointerToUnusedMarker = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
+	pointerToLinks = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
 
-	printf("pointerToBaseLinksMaxSize = %d\n", *pointerToBaseLinksMaxSize);
+	printf("pointerToMappingLinksMaxSize = %d\n", *pointerToMappingLinksMaxSize);
 	printf("pointerToLinksMaxSize = %llu\n",
 	       (long long unsigned int)*pointerToLinksMaxSize);
 	printf("pointerToLinksSize = %llu\n",
@@ -246,16 +252,17 @@ int SetStorageFileMemoryMapping()
 
 	// Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
 
-	if (*pointerToBaseLinksMaxSize == 0)
-		*pointerToBaseLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ??? выяснить - почему так
 
-	// Links == UnusedMarker
+
+	if (*pointerToMappingLinksMaxSize == 0)
+		*pointerToMappingLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ? почему так
+
 	if (*pointerToLinksMaxSize == 0)
-		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link);
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 		// <- число линков, после Marker, объем "памяти" (в линках)
 	// если переменная установлена неправильно, исправляем
-	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link))
-		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - sizeof(Link)) / sizeof(Link);
+	else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
+		*pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
 
 	// число линков почему-то превышает заданный размер (может быть, реакция должна быть не такой?)
 	if (*pointerToLinksSize > *pointerToLinksMaxSize)
@@ -281,7 +288,7 @@ int CloseStorageFile()
 	// При освобождении лишнего места, можно уменьшать размер файла, для этого используется функция SetEndOfFile(fh); 
 	// По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла	SetFileValidData(fh,newFileLen); 
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
 	{
 		// убрал принудительный выход, так как даже в случае неправильного дескриптора, его можно попытаться закрыть
@@ -293,7 +300,7 @@ int CloseStorageFile()
 	CloseHandle(storageFileHandle);
 	storageFileHandle = INVALID_HANDLE_VALUE;
 	storageFileSizeInBytes = 0;
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	if (storageFileHandle == -1)
 	{
 		printf("Storage file is not open or already closed.\n\n");
@@ -312,9 +319,9 @@ int CloseStorageFile()
 
 unsigned long EnlargeStorageFile()
 {
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	if (storageFileHandle == -1)
 #endif
 	{
@@ -344,9 +351,9 @@ unsigned long EnlargeStorageFile()
 
 unsigned long ShrinkStorageFile()
 {
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	if (storageFileHandle == -1)
 #endif
 	{
@@ -366,7 +373,7 @@ unsigned long ShrinkStorageFile()
 			if(error != 0)
 				return error;
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 			{
 				LARGE_INTEGER distanceToMoveFilePointer;
 				distanceToMoveFilePointer.QuadPart = -((long long)baseBlockSizeInBytes);
@@ -376,7 +383,7 @@ unsigned long ShrinkStorageFile()
 				SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END);
 				SetEndOfFile(storageFileHandle);
 			}
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 				storageFileSizeInBytes -= baseBlockSizeInBytes;
 #endif
 
@@ -395,9 +402,9 @@ unsigned long ResetStorageFileMemoryMapping()
 {
 	printf("Resetting memory mapping of storage file...\n");
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	if (storageFileHandle == -1)
 #endif
 	{
@@ -408,13 +415,13 @@ unsigned long ResetStorageFileMemoryMapping()
 
 	PrintLinksTableSize();
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+#if defined(_MFC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 	UnmapViewOfFile (pointerToMappedRegion);
 	CloseHandle(storageFileMappingHandle);
 	storageFileMappingHandle = INVALID_HANDLE_VALUE;
-#elif defined(__GNUC__)
+#elif defined(__linux__)
 	munmap(pointerToMappedRegion, storageFileSizeInBytes);
-//	storageFileHandle = -1; // некорректно так делать, а дескриптора для mmapped region нету
+//	storageFileHandle = -1; // некорректно так делать
 #endif
 
 	printf("Memory mapping of storage file is reset.\n\n");
@@ -424,53 +431,58 @@ unsigned long ResetStorageFileMemoryMapping()
 
 /***  Работа с линками  ***/
 
+/*
 uint64_t AllocateFromUnusedLinks()
 {
-	uint64_t unusedLinkIndex = GetByLinkerIndex(LINK_0); // ??? правильно?
-	DetachLinkFromUnusedMarker(unusedLinkIndex); // переименовали функцию, pointerToUnusedMarker уже не передаём
+	uint64_t unusedLinkIndex = pointerToUnusedMarker->ByLinkerIndex;
+	DetachLinkFromMarker(unusedLinkIndex, pointerToUnusedMarker);
 	return unusedLinkIndex;
 }
 
 // пока что программа - однопоточная, не надо использовать mutex'и
 uint64_t AllocateFromFreeLinks()
 {
-	if (*pointerToLinksMaxSize <= *pointerToLinksSize) // более корректно: <=, чем ==
+	uint64_t freeLinkIndex;
+
+	if (*pointerToLinksMaxSize == *pointerToLinksSize)
 		EnlargeStorageFile();
-	uint64_t freeLinkIndex = (*pointerToLinksSize); // первый свободный элемент в таблице
-	++(*pointerToLinksSize);
-	return freeLinkIndex; // после return - увеличиваем
+
+	freeLink = pointerToLinks + *pointerToLinksSize;
+	++*pointerToLinksSize;
+	return freeLinkIndex;
 }
 
 uint64_t AllocateLink()
 {
-	if (GetByLinkerIndex(LINK_0) != LINK_0) // ??? корректно ли
+	if (pointerToUnusedMarker->ByLinkerIndex != null)
 		return AllocateFromUnusedLinks();
 	else
 		return AllocateFromFreeLinks();	
+	return null;
 }
 
 void FreeLink(uint64_t linkIndex)
 {
 	DetachLink(linkIndex);
 
-    while (GetBySourceIndex(linkIndex) != LINK_0) FreeLink(GetBySourceIndex(linkIndex));
-    while (GetByLinkerIndex(linkIndex) != LINK_0) FreeLink(GetByLinkerIndex(linkIndex));
-    while (GetByTargetIndex(linkIndex) != LINK_0) FreeLink(GetByTargetIndex(linkIndex));
+    while (link->FirstRefererBySource != null) FreeLink(link->FirstRefererBySource);
+    while (link->FirstRefererByLinker != null) FreeLink(link->FirstRefererByLinker);
+    while (link->FirstRefererByTarget != null) FreeLink(link->FirstRefererByTarget);
 
 	{
-		uint64_t lastUsedLinkIndex = *pointerToLinksSize - 1; // pointerToLinks и так смещается на -1, поэтому -1 убираем
+		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
 
-		if (linkIndex < lastUsedLinkIndex)
+		if (link < lastUsedLink)
 		{
-			AttachLinkToUnusedMarker(linkIndex); // убран указатель на Marker, так как функция принимала только такой аргумент (второй)
+			AttachLinkToMarker(link, pointerToUnusedMarker);
 		}
-		else if(linkIndex == lastUsedLinkIndex)
+		else if(link == lastUsedLink)
 		{
 			--*pointerToLinksSize;
 
-			while(GetLinkerIndex(--lastUsedLinkIndex) == LINK_0) // ?
+			while((--lastUsedLink)->Linker == pointerToUnusedMarker)
 			{
-				DetachLinkFromUnusedMarker(lastUsedLinkIndex);
+				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
 				--*pointerToLinksSize;
 			}
 
@@ -481,141 +493,53 @@ void FreeLink(uint64_t linkIndex)
 
 void WalkThroughAllLinks(func func_)
 {
-	uint64_t currentLinkIndex = LINK_0; // ??? правильный ли старт
-	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize - 1;
+	Link *currentLink = pointerToLinks;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (GetLinkerIndex(currentLinkIndex) != LINK_0) // ? корректна ли замена
+		if (currentLink->Linker != pointerToUnusedMarker)
 		{
-			func_(currentLinkIndex);
+			func_(currentLink);
 		}
 	}
-	while(++currentLinkIndex <= lastLinkIndex);
+	while(++currentLink <= lastLink);
 }
 
 int WalkThroughLinks(func func_)
 {
-	uint64_t currentLinkIndex = LINK_0; // ??? правильный ли старт
-	uint64_t lastLinkIndex = LINK_0 + *pointerToLinksSize - 1;
+	Link *currentLink = pointerToLinks;
+	Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
 	do
 	{
-		if (GetLinkerIndex(currentLinkIndex) != LINK_0) // ?
+		if (currentLink->Linker != pointerToUnusedMarker)
 		{
-			if(!func_(currentLinkIndex)) return false;
+			if(!func_(currentLink)) return false;
 		}
 	}
-	while(++currentLinkIndex <= lastLinkIndex);
+	while(++currentLink <= lastLink);
 	
 	return true;
 }
 
-
-// работа с базовыми линками
-uint64_t GetBaseLink(uint32_t index)
+// работа с опорными (базовыми) связями; их не должно быть много
+uint64_t GetMappingLink(int index)
 {
-	if (index < *pointerToBaseLinksMaxSize)
-		return pointerToBaseLinks[index]; // возвращает индекс линка, linkIndex
+	if (index < *pointerToMappingLinksMaxSize)
+		return (*pointerToPointerToMappingLinks)[index]; //?
 	else
-		return LINK_0; // вместо Link * == NULL
+		return null;
 }
 
-// базовых линков не должно быть много, поэтому - int
-void SetBaseLink(uint32_t index, uint64_t linkIndex)
+void SetMappingLink(int index, uint64_t linkIndex)
 {
-	if (index < *pointerToBaseLinksMaxSize)
-		pointerToBaseLinks[index] = linkIndex; // может быть 0 (соответствует NULL)
+	if (index < *pointerToMappingLinksMaxSize)
+		(*pointerToPointerToMappingLinks)[index] = link;
 }
+*/
 
-
-// работа с основными линками
-Link* GetLink(uint64_t linkIndex)
+Link *GetLink(uint64_t linkIndex)
 {
-	if (linkIndex < *pointerToLinksMaxSize) // ? Почему -Max
-		return &(pointerToLinks[linkIndex]);
-	else {
-		printf("linkIndex = %llu\n", (long long unsigned int)linkIndex);
-		return NULL; // корректный указатель из malloc.h
-	}
-}
-
-// SetLink, SetSource, ... не нужны - так как поломают целостность ассоц. сети
-
-// GetSource(0) == 0 - это очень важно
-// GetSource(X) == 0, где X - удаленная или неправильная связь - тоже очень важно
-uint64_t GetSourceIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->Source;
-}
-
-uint64_t GetTargetIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->Target;
-}
-
-// LinkerLink index
-uint64_t GetLinkerIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->Linker;
-}
-
-// By ...
-uint64_t GetBySourceIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->BySource;
-}
-
-uint64_t GetByTargetIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->ByTarget;
-}
-
-uint64_t GetByLinkerIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->ByLinker;
-}
-
-// LeftBy ...
-uint64_t GetLeftBySourceIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->LeftBySource;
-}
-
-uint64_t GetLeftByTargetIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->LeftByTarget;
-}
-
-uint64_t GetLeftByLinkerIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->LeftByLinker;
-}
-
-// RightBy ...
-uint64_t GetRightBySourceIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->RightBySource;
-}
-
-uint64_t GetRightByTargetIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->RightByTarget;
-}
-
-uint64_t GetRightByLinkerIndex(uint64_t linkIndex)
-{
-	Link* link = GetLink(linkIndex);
-	return (link == NULL) ? LINK_0 : link->RightByLinker;
+	return &(pointerToLinks[linkIndex]);
 }

@@ -1,13 +1,18 @@
 
+// Модуль с функцией вычисления "штампа времени" (time-stamp).
+
 #include "Common.h"
 #include "Timestamp.h"
 
 
 int64_t LastTimestamp = 0;
 
-// Получить число 100-наносекундных интервалов от 1 января 1601 года. (+возможна небольшая коррекция +1 тик)
+// Получить число 100-наносекундных интервалов от 1 января 1601 года.
 
-#if defined(_MFC_VER) || defined(__MINGW32__)
+// для винды: получения .exe/.obj/.dll (Visual C++/MinGW32):
+
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
+
 #include <windows.h>
 
 int64_t GetTimestamp()
@@ -15,13 +20,13 @@ int64_t GetTimestamp()
 
 	FILETIME fileTime;
 
-	// This structure is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601.
+        // This structure is a 64-bit value representing the number of 100-nanosecond intervals since January 1, 1601.
 	// The actual resolution depends on the system, http://msdn.microsoft.com/en-us/library/windows/desktop/ms724397%28v=vs.85%29.aspx
 
 	GetSystemTimeAsFileTime(&fileTime);
 
 	{
-		int64_t = (((int64_t) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
+		int64_t time = (((int64_t) fileTime.dwHighDateTime) << 32) | fileTime.dwLowDateTime;
 
 		if (time <= LastTimestamp)
 			return ++LastTimestamp;
@@ -30,7 +35,9 @@ int64_t GetTimestamp()
 	}
 }
 
-#elif defined(__GNUC__)
+// для линукса: получения ./.o/.so:
+
+#elif defined(__GLIBC__)
 
 #include <stdint.h>
 #include <time.h>

@@ -1,90 +1,77 @@
 #ifndef __LINKS_LINK_H__
 #define __LINKS_LINK_H__
 
-// Всё, что достаточно для работы с линками + ??? Common.h (?)
+// ��������������� ������ ������ � "�������".
 
 #include "Common.h"
 
 typedef struct Link
 {
-	// заменяем всё на индексы
-	uint64_t Source; // Индекс начала
-	uint64_t Linker; // Индекс связки
-	uint64_t Target; // Индекс конца
-	
-	// ссылка на ссылающихся
-	uint64_t BySource; // Индекс вершины дерева (связей, использующих данную в качестве Source)
-	uint64_t ByLinker; // Индекс вершины дерева (связей, использующих данную в качестве Linker)
-	uint64_t ByTarget; // Индекс вершины дерева (связей, использующих данную в качестве Target)
-	
-	// структура дерева ссылающихся
-	uint64_t LeftBySource; // левое поддерево связей (использующих данную в качестве Source)
-	uint64_t LeftByLinker; // левое поддерево связей (использующих данную в качестве Linker)
-	uint64_t LeftByTarget; // левое поддерево связей (использующих данную в качестве Target)
-	
-	uint64_t RightBySource; // правое поддерево связей (использующих данную в качестве Source)
-	uint64_t RightByLinker; // правое поддерево связей (использующих данную в качестве Linker)
-	uint64_t RightByTarget; // правое поддерево связей (использующих данную в качестве Target)
-	
-	uint64_t CountBySource; // Число связей, использующих данную в качестве Source
-	uint64_t CountByLinker; // Число связей, использующих данную в качестве Linker
-	uint64_t CountByTarget; // Число связей, использующих данную в качестве Target
-	
-	int64_t Timestamp; // используется :)
+        uint64_t SourceIndex; // Ссылка на начальную связь
+        uint64_t LinkerIndex; // Ссылка на связь-связку
+        uint64_t TargetIndex; // Ссылка на конечную связь
+        uint64_t BySourceRootIndex; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве начальной связи
+        uint64_t ByLinkerRootIndex; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве связи связки
+        uint64_t ByTargetRootIndex; // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве конечной связи
+        uint64_t BySourceRightIndex; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве начальной связи
+        uint64_t ByLinkerRightIndex; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве связи связки
+        uint64_t ByTargetRightIndex; // Ссылка на правое поддерво связей ссылающихся на эту связь в качестве конечной связи
+        uint64_t BySourceLeftIndex; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве начальной связи
+        uint64_t ByLinkerLeftIndex; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве связи связки
+        uint64_t ByTargetLeftIndex; // Ссылка на левое поддерво связей ссылающихся на эту связь в качестве конечной связи
+        uint64_t BySourceCount; // Количество связей ссылающихся на эту связь в качестве начальной связи (элементов в дереве)
+        uint64_t ByLinkerCount; // Количество связей ссылающихся на эту связь в качестве связи связки (элементов в дереве)
+        uint64_t ByTargetCount; // Количество связей ссылающихся на эту связь в качестве конечной связи (элементов в дереве)
+        int64_t Timestamp; // Не использутся
 } Link;
 
-typedef int (*func)(uint64_t); // callback
-typedef void (*action)(uint64_t); // callback
-
+typedef int (*func)(Link *); // callback
+typedef void (*action)(Link *); // callback
 
 #if defined(__cplusplus)
 extern "C" {
 #endif
 
 // see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
-#if defined(_WIN32)
-#if defined(LINKS_DLL)
-#define PREFIX_DLL __stdcall __declspec(dllexport)
+//#if defined(_WIN32)
+#if defined(_MSC_VER) || defined(__MINGW32__)
+#if defined(LINKS_DLL_EXPORT)
+#define PREFIX_DLL __declspec(dllexport)
 #else
-#define PREFIX_DLL __stdcall __declspec(dllimport)
+#define PREFIX_DLL __declspec(dllimport)
 #endif
-// Linux,Unix
 #else
+// Linux,Unix
 #define PREFIX_DLL 
 #endif
 
-// Созвращает индекс линка
-uint64_t PREFIX_DLL CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
-uint64_t PREFIX_DLL UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+/*
+PREFIX_DLL Link* CreateLink(Link* source, Link* linker, Link* target);
+PREFIX_DLL Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target);
+PREFIX_DLL void  DeleteLink(Link* link);
+PREFIX_DLL Link* ReplaceLink(Link* link, Link* replacement);
+PREFIX_DLL Link* SearchLink(Link* source, Link* linker, Link* target);
 
-void  PREFIX_DLL DeleteLink(uint64_t linkIndex);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersBySource(Link *link);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersByLinker(Link *link);
+PREFIX_DLL uint64_t GetLinkNumberOfReferersByTarget(Link *link);
 
-// ??? Аналог ассемблерного оператора MOV (в языка высокого уровня - оператор приравнивания)
-uint64_t PREFIX_DLL ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
+PREFIX_DLL void WalkThroughAllReferersBySource(Link* root, action);
+PREFIX_DLL int WalkThroughReferersBySource(Link* root, func);
 
-uint64_t PREFIX_DLL SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+PREFIX_DLL void WalkThroughAllReferersByLinker(Link* root, action);
+PREFIX_DLL int WalkThroughReferersByLinker(Link* root, func);
 
-// Возвращает число By-Count
-uint64_t PREFIX_DLL GetLinkNumberOfReferersBySource(uint64_t linkIndex);
-uint64_t PREFIX_DLL GetLinkNumberOfReferersByLinker(uint64_t linkIndex);
-uint64_t PREFIX_DLL GetLinkNumberOfReferersByTarget(uint64_t linkIndex);
+PREFIX_DLL void WalkThroughAllReferersByTarget(Link* root, action);
+PREFIX_DLL int WalkThroughReferersByTarget(Link* root, func);
 
-// ??? Обход
-void PREFIX_DLL WalkThroughAllReferersBySource(uint64_t rootLinkIndex, action);
-int PREFIX_DLL WalkThroughReferersBySource(uint64_t rootLinkIndex, func);
+// not exported
 
-void PREFIX_DLL WalkThroughAllReferersByLinker(uint64_t rootLinkIndex, action);
-int PREFIX_DLL WalkThroughReferersByLinker(uint64_t rootLinkIndex, func);
+void AttachLinkToMarker(Link *link, Link *marker);
+void DetachLinkFromMarker(Link* link, Link* marker);
 
-void PREFIX_DLL WalkThroughAllReferersByTarget(uint64_t rootLinkIndex, action);
-int PREFIX_DLL WalkThroughReferersByTarget(uint64_t rootLinkIndex, func);
-
-// ??? not for export !!!
-
-void AttachLinkToUnusedMarker(uint64_t linkIndex);
-void DetachLinkFromUnusedMarker(uint64_t linkIndex);
-
-void DetachLink(uint64_t linkIndex);
+void DetachLink(Link* link);
+*/
 
 #if defined(__cplusplus)
 }
