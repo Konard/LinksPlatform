@@ -1,5 +1,5 @@
 
-// Âûñîêîóğîâíåâàÿ ëîãèêà ğàáîòû ñ "ëèíêàìè".
+// Ğ’Ñ‹ÑĞ¾ĞºĞ¾ÑƒÑ€Ğ¾Ğ²Ğ½ĞµĞ²Ğ°Ñ Ğ»Ğ¾Ğ³Ğ¸ĞºĞ° Ñ€Ğ°Ğ±Ğ¾Ñ‚Ñ‹ Ñ "Ğ»Ğ¸Ğ½ĞºĞ°Ğ¼Ğ¸".
 
 #include "Common.h"
 #include "Timestamp.h"
@@ -23,28 +23,65 @@
 //DefineAllReferersTreeMethods(Target)
 //DefineAllSearchMethods()
 
+// Ğ¿Ğ¾Ğ´Ñ‡Ğ¸Ğ½ĞµĞ½Ğ½Ğ°Ñ CreateLink/UpdateLink/.. Ñ„ÑƒĞ½ĞºÑ†Ğ¸Ñ
+
 void AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-	GetLink(linkIndex)->SourceIndex = sourceIndex;
-	GetLink(linkIndex)->LinkerIndex = linkerIndex;
-	GetLink(linkIndex)->TargetIndex = targetIndex;
+	Link *link = GetLink(linkIndex);
+	link->SourceIndex = sourceIndex;
+	link->LinkerIndex = linkerIndex;
+	link->TargetIndex = targetIndex;
 
 //	SubscribeAsRefererToSource(link, source);
 //	SubscribeAsRefererToLinker(link, linker);
 //	SubscribeAsRefererToTarget(link, target);
 }
 
-/*
+uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+{
+	if (sourceIndex != itself &&
+		linkerIndex != itself &&
+		targetIndex != itself)
+	{
+		uint64_t linkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
+		if (linkIndex == null)
+		{
+			linkIndex = AllocateLink();
+			Link *link = GetLink(linkIndex);
+			link->Timestamp = GetTimestamp();
+			if (linkIndex != null)
+				AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
+		}
+		return linkIndex;
+	}
+	else
+	{
+		uint64_t linkIndex = AllocateLink();
+		Link* link = GetLink(linkIndex);
+		link->Timestamp = GetTimestamp();
+		if (linkIndex != null)
+		{
+			sourceIndex = (sourceIndex == itself ? linkIndex : sourceIndex);
+			linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
+			targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
+			AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
+		}
+		return linkIndex;
+	}
+}
+
 void DetachLink(Link* link)
 {
-	UnSubscribeFromSource(link, link->Source);
-	UnSubscribeFromLinker(link, link->Linker);
-	UnSubscribeFromTarget(link, link->Target);
+//	UnSubscribeFromSource(link, link->SourceIndex);
+//	UnSubscribeFromLinker(link, link->LinkerIndex);
+//	UnSubscribeFromTarget(link, link->TargetIndex);
 
-	link->Source = null;
-	link->Linker = null;
-	link->Target = null;
+	link->SourceIndex = null;
+	link->LinkerIndex = null;
+	link->TargetIndex = null;
 }
+
+/*
 
 void AttachLinkToMarker(Link *link, Link *marker)
 {
@@ -66,38 +103,6 @@ Link* _H SearchLink(Link* source, Link* linker, Link* target)
 		return SearchRefererOfTarget(target, source, linker);
 	else
 		return SearchRefererOfSource(source, target, linker);
-}
-
-Link* _H CreateLink(Link* source, Link* linker, Link* target)
-{
-    if (source != itself && linker != itself && target != itself)
-    {
-        Link* link = SearchLink(source, linker, target);
-        if (link == null)
-        {
-            link = AllocateLink();
-			link->Timestamp = GetTimestamp();
-			if (link != null)
-				AttachLink(link, source, linker, target);
-        }
-        return link;
-    }
-    else
-    {
-        Link* link = AllocateLink();
-		link->Timestamp = GetTimestamp();
-
-		if (link != null)
-		{
-			source = (source == itself ? link : source);
-			linker = (linker == itself ? link : linker);
-			target = (target == itself ? link : target);
-
-			AttachLink(link, source, linker, target);
-		}
-
-        return link;
-	}
 }
 
 Link* _H ReplaceLink(Link* link, Link* replacement)

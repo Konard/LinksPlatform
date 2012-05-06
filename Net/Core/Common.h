@@ -7,7 +7,6 @@
 // what is for Windows? #warning "Links platform needs 64-bit CPU architecture."
 #endif
 
-#define null 0
 #define false 0
 #define true 1
 #define bool unsigned

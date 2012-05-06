@@ -1,9 +1,12 @@
 #ifndef __LINKS_LINK_H__
 #define __LINKS_LINK_H__
 
-// Высокоуровневая логика работы с "линками".
+// Р’С‹СЃРѕРєРѕСѓСЂРѕРІРЅРµРІР°СЏ Р»РѕРіРёРєР° СЂР°Р±РѕС‚С‹ СЃ "Р»РёРЅРєР°РјРё".
 
 #include "Common.h"
+
+#define null 0LL
+#define itself 0LL
 
 typedef struct Link
 {
@@ -33,7 +36,6 @@ extern "C" {
 #endif
 
 // see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
-//#if defined(_WIN32)
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #if defined(LINKS_DLL_EXPORT)
 #define PREFIX_DLL __declspec(dllexport)
@@ -45,8 +47,9 @@ extern "C" {
 #define PREFIX_DLL 
 #endif
 
+PREFIX_DLL uint64_t CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+
 /*
-PREFIX_DLL Link* CreateLink(Link* source, Link* linker, Link* target);
 PREFIX_DLL Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target);
 PREFIX_DLL void  DeleteLink(Link* link);
 PREFIX_DLL Link* ReplaceLink(Link* link, Link* replacement);
@@ -67,11 +70,12 @@ PREFIX_DLL int WalkThroughReferersByTarget(Link* root, func);
 
 // not exported
 
+*/
+
 void AttachLinkToMarker(Link *link, Link *marker);
 void DetachLinkFromMarker(Link* link, Link* marker);
 
 void DetachLink(Link* link);
-*/
 
 #if defined(__cplusplus)
 }
