@@ -75,8 +75,8 @@ PREFIX_DLL int WalkThroughReferersByTarget(Link* root, func);
 
 */
 
-void AttachLinkToMarker(Link *link, uint64_t markerIndex);
-void DetachLinkFromMarker(Link* link, uint64_t markerIndex);
+void AttachLinkToUnusedMarker(Link *link);
+void DetachLinkFromUnusedMarker(Link* link);
 
 void DetachLink(Link* link);
 

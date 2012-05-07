@@ -82,16 +82,16 @@ void DetachLink(Link* link)
 	link->TargetIndex = null;
 }
 
-void AttachLinkToMarker(Link *link, uint64_t markerIndex)
+void AttachLinkToUnusedMarker(Link *link)
 {
-	link->LinkerIndex = markerIndex;
+	link->LinkerIndex = null;
 
-//	SubscribeToListOfReferersBy(LinkerIndex, link, markerIndex);
+//	SubscribeToListOfReferersBy(LinkerIndex, link, null);
 }
 
-void DetachLinkFromMarker(Link* link, uint64_t marker)
+void DetachLinkFromUnusedMarker(Link* link)
 {
-//	UnSubscribeFromListOfReferersBy(LinkerIndex, link, markerIndex);
+//	UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
 
 	link->LinkerIndex = null;
 }
@@ -106,6 +106,9 @@ uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
 		return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
 */
 }
+
+// в функции Replace почти ничего нет - вся работа происходит в Update;
+// Replace - функция-координатор
 
 uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {

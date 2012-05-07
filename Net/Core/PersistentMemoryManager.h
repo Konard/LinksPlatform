@@ -36,7 +36,7 @@ PREFIX_DLL void ReadTest();
 PREFIX_DLL void WriteTest();
 
 uint64_t AllocateLink();
-void FreeLink(uint64_t linkIndex);
+void FreeLink(Link *link);
 
 PREFIX_DLL void WalkThroughAllLinks(func);
 PREFIX_DLL int WalkThroughLinks(func);

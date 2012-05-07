@@ -430,6 +430,45 @@ unsigned long ResetStorageFileMemoryMapping()
 
 /***  Работа с линками  ***/
 
+uint64_t AllocateLink()
+{
+	if (pointerToUnusedMarker->ByLinkerRootIndex != null)
+		return AllocateFromUnusedLinks();
+	else
+		return AllocateFromFreeLinks();	
+	return null;
+}
+
+void FreeLink(Link *link)
+{
+	DetachLink(link);
+
+	while (link->BySourceRootIndex != null) FreeLink(GetLink(link->BySourceRootIndex));
+	while (link->ByLinkerRootIndex != null) FreeLink(GetLink(link->ByLinkerRootIndex));
+	while (link->ByTargetRootIndex != null) FreeLink(GetLink(link->ByTargetRootIndex));
+
+	{
+		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
+
+		if (link < lastUsedLink)
+		{
+			AttachLinkToMarker(link, pointerToUnusedMarker);
+		}
+		else if(link == lastUsedLink)
+		{
+			--*pointerToLinksSize;
+
+			while((--lastUsedLink)->LinkerIndex == pointerToUnusedMarker)
+			{
+				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
+				--*pointerToLinksSize;
+			}
+
+			ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
+		}
+	}
+}
+
 /*
 uint64_t AllocateFromUnusedLinks()
 {
@@ -451,44 +490,6 @@ uint64_t AllocateFromFreeLinks()
 	return freeLinkIndex;
 }
 
-uint64_t AllocateLink()
-{
-	if (pointerToUnusedMarker->ByLinkerIndex != null)
-		return AllocateFromUnusedLinks();
-	else
-		return AllocateFromFreeLinks();	
-	return null;
-}
-
-void FreeLink(uint64_t linkIndex)
-{
-	DetachLink(linkIndex);
-
-    while (link->FirstRefererBySource != null) FreeLink(link->FirstRefererBySource);
-    while (link->FirstRefererByLinker != null) FreeLink(link->FirstRefererByLinker);
-    while (link->FirstRefererByTarget != null) FreeLink(link->FirstRefererByTarget);
-
-	{
-		Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
-
-		if (link < lastUsedLink)
-		{
-			AttachLinkToMarker(link, pointerToUnusedMarker);
-		}
-		else if(link == lastUsedLink)
-		{
-			--*pointerToLinksSize;
-
-			while((--lastUsedLink)->Linker == pointerToUnusedMarker)
-			{
-				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
-				--*pointerToLinksSize;
-			}
-
-			ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
-		}
-	}
-}
 
 void WalkThroughAllLinks(func func_)
 {
