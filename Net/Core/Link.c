@@ -6,10 +6,10 @@
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-//#ifdef _WIN32
 #if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
 #ifdef LINKS_DLL_EXPORT
-#define _H __stdcall
+//#define _H __stdcall
+#define _H 
 #else
 #define _H 
 #endif
@@ -82,104 +82,130 @@ void DetachLink(Link* link)
 	link->TargetIndex = null;
 }
 
+void AttachLinkToMarker(Link *link, uint64_t markerIndex)
+{
+	link->LinkerIndex = markerIndex;
+
+//	SubscribeToListOfReferersBy(LinkerIndex, link, markerIndex);
+}
+
+void DetachLinkFromMarker(Link* link, uint64_t marker)
+{
+//	UnSubscribeFromListOfReferersBy(LinkerIndex, link, markerIndex);
+
+	link->LinkerIndex = null;
+}
+
+uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+{
+	// смотря, какое дерево меньше (target или source); по linker - список
 /*
-
-void AttachLinkToMarker(Link *link, Link *marker)
-{
-	link->Linker = marker;
-
-	SubscribeToListOfReferersBy(Linker, link, marker);
-}
-
-void DetachLinkFromMarker(Link* link, Link* marker)
-{
-	UnSubscribeFromListOfReferersBy(Linker, link, marker);
-
-	link->Linker = null;
-}
-
-Link* _H SearchLink(Link* source, Link* linker, Link* target)
-{
-	if (GetLinkNumberOfReferersByTarget(target) <= GetLinkNumberOfReferersBySource(source))
-		return SearchRefererOfTarget(target, source, linker);
+	if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
+		return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
 	else
-		return SearchRefererOfSource(source, target, linker);
+		return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
+*/
 }
 
-Link* _H ReplaceLink(Link* link, Link* replacement)
+uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
-	if (link != replacement)
+	Link *link = GetLink(linkIndex);
+	Link *replacement = GetLink(replacementIndex);
+
+	if (linkIndex != replacementIndex)
 	{
-		Link* firstRefererBySource = link->FirstRefererBySource;
-		Link* firstRefererByLinker = link->FirstRefererByLinker;
-		Link* firstRefererByTarget = link->FirstRefererByTarget;
+		uint64_t firstRefererBySourceIndex = link->BySourceRootIndex;
+		uint64_t firstRefererByLinkerIndex = link->ByLinkerRootIndex;
+		uint64_t firstRefererByTargetIndex = link->ByTargetRootIndex;
 
-		while (firstRefererBySource != null)
+		// что здесь происходит - непонятно
+		while (firstRefererBySourceIndex != null)
 		{
-			UpdateLink(firstRefererBySource, replacement, firstRefererBySource->Linker, firstRefererBySource->Target);
-			firstRefererBySource = link->FirstRefererBySource;
+			UpdateLink(
+				firstRefererBySourceIndex,
+				replacementIndex,
+				GetLink(firstRefererBySourceIndex)->LinkerIndex,
+				GetLink(firstRefererBySourceIndex)->TargetIndex
+			);
+			firstRefererBySourceIndex = link->BySourceRootIndex;
 		}
 
-		while (firstRefererByLinker != null)
+		while (firstRefererByLinkerIndex != null)
 		{
-			UpdateLink(firstRefererByLinker, firstRefererByLinker->Source, replacement, firstRefererByLinker->Target);
-			firstRefererByLinker = link->FirstRefererByLinker;
+			UpdateLink(
+				firstRefererByLinkerIndex,
+				GetLink(firstRefererByLinkerIndex)->SourceIndex,
+				replacementIndex,
+				GetLink(firstRefererByLinkerIndex)->TargetIndex
+			);
+			firstRefererByLinkerIndex = link->ByLinkerRootIndex;
 		}
 
-		while (firstRefererByTarget != null)
+		while (firstRefererByTargetIndex != null)
 		{
-			UpdateLink(firstRefererByTarget, firstRefererByTarget->Source, firstRefererByTarget->Linker, replacement);
-			firstRefererByTarget = link->FirstRefererByTarget;
+			UpdateLink(
+				firstRefererByTargetIndex,
+				GetLink(firstRefererByTargetIndex)->SourceIndex,
+				GetLink(firstRefererByTargetIndex)->LinkerIndex,
+				replacementIndex
+			);
+			firstRefererByTargetIndex = link->ByTargetRootIndex;
 		}
 
-		FreeLink(link);
+		FreeLink(linkIndex);
 
 		replacement->Timestamp = GetTimestamp();
 	}
-	return replacement;
+	return replacementIndex;
 }
 
-Link* _H UpdateLink(Link* link, Link* source, Link* linker, Link* target)
-{
-	if(link->Source == source && link->Linker == linker && link->Target == target)
-		return link;
 
-    if (source != itself && linker != itself && target != itself)
-    {
-        Link* existingLink = SearchLink(source, linker, target);
-        if (existingLink == null)
-        {
+uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+{
+	Link *link = GetLink(linkIndex);
+	if(link->SourceIndex == sourceIndex && link->LinkerIndex == linkerIndex && link->TargetIndex == targetIndex)
+		return linkIndex;
+
+	if (sourceIndex != itself && linkerIndex != itself && targetIndex != itself)
+	{
+		uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
+		Link* existingLink = GetLink(existingLinkIndex);
+		if (existingLinkIndex == null)
+		{
 			DetachLink(link);
-			AttachLink(link, source, linker, target);
+			AttachLink(link, sourceIndex, linkerIndex, targetIndex);
 
 			link->Timestamp = GetTimestamp();
 
-			return link;
-        }
+			return linkIndex;
+		}
 		else
 		{
-			return ReplaceLink(link, existingLink);
+			return ReplaceLink(linkIndex, existingLinkIndex);
 		}
-    }
-    else
-    {
-		source = (source == itself ? link : source);
-		linker = (linker == itself ? link : linker);
-		target = (target == itself ? link : target);
+	}
+	else
+	{
+		sourceIndex = (sourceIndex == itself ? linkIndex : sourceIndex);
+		linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
+		targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
 
 		DetachLink(link);
-		AttachLink(link, source, linker, target);
+		AttachLink(link, sourceIndex, linkerIndex, targetIndex);
 
 		link->Timestamp = GetTimestamp();
 
-        return link;
+        	return linkIndex;
 	}
 }
 
-void _H DeleteLink(Link* link)
+
+void _H DeleteLink(uint64_t linkIndex)
 {
-	FreeLink(link);
+	FreeLink(linkIndex);
 }
+
+/*
 
 uint64_t _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
 uint64_t _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }

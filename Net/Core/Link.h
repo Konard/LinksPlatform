@@ -49,11 +49,14 @@ extern "C" {
 
 PREFIX_DLL uint64_t CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
 
+PREFIX_DLL uint64_t SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+
+PREFIX_DLL uint64_t ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex);
+PREFIX_DLL uint64_t UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+
+PREFIX_DLL void DeleteLink(uint64_t linkIndex);
+
 /*
-PREFIX_DLL Link* UpdateLink(Link* link, Link* source, Link* linker, Link* target);
-PREFIX_DLL void  DeleteLink(Link* link);
-PREFIX_DLL Link* ReplaceLink(Link* link, Link* replacement);
-PREFIX_DLL Link* SearchLink(Link* source, Link* linker, Link* target);
 
 PREFIX_DLL uint64_t GetLinkNumberOfReferersBySource(Link *link);
 PREFIX_DLL uint64_t GetLinkNumberOfReferersByLinker(Link *link);
@@ -72,8 +75,8 @@ PREFIX_DLL int WalkThroughReferersByTarget(Link* root, func);
 
 */
 
-void AttachLinkToMarker(Link *link, Link *marker);
-void DetachLinkFromMarker(Link* link, Link* marker);
+void AttachLinkToMarker(Link *link, uint64_t markerIndex);
+void DetachLinkFromMarker(Link* link, uint64_t markerIndex);
 
 void DetachLink(Link* link);
 
