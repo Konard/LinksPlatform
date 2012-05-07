@@ -443,10 +443,7 @@ uint64_t AllocateFromFreeLinks()
 	if (*pointerToLinksMaxSize == *pointerToLinksSize)
 		EnlargeStorageFile();
 
-//	freeLink = pointerToLinks + *pointerToLinksSize;
-	uint64_t freeLinkIndex = *pointerToLinksSize;
-	++*pointerToLinksSize;
-	return freeLinkIndex;
+	return (*pointerToLinksSize)++; // freeLinkIndex
 }
 
 uint64_t AllocateLink()
