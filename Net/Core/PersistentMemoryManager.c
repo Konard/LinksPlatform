@@ -430,6 +430,25 @@ unsigned long ResetStorageFileMemoryMapping()
 
 /***  Работа с линками  ***/
 
+uint64_t AllocateFromUnusedLinks()
+{
+	uint64_t unusedLinkIndex = pointerToUnusedMarker->ByLinkerRootIndex;
+	DetachLinkFromUnusedMarker(GetLink(unusedLinkIndex));
+	return unusedLinkIndex;
+}
+
+// пока что программа - однопоточная, не надо использовать mutex'и
+uint64_t AllocateFromFreeLinks()
+{
+	if (*pointerToLinksMaxSize == *pointerToLinksSize)
+		EnlargeStorageFile();
+
+//	freeLink = pointerToLinks + *pointerToLinksSize;
+	uint64_t freeLinkIndex = *pointerToLinksSize;
+	++*pointerToLinksSize;
+	return freeLinkIndex;
+}
+
 uint64_t AllocateLink()
 {
 	if (pointerToUnusedMarker->ByLinkerRootIndex != null)
@@ -452,15 +471,15 @@ void FreeLink(Link *link)
 
 		if (link < lastUsedLink)
 		{
-			AttachLinkToMarker(link, pointerToUnusedMarker);
+			AttachLinkToUnusedMarker(link);
 		}
 		else if(link == lastUsedLink)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->LinkerIndex == pointerToUnusedMarker)
+			while((--lastUsedLink)->LinkerIndex == 0) // здесь было сравнение с pointerToUnusedMarker
 			{
-				DetachLinkFromMarker(lastUsedLink, pointerToUnusedMarker);
+				DetachLinkFromUnusedMarker(lastUsedLink);
 				--*pointerToLinksSize;
 			}
 
@@ -470,26 +489,6 @@ void FreeLink(Link *link)
 }
 
 /*
-uint64_t AllocateFromUnusedLinks()
-{
-	uint64_t unusedLinkIndex = pointerToUnusedMarker->ByLinkerIndex;
-	DetachLinkFromMarker(unusedLinkIndex, pointerToUnusedMarker);
-	return unusedLinkIndex;
-}
-
-// пока что программа - однопоточная, не надо использовать mutex'и
-uint64_t AllocateFromFreeLinks()
-{
-	uint64_t freeLinkIndex;
-
-	if (*pointerToLinksMaxSize == *pointerToLinksSize)
-		EnlargeStorageFile();
-
-	freeLink = pointerToLinks + *pointerToLinksSize;
-	++*pointerToLinksSize;
-	return freeLinkIndex;
-}
-
 
 void WalkThroughAllLinks(func func_)
 {

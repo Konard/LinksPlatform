@@ -84,16 +84,12 @@ void DetachLink(Link* link)
 
 void AttachLinkToUnusedMarker(Link *link)
 {
-	link->LinkerIndex = null;
-
 //	SubscribeToListOfReferersBy(LinkerIndex, link, null);
 }
 
 void DetachLinkFromUnusedMarker(Link* link)
 {
 //	UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
-
-	link->LinkerIndex = null;
 }
 
 uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
@@ -155,7 +151,7 @@ uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 			firstRefererByTargetIndex = link->ByTargetRootIndex;
 		}
 
-		FreeLink(linkIndex);
+		FreeLink(link);
 
 		replacement->Timestamp = GetTimestamp();
 	}
@@ -172,7 +168,7 @@ uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linker
 	if (sourceIndex != itself && linkerIndex != itself && targetIndex != itself)
 	{
 		uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
-		Link* existingLink = GetLink(existingLinkIndex);
+//		Link* existingLink = GetLink(existingLinkIndex);
 		if (existingLinkIndex == null)
 		{
 			DetachLink(link);
@@ -205,7 +201,7 @@ uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linker
 
 void _H DeleteLink(uint64_t linkIndex)
 {
-	FreeLink(linkIndex);
+	FreeLink(GetLink(linkIndex));
 }
 
 /*
