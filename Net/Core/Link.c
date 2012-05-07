@@ -25,16 +25,15 @@
 
 // подчиненная CreateLink/UpdateLink/.. функция
 
-void AttachLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
-	Link *link = GetLink(linkIndex);
 	link->SourceIndex = sourceIndex;
 	link->LinkerIndex = linkerIndex;
 	link->TargetIndex = targetIndex;
 
-//	SubscribeAsRefererToSource(link, source);
-//	SubscribeAsRefererToLinker(link, linker);
-//	SubscribeAsRefererToTarget(link, target);
+//	SubscribeAsRefererToSource(link, sourceIndex);
+//	SubscribeAsRefererToLinker(link, linkerIndex);
+//	SubscribeAsRefererToTarget(link, targetIndex);
 }
 
 uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
@@ -51,7 +50,7 @@ uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
 			{
 				Link *link = GetLink(linkIndex);
 				link->Timestamp = GetTimestamp();
-				AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
+				AttachLink(link, sourceIndex, linkerIndex, targetIndex);
 			}
 		}
 		return linkIndex;
@@ -66,7 +65,7 @@ uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
 			sourceIndex = (sourceIndex == itself ? linkIndex : sourceIndex);
 			linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
 			targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
-			AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
+			AttachLink(link, sourceIndex, linkerIndex, targetIndex);
 		}
 		return linkIndex;
 	}
