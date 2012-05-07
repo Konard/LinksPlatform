@@ -47,20 +47,22 @@ uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
 		if (linkIndex == null)
 		{
 			linkIndex = AllocateLink();
-			Link *link = GetLink(linkIndex);
-			link->Timestamp = GetTimestamp();
 			if (linkIndex != null)
+			{
+				Link *link = GetLink(linkIndex);
+				link->Timestamp = GetTimestamp();
 				AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
+			}
 		}
 		return linkIndex;
 	}
 	else
 	{
 		uint64_t linkIndex = AllocateLink();
-		Link* link = GetLink(linkIndex);
-		link->Timestamp = GetTimestamp();
 		if (linkIndex != null)
 		{
+			Link* link = GetLink(linkIndex);
+			link->Timestamp = GetTimestamp();
 			sourceIndex = (sourceIndex == itself ? linkIndex : sourceIndex);
 			linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
 			targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
