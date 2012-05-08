@@ -474,7 +474,7 @@ void FreeLink(Link *link)
 		{
 			--*pointerToLinksSize;
 
-			while((--lastUsedLink)->LinkerIndex == 0) // здесь было сравнение с pointerToUnusedMarker
+			while((--lastUsedLink)->LinkerIndex == null) // здесь было сравнение с pointerToUnusedMarker
 			{
 				DetachLinkFromUnusedMarker(lastUsedLink);
 				--*pointerToLinksSize;
