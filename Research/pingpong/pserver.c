@@ -1,4 +1,8 @@
 
+// TCP/IP-server (Linux, Windows).
+
+long long int i = 0;
+
 #ifdef __linux__
 
 #include <stdlib.h> // atoi(), exit()
@@ -13,14 +17,24 @@
 #include <signal.h> // SIGINT
 
 #define BACKLOG 100
+#define TRUE 1
 
-int sock = 0;
-int sock_c = 0;
+int ListenSocket = 0;
+int ClientSocket = 0;
 
-void func(int *sock_c) {
+void Func(int *clientSocket) {
+  char buffer[8];
+  while(TRUE) {
+    read(*clientSocket, buffer, 8);
+    write(*clientSocket, buffer, 8);
+    i++;
+    if (i%1000 == 0) printf("i = %lld\n", i);
+  }
 }
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
+
+#define _WIN32_WINNT 0x0501
 
 #include <winsock2.h>
 #include <ws2tcpip.h>
@@ -30,7 +44,28 @@ WSADATA wsaData;
 SOCKET ListenSocket = INVALID_SOCKET;
 SOCKET ClientSocket = INVALID_SOCKET;
 
-void func(SOCKET *pClientSocket) {
+int Func(SOCKET *clientSocket) {
+  char buffer[8];
+  int result;
+  while(TRUE) {
+    result = read(*clientSocket, buffer, 8);
+    if (result == SOCKET_ERROR) {
+      printf("read failed: %d\n", WSAGetLastError());
+      closesocket(ClientSocket);
+      WSACleanup();
+      return -1;
+    }
+    result = write(*clientSocket, buffer, 8);
+    if (result == SOCKET_ERROR) {
+      printf("write failed: %d\n", WSAGetLastError());
+      closesocket(ClientSocket);
+      WSACleanup();
+      return -1;
+    }
+    i++;
+    if (i%1000 == 0) printf("i = %lld\n", i);
+  }
+  return 0;
 }
 
 #endif
@@ -38,13 +73,12 @@ void func(SOCKET *pClientSocket) {
 
 #define _DEBUG 1
 
-int i = 123;
 
-int pserver_init(char *hostname, char *s_port) {
+int ServerInitialize(char *hostname, char *port) {
 #ifdef __linux__
-  int port = atoi(s_port);
-  sock = socket(AF_INET, SOCK_STREAM, 0);
-  if (sock < 0) {
+
+  ListenSocket = socket(AF_INET, SOCK_STREAM, 0);
+  if (ListenSocket < 0) {
     if (_DEBUG) perror("socket()");
     exit(EXIT_FAILURE);
   }
@@ -52,7 +86,7 @@ int pserver_init(char *hostname, char *s_port) {
     if (_DEBUG) printf("socket(): Success\n");
   }
   const int on = 1;
-  if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+  if (setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
     if (_DEBUG) perror("socket()");
     exit(EXIT_FAILURE);
   }
@@ -60,8 +94,8 @@ int pserver_init(char *hostname, char *s_port) {
   struct sockaddr_in serv_addr;
   serv_addr.sin_family = AF_INET;
   serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(port);
-  int res = bind(sock, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
+  serv_addr.sin_port = htons(atoi(port));
+  int res = bind(ListenSocket, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
   if (res < 0) {
     if (_DEBUG) perror("bind()");
     exit(EXIT_FAILURE);
@@ -70,7 +104,7 @@ int pserver_init(char *hostname, char *s_port) {
     if (_DEBUG) printf("bind(): Success\n");
   }
 
-  res = listen(sock, BACKLOG);
+  res = listen(ListenSocket, BACKLOG);
   if (res < 0) {
     if (_DEBUG) perror("listen()");
     exit(EXIT_FAILURE);
@@ -78,6 +112,7 @@ int pserver_init(char *hostname, char *s_port) {
   else {
     if (_DEBUG) printf("listen(): Success\n");
   }
+
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 
   int iResult;
@@ -98,7 +133,7 @@ int pserver_init(char *hostname, char *s_port) {
   hints.ai_flags = AI_PASSIVE;
 
   // Resolve the local address and port to be used by the server
-  iResult = getaddrinfo(NULL, s_port, &hints, &result);
+  iResult = getaddrinfo(NULL, port, &hints, &result);
   if (iResult != 0) {
     printf("getaddrinfo failed: %d\n", iResult);
     WSACleanup();
@@ -106,7 +141,7 @@ int pserver_init(char *hostname, char *s_port) {
   }
 
   // Create a SOCKET for the server to listen for client connections
-  ListenSocket = socket(result->ai_family, result->ai_socktype, 
+  ListenSocket = socket(result->ai_family, result->ai_socktype,
     result->ai_protocol);
 
   if (ListenSocket == INVALID_SOCKET) {
@@ -135,60 +170,59 @@ int pserver_init(char *hostname, char *s_port) {
 
   freeaddrinfo(result);
 #endif
+  printf("initialized.");
   return 0;
 }
 
 // signal event handler for SIGINT
-void finish(int sig) {
+void FinalizeCallback(int signal) {
   exit(EXIT_SUCCESS); // this calls pserver_fini()
 }
 
-void pserver_fini() {
+void ServerFinalize() {
 #ifdef __linux__
-  shutdown(sock, 2); // send
-  close(sock);
+  shutdown(ListenSocket, 2);
+  shutdown(ClientSocket, 2);
+  close(ListenSocket);
+  close(ClientSocket);
 #elif defined(__MINGW32__) || defined(__MINGW64__)
   closesocket(ListenSocket);
+  closesocket(ClientSocket);
   WSACleanup();
 #endif
 }
 
-int main(int argc, char **argv) {
-  if (argc < 3) return EXIT_SUCCESS;
+int main(int argumentsCount, char **arguments) {
 
-  char *hostname = argv[1];
-  char *port = argv[2];
-  pserver_init(hostname, port);
+  if (argumentsCount < 3) return EXIT_SUCCESS;
+
+  char *hostname = arguments[1];
+  char *port = arguments[2];
+
 #ifdef __linux__
-  atexit((void(*)())pserver_fini);
-  signal(SIGINT, finish); // this calls pserver_terminate()
+  atexit((void(*)())ServerFinalize);
+  signal(SIGINT, FinalizeCallback); // this calls pserver_terminate()
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 #endif
 
-#ifdef __linux__
-  while (1) {
-    // blocking accept()
-    sock_c = accept(sock, NULL, NULL);
-    printf("[accepted]\n");
-    func(&sock_c);
-  }
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+  ServerInitialize(hostname, port);
+
   while (TRUE) {
-    // blocking accept()
-    ClientSocket = INVALID_SOCKET;
-    // Accept a client socket
-    ClientSocket = accept(ListenSocket, NULL, NULL);
+    ClientSocket = accept(ListenSocket, NULL, NULL); // blocking accept()
+#ifdef __linux__
+#elif defined(__MINGW32__) || defined(__MINGW64__)
     if (ClientSocket == INVALID_SOCKET) {
       printf("accept failed: %d\n", WSAGetLastError());
       closesocket(ListenSocket);
       WSACleanup();
       return 1;
     }
-    printf("[accepted]\n");
-    func(&ClientSocket);
-  }
 #endif
+    printf("[accepted]\n");
+    Func(&ClientSocket);
+  }
 
-  pserver_fini();
+  ServerFinalize();
   return EXIT_SUCCESS;
 }
+
