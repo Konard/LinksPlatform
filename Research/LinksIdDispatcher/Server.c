@@ -94,18 +94,18 @@ int ServerInitialize(char *hostname, char *port)
   {
     if (_DEBUG) printf("socket(): Success\n");
   }
-  const int on = 1;
-  if (setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
+  const int isOn = 1;
+  if (setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &isOn, sizeof(isOn)) < 0)
   {
     if (_DEBUG) perror("socket()");
     exit(EXIT_FAILURE);
   }
 
-  struct sockaddr_in serv_addr;
-  serv_addr.sin_family = AF_INET;
-  serv_addr.sin_addr.s_addr = INADDR_ANY;
-  serv_addr.sin_port = htons(atoi(port));
-  int res = bind(ListenSocket, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
+  struct sockaddr_in serverAddressStruct;
+  serverAddressStruct.sin_family = AF_INET;
+  serverAddressStruct.sin_addr.s_addr = INADDR_ANY;
+  serverAddressStruct.sin_port = htons(atoi(port));
+  int res = bind(ListenSocket, (struct sockaddr *)&serverAddressStruct, sizeof(struct sockaddr_in));
   if (res < 0)
   {
     if (_DEBUG) perror("bind()");
@@ -129,12 +129,12 @@ int ServerInitialize(char *hostname, char *port)
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 
-  int iResult;
+  int winsockResult;
   // Initialize Winsock
-  iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-  if (iResult != 0)
+  winsock = WSAStartup(MAKEWORD(2,2), &wsaData);
+  if (winsockResult != 0)
   {
-    printf("WSAStartup failed: %d\n", iResult);
+    printf("WSAStartup failed: %d\n", winsockResult);
     return 1;
   }
 
@@ -148,10 +148,10 @@ int ServerInitialize(char *hostname, char *port)
   hints.ai_flags = AI_PASSIVE;
 
   // Resolve the local address and port to be used by the server
-  iResult = getaddrinfo(NULL, port, &hints, &result);
-  if (iResult != 0)
+  winsockResult = getaddrinfo(NULL, port, &hints, &result);
+  if (winsockResult != 0)
   {
-    printf("getaddrinfo failed: %d\n", iResult);
+    printf("getaddrinfo failed: %d\n", winsockResult);
     WSACleanup();
     return 1;
   }
@@ -169,8 +169,8 @@ int ServerInitialize(char *hostname, char *port)
   }
 
   // Setup the TCP listening socket
-  iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-  if (iResult == SOCKET_ERROR)
+  winsockResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+  if (winsockResult == SOCKET_ERROR)
   {
     printf("bind failed with error: %d\n", WSAGetLastError());
     freeaddrinfo(result);

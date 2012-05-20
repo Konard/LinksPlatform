@@ -68,20 +68,20 @@ int ClientInitialize(const char *hostname, const char *port)
     {
       if (_DEBUG) printf("socket(): Success\n");
     }
-    const int on = 1;
-    if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
+    const int isOn = 1;
+    if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &isOn, sizeof(isOn)) < 0)
     {
       if (_DEBUG) perror("socket()");
       return -EXIT_FAILURE; // -1
     }
 
-    struct sockaddr_in addr;
-    addr.sin_family = AF_INET;
-    inet_aton(hostname, &addr.sin_addr);
-    addr.sin_port = htons(atoi(port));
+    struct sockaddr_in hostAddressStruct;
+    hostAddressStruct.sin_family = AF_INET;
+    inet_aton(hostname, &hostAddressStruct.sin_addr);
+    hostAddressStruct.sin_port = htons(atoi(port));
     if (_DEBUG) printf("hostname:port = %s\n", hostname, port);
 
-    int res = connect(ClientSocket, (struct sockaddr *)&addr, sizeof(addr));
+    int res = connect(ClientSocket, (struct sockaddr *)&hostAddressStruct, sizeof(hostAddressStruct));
 
     if (res < 0)
     {
