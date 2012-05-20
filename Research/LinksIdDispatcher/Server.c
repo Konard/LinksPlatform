@@ -22,9 +22,11 @@ long long int i = 0;
 int ListenSocket = 0;
 int ClientSocket = 0;
 
-void Func(int *clientSocket) {
+void Func(int *clientSocket)
+{
   char buffer[8];
-  while(TRUE) {
+  while(TRUE)
+  {
     read(*clientSocket, buffer, 8);
     write(*clientSocket, buffer, 8);
     i++;
@@ -44,19 +46,23 @@ WSADATA wsaData;
 SOCKET ListenSocket = INVALID_SOCKET;
 SOCKET ClientSocket = INVALID_SOCKET;
 
-int Func(SOCKET *clientSocket) {
+int Func(SOCKET *clientSocket)
+{
   char buffer[8];
   int result;
-  while(TRUE) {
+  while(TRUE)
+  {
     result = read(*clientSocket, buffer, 8);
-    if (result == SOCKET_ERROR) {
+    if (result == SOCKET_ERROR)
+    {
       printf("read failed: %d\n", WSAGetLastError());
       closesocket(ClientSocket);
       WSACleanup();
       return -1;
     }
     result = write(*clientSocket, buffer, 8);
-    if (result == SOCKET_ERROR) {
+    if (result == SOCKET_ERROR)
+    {
       printf("write failed: %d\n", WSAGetLastError());
       closesocket(ClientSocket);
       WSACleanup();
@@ -74,19 +80,23 @@ int Func(SOCKET *clientSocket) {
 #define _DEBUG 1
 
 
-int ServerInitialize(char *hostname, char *port) {
+int ServerInitialize(char *hostname, char *port)
+{
 #ifdef __linux__
 
   ListenSocket = socket(AF_INET, SOCK_STREAM, 0);
-  if (ListenSocket < 0) {
+  if (ListenSocket < 0)
+  {
     if (_DEBUG) perror("socket()");
     exit(EXIT_FAILURE);
   }
-  else {
+  else
+  {
     if (_DEBUG) printf("socket(): Success\n");
   }
   const int on = 1;
-  if (setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+  if (setsockopt(ListenSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
+  {
     if (_DEBUG) perror("socket()");
     exit(EXIT_FAILURE);
   }
@@ -96,20 +106,24 @@ int ServerInitialize(char *hostname, char *port) {
   serv_addr.sin_addr.s_addr = INADDR_ANY;
   serv_addr.sin_port = htons(atoi(port));
   int res = bind(ListenSocket, (struct sockaddr *)&serv_addr, sizeof(struct sockaddr_in));
-  if (res < 0) {
+  if (res < 0)
+  {
     if (_DEBUG) perror("bind()");
     exit(EXIT_FAILURE);
   }
-  else {
+  else
+  {
     if (_DEBUG) printf("bind(): Success\n");
   }
 
   res = listen(ListenSocket, BACKLOG);
-  if (res < 0) {
+  if (res < 0)
+  {
     if (_DEBUG) perror("listen()");
     exit(EXIT_FAILURE);
   }
-  else {
+  else
+  {
     if (_DEBUG) printf("listen(): Success\n");
   }
 
@@ -118,7 +132,8 @@ int ServerInitialize(char *hostname, char *port) {
   int iResult;
   // Initialize Winsock
   iResult = WSAStartup(MAKEWORD(2,2), &wsaData);
-  if (iResult != 0) {
+  if (iResult != 0)
+  {
     printf("WSAStartup failed: %d\n", iResult);
     return 1;
   }
@@ -134,7 +149,8 @@ int ServerInitialize(char *hostname, char *port) {
 
   // Resolve the local address and port to be used by the server
   iResult = getaddrinfo(NULL, port, &hints, &result);
-  if (iResult != 0) {
+  if (iResult != 0)
+  {
     printf("getaddrinfo failed: %d\n", iResult);
     WSACleanup();
     return 1;
@@ -144,7 +160,8 @@ int ServerInitialize(char *hostname, char *port) {
   ListenSocket = socket(result->ai_family, result->ai_socktype,
     result->ai_protocol);
 
-  if (ListenSocket == INVALID_SOCKET) {
+  if (ListenSocket == INVALID_SOCKET)
+  {
     printf("Error at socket(): %ld\n", WSAGetLastError());
     freeaddrinfo(result);
     WSACleanup();
@@ -153,7 +170,8 @@ int ServerInitialize(char *hostname, char *port) {
 
   // Setup the TCP listening socket
   iResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
-  if (iResult == SOCKET_ERROR) {
+  if (iResult == SOCKET_ERROR)
+  {
     printf("bind failed with error: %d\n", WSAGetLastError());
     freeaddrinfo(result);
     closesocket(ListenSocket);
@@ -161,7 +179,8 @@ int ServerInitialize(char *hostname, char *port) {
     return 1;
   }
 
-  if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR ) {
+  if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR )
+  {
     printf( "Listen failed with error: %ld\n", WSAGetLastError() );
     closesocket(ListenSocket);
     WSACleanup();
@@ -175,11 +194,13 @@ int ServerInitialize(char *hostname, char *port) {
 }
 
 // signal event handler for SIGINT
-void FinalizeCallback(int signal) {
+void FinalizeCallback(int signal)
+{
   exit(EXIT_SUCCESS); // this calls pserver_fini()
 }
 
-void ServerFinalize() {
+void ServerFinalize()
+{
 #ifdef __linux__
   shutdown(ListenSocket, 2);
   shutdown(ClientSocket, 2);
@@ -192,7 +213,8 @@ void ServerFinalize() {
 #endif
 }
 
-int main(int argumentsCount, char **arguments) {
+int main(int argumentsCount, char **arguments)
+{
 
   if (argumentsCount < 3) return EXIT_SUCCESS;
 
@@ -207,11 +229,13 @@ int main(int argumentsCount, char **arguments) {
 
   ServerInitialize(hostname, port);
 
-  while (TRUE) {
+  while (TRUE)
+  {
     ClientSocket = accept(ListenSocket, NULL, NULL); // blocking accept()
 #ifdef __linux__
 #elif defined(__MINGW32__) || defined(__MINGW64__)
-    if (ClientSocket == INVALID_SOCKET) {
+    if (ClientSocket == INVALID_SOCKET)
+    {
       printf("accept failed: %d\n", WSAGetLastError());
       closesocket(ListenSocket);
       WSACleanup();
@@ -225,4 +249,3 @@ int main(int argumentsCount, char **arguments) {
   ServerFinalize();
   return EXIT_SUCCESS;
 }
-

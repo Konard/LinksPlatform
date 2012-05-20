@@ -21,9 +21,11 @@ long long int i = 0;
 
 int ClientSocket = 0;
 
-void Func(int *clientSocket) {
+void Func(int *clientSocket)
+{
   char buffer[8];
-  while(TRUE) {
+  while(TRUE)
+  {
     write(*clientSocket, buffer, 8);
     read(*clientSocket, buffer, 8);
     i++;
@@ -52,19 +54,23 @@ void Func(SOCKET *pClientSocket) {
 #define _DEBUG 1
 
 
-int ClientInitialize(const char *hostname, const char *port) {
+int ClientInitialize(const char *hostname, const char *port)
+{
 #ifdef __linux__
 
     ClientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (ClientSocket < 0) {
+    if (ClientSocket < 0)
+    {
       if (_DEBUG) perror("socket()");
       return -EXIT_FAILURE;
     }
-    else {
+    else
+    {
       if (_DEBUG) printf("socket(): Success\n");
     }
     const int on = 1;
-    if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0) {
+    if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &on, sizeof(on)) < 0)
+    {
       if (_DEBUG) perror("socket()");
       return -EXIT_FAILURE; // -1
     }
@@ -77,11 +83,13 @@ int ClientInitialize(const char *hostname, const char *port) {
 
     int res = connect(ClientSocket, (struct sockaddr *)&addr, sizeof(addr));
 
-    if (res < 0) {
+    if (res < 0)
+    {
       if (_DEBUG) perror("connect()");
       return -EXIT_FAILURE;
     }
-    else {
+    else
+    {
       if (_DEBUG) printf("connect(): Success\n");
     }
 
@@ -90,7 +98,8 @@ int ClientInitialize(const char *hostname, const char *port) {
   int iResult;
   // Initialize Winsock
   iResult = WSAStartup(MAKEWORD(2,2), &WSAData);
-  if (iResult != 0) {
+  if (iResult != 0)
+  {
     printf("WSAStartup failed: %d\n", iResult);
     return 1;
   }
@@ -100,11 +109,13 @@ int ClientInitialize(const char *hostname, const char *port) {
 }
 
 // signal event handler for SIGINT
-void FinalizeCallback(int signal) {
+void FinalizeCallback(int signal)
+{
   exit(EXIT_SUCCESS); // this calls pserver_fini()
 }
 
-void ClientFinalize() {
+void ClientFinalize()
+{
 #ifdef __linux__
   shutdown(ClientSocket, 2);
   close(ClientSocket);
@@ -114,7 +125,8 @@ void ClientFinalize() {
 #endif
 }
 
-int main(int argumentsCount, char **arguments) {
+int main(int argumentsCount, char **arguments)
+{
 
   if (argumentsCount < 3) return EXIT_SUCCESS;
 
