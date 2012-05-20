@@ -23,14 +23,14 @@ int ClientSocket = 0;
 
 void Func(int *clientSocket)
 {
-  char buffer[8];
-  while(TRUE)
-  {
-    write(*clientSocket, buffer, 8);
-    read(*clientSocket, buffer, 8);
-    i++;
-    if (i%1000 == 0) printf("i = %lld\n", i);
-  }
+	char buffer[8];
+	while(TRUE)
+	{
+		write(*clientSocket, buffer, 8);
+		read(*clientSocket, buffer, 8);
+		i++;
+		if (i%1000 == 0) printf("i = %lld\n", i);
+	}
 }
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
@@ -58,91 +58,91 @@ int ClientInitialize(const char *hostname, const char *port)
 {
 #ifdef __linux__
 
-    ClientSocket = socket(AF_INET, SOCK_STREAM, 0);
-    if (ClientSocket < 0)
-    {
-      if (_DEBUG) perror("socket()");
-      return -EXIT_FAILURE;
-    }
-    else
-    {
-      if (_DEBUG) printf("socket(): Success\n");
-    }
-    const int isOn = 1;
-    if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &isOn, sizeof(isOn)) < 0)
-    {
-      if (_DEBUG) perror("socket()");
-      return -EXIT_FAILURE; // -1
-    }
+	ClientSocket = socket(AF_INET, SOCK_STREAM, 0);
+	if (ClientSocket < 0)
+	{
+		if (_DEBUG) perror("socket()");
+		return -EXIT_FAILURE;
+	}
+	else
+	{
+		if (_DEBUG) printf("socket(): Success\n");
+	}
+	const int isOn = 1;
+	if (setsockopt(ClientSocket, SOL_SOCKET, SO_REUSEADDR, &isOn, sizeof(isOn)) < 0)
+	{
+		if (_DEBUG) perror("socket()");
+		return -EXIT_FAILURE; // -1
+	}
 
-    struct sockaddr_in hostAddressStruct;
-    hostAddressStruct.sin_family = AF_INET;
-    inet_aton(hostname, &hostAddressStruct.sin_addr);
-    hostAddressStruct.sin_port = htons(atoi(port));
-    if (_DEBUG) printf("hostname:port = %s\n", hostname, port);
+	struct sockaddr_in hostAddressStruct;
+	hostAddressStruct.sin_family = AF_INET;
+	inet_aton(hostname, &hostAddressStruct.sin_addr);
+	hostAddressStruct.sin_port = htons(atoi(port));
+	if (_DEBUG) printf("hostname:port = %s\n", hostname, port);
 
-    int res = connect(ClientSocket, (struct sockaddr *)&hostAddressStruct, sizeof(hostAddressStruct));
+	int res = connect(ClientSocket, (struct sockaddr *)&hostAddressStruct, sizeof(hostAddressStruct));
 
-    if (res < 0)
-    {
-      if (_DEBUG) perror("connect()");
-      return -EXIT_FAILURE;
-    }
-    else
-    {
-      if (_DEBUG) printf("connect(): Success\n");
-    }
+	if (res < 0)
+	{
+		if (_DEBUG) perror("connect()");
+		return -EXIT_FAILURE;
+	}
+	else
+	{
+		if (_DEBUG) printf("connect(): Success\n");
+	}
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 
-  int iResult;
-  // Initialize Winsock
-  iResult = WSAStartup(MAKEWORD(2,2), &WSAData);
-  if (iResult != 0)
-  {
-    printf("WSAStartup failed: %d\n", iResult);
-    return 1;
-  }
+	int iResult;
+	// Initialize Winsock
+	iResult = WSAStartup(MAKEWORD(2,2), &WSAData);
+	if (iResult != 0)
+	{
+		printf("WSAStartup failed: %d\n", iResult);
+		return 1;
+	}
 
 #endif
-  return 0;
+	return 0;
 }
 
 // signal event handler for SIGINT
 void FinalizeCallback(int signal)
 {
-  exit(EXIT_SUCCESS); // this calls pserver_fini()
+	exit(EXIT_SUCCESS); // this calls pserver_fini()
 }
 
 void ClientFinalize()
 {
 #ifdef __linux__
-  shutdown(ClientSocket, 2);
-  close(ClientSocket);
+	shutdown(ClientSocket, 2);
+	close(ClientSocket);
 #elif defined(__MINGW32__) || defined(__MINGW64__)
-  closesocket(ClientSocket);
-  WSACleanup();
+	closesocket(ClientSocket);
+	WSACleanup();
 #endif
 }
 
 int main(int argumentsCount, char **arguments)
 {
 
-  if (argumentsCount < 3) return EXIT_SUCCESS;
+	if (argumentsCount < 3) return EXIT_SUCCESS;
 
-  char *hostname = arguments[1];
-  char *port = arguments[2];
+	char *hostname = arguments[1];
+	char *port = arguments[2];
 
 #ifdef __linux__
-  atexit((void(*)())ClientFinalize);
-  signal(SIGINT, FinalizeCallback); // this calls pserver_terminate()
+	atexit((void(*)())ClientFinalize);
+	signal(SIGINT, FinalizeCallback); // this calls pserver_terminate()
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 #endif
 
-  ClientInitialize(hostname, port);
+	ClientInitialize(hostname, port);
 
-  Func(&ClientSocket);
+	Func(&ClientSocket);
 
-  ClientFinalize();
-  return EXIT_SUCCESS;
+	ClientFinalize();
+	return EXIT_SUCCESS;
 }
