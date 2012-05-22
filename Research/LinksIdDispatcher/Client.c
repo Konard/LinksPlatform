@@ -21,7 +21,7 @@ long long int i = 0;
 
 int ClientSocket = 0;
 
-void Func(int *clientSocket)
+int Func(int *clientSocket)
 {
 	char buffer[8];
 	while(TRUE)
@@ -31,6 +31,7 @@ void Func(int *clientSocket)
 		i++;
 		if (i%1000 == 0) printf("i = %lld\n", i);
 	}
+	return 0;
 }
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
@@ -45,7 +46,31 @@ WSADATA WSAData;
 SOCKET ListenSocket = INVALID_SOCKET;
 SOCKET ClientSocket = INVALID_SOCKET;
 
-void Func(SOCKET *pClientSocket) {
+int Func(SOCKET *clientSocket) {
+	char buffer[8];
+	int result;
+	while(TRUE)
+	{
+		result = write(*clientSocket, buffer, 8);
+		if (result == SOCKET_ERROR)
+		{
+			printf("write failed: %d\n", WSAGetLastError());
+			closesocket(*clientSocket);
+			WSACleanup();
+			return -1;
+		}
+		result = read(*clientSocket, buffer, 8);
+		if (result == SOCKET_ERROR)
+		{
+			printf("read failed: %d\n", WSAGetLastError());
+			closesocket(*clientSocket);
+			WSACleanup();
+			return -1;
+		}
+		i++;
+		if (i%1000 == 0) printf("i = %lld\n", i);
+	}
+	return 0;
 }
 
 #endif
@@ -95,12 +120,53 @@ int ClientInitialize(const char *hostname, const char *port)
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 
-	int iResult;
+	int winsockResult;
 	// Initialize Winsock
-	iResult = WSAStartup(MAKEWORD(2,2), &WSAData);
-	if (iResult != 0)
+	winsockResult = WSAStartup(MAKEWORD(2,2), &WSAData);
+	if (winsockResult != 0)
 	{
-		printf("WSAStartup failed: %d\n", iResult);
+		printf("WSAStartup failed: %d\n", winsockResult);
+		return 1;
+	}
+
+	struct addrinfo *result = NULL, hints;
+	ZeroMemory(&hints, sizeof(hints));
+	hints.ai_family = AF_UNSPEC;
+	hints.ai_socktype = SOCK_STREAM;
+	hints.ai_protocol = IPPROTO_TCP;
+
+	// Resolve the server address and port
+	winsockResult = getaddrinfo(hostname, port, &hints, &result);
+	if (winsockResult != 0) {
+		printf("getaddrinfo failed: %d\n", winsockResult);
+		WSACleanup();
+		return 1;
+	}
+
+	// Create a SOCKET for connecting to server
+	ClientSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
+	if (ClientSocket == INVALID_SOCKET) {
+		printf("Error at socket(): %ld\n", WSAGetLastError());
+		freeaddrinfo(result);
+		WSACleanup();
+		return 1;
+	}
+
+	// Connect to server.
+	winsockResult = connect(ClientSocket, result->ai_addr, (int)result->ai_addrlen);
+	if (winsockResult == SOCKET_ERROR) {
+		closesocket(ClientSocket);
+		ClientSocket = INVALID_SOCKET;
+	}
+
+	// Should really try the next address returned by getaddrinfo
+	// if the connect call failed
+	// But for this simple example we just free the resources
+	// returned by getaddrinfo and print an error message
+	freeaddrinfo(result);
+	if (ClientSocket == INVALID_SOCKET) {
+		printf("Unable to connect to server!\n");
+		WSACleanup();
 		return 1;
 	}
 

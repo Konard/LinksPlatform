@@ -56,7 +56,7 @@ int Func(SOCKET *clientSocket)
 		if (result == SOCKET_ERROR)
 		{
 			printf("read failed: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
+			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
 		}
@@ -64,7 +64,7 @@ int Func(SOCKET *clientSocket)
 		if (result == SOCKET_ERROR)
 		{
 			printf("write failed: %d\n", WSAGetLastError());
-			closesocket(ClientSocket);
+			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
 		}
@@ -131,7 +131,7 @@ int ServerInitialize(char *hostname, char *port)
 
 	int winsockResult;
 	// Initialize Winsock
-	winsock = WSAStartup(MAKEWORD(2,2), &wsaData);
+	winsockResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (winsockResult != 0)
 	{
 		printf("WSAStartup failed: %d\n", winsockResult);
