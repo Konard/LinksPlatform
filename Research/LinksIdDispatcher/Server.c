@@ -11,6 +11,7 @@ long long int i = 0;
 #include <sys/socket.h>
 
 #include <arpa/inet.h> // htons()
+#include <netinet/tcp.h> // TCP_NODELAY
 
 #include <stdio.h> // perror(), printf()
 
@@ -30,7 +31,7 @@ void Func(int *clientSocket)
 		read(*clientSocket, buffer, 8);
 		write(*clientSocket, buffer, 8);
 		i++;
-		if (i%1000 == 0) printf("i = %lld\n", i);
+		if (i % 1000 == 0) printf("i = %lld\n", i);
 	}
 }
 
@@ -69,7 +70,7 @@ int Func(SOCKET *clientSocket)
 			return -1;
 		}
 		i++;
-		if (i%1000 == 0) printf("i = %lld\n", i);
+		if (i % 1000 == 0) printf("i = %lld\n", i);
 	}
 	return 0;
 }
@@ -233,6 +234,12 @@ int main(int argumentsCount, char **arguments)
 	{
 		ClientSocket = accept(ListenSocket, NULL, NULL); // blocking accept()
 #ifdef __linux__
+		int yes = 1;
+		if (setsockopt(ClientSocket, IPPROTO_TCP, TCP_NODELAY, (char *)&yes, sizeof(yes)) < 0)
+		{
+			if (_DEBUG) perror("setsockopt()");
+			return -EXIT_FAILURE; // -1
+		}
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 		if (ClientSocket == INVALID_SOCKET)
 		{
@@ -241,6 +248,16 @@ int main(int argumentsCount, char **arguments)
 			WSACleanup();
 			return 1;
 		}
+		int optionYes = 1;
+		int optionYesLen = sizeof(optionYes);
+		int winsockResult = getsockopt(ClientSocket, IPPROTO_TCP, TCP_NODELAY, (char *) &optionYes, &optionYesLen);
+		if (winsockResult == SOCKET_ERROR) {
+			printf("getsockopt for SO_KEEPALIVE failed with error: %u\n", WSAGetLastError());
+		}
+		else {
+			printf("SO_KEEPALIVE Value: %d\n", optionYes);
+		}
+
 #endif
 		printf("[accepted]\n");
 		Func(&ClientSocket);
