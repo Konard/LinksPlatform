@@ -108,13 +108,13 @@ int ClientInitialize(const char *hostname, const char *port)
 		return -EXIT_FAILURE; // -1
 	}
 
-	struct sockaddr_in hostAddressStruct;
-	hostAddressStruct.sin_family = AF_INET;
-	inet_aton(hostname, &hostAddressStruct.sin_addr);
-	hostAddressStruct.sin_port = htons(atoi(port));
+	struct sockaddr_in hostAddress;
+	hostAddress.sin_family = AF_INET;
+	inet_aton(hostname, &hostAddress.sin_addr);
+	hostAddress.sin_port = htons(atoi(port));
 	if (_DEBUG) printf("hostname:port = %s\n", hostname, port);
 
-	int res = connect(ClientSocket, (struct sockaddr *)&hostAddressStruct, sizeof(hostAddressStruct));
+	int res = connect(ClientSocket, (struct sockaddr *)&hostAddress, sizeof(hostAddress));
 
 	if (res < 0)
 	{

@@ -3,6 +3,8 @@
 
 long long int i = 0;
 
+#define _DEBUG 1
+
 #ifdef __linux__
 
 #include <stdlib.h> // atoi(), exit()
@@ -78,9 +80,6 @@ int Func(SOCKET *clientSocket)
 #endif
 
 
-#define _DEBUG 1
-
-
 int ServerInitialize(char *hostname, char *port)
 {
 #ifdef __linux__
@@ -102,11 +101,11 @@ int ServerInitialize(char *hostname, char *port)
 		exit(EXIT_FAILURE);
 	}
 
-	struct sockaddr_in serverAddressStruct;
-	serverAddressStruct.sin_family = AF_INET;
-	serverAddressStruct.sin_addr.s_addr = INADDR_ANY;
-	serverAddressStruct.sin_port = htons(atoi(port));
-	int res = bind(ListenSocket, (struct sockaddr *)&serverAddressStruct, sizeof(struct sockaddr_in));
+	struct sockaddr_in serverAddress;
+	serverAddress.sin_family = AF_INET;
+	serverAddress.sin_addr.s_addr = INADDR_ANY;
+	serverAddress.sin_port = htons(atoi(port));
+	int res = bind(ListenSocket, (struct sockaddr *)&serverAddress, sizeof(struct sockaddr_in));
 	if (res < 0)
 	{
 		if (_DEBUG) perror("bind()");
