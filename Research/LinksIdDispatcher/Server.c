@@ -1,7 +1,7 @@
 
 // TCP/IP-server (Linux, Windows).
 
-long long int i = 0;
+long long int requestsCount = 0;
 
 #define _DEBUG 1
 
@@ -32,8 +32,8 @@ void Func(int *clientSocket)
 	{
 		read(*clientSocket, buffer, 8);
 		write(*clientSocket, buffer, 8);
-		i++;
-		if (_DEBUG) if (i % 1000 == 0) printf("i = %lld\n", i);
+		requestsCount++;
+		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
 }
 
@@ -71,8 +71,8 @@ int Func(SOCKET *clientSocket)
 			WSACleanup();
 			return -1;
 		}
-		i++;
-		if (_DEBUG) if (i % 1000 == 0) printf("i = %lld\n", i);
+		requestsCount++;
+		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
 	return 0;
 }
