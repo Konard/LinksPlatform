@@ -31,7 +31,7 @@ void Func(int *clientSocket)
 		read(*clientSocket, buffer, 8);
 		write(*clientSocket, buffer, 8);
 		i++;
-		if (i % 1000 == 0) printf("i = %lld\n", i);
+		if (_DEBUG) if (i % 1000 == 0) printf("i = %lld\n", i);
 	}
 }
 
@@ -56,7 +56,7 @@ int Func(SOCKET *clientSocket)
 		result = read(*clientSocket, buffer, 8);
 		if (result == SOCKET_ERROR)
 		{
-			printf("read failed: %d\n", WSAGetLastError());
+			if (_DEBUG) printf("read failed: %d\n", WSAGetLastError());
 			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
@@ -64,13 +64,13 @@ int Func(SOCKET *clientSocket)
 		result = write(*clientSocket, buffer, 8);
 		if (result == SOCKET_ERROR)
 		{
-			printf("write failed: %d\n", WSAGetLastError());
+			if (_DEBUG) printf("write failed: %d\n", WSAGetLastError());
 			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
 		}
 		i++;
-		if (i % 1000 == 0) printf("i = %lld\n", i);
+		if (_DEBUG) if (i % 1000 == 0) printf("i = %lld\n", i);
 	}
 	return 0;
 }
@@ -135,7 +135,7 @@ int ServerInitialize(char *hostname, char *port)
 	winsockResult = WSAStartup(MAKEWORD(2,2), &wsaData);
 	if (winsockResult != 0)
 	{
-		printf("WSAStartup failed: %d\n", winsockResult);
+		if (_DEBUG) printf("WSAStartup failed: %d\n", winsockResult);
 		return 1;
 	}
 
@@ -152,7 +152,7 @@ int ServerInitialize(char *hostname, char *port)
 	winsockResult = getaddrinfo(NULL, port, &hints, &result);
 	if (winsockResult != 0)
 	{
-		printf("getaddrinfo failed: %d\n", winsockResult);
+		if (_DEBUG) printf("getaddrinfo failed: %d\n", winsockResult);
 		WSACleanup();
 		return 1;
 	}
@@ -163,7 +163,7 @@ int ServerInitialize(char *hostname, char *port)
 
 	if (ListenSocket == INVALID_SOCKET)
 	{
-		printf("Error at socket(): %ld\n", WSAGetLastError());
+		if (_DEBUG) printf("Error at socket(): %ld\n", WSAGetLastError());
 		freeaddrinfo(result);
 		WSACleanup();
 		return 1;
@@ -173,7 +173,7 @@ int ServerInitialize(char *hostname, char *port)
 	winsockResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
 	if (winsockResult == SOCKET_ERROR)
 	{
-		printf("bind failed with error: %d\n", WSAGetLastError());
+		if (_DEBUG) printf("bind failed with error: %d\n", WSAGetLastError());
 		freeaddrinfo(result);
 		closesocket(ListenSocket);
 		WSACleanup();
@@ -182,7 +182,7 @@ int ServerInitialize(char *hostname, char *port)
 
 	if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR )
 	{
-		printf( "Listen failed with error: %ld\n", WSAGetLastError() );
+		if (_DEBUG) printf( "Listen failed with error: %ld\n", WSAGetLastError() );
 		closesocket(ListenSocket);
 		WSACleanup();
 		return 1;
@@ -190,7 +190,7 @@ int ServerInitialize(char *hostname, char *port)
 
 	freeaddrinfo(result);
 #endif
-	printf("initialized.");
+	if (_DEBUG) printf("initialized.");
 	return 0;
 }
 
@@ -243,7 +243,7 @@ int main(int argumentsCount, char **arguments)
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 		if (ClientSocket == INVALID_SOCKET)
 		{
-			printf("accept failed: %d\n", WSAGetLastError());
+			if (_DEBUG) printf("accept failed: %d\n", WSAGetLastError());
 			closesocket(ListenSocket);
 			WSACleanup();
 			return 1;
@@ -252,14 +252,14 @@ int main(int argumentsCount, char **arguments)
 		int optionYesLen = sizeof(optionYes);
 		int winsockResult = getsockopt(ClientSocket, IPPROTO_TCP, TCP_NODELAY, (char *) &optionYes, &optionYesLen);
 		if (winsockResult == SOCKET_ERROR) {
-			printf("getsockopt for SO_KEEPALIVE failed with error: %u\n", WSAGetLastError());
+			if (_DEBUG) printf("getsockopt for SO_KEEPALIVE failed with error: %u\n", WSAGetLastError());
 		}
 		else {
-			printf("SO_KEEPALIVE Value: %d\n", optionYes);
+			if (_DEBUG) printf("TCP_NODELAY Value: %d\n", optionYes);
 		}
 
 #endif
-		printf("[accepted]\n");
+		if (_DEBUG) printf("[accepted]\n");
 		Func(&ClientSocket);
 	}
 

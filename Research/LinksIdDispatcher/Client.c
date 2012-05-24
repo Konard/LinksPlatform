@@ -73,7 +73,7 @@ int Func(SOCKET *clientSocket) {
 			return -1;
 		}
 		i++;
-		if (i % 1000 == 0) printf("i = %lld\n", i);
+		if (_DEBUG) if (i % 1000 == 0) printf("i = %lld\n", i);
 	}
 	return 0;
 }
@@ -133,7 +133,7 @@ int ClientInitialize(const char *hostname, const char *port)
 	winsockResult = WSAStartup(MAKEWORD(2,2), &WSAData);
 	if (winsockResult != 0)
 	{
-		printf("WSAStartup failed: %d\n", winsockResult);
+		if (_DEBUG) printf("WSAStartup failed: %d\n", winsockResult);
 		return 1;
 	}
 
@@ -146,7 +146,7 @@ int ClientInitialize(const char *hostname, const char *port)
 	// Resolve the server address and port
 	winsockResult = getaddrinfo(hostname, port, &hints, &result);
 	if (winsockResult != 0) {
-		printf("getaddrinfo failed: %d\n", winsockResult);
+		if (_DEBUG) printf("getaddrinfo failed: %d\n", winsockResult);
 		WSACleanup();
 		return 1;
 	}
@@ -154,7 +154,7 @@ int ClientInitialize(const char *hostname, const char *port)
 	// Create a SOCKET for connecting to server
 	ClientSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (ClientSocket == INVALID_SOCKET) {
-		printf("Error at socket(): %ld\n", WSAGetLastError());
+		if (_DEBUG) printf("Error at socket(): %ld\n", WSAGetLastError());
 		freeaddrinfo(result);
 		WSACleanup();
 		return 1;
@@ -164,10 +164,10 @@ int ClientInitialize(const char *hostname, const char *port)
 	int optionYesLen = sizeof(optionYes);
 	winsockResult = getsockopt(ClientSocket, IPPROTO_TCP, TCP_NODELAY, (char *) &optionYes, &optionYesLen);
 	if (winsockResult == SOCKET_ERROR) {
-		printf("getsockopt for SO_KEEPALIVE failed with error: %u\n", WSAGetLastError());
+		if (_DEBUG) printf("getsockopt for SO_KEEPALIVE failed with error: %u\n", WSAGetLastError());
 	}
 	else {
-		printf("SO_KEEPALIVE Value: %d\n", optionYes);
+		if (_DEBUG) printf("TCP_NODELAY Value: %d\n", optionYes);
 	}
 
 	// Connect to server.
@@ -183,7 +183,7 @@ int ClientInitialize(const char *hostname, const char *port)
 	// returned by getaddrinfo and print an error message
 	freeaddrinfo(result);
 	if (ClientSocket == INVALID_SOCKET) {
-		printf("Unable to connect to server!\n");
+		if (_DEBUG) printf("Unable to connect to server!\n");
 		WSACleanup();
 		return 1;
 	}
