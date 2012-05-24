@@ -27,7 +27,7 @@ int ClientSocket = 0;
 int Func(int *clientSocket)
 {
 	char buffer[8];
-	while(TRUE)
+	while (TRUE)
 	{
 		write(*clientSocket, buffer, 8);
 		read(*clientSocket, buffer, 8);
@@ -52,7 +52,7 @@ SOCKET ClientSocket = INVALID_SOCKET;
 int Func(SOCKET *clientSocket) {
 	char buffer[8];
 	int result;
-	while(TRUE)
+	while (TRUE)
 	{
 		result = send(*clientSocket, buffer, 8, 0);
 		if (result == SOCKET_ERROR)
@@ -129,7 +129,7 @@ int ClientInitialize(const char *hostname, const char *port)
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 
 	int winsockResult;
-	// Initialize Winsock
+	// Initialize Winsock2 system.
 	winsockResult = WSAStartup(MAKEWORD(2,2), &WSAData);
 	if (winsockResult != 0)
 	{
@@ -138,12 +138,18 @@ int ClientInitialize(const char *hostname, const char *port)
 	}
 
 	struct addrinfo *result = NULL, hints;
+	
+	// We can provide hints about the type of socket supported through an addrinfo structure
+	// pointed to by the pHints parameter:
+	// * AF_UNSPEC indicates the caller will accept any protocol family
+	// * SOCK_STREAM indicates the caller will accept this socket type
+	// * IPPROTO_TCP indicates the caller will accept TCP protocol
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_UNSPEC;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 
-	// Resolve the server address and port
+	// Resolve the server address and port.
 	winsockResult = getaddrinfo(hostname, port, &hints, &result);
 	if (winsockResult != 0) {
 		if (_DEBUG) printf("getaddrinfo failed: %d\n", winsockResult);
@@ -151,7 +157,7 @@ int ClientInitialize(const char *hostname, const char *port)
 		return 1;
 	}
 
-	// Create a SOCKET for connecting to server
+	// Create a SOCKET for connecting to server.
 	ClientSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	if (ClientSocket == INVALID_SOCKET) {
 		if (_DEBUG) printf("Error at socket(): %ld\n", WSAGetLastError());
@@ -178,9 +184,9 @@ int ClientInitialize(const char *hostname, const char *port)
 	}
 
 	// Should really try the next address returned by getaddrinfo
-	// if the connect call failed
+	// if the connect call failed.
 	// But for this simple example we just free the resources
-	// returned by getaddrinfo and print an error message
+	// returned by getaddrinfo and print an error message.
 	freeaddrinfo(result);
 	if (ClientSocket == INVALID_SOCKET) {
 		if (_DEBUG) printf("Unable to connect to server!\n");
@@ -192,7 +198,7 @@ int ClientInitialize(const char *hostname, const char *port)
 	return 0;
 }
 
-// signal event handler for SIGINT
+// Signal event handler for SIGINT.
 void FinalizeCallback(int signal)
 {
 	exit(EXIT_SUCCESS); // this calls pserver_fini()
@@ -219,7 +225,7 @@ int main(int argumentsCount, char **arguments)
 
 #ifdef __linux__
 	atexit((void(*)())ClientFinalize);
-	signal(SIGINT, FinalizeCallback); // this calls pserver_terminate()
+	signal(SIGINT, FinalizeCallback);
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 #endif
 

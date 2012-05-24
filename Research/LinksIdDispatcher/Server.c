@@ -28,7 +28,7 @@ int ClientSocket = 0;
 void Func(int *clientSocket)
 {
 	char buffer[8];
-	while(TRUE)
+	while (TRUE)
 	{
 		read(*clientSocket, buffer, 8);
 		write(*clientSocket, buffer, 8);
@@ -53,7 +53,7 @@ int Func(SOCKET *clientSocket)
 {
 	char buffer[8];
 	int result;
-	while(TRUE)
+	while (TRUE)
 	{
 		result = read(*clientSocket, buffer, 8);
 		if (result == SOCKET_ERROR)
@@ -141,13 +141,16 @@ int ServerInitialize(char *hostname, char *port)
 	struct addrinfo *result = NULL,
 		*ptr = NULL,
 		hints;
+
+	// * AI_PASSIVE indicates the caller intends to use the returned socket address
+	//   structure in a call to the bind() function.
 	ZeroMemory( &hints, sizeof(hints) );
 	hints.ai_family = AF_INET;
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 
-	// Resolve the local address and port to be used by the server
+	// Resolve the local address and port to be used by the server.
 	winsockResult = getaddrinfo(NULL, port, &hints, &result);
 	if (winsockResult != 0)
 	{
@@ -156,7 +159,7 @@ int ServerInitialize(char *hostname, char *port)
 		return 1;
 	}
 
-	// Create a SOCKET for the server to listen for client connections
+	// Create a SOCKET for the server to listen for client connections.
 	ListenSocket = socket(result->ai_family, result->ai_socktype,
 		result->ai_protocol);
 
@@ -168,8 +171,8 @@ int ServerInitialize(char *hostname, char *port)
 		return 1;
 	}
 
-	// Setup the TCP listening socket
-	winsockResult = bind( ListenSocket, result->ai_addr, (int)result->ai_addrlen);
+	// Setup the TCP listening socket.
+	winsockResult = bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
 	if (winsockResult == SOCKET_ERROR)
 	{
 		if (_DEBUG) printf("bind failed with error: %d\n", WSAGetLastError());
@@ -179,9 +182,9 @@ int ServerInitialize(char *hostname, char *port)
 		return 1;
 	}
 
-	if ( listen( ListenSocket, SOMAXCONN ) == SOCKET_ERROR )
+	if (listen(ListenSocket, SOMAXCONN) == SOCKET_ERROR)
 	{
-		if (_DEBUG) printf( "Listen failed with error: %ld\n", WSAGetLastError() );
+		if (_DEBUG) printf("Listen failed with error: %ld\n", WSAGetLastError());
 		closesocket(ListenSocket);
 		WSACleanup();
 		return 1;
@@ -193,10 +196,10 @@ int ServerInitialize(char *hostname, char *port)
 	return 0;
 }
 
-// signal event handler for SIGINT
+// Signal event handler for SIGINT.
 void FinalizeCallback(int signal)
 {
-	exit(EXIT_SUCCESS); // this calls pserver_fini()
+	exit(EXIT_SUCCESS); // This calls ServerFinalize().
 }
 
 void ServerFinalize()
@@ -223,7 +226,7 @@ int main(int argumentsCount, char **arguments)
 
 #ifdef __linux__
 	atexit((void(*)())ServerFinalize);
-	signal(SIGINT, FinalizeCallback); // this calls pserver_terminate()
+	signal(SIGINT, FinalizeCallback);
 #elif defined(__MINGW32__) || defined(__MINGW64__)
 #endif
 
@@ -231,7 +234,7 @@ int main(int argumentsCount, char **arguments)
 
 	while (TRUE)
 	{
-		ClientSocket = accept(ListenSocket, NULL, NULL); // blocking accept()
+		ClientSocket = accept(ListenSocket, NULL, NULL); // Blocking accept().
 #ifdef __linux__
 		int yes = 1;
 		if (setsockopt(ClientSocket, IPPROTO_TCP, TCP_NODELAY, (char *)&yes, sizeof(yes)) < 0)
