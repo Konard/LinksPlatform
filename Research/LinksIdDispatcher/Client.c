@@ -4,6 +4,7 @@
 long long int requestsCount = 0;
 
 #define _DEBUG 1
+#define BUFSIZE 32
 
 #ifdef __linux__
 
@@ -26,11 +27,11 @@ int ClientSocket = 0;
 
 int Func(int *clientSocket)
 {
-	char buffer[8];
+	char buffer[BUFSIZE];
 	while (TRUE)
 	{
-		write(*clientSocket, buffer, 8);
-		read(*clientSocket, buffer, 8);
+		send(*clientSocket, buffer, BUFSIZE, 0);
+		recv(*clientSocket, buffer, BUFSIZE, 0);
 		requestsCount++;
 		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
@@ -50,11 +51,11 @@ SOCKET ListenSocket = INVALID_SOCKET;
 SOCKET ClientSocket = INVALID_SOCKET;
 
 int Func(SOCKET *clientSocket) {
-	char buffer[8];
+	char buffer[BUFSIZE];
 	int result;
 	while (TRUE)
 	{
-		result = send(*clientSocket, buffer, 8, 0);
+		result = send(*clientSocket, buffer, BUFSIZE, 0);
 		if (result == SOCKET_ERROR)
 		{
 			printf("send failed: %d\n", WSAGetLastError());
@@ -63,7 +64,7 @@ int Func(SOCKET *clientSocket) {
 			WSACleanup();
 			return -1;
 		}
-		result = recv(*clientSocket, buffer, 8, 0);
+		result = recv(*clientSocket, buffer, BUFSIZE, 0);
 		if (result == SOCKET_ERROR)
 		{
 			printf("recv failed: %d\n", WSAGetLastError());

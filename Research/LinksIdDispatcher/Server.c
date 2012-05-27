@@ -4,6 +4,7 @@
 long long int requestsCount = 0;
 
 #define _DEBUG 1
+#define BUFSIZE 32
 
 #ifdef __linux__
 
@@ -25,16 +26,39 @@ long long int requestsCount = 0;
 int ListenSocket = 0;
 int ClientSocket = 0;
 
-void Func(int *clientSocket)
+int Func(int *clientSocket)
 {
 	char buffer[8];
+	int result;
+
+#if defined(SERVER_SELECT)
+	fd_set rfds;
+	struct timeval tv;
+	FD_ZERO(&rfds);
+	FD_SET(*clientSocket, &rfds);
+	tv.tv_sec = 0; // wait for five seconds
+	tv.tv_usec = 5000;
+
 	while (TRUE)
 	{
-		read(*clientSocket, buffer, 8);
-		write(*clientSocket, buffer, 8);
+		result = select(1, &rfds, NULL, NULL, &tv);
+		if (result) {
+			recv(*clientSocket, buffer, BUFSIZE, 0);
+			send(*clientSocket, buffer, BUFSIZE, 0);
+			requestsCount++;
+			if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
+		}
+		else if (result == -1) perror("select()");
+	}
+#else
+	while (TRUE)
+	{
+		recv(*clientSocket, buffer, BUFSIZE, 0);
+		send(*clientSocket, buffer, BUFSIZE, 0);
 		requestsCount++;
 		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
+#endif
 }
 
 #elif defined(__MINGW32__) || defined(__MINGW64__)
@@ -53,20 +77,29 @@ int Func(SOCKET *clientSocket)
 {
 	char buffer[8];
 	int result;
+
+	fd_set rfds;
+	struct timeval tv;
+	FD_ZERO(&rfds);
+	FD_SET(0, &rfds);
+	tv.tv_sec = 5; // wait for five seconds
+	tv.tv_usec = 0;
+
 	while (TRUE)
 	{
-		result = read(*clientSocket, buffer, 8);
+		result = select(1, &rfds, NULL, NULL, &tv);
+		result = recv(*clientSocket, buffer, BUFSIZE, 0);
 		if (result == SOCKET_ERROR)
 		{
-			if (_DEBUG) printf("read failed: %d\n", WSAGetLastError());
+			if (_DEBUG) printf("recv failed: %d\n", WSAGetLastError());
 			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
 		}
-		result = write(*clientSocket, buffer, 8);
+		result = send(*clientSocket, buffer, BUFSIZE, 0);
 		if (result == SOCKET_ERROR)
 		{
-			if (_DEBUG) printf("write failed: %d\n", WSAGetLastError());
+			if (_DEBUG) printf("send failed: %d\n", WSAGetLastError());
 			closesocket(*clientSocket);
 			WSACleanup();
 			return -1;
@@ -192,7 +225,7 @@ int ServerInitialize(char *hostname, char *port)
 
 	freeaddrinfo(result);
 #endif
-	if (_DEBUG) printf("initialized.");
+	if (_DEBUG) printf("initialized.\n");
 	return 0;
 }
 
