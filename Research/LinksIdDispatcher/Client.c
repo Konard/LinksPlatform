@@ -3,7 +3,7 @@
 
 long long int requestsCount = 0;
 
-#define _DEBUG 1
+#define _DEBUG 0
 #define BUFSIZE 32
 
 #ifdef __linux__
@@ -33,7 +33,7 @@ int Func(int *clientSocket)
 		send(*clientSocket, buffer, BUFSIZE, 0);
 		recv(*clientSocket, buffer, BUFSIZE, 0);
 		requestsCount++;
-		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
+		if (_DEBUG) if (requestsCount % 10000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
 	return 0;
 }
@@ -74,7 +74,7 @@ int Func(SOCKET *clientSocket) {
 			return -1;
 		}
 		requestsCount++;
-		if (_DEBUG) if (requestsCount % 1000 == 0) printf("requestsCount = %lld\n", requestsCount);
+		if (_DEBUG) if (requestsCount % 10000 == 0) printf("requestsCount = %lld\n", requestsCount);
 	}
 	return 0;
 }
