@@ -386,7 +386,7 @@ int main(int argumentsCount, char **arguments)
 			NULL,
 			0,
 			(LPTHREAD_START_ROUTINE)Func,
-			&i,
+			NULL, // &i
 			0,
 			&_thread_id
 		);
