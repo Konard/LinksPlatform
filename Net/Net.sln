@@ -1,6 +1,8 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
+MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleTester", "ConsoleTester\ConsoleTester.csproj", "{B7813AB4-392F-412E-B826-A6DE75C05E15}"
 	ProjectSection(ProjectDependencies) = postProject
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C} = {6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}
@@ -49,8 +51,8 @@ Global
 		{B7813AB4-392F-412E-B826-A6DE75C05E15}.Release|x86.ActiveCfg = Release|x86
 		{B7813AB4-392F-412E-B826-A6DE75C05E15}.Release|x86.Build.0 = Release|x86
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Any CPU.ActiveCfg = Debug|Win32
-		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Mixed Platforms.ActiveCfg = Debug|Win32
-		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Mixed Platforms.Build.0 = Debug|Win32
+		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Mixed Platforms.ActiveCfg = Debug|x64
+		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Mixed Platforms.Build.0 = Debug|x64
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|Win32.Build.0 = Debug|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|x64.ActiveCfg = Debug|x64
@@ -58,8 +60,8 @@ Global
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|x86.ActiveCfg = Debug|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Debug|x86.Build.0 = Debug|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Any CPU.ActiveCfg = Release|Win32
-		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Mixed Platforms.ActiveCfg = Release|Win32
-		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Mixed Platforms.Build.0 = Release|Win32
+		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Mixed Platforms.ActiveCfg = Release|x64
+		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Mixed Platforms.Build.0 = Release|x64
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Win32.ActiveCfg = Release|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|Win32.Build.0 = Release|Win32
 		{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}.Release|x64.ActiveCfg = Release|x64

@@ -37,22 +37,22 @@ uint64_t		storageFileSizeInBytes; // <- off_t
 
 
 // Константы, рассчитываемые при запуске приложения
-int			currentMemoryPageSizeInBytes;	// Размер страницы в операционной системе
-int			serviceBlockSizeInBytes;	// Размер сервисных данных, (две страницы)
+int			currentMemoryPageSizeInBytes;		// Размер страницы в операционной системе
+int			serviceBlockSizeInBytes;			// Размер сервисных данных, (две страницы)
 int			baseLinksSizeInBytes;	
-uint64_t		baseBlockSizeInBytes; // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-uint64_t		storageFileMinSizeInBytes;
+uint64_t	baseBlockSizeInBytes;				// Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
+uint64_t	storageFileMinSizeInBytes;
 
-void*			pointerToMappedRegion; 		// указатель на начало региона памяти - результата mmap()
+void*		pointerToMappedRegion;				// указатель на начало региона памяти - результата mmap()
 
-int*				pointerToMappingLinksMaxSize;
-Link**			pointerToPointerToMappingLinks;	// инициализируется в SetStorageFileMemoryMapping()
-uint64_t*			pointerToLinksMaxSize;
-uint64_t*			pointerToLinksSize;
+int*		pointerToMappingLinksMaxSize;
+Link**		pointerToPointerToMappingLinks;		// инициализируется в SetStorageFileMemoryMapping()
+uint64_t*	pointerToLinksMaxSize;
+uint64_t*	pointerToLinksSize;
 
 /* Не используемый блок памяти, с размером (sizeof(Link) - 16) */
-Link*				pointerToUnusedMarker;	// инициализируется в SetStorageFileMemoryMapping()
-Link*				pointerToLinks;		// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
+Link*		pointerToUnusedMarker;				// инициализируется в SetStorageFileMemoryMapping()
+Link*		pointerToLinks;						// здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
 
 
 
@@ -518,6 +518,7 @@ int WalkThroughLinks(func func_)
 	
 	return true;
 }
+*/
 
 // работа с опорными (базовыми) связями; их не должно быть много
 uint64_t GetMappingLink(int index)
@@ -533,7 +534,6 @@ void SetMappingLink(int index, uint64_t linkIndex)
 	if (index < *pointerToMappingLinksMaxSize)
 		(*pointerToPointerToMappingLinks)[index] = link;
 }
-*/
 
 Link *GetLink(uint64_t linkIndex)
 {
