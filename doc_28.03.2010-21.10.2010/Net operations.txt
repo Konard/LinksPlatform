@@ -1,7 +1,7 @@
-Операции:
+РћРїРµСЂР°С†РёРё:
 
 
-Переход:
+РџРµСЂРµС…РѕРґ:
 	Link
 		- source: goto source.
 		- verb: goto verb.
@@ -9,7 +9,7 @@
 		
 		- 
 	
-Чтение
+Р§С‚РµРЅРёРµ
 	Link:		
 		
 		- all get operations return reference to some link.
@@ -20,16 +20,16 @@
 		
 		-
 		
-Запись:
+Р—Р°РїРёСЃСЊ:
 
 		- set [source] { of [current] }.
 		- set [verb] { of [current] }.
 		- set [target] { of [current] }.
 		
-Создание связи:
+РЎРѕР·РґР°РЅРёРµ СЃРІСЏР·Рё:
 		- create link from [source] { to [current] } by [verb].
 		- create link { from [current] } to [target] by [verb].
 		- link [source] with [target] { by [current] }.
 		
-Создание нода:
+РЎРѕР·РґР°РЅРёРµ РЅРѕРґР°:
 
