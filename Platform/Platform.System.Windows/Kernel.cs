@@ -14,47 +14,27 @@ namespace Platform.System.Windows
         {
             Commit
                 = 0x00001000,
+
             Reserve
                 = 0x00002000,
+
             Reset
                 = 0x00080000,
+
             ResetUndo
                 = 0x01000000,
+
             LargePages
                 = 0x20000000,
+
             Physical
                 = 0x00400000,
+
             TopDown
                 = 0x00100000,
+
             WriteWatch
                 = 0x00200000
-        }
-
-        [Flags]
-        public enum MemoryProtection : uint
-        {
-            NoAccess
-                = 0x001,
-            Readonly
-                = 0x002,
-            ReadWrite
-                = 0x004,
-            WriteCopy
-                = 0x008,
-            Execute
-                = 0x010,
-            ExecuteRead
-                = 0x020,
-            ExecuteReadWrite
-                = 0x040,
-            ExecuteWriteCopy
-                = 0x080,
-            GuardModifierFlag
-                = 0x100,
-            NoCacheModifierFlag
-                = 0x200,
-            WriteCombineModifierFlag
-                = 0x400
         }
 
         [Flags]
@@ -62,8 +42,46 @@ namespace Platform.System.Windows
         {
             Decommit
                 = 0x4000,
+
             Release
                 = 0x8000
+        }
+
+        [Flags]
+        public enum MemoryProtection : uint
+        {
+            NoAccess
+                = 0x001,
+
+            Readonly
+                = 0x002,
+
+            ReadWrite
+                = 0x004,
+
+            WriteCopy
+                = 0x008,
+
+            Execute
+                = 0x010,
+
+            ExecuteRead
+                = 0x020,
+
+            ExecuteReadWrite
+                = 0x040,
+
+            ExecuteWriteCopy
+                = 0x080,
+
+            GuardModifierFlag
+                = 0x100,
+
+            NoCacheModifierFlag
+                = 0x200,
+
+            WriteCombineModifierFlag
+                = 0x400
         }
 
         #endregion
@@ -71,9 +89,11 @@ namespace Platform.System.Windows
         #region Methods
 
         [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr VirtualAlloc(IntPtr blockAddress, UIntPtr sizeInBytes, MemoryAllocationType allocationType, MemoryProtection protection);
+        public static extern IntPtr VirtualAlloc(IntPtr blockAddress, UIntPtr sizeInBytes,
+            MemoryAllocationType allocationType, MemoryProtection protection);
 
-        public static IntPtr VirtualAlloc(UIntPtr sizeInBytes, MemoryAllocationType allocationType, MemoryProtection protection)
+        public static IntPtr VirtualAlloc(UIntPtr sizeInBytes, MemoryAllocationType allocationType,
+            MemoryProtection protection)
         {
             return VirtualAlloc(IntPtr.Zero, sizeInBytes, allocationType, protection);
         }
@@ -94,24 +114,34 @@ namespace Platform.System.Windows
         {
             NoSerialize
                 = 0x00000001,
+
             Growable
                 = 0x00000002,
+
             GenerateExceptions
                 = 0x00000004,
+
             ZeroMemory
                 = 0x00000008,
+
             ReallocInPlaceOnly
                 = 0x00000010,
+
             TailCheckingEnabled
                 = 0x00000020,
+
             FreeCheckingEnabled
                 = 0x00000040,
+
             DisableCoalesceOnFree
                 = 0x00000080,
+
             CreateAlign16
                 = 0x00010000,
+
             CreateEnableTracing
                 = 0x00020000,
+
             CreateEnableExecute
                 = 0x00040000
         }
@@ -131,7 +161,8 @@ namespace Platform.System.Windows
 
         // TODO: Узнать, как проверять конкретное значение SetLastError
         [DllImport("kernel32")]
-        public static extern IntPtr HeapReAlloc(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress, UIntPtr sizeInBytes);
+        public static extern IntPtr HeapReAlloc(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress,
+            UIntPtr sizeInBytes);
 
         [DllImport("kernel32")]
         public static extern UIntPtr HeapSize(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress);

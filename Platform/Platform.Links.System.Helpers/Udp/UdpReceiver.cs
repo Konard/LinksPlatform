@@ -84,8 +84,14 @@ namespace Platform.Links.System.Helpers.Udp
 
         protected override void DisposeCore(bool manual)
         {
-            try { Stop(); }
-            finally { _worker = null; }
+            try
+            {
+                Stop();
+            }
+            finally
+            {
+                _worker = null;
+            }
         }
     }
 }

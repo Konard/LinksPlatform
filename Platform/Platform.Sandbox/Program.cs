@@ -3,9 +3,9 @@ using System.IO;
 
 namespace Platform.Sandbox
 {
-    unsafe class Program
+    internal unsafe class Program
     {
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             //Sequences.TestSimplify();
             //WrongPointerTest();
@@ -21,18 +21,17 @@ namespace Platform.Sandbox
 
                 fixed (byte* pointer = array)
                 {
-                    var value = *(pointer - 259);
+                    byte value = *(pointer - 259);
                 }
             }
             catch (Exception ex)
             {
-
             }
         }
 
         private static void Links()
         {
-            var filename = (new Random(2)).Next(1, 99999).ToString();
+            string filename = (new Random(2)).Next(1, 99999).ToString();
 
             //if (File.Exists(filename))
             //    File.Delete(filename);

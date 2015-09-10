@@ -3,11 +3,11 @@ using Platform.Links.System.Helpers.Udp;
 
 namespace Platform.Links.DataBase.Terminal
 {
-    static class Program
+    internal static class Program
     {
-        static void Main()
+        private static void Main()
         {
-            using (var receiver = new UdpReceiver(8888, (m) => Console.WriteLine("R.M.: {0}", m)))
+            using (var receiver = new UdpReceiver(8888, m => Console.WriteLine("R.M.: {0}", m)))
             {
                 receiver.Start();
 

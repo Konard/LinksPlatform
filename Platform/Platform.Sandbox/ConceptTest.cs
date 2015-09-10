@@ -6,29 +6,9 @@ namespace Platform.Sandbox
 {
     public static class ConceptTest
     {
-        private class UserGroup
-        {
-            public long Id { get; set; }
-            public string[] AllowedLocations { get; set; }
-            public string[] DisallowedLocations { get; set; }
-        }
-
-        private class UserRight
-        {
-            public long Id { get; set; }
-            public long UserGroupsIds { get; set; }
-        }
-
-        private class User
-        {
-            public string FirstName { get; set; }
-            public string LastName { get; set; }
-            public string Username { get; set; }
-        }
-
         public static void TestGexf(string filename)
         {
-            using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512 * 1024 * 1024))
+            using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512*1024*1024))
             {
                 const int linksToCreate = 1024;
 
@@ -44,7 +24,7 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512 * 1024 * 1024))
+                using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512*1024*1024))
                 {
                     //links.EnterTransaction();
 
@@ -52,17 +32,21 @@ namespace Platform.Sandbox
 
                     Console.ReadKey();
 
-                    var temp1 = links.Create(0, 0);
-                    var temp2 = links.Create(0, 0);
-                    var temp3 = links.Create(temp1, temp2);
-                    var temp4 = links.Create(temp1, temp3);
-                    var temp5 = links.Create(temp4, temp2);
+                    ulong temp1 = links.Create(0, 0);
+                    ulong temp2 = links.Create(0, 0);
+                    ulong temp3 = links.Create(temp1, temp2);
+                    ulong temp4 = links.Create(temp1, temp3);
+                    ulong temp5 = links.Create(temp4, temp2);
 
                     //links.Delete(links.GetSource(temp2), links.GetTarget(temp2));
 
                     //links.Each(0, temp2, x => links.PrintLink(x));
 
-                    links.Each(0, 0, x => { links.PrintLink(x); return true; });
+                    links.Each(0, 0, x =>
+                    {
+                        links.PrintLink(x);
+                        return true;
+                    });
 
                     //links.ExportSourcesTree(filename + ".gexf");
 
@@ -74,14 +58,16 @@ namespace Platform.Sandbox
 
                     //var seq = sequences.Create(temp1, temp5, temp2, temp1, temp2); //, temp5);
 
-                    var sequence = sequences.Create(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5); //, temp5);
+                    ulong sequence = sequences.Create(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1,
+                        temp5);
+                    //, temp5);
 
                     //links.Each(0, 0, (x, isAPoint) => { links.PrintLink(x); return true; });
 
                     //sequences.Each((x, isAPoint) => { links.PrintLink(x); return true; }, temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
 
 
-                    var sequencesCount = 0;
+                    int sequencesCount = 0;
 
                     sequences.Each(x =>
                     {
@@ -96,10 +82,10 @@ namespace Platform.Sandbox
 
                     Console.WriteLine(links.Total);
 
-                    sequences.Create(temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1);
+                    sequences.Create(temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1,
+                        temp1);
 
                     Console.WriteLine(links.Total);
-
 
 
                     Console.ReadKey();
@@ -121,7 +107,11 @@ namespace Platform.Sandbox
 
                     Console.WriteLine("---");
 
-                    links.Each(0, 0, x => { links.PrintLink(x); return true; });
+                    links.Each(0, 0, x =>
+                    {
+                        links.PrintLink(x);
+                        return true;
+                    });
 
                     Console.WriteLine("---");
 
@@ -130,7 +120,8 @@ namespace Platform.Sandbox
                     //links.EnterTransaction();
 
                     //links.ExitTransaction();
-                };
+                }
+                ;
             }
             //catch (Exception ex)
             {
@@ -143,6 +134,26 @@ namespace Platform.Sandbox
         private static void PrintLink(this Links.DataBase.Core.Pairs.Links links, ulong link)
         {
             Console.WriteLine(links.FormatLink(link));
+        }
+
+        private class User
+        {
+            public string FirstName { get; set; }
+            public string LastName { get; set; }
+            public string Username { get; set; }
+        }
+
+        private class UserGroup
+        {
+            public long Id { get; set; }
+            public string[] AllowedLocations { get; set; }
+            public string[] DisallowedLocations { get; set; }
+        }
+
+        private class UserRight
+        {
+            public long Id { get; set; }
+            public long UserGroupsIds { get; set; }
         }
     }
 }

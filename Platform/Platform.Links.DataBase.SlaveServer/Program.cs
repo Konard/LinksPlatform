@@ -4,7 +4,7 @@ using Platform.Links.System.Helpers.Udp;
 
 namespace Platform.Links.DataBase.SlaveServer
 {
-    class Program
+    internal class Program
     {
         //static void Main(string[] args)
         //{
@@ -13,11 +13,11 @@ namespace Platform.Links.DataBase.SlaveServer
         //}
 
         private static bool UTF16Initialized = false;
-        static ulong UTF16FirstCharLink;
+        private static ulong UTF16FirstCharLink;
         private static ulong UTF16LastCharLink;
-        private static bool LinksServerStoped = false;
+        private static bool LinksServerStoped;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
@@ -37,7 +37,7 @@ namespace Platform.Links.DataBase.SlaveServer
 
             using (var sender = new UdpSender(8888))
             {
-                using (var receiver = new UdpReceiver(7777, (m) =>
+                using (var receiver = new UdpReceiver(7777, m =>
                 {
                     Console.WriteLine("R.M.: {0}", m);
 
@@ -48,12 +48,7 @@ namespace Platform.Links.DataBase.SlaveServer
                             m = m.Remove(m.Length - 1);
                             //sequences.Search(sender, m);
                         }
-                        else
-                        {
-                            //sequences.Create(sender, m);
-                        }
                     }
-
                 }))
                 {
                     receiver.Start();
@@ -65,7 +60,6 @@ namespace Platform.Links.DataBase.SlaveServer
             }
 
             Console.WriteLine("Links slave server stopped.");
-
         }
 
         // Устранить дублирование
@@ -77,13 +71,13 @@ namespace Platform.Links.DataBase.SlaveServer
             {
                 Console.WriteLine("Contents:");
 
-                var linksTotalLength = links.Total.ToString("0").Length;
+                int linksTotalLength = links.Total.ToString("0").Length;
 
                 var printFormatBase = new String('0', linksTotalLength);
 
-                var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} ({{3}})", printFormatBase);
+                string printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} ({{3}})", printFormatBase);
 
-                for (var link = UTF16LastCharLink + 1; link <= links.Total; link++)
+                for (ulong link = UTF16LastCharLink + 1; link <= links.Total; link++)
                 {
                     //Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link), links.GetLink(link));
                 }

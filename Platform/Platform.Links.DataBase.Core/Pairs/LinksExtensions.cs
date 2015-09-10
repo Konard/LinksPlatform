@@ -37,7 +37,7 @@ namespace Platform.Links.DataBase.Core.Pairs
         {
             ulong result = 0;
 
-            ulong min = (ulong)amountOfDeletions > links.Total ? 1 : links.Total - (ulong)amountOfDeletions;
+            ulong min = (ulong) amountOfDeletions > links.Total ? 1 : links.Total - (ulong) amountOfDeletions;
 
             for (long i = 0; i < amountOfDeletions; i++)
             {
@@ -45,7 +45,7 @@ namespace Platform.Links.DataBase.Core.Pairs
                 result += link;
                 links.Delete(ref link);
                 if (links.Total < min)
-                     break;
+                    break;
             }
             return result;
         }

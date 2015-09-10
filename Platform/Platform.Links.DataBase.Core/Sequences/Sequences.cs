@@ -104,10 +104,10 @@ namespace Platform.Links.DataBase.Core.Sequences
             if (sequence.Length == 2)
                 return _links.Create(sequence[0], sequence[1]);
 
-            var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
+            var innerSequence = new ulong[sequence.Length/2 + sequence.Length%2];
 
             for (var i = 0; i < sequence.Length; i += 2)
-                innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Create(sequence[i], sequence[i + 1]);
+                innerSequence[i/2] = i + 1 == sequence.Length ? sequence[i] : Create(sequence[i], sequence[i + 1]);
 
             return CreateBalancedVariantCore(innerSequence);
         }
@@ -253,7 +253,7 @@ namespace Platform.Links.DataBase.Core.Sequences
             var leftSource = _links.GetSource(left);
             var leftTarget = _links.GetTarget(left);
 
-            if(_links.CalculateReferences(left) == 0)
+            if (_links.CalculateReferences(left) == 0)
             {
                 _links.Delete(ref left);
                 ClearGarbage(leftSource, leftTarget);
@@ -281,7 +281,8 @@ namespace Platform.Links.DataBase.Core.Sequences
 
             for (var i = 0; i < sequence.Length; i++)
                 if (!links.Exists(sequence[i]))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], string.Format("patternSequence[{0}]", i));
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
+                        string.Format("patternSequence[{0}]", i));
         }
 
         private static void EnsureEachLinkIsAnyOrExists(Pairs.Links links, params ulong[] sequence)
@@ -291,7 +292,8 @@ namespace Platform.Links.DataBase.Core.Sequences
 
             for (var i = 0; i < sequence.Length; i++)
                 if (sequence[i] != Pairs.Links.Null && !links.Exists(sequence[i]))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], string.Format("patternSequence[{0}]", i));
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
+                        string.Format("patternSequence[{0}]", i));
         }
 
         // Pattern Matching -> Key To Triggers
@@ -299,8 +301,6 @@ namespace Platform.Links.DataBase.Core.Sequences
         public void MatchPattern(ulong zeroOrMany, params ulong[] patternSequence)
         {
             patternSequence = Simplify(zeroOrMany, patternSequence);
-
-
         }
 
         // Найти все возможные связи между указанным списком связей
@@ -308,7 +308,6 @@ namespace Platform.Links.DataBase.Core.Sequences
         // Или можно взять произвольные множества связей из исходного множества и найти для каждого из них все возможные связи?
         public void FindAllConnections(params ulong[] linksToConnect)
         {
-
         }
 
         private static ulong[] Simplify(ulong zeroOrMany, ulong[] sequence)
@@ -374,15 +373,11 @@ namespace Platform.Links.DataBase.Core.Sequences
 
         public static void TestSimplify()
         {
-            var sequence = new ulong[] { 1, 1, 2, 3, 4, 1, 1, 1, 4, 1, 1, 1 };
+            var sequence = new ulong[] {1, 1, 2, 3, 4, 1, 1, 1, 4, 1, 1, 1};
             const ulong zeroOrMany = 1UL;
 
             var simplifiedSequence = Simplify(zeroOrMany, sequence);
-
-
         }
-
-
 
 
         public void Prediction()

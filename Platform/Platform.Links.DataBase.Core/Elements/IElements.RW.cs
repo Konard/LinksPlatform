@@ -12,7 +12,7 @@
     /// <param name="right">Правый элемент-продолжение.</param>
     /// <returns>True - чтение продолжается, False - чтение прервано.</returns>
     public delegate bool ElementReader<in TElement>(TElement element, TElement value, TElement left, TElement right);
-   
+
     /// <summary>
     /// Представляет интерфейс для работы с базой данных (хранилищем)
     /// в формате Elements (хранилища элементов и составных элементов (последовательностей)).

@@ -56,7 +56,7 @@ namespace Platform.Links.DataBase.Core.Pairs
         /// Используется только во вне класса, не рекомедуется использовать внутри.
         /// Так как во вне не обязательно будет доступен unsafe С#.
         /// </remarks>
-        public static readonly int LinkSizeInBytes = sizeof(Link);
+        public static readonly int LinkSizeInBytes = sizeof (Link);
 
         #endregion
 
@@ -108,10 +108,7 @@ namespace Platform.Links.DataBase.Core.Pairs
         /// </summary>
         public ulong Total
         {
-            get
-            {
-                return _sync.ExecuteReadOperation(() => _header->AllocatedLinks - _header->FreeLinks);
-            }
+            get { return _sync.ExecuteReadOperation(() => _header->AllocatedLinks - _header->FreeLinks); }
         }
 
         #endregion
@@ -131,10 +128,10 @@ namespace Platform.Links.DataBase.Core.Pairs
             UpdatePointers(_memory);
 
             // Гарантия корректности _memory.UsedCapacity относительно _header->AllocatedLinks
-            _memory.UsedCapacity = (long)_header->AllocatedLinks * sizeof(Link) + sizeof(LinksHeader);
+            _memory.UsedCapacity = (long) _header->AllocatedLinks*sizeof (Link) + sizeof (LinksHeader);
 
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
-            _header->ReservedLinks = (ulong)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
+            _header->ReservedLinks = (ulong) ((_memory.ReservedCapacity - sizeof (LinksHeader))/sizeof (Link));
         }
 
         /// <summary>
@@ -145,12 +142,12 @@ namespace Platform.Links.DataBase.Core.Pairs
         public ulong GetSource(ulong link)
         {
             return _sync.ExecuteReadOperation(() =>
-              {
-                  if (!ExistsCore(link))
-                      throw new ArgumentLinkDoesNotExistsException<ulong>(link);
+            {
+                if (!ExistsCore(link))
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(link);
 
-                  return GetSourceCore(link);
-              });
+                return GetSourceCore(link);
+            });
         }
 
         private ulong GetSourceCore(ulong link)
@@ -276,7 +273,8 @@ namespace Platform.Links.DataBase.Core.Pairs
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
                 if (source == Null && target == Null)
-                { // Этот блок используется в GetEnumerator, CopyTo, Clear
+                {
+                    // Этот блок используется в GetEnumerator, CopyTo, Clear
                     for (ulong link = 1; link <= _header->AllocatedLinks; link++)
                         if (ExistsCore(link))
                             if (handler(link) == Break)
@@ -390,7 +388,8 @@ namespace Platform.Links.DataBase.Core.Pairs
                 }
                 //throw new Exception(string.Format("Link with source {0} and target {1} is not exists.", source, target));
 
-                if (newSource != newTarget && (newSource == Null || newSource == linkIndex || newTarget == Null || newTarget == linkIndex))
+                if (newSource != newTarget &&
+                    (newSource == Null || newSource == linkIndex || newTarget == Null || newTarget == linkIndex))
                     throw new Exception("Not passible.");
 
                 if (newSource == source && newTarget == target)
@@ -414,8 +413,16 @@ namespace Platform.Links.DataBase.Core.Pairs
                     var referencesAsSource = new List<ulong>();
                     var referencesAsTarget = new List<ulong>();
 
-                    _sourcesTreeMethods.EachReference(linkIndex, x => { referencesAsSource.Add(x); return true; });
-                    _targetsTreeMethods.EachReference(linkIndex, x => { referencesAsTarget.Add(x); return true; });
+                    _sourcesTreeMethods.EachReference(linkIndex, x =>
+                    {
+                        referencesAsSource.Add(x);
+                        return true;
+                    });
+                    _targetsTreeMethods.EachReference(linkIndex, x =>
+                    {
+                        referencesAsTarget.Add(x);
+                        return true;
+                    });
 
                     for (var i = 0; i < referencesAsSource.Count; i++)
                     {
@@ -485,8 +492,16 @@ namespace Platform.Links.DataBase.Core.Pairs
 
                 var references = new List<ulong>();
 
-                _sourcesTreeMethods.EachReference(link, x => { references.Add(x); return true; });
-                _targetsTreeMethods.EachReference(link, x => { references.Add(x); return true; });
+                _sourcesTreeMethods.EachReference(link, x =>
+                {
+                    references.Add(x);
+                    return true;
+                });
+                _targetsTreeMethods.EachReference(link, x =>
+                {
+                    references.Add(x);
+                    return true;
+                });
 
                 references.ForEach(DeleteCore);
 
@@ -507,12 +522,12 @@ namespace Platform.Links.DataBase.Core.Pairs
         /// <param name="memory">Объект для работы с файлом как виртуальным блоком памяти.</param>
         private void UpdatePointers(IMemory memory)
         {
-            _header = (LinksHeader*)memory.Pointer;
+            _header = (LinksHeader*) memory.Pointer;
 
             // Указатель this.links может быть в том же месте, 
             // так как 0-я связь не используется и имеет такой же размер как Header,
             // поэтому header размещается в том же месте, что и 0-я связь
-            _links = (Link*)memory.Pointer;
+            _links = (Link*) memory.Pointer;
 
             _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
@@ -578,17 +593,18 @@ namespace Platform.Links.DataBase.Core.Pairs
             else
             {
                 if (_header->AllocatedLinks == long.MaxValue)
-                    throw new Exception(string.Format("Количество связей в базе данных не может превышать {0}.", long.MaxValue));
+                    throw new Exception(string.Format("Количество связей в базе данных не может превышать {0}.",
+                        long.MaxValue));
 
                 if (_header->AllocatedLinks >= (_header->ReservedLinks - 1))
                 {
                     _memory.ReservedCapacity += _memoryReservationStep;
                     UpdatePointers(_memory);
-                    _header->ReservedLinks = (ulong)(_memory.ReservedCapacity / sizeof(Link));
+                    _header->ReservedLinks = (ulong) (_memory.ReservedCapacity/sizeof (Link));
                 }
 
                 _header->AllocatedLinks++;
-                _memory.UsedCapacity += sizeof(Link);
+                _memory.UsedCapacity += sizeof (Link);
                 freeLink = _header->AllocatedLinks;
             }
 
@@ -603,7 +619,7 @@ namespace Platform.Links.DataBase.Core.Pairs
         private bool IsUnusedLink(ulong link)
         {
             return _header->FirstFreeLink == link
-                || (_links[link].SizeAsSource == Null && (_links[link].Source != Null));
+                   || (_links[link].SizeAsSource == Null && (_links[link].Source != Null));
         }
 
         /// <summary>
@@ -615,7 +631,7 @@ namespace Platform.Links.DataBase.Core.Pairs
             if (link == _header->AllocatedLinks)
             {
                 _header->AllocatedLinks--;
-                _memory.UsedCapacity -= sizeof(Link);
+                _memory.UsedCapacity -= sizeof (Link);
 
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
@@ -624,7 +640,7 @@ namespace Platform.Links.DataBase.Core.Pairs
                     DetachFromFreeLinkList(_header->AllocatedLinks);
 
                     _header->AllocatedLinks--;
-                    _memory.UsedCapacity -= sizeof(Link);
+                    _memory.UsedCapacity -= sizeof (Link);
                 }
             }
             else

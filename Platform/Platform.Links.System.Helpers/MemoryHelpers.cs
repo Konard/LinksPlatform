@@ -14,8 +14,8 @@ namespace Platform.Links.System.Helpers
             // TODO: Изучить почему это было важно
             //if (size == 0)
             //    size = SystemPageSize;
-            if (size % SystemPageSize != 0)
-                size = (size / SystemPageSize + 1) * SystemPageSize;
+            if (size%SystemPageSize != 0)
+                size = (size/SystemPageSize + 1)*SystemPageSize;
         }
     }
 }

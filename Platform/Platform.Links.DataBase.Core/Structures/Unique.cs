@@ -10,7 +10,7 @@ namespace Platform.Links.DataBase.Core.Structures
     {
         private const string DateFormat = "yyyy.MM.dd hh:mm:ss.fffffff";
 
-        private static readonly Random SeedFactory = new Random((int)DateTime.UtcNow.Ticks);
+        private static readonly Random SeedFactory = new Random((int) DateTime.UtcNow.Ticks);
         public static readonly Unique Null = new Unique(0, 0);
 
         public readonly ulong Time;
@@ -24,7 +24,7 @@ namespace Platform.Links.DataBase.Core.Structures
 
         public static Unique Create()
         {
-            var time = (ulong)DateTime.UtcNow.Ticks;
+            var time = (ulong) DateTime.UtcNow.Ticks;
 
             //var rndBytes = new byte[8];
             //SeedFactory.NextBytes(rndBytes);
@@ -44,8 +44,8 @@ namespace Platform.Links.DataBase.Core.Structures
         public override int GetHashCode()
         {
             var hash = 17;
-            hash = hash * 31 + (int)Time;
-            hash = hash * 31 + (int)Seed;
+            hash = hash*31 + (int) Time;
+            hash = hash*31 + (int) Seed;
             return hash;
         }
 
@@ -67,7 +67,7 @@ namespace Platform.Links.DataBase.Core.Structures
 
         public override string ToString()
         {
-            return string.Format("[{0},{1}]", new DateTime((long)Time).ToString(DateFormat), Seed);
+            return string.Format("[{0},{1}]", new DateTime((long) Time).ToString(DateFormat), Seed);
         }
     }
 }

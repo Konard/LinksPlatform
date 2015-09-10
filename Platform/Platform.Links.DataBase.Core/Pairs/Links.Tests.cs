@@ -152,8 +152,10 @@ namespace Platform.Links.DataBase.Core.Pairs
                             // <edge id="0" source="0" target="1" />
                             writer.WriteStartElement("edge");
                             writer.WriteAttributeString("id", edges.ToString(CultureInfo.InvariantCulture));
-                            writer.WriteAttributeString("source", _links[link].Source.ToString(CultureInfo.InvariantCulture));
-                            writer.WriteAttributeString("target", _links[link].Target.ToString(CultureInfo.InvariantCulture));
+                            writer.WriteAttributeString("source",
+                                _links[link].Source.ToString(CultureInfo.InvariantCulture));
+                            writer.WriteAttributeString("target",
+                                _links[link].Target.ToString(CultureInfo.InvariantCulture));
                             writer.WriteEndElement();
 
                             edges++;
@@ -187,7 +189,7 @@ namespace Platform.Links.DataBase.Core.Pairs
                 //if (_links[link].Target == 0)
                 //    return string.Format("0 {0} 0", link);
                 //else
-                
+
                 return string.Format("{1} {0} {2}", link, _links[link].Source, _links[link].Target);
             });
         }

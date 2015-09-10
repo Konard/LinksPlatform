@@ -4,7 +4,7 @@
 
     public class DefaultDisposal : DisposalBase
     {
-        public event DisposedDelegate Disposed = m => {};
+        public event DisposedDelegate Disposed = m => { };
 
         public DefaultDisposal(DisposedDelegate disposed)
         {

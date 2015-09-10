@@ -31,8 +31,8 @@ namespace Platform.Links.DataBase.Core.Structures
             if (serverType == ServerType.Master)
                 return seed &= 0x8000000000000000;
 
-            seed &= (uint)serverId;
-            seed &= (ulong)itemId >> 32;
+            seed &= (uint) serverId;
+            seed &= (ulong) itemId >> 32;
 
             return seed;
         }

@@ -18,7 +18,9 @@ namespace Platform.Links.System.Memory
 
         #region Structure
 
-        private byte* _pointer; // Может хранить как ссылку на MemoryMappedFile, так и на блок, выделенный в куче операционной системы.
+        private byte* _pointer;
+            // Может хранить как ссылку на MemoryMappedFile, так и на блок, выделенный в куче операционной системы.
+
         private long _reservedCapacity;
         private long _usedCapacity;
 
@@ -129,7 +131,7 @@ namespace Platform.Links.System.Memory
         public HeapMemory(long minimumReservedCapacity)
         {
             if (minimumReservedCapacity < 0
-             || minimumReservedCapacity > Int32.MaxValue)
+                || minimumReservedCapacity > Int32.MaxValue)
                 throw new ArgumentOutOfRangeException("minimumReservedCapacity");
 
             _reservedCapacity = minimumReservedCapacity;
@@ -138,7 +140,7 @@ namespace Platform.Links.System.Memory
             // Решить, нужно ли это в случае управляемой кучи
             MemoryHelpers.AlignSizeToSystemPageSize(ref _reservedCapacity);
 
-            _pointer = (byte*)Alloc((int)_reservedCapacity);
+            _pointer = (byte*) Alloc((int) _reservedCapacity);
         }
 
         private void Alloc()
@@ -228,7 +230,9 @@ namespace Platform.Links.System.Memory
         // automatically initialized to zero.
         public static void* Alloc(int size)
         {
-            void* result = Kernel.HeapAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new UIntPtr((uint)size)).ToPointer();
+            void* result =
+                Kernel.HeapAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new UIntPtr((uint) size))
+                    .ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }
@@ -237,7 +241,7 @@ namespace Platform.Links.System.Memory
         // blocks are permitted to overlap.
         public static void Copy(void* src, void* dst, int count)
         {
-            Kernel.CopyMemory(new IntPtr(dst), new IntPtr(src), new UIntPtr((uint)count));
+            Kernel.CopyMemory(new IntPtr(dst), new IntPtr(src), new UIntPtr((uint) count));
 
             /*
             byte* ps = (byte*)src;
@@ -264,7 +268,9 @@ namespace Platform.Links.System.Memory
         // initialized to zero.
         public static void* ReAlloc(void* block, int size)
         {
-            void* result = Kernel.HeapReAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new IntPtr(block), new UIntPtr((uint)size)).ToPointer();
+            void* result =
+                Kernel.HeapReAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new IntPtr(block),
+                    new UIntPtr((uint) size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }
@@ -272,7 +278,7 @@ namespace Platform.Links.System.Memory
         // Returns the size of a memory block.
         public static int SizeOf(void* block)
         {
-            int result = (int)Kernel.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
+            int result = (int) Kernel.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
             if (result == -1) throw new InvalidOperationException();
             return result;
         }

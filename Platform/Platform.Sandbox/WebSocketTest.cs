@@ -1,6 +1,6 @@
 ﻿namespace Platform.Sandbox
 {
-    public static  class WebSocketTest
+    public static class WebSocketTest
     {
         public static void Run()
         {

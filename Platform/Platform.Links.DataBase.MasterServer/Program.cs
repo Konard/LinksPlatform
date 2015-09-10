@@ -1,18 +1,19 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using Platform.Links.DataBase.Core.Sequences;
 using Platform.Links.System.Helpers.Udp;
 
 namespace Platform.Links.DataBase.MasterServer
 {
-    static class Program
+    internal static class Program
     {
-        private static bool UTF16Initialized = false;
+        private static bool UTF16Initialized;
         private static ulong UTF16FirstCharLink;
         private static ulong UTF16LastCharLink;
-        private static bool LinksServerStoped = false;
+        private static bool LinksServerStoped;
 
-        static void Main(string[] args)
+        private static void Main(string[] args)
         {
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
@@ -20,7 +21,7 @@ namespace Platform.Links.DataBase.MasterServer
                 LinksServerStoped = true;
             };
 
-            using (var links = new Core.Pairs.Links("db.links", 512 * 1024 * 1024))
+            using (var links = new Core.Pairs.Links("db.links", 512*1024*1024))
             {
                 InitUTF16(links);
 
@@ -32,7 +33,7 @@ namespace Platform.Links.DataBase.MasterServer
 
                 using (var sender = new UdpSender(8888))
                 {
-                    using (var receiver = new UdpReceiver(7777, (m) =>
+                    using (var receiver = new UdpReceiver(7777, m =>
                     {
                         Console.WriteLine("R.M.: {0}", m);
 
@@ -46,7 +47,6 @@ namespace Platform.Links.DataBase.MasterServer
                             else
                                 sequences.Create(sender, m);
                         }
-
                     }))
                     {
                         receiver.Start();
@@ -69,15 +69,16 @@ namespace Platform.Links.DataBase.MasterServer
             {
                 Console.WriteLine("Contents:");
 
-                var linksTotalLength = links.Total.ToString("0").Length;
+                int linksTotalLength = links.Total.ToString("0").Length;
 
                 var printFormatBase = new String('0', linksTotalLength);
 
-                var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} ({{3}})", printFormatBase);
+                string printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} ({{3}})", printFormatBase);
 
-                for (var link = UTF16LastCharLink + 1; link <= links.Total; link++)
+                for (ulong link = UTF16LastCharLink + 1; link <= links.Total; link++)
                 {
-                    Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link), links.GetLink(link));
+                    Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link),
+                        links.GetLink(link));
                 }
             }
         }
@@ -91,7 +92,7 @@ namespace Platform.Links.DataBase.MasterServer
             UTF16FirstCharLink = 1;
             UTF16LastCharLink = UTF16FirstCharLink + char.MaxValue - 1;
 
-            var firstLink = links.Create(0, 0);
+            ulong firstLink = links.Create(0, 0);
 
             if (firstLink != UTF16FirstCharLink)
             {
@@ -100,9 +101,9 @@ namespace Platform.Links.DataBase.MasterServer
             }
             else
             {
-                for (var i = UTF16FirstCharLink + 1; i <= UTF16LastCharLink; i++)
+                for (ulong i = UTF16FirstCharLink + 1; i <= UTF16LastCharLink; i++)
                 {
-                    var createdLink = links.Create(0, 0);
+                    ulong createdLink = links.Create(0, 0);
                     if (createdLink != i)
                         throw new Exception("Unable to initialize UTF 16 table.");
                 }
@@ -116,10 +117,10 @@ namespace Platform.Links.DataBase.MasterServer
         private static void Create(this Sequences sequences, UdpSender sender, string sequence)
         {
             var linksSequence = new ulong[sequence.Length];
-            for (var i = 0; i < sequence.Length; i++)
+            for (int i = 0; i < sequence.Length; i++)
                 linksSequence[i] = sequence[i];
 
-            var resultLink = sequences.Create(linksSequence);
+            ulong resultLink = sequences.Create(linksSequence);
 
             sender.Send(string.Format("Sequence with balanced variant at {0} created.", resultLink));
         }
@@ -127,13 +128,13 @@ namespace Platform.Links.DataBase.MasterServer
         private static void Search(this Sequences sequences, UdpSender sender, string sequenceQuery)
         {
             var linksSequenceQuery = new ulong[sequenceQuery.Length];
-            for (var i = 0; i < sequenceQuery.Length; i++)
+            for (int i = 0; i < sequenceQuery.Length; i++)
                 if (sequenceQuery[i] == '_')
                     linksSequenceQuery[i] = 0;
                 else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            var resultList = sequences.Each(linksSequenceQuery);
+            List<ulong> resultList = sequences.Each(linksSequenceQuery);
 
             if (resultList.Count == 0)
                 sender.Send("No sequences found.");
@@ -143,7 +144,7 @@ namespace Platform.Links.DataBase.MasterServer
             {
                 sender.Send(string.Format("Found {0} sequences:", resultList.Count));
 
-                for (var i = 0; i < resultList.Count; i++)
+                for (int i = 0; i < resultList.Count; i++)
                     sender.Send(string.Format("\t{0}", resultList[i]));
             }
         }

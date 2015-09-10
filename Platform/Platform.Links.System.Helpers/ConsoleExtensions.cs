@@ -30,7 +30,7 @@ namespace Platform.Links.System.Helpers
 
             Console.WriteLine(Separator);
 
-            Console.WriteLine(ex.StackTrace);            
+            Console.WriteLine(ex.StackTrace);
         }
     }
 }

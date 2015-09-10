@@ -27,22 +27,22 @@ namespace Platform.Links.System.Memory
     /// 
     /// Нехранимая память? Лог?
     /// </remarks>
-	public unsafe interface IMemory : IDisposable
-	{
+    public unsafe interface IMemory : IDisposable
+    {
         /// <summary>
         /// Возвращает указатель на начало блока памяти.
         /// </summary>
-		void* Pointer { get; }
+        void* Pointer { get; }
 
         /// <summary>
         /// Возвращает или устаналивает зарезервированный размер блока памяти в байтах.
         /// </summary>
-		long ReservedCapacity { get; set; }
+        long ReservedCapacity { get; set; }
 
         /// <summary>
         /// Возвращает или устанавливает используемый размер в блоке памяти (в байтах).
         /// При выполнении метода Dispose, размер файла будет автоматически усечён до этого размера.
         /// </summary>
-		long UsedCapacity { get; set; }
-	}
+        long UsedCapacity { get; set; }
+    }
 }

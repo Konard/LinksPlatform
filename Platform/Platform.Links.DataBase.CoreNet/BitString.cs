@@ -5,29 +5,27 @@ using System.Diagnostics;
 namespace Platform.Links.DataBase.CoreNet
 {
     /// <remarks>
-    /// А что если хранить карту значений, где каждый бит будет означать присутствует ли блок в 64 бит в массиве значений.
-    /// 64 бита по 0 бит, будут означать отсутствие 64-х блоков по 64 бита. Т.е. упаковка 512 байт в 8 байт.
-    /// Подобный принцип можно применять и к 64-ём блокам и т.п. По сути это карта значений. С помощью которой можно быстро проверять есть ли значения непосредственно далее (ниже по уровню).
-    /// 
-    /// Или как таблица виртуальной памяти где номер блока означает его присутствие и адрес.
+    ///     А что если хранить карту значений, где каждый бит будет означать присутствует ли блок в 64 бит в массиве значений.
+    ///     64 бита по 0 бит, будут означать отсутствие 64-х блоков по 64 бита. Т.е. упаковка 512 байт в 8 байт.
+    ///     Подобный принцип можно применять и к 64-ём блокам и т.п. По сути это карта значений. С помощью которой можно быстро
+    ///     проверять есть ли значения непосредственно далее (ниже по уровню).
+    ///     Или как таблица виртуальной памяти где номер блока означает его присутствие и адрес.
     /// </remarks>
     public sealed class BitString : ICloneable
     {
-        static readonly Dictionary<int, List<byte>> BitSetsIn16Bits;
+        private static readonly Dictionary<int, List<byte>> BitSetsIn16Bits;
         private long[] _array;
         private int _length;
         private int _version;
-        private int MinPositiveWord { get; set; }
-        private int MaxPositiveWord { get; set; }
 
         static BitString()
         {
             BitSetsIn16Bits = new Dictionary<int, List<byte>>();
 
-            for (var i = 0; i < 65536; i++)
+            for (int i = 0; i < 65536; i++)
             {
                 BitSetsIn16Bits.Add(i, new List<byte>());
-                var k = 1;
+                int k = 1;
                 byte j = 0;
                 while (k <= 65536)
                 {
@@ -42,6 +40,7 @@ namespace Platform.Links.DataBase.CoreNet
         }
 
         #region Constructors
+
         public BitString(BitString bits)
         {
             if (bits == null)
@@ -50,7 +49,7 @@ namespace Platform.Links.DataBase.CoreNet
             }
 
             _length = bits._length;
-            _array = new long[(_length + 63) / 64];
+            _array = new long[(_length + 63)/64];
 
             MinPositiveWord = bits.MinPositiveWord;
             MaxPositiveWord = bits.MaxPositiveWord;
@@ -73,7 +72,7 @@ namespace Platform.Links.DataBase.CoreNet
             }
 
             _length = length;
-            _array = new long[(_length + 63) / 64];
+            _array = new long[(_length + 63)/64];
             MinPositiveWord = _array.Length - 1;
             MaxPositiveWord = 0;
         }
@@ -83,8 +82,8 @@ namespace Platform.Links.DataBase.CoreNet
         {
             if (defaultValue)
             {
-                const int fillValue = unchecked(((int)0xffffffff));
-                for (var i = 0; i < _array.Length; i++)
+                const int fillValue = unchecked(((int) 0xffffffff));
+                for (int i = 0; i < _array.Length; i++)
                 {
                     _array[i] = fillValue;
                 }
@@ -98,7 +97,7 @@ namespace Platform.Links.DataBase.CoreNet
 
         #region Utility Methods        
 
-        void checkOperand(BitString operand)
+        private void checkOperand(BitString operand)
         {
             if (operand == null)
             {
@@ -110,7 +109,11 @@ namespace Platform.Links.DataBase.CoreNet
                 throw new ArgumentException();
             }
         }
+
         #endregion
+
+        private int MinPositiveWord { get; set; }
+        private int MaxPositiveWord { get; set; }
 
         public int Count
         {
@@ -151,8 +154,8 @@ namespace Platform.Links.DataBase.CoreNet
                 // Currently we never shrink the array
                 if (value > _length)
                 {
-                    var numints = (value + 63) / 64;
-                    var oldNumints = (_length + 63) / 64;
+                    int numints = (value + 63)/64;
+                    int oldNumints = (_length + 63)/64;
                     if (numints > _array.Length)
                     {
                         var newArr = new long[numints];
@@ -164,10 +167,10 @@ namespace Platform.Links.DataBase.CoreNet
                         Array.Clear(_array, oldNumints, numints - oldNumints);
                     }
 
-                    var mask = _length % 64;
+                    int mask = _length%64;
                     if (mask > 0)
                     {
-                        _array[oldNumints - 1] &= ((long)1 << mask) - 1;
+                        _array[oldNumints - 1] &= ((long) 1 << mask) - 1;
                     }
                 }
 
@@ -190,8 +193,8 @@ namespace Platform.Links.DataBase.CoreNet
 
         public BitString Not()
         {
-            var ints = (_length + 63) / 64;
-            for (var i = 0; i < ints; i++)
+            int ints = (_length + 63)/64;
+            for (int i = 0; i < ints; i++)
             {
                 _array[i] = ~_array[i];
                 RefreshBordersByWord(i);
@@ -207,8 +210,8 @@ namespace Platform.Links.DataBase.CoreNet
 
             checkOperand(value);
 
-            var ints = (_length + 63) / 64;
-            for (var i = 0; i < ints; i++)
+            int ints = (_length + 63)/64;
+            for (int i = 0; i < ints; i++)
             {
                 _array[i] &= value._array[i];
                 RefreshBordersByWord(i);
@@ -227,8 +230,8 @@ namespace Platform.Links.DataBase.CoreNet
 
             checkOperand(value);
 
-            var ints = (_length + 63) / 64;
-            for (var i = 0; i < ints; i++)
+            int ints = (_length + 63)/64;
+            for (int i = 0; i < ints; i++)
             {
                 _array[i] |= value._array[i];
                 RefreshBordersByWord(i);
@@ -245,8 +248,8 @@ namespace Platform.Links.DataBase.CoreNet
         {
             checkOperand(value);
 
-            var ints = (_length + 63) / 64;
-            for (var i = 0; i < ints; i++)
+            int ints = (_length + 63)/64;
+            for (int i = 0; i < ints; i++)
             {
                 _array[i] ^= value._array[i];
                 RefreshBordersByWord(i);
@@ -305,7 +308,7 @@ namespace Platform.Links.DataBase.CoreNet
                 throw new ArgumentOutOfRangeException();
             }
 
-            var wordIndex = GetWordIndex(index);
+            int wordIndex = GetWordIndex(index);
 
             return (_array[wordIndex] & (1 << (index & 63))) != 0;
         }
@@ -317,16 +320,16 @@ namespace Platform.Links.DataBase.CoreNet
                 throw new ArgumentOutOfRangeException();
             }
 
-            var wordIndex = GetWordIndex(index);
+            int wordIndex = GetWordIndex(index);
 
             if (value)
             {
-                _array[wordIndex] |= ((long)1 << (index & 63));
+                _array[wordIndex] |= ((long) 1 << (index & 63));
                 RefreshBordersByWord(wordIndex);
             }
             else
             {
-                _array[wordIndex] &= ~((long)1 << (index & 63));
+                _array[wordIndex] &= ~((long) 1 << (index & 63));
             }
 
             _version++;
@@ -334,9 +337,9 @@ namespace Platform.Links.DataBase.CoreNet
 
         public void SetAll(bool value)
         {
-            var fillValue = value ? unchecked(((long)0xffffffffffffffff)) : 0;
-            var ints = (_length + 63) / 64;
-            for (var i = 0; i < ints; i++)
+            long fillValue = value ? unchecked(((long) 0xffffffffffffffff)) : 0;
+            int ints = (_length + 63)/64;
+            for (int i = 0; i < ints; i++)
             {
                 _array[i] = fillValue;
             }
@@ -356,14 +359,16 @@ namespace Platform.Links.DataBase.CoreNet
 
         public int CountSet()
         {
-            var result = 0;
-            for (var i = 0; i < _array.Length; i++)
+            int result = 0;
+            for (int i = 0; i < _array.Length; i++)
             {
-                var n = _array[i];
+                long n = _array[i];
                 if (n != 0)
                 {
-                    result += BitSetsIn16Bits[(int)(n & 0xffffu)].Count + BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)].Count;
-                    result += BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)].Count + BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)].Count;
+                    result += BitSetsIn16Bits[(int) (n & 0xffffu)].Count +
+                              BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)].Count;
+                    result += BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)].Count +
+                              BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)].Count;
                 }
             }
             return result;
@@ -371,36 +376,36 @@ namespace Platform.Links.DataBase.CoreNet
 
         public List<int> GetSetIndeces()
         {
-            var sw = Stopwatch.StartNew();
+            Stopwatch sw = Stopwatch.StartNew();
             var result = new List<int>();
-            for (var i = 0; i < _array.Length; i++)
+            for (int i = 0; i < _array.Length; i++)
             {
-                var n = _array[i];
+                long n = _array[i];
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
-                    for (var j = 0; j < bits1.Count; j++)
+                    for (int j = 0; j < bits1.Count; j++)
                     {
-                        result.Add(bits1[j] + i * 64);
+                        result.Add(bits1[j] + i*64);
                     }
 
-                    for (var j = 0; j < bits2.Count; j++)
+                    for (int j = 0; j < bits2.Count; j++)
                     {
-                        result.Add(bits2[j] + 16 + i * 64);
+                        result.Add(bits2[j] + 16 + i*64);
                     }
 
-                    for (var j = 0; j < bits3.Count; j++)
+                    for (int j = 0; j < bits3.Count; j++)
                     {
-                        result.Add(bits3[j] + 32 + i * 64);
+                        result.Add(bits3[j] + 32 + i*64);
                     }
 
-                    for (var j = 0; j < bits4.Count; j++)
+                    for (int j = 0; j < bits4.Count; j++)
                     {
-                        result.Add(bits4[j] + 48 + i * 64);
+                        result.Add(bits4[j] + 48 + i*64);
                     }
                 }
             }
@@ -412,35 +417,33 @@ namespace Platform.Links.DataBase.CoreNet
 
         public int GetFirstSetBitIndex()
         {
-            var sw = Stopwatch.StartNew();            
-            for (var i = 0; i < _array.Length; i++)
+            Stopwatch sw = Stopwatch.StartNew();
+            for (int i = 0; i < _array.Length; i++)
             {
-                var n = _array[i];
+                long n = _array[i];
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
-                    Console.WriteLine("Get-First-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+                    Console.WriteLine("Get-First-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds,
+                        _array.Length);
 
                     if (bits1.Count > 0)
                     {
-                        return bits1[0] + i * 64;
+                        return bits1[0] + i*64;
                     }
-                    else if (bits2.Count > 0)
+                    if (bits2.Count > 0)
                     {
-                        return bits2[0] + 16 + i * 64;
+                        return bits2[0] + 16 + i*64;
                     }
-                    else if (bits3.Count > 0)
+                    if (bits3.Count > 0)
                     {
-                        return bits3[0] + 32 + i * 64;
+                        return bits3[0] + 32 + i*64;
                     }
-                    else
-                    {
-                        return bits4[0] + 48 + i * 64;
-                    }
+                    return bits4[0] + 48 + i*64;
                 }
             }
 
@@ -449,35 +452,33 @@ namespace Platform.Links.DataBase.CoreNet
 
         public int GetLastSetBitIndex()
         {
-            var sw = Stopwatch.StartNew();
-            for (var i = _array.Length - 1 ; i >= 0; i--)
+            Stopwatch sw = Stopwatch.StartNew();
+            for (int i = _array.Length - 1; i >= 0; i--)
             {
-                var n = _array[i];
+                long n = _array[i];
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
-                    Console.WriteLine("Get-Last-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+                    Console.WriteLine("Get-Last-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds,
+                        _array.Length);
 
                     if (bits4.Count > 0)
                     {
-                        return bits4[bits4.Count - 1] + 48 + i * 64;                        
+                        return bits4[bits4.Count - 1] + 48 + i*64;
                     }
-                    else if (bits3.Count > 0)
+                    if (bits3.Count > 0)
                     {
-                        return bits3[bits3.Count - 1] + 32 + i * 64;                        
+                        return bits3[bits3.Count - 1] + 32 + i*64;
                     }
-                    else if (bits2.Count > 0)
+                    if (bits2.Count > 0)
                     {
-                        return bits2[bits2.Count - 1] + 16 + i * 64;
+                        return bits2[bits2.Count - 1] + 16 + i*64;
                     }
-                    else
-                    {
-                        return bits1[bits1.Count - 1] + i * 64;
-                    }
+                    return bits1[bits1.Count - 1] + i*64;
                 }
             }
 
@@ -486,16 +487,16 @@ namespace Platform.Links.DataBase.CoreNet
 
         public int GetSetIndecesCount()
         {
-            var result = 0;
-            for (var i = 0; i < _array.Length; i++)
+            int result = 0;
+            for (int i = 0; i < _array.Length; i++)
             {
-                var n = _array[i];
+                long n = _array[i];
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
                     result += bits1.Count + bits2.Count + bits3.Count + bits4.Count;
                 }
@@ -512,20 +513,20 @@ namespace Platform.Links.DataBase.CoreNet
 
             //var sw = Stopwatch.StartNew();
 
-            var from = Math.Max(MinPositiveWord, other.MinPositiveWord);
-            var to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
+            int from = Math.Max(MinPositiveWord, other.MinPositiveWord);
+            int to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
 
-            var result = false;
+            bool result = false;
 
-            var steps = 0;
+            int steps = 0;
 
-            var otherArray = other._array;
+            long[] otherArray = other._array;
 
-            for (var i = from; i <= to; i++)
+            for (int i = from; i <= to; i++)
             {
                 steps++;
-                var v1 = _array[i];
-                var v2 = otherArray[i];
+                long v1 = _array[i];
+                long v2 = otherArray[i];
                 if (v1 != 0 && v2 != 0 && ((v1 & v2) != 0))
                 {
                     result = true;
@@ -550,73 +551,73 @@ namespace Platform.Links.DataBase.CoreNet
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            var from = Math.Max(MinPositiveWord, other.MinPositiveWord);
-            var to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
+            int from = Math.Max(MinPositiveWord, other.MinPositiveWord);
+            int to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
 
-            var result = 0;
+            int result = 0;
 
-            var otherArray = other._array;
+            long[] otherArray = other._array;
 
-            for (var i = from; i <= to; i++)
+            for (int i = from; i <= to; i++)
             {
-                var v1 = _array[i];
-                var v2 = otherArray[i];
-                var n = v1 & v2;
+                long v1 = _array[i];
+                long v2 = otherArray[i];
+                long n = v1 & v2;
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
                     result += bits1.Count + bits2.Count + bits3.Count + bits4.Count;
                 }
-            }            
+            }
 
             return result;
         }
 
         public List<int> GetCommonIndices(BitString other)
-        {            
+        {
             if (Length != other.Length)
             {
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            var from = Math.Max(MinPositiveWord, other.MinPositiveWord);
-            var to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
+            int from = Math.Max(MinPositiveWord, other.MinPositiveWord);
+            int to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
 
             var result = new List<int>();
 
-            var otherArray = other._array;
+            long[] otherArray = other._array;
 
-            for (var i = from; i <= to; i++)
+            for (int i = from; i <= to; i++)
             {
-                var v1 = _array[i];
-                var v2 = otherArray[i];
-                var n = v1 & v2;
+                long v1 = _array[i];
+                long v2 = otherArray[i];
+                long n = v1 & v2;
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
                     if (bits1.Count > 0)
                     {
-                        result.Add(bits1[0] + i * 64);
+                        result.Add(bits1[0] + i*64);
                     }
                     else if (bits2.Count > 0)
                     {
-                        result.Add(bits2[0] + 16 + i * 64);
+                        result.Add(bits2[0] + 16 + i*64);
                     }
                     else if (bits3.Count > 0)
                     {
-                        result.Add(bits3[0] + 32 + i * 64);
+                        result.Add(bits3[0] + 32 + i*64);
                     }
                     else
                     {
-                        result.Add(bits4[0] + 48 + i * 64);
+                        result.Add(bits4[0] + 48 + i*64);
                     }
                 }
             }
@@ -631,43 +632,40 @@ namespace Platform.Links.DataBase.CoreNet
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            var from = Math.Max(MinPositiveWord, other.MinPositiveWord);
-            var to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
+            int from = Math.Max(MinPositiveWord, other.MinPositiveWord);
+            int to = Math.Min(MaxPositiveWord, other.MaxPositiveWord);
 
-            var otherArray = other._array;
+            long[] otherArray = other._array;
 
-            for (var i = from; i <= to; i++)
+            for (int i = from; i <= to; i++)
             {
-                var v1 = _array[i];
-                var v2 = otherArray[i];
-                var n = v1 & v2;
+                long v1 = _array[i];
+                long v2 = otherArray[i];
+                long n = v1 & v2;
                 if (n != 0)
                 {
-                    var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
-                    var bits2 = BitSetsIn16Bits[(int)((n >> 16) & 0xffffu)];
-                    var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
-                    var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
+                    List<byte> bits1 = BitSetsIn16Bits[(int) (n & 0xffffu)];
+                    List<byte> bits2 = BitSetsIn16Bits[(int) ((n >> 16) & 0xffffu)];
+                    List<byte> bits3 = BitSetsIn16Bits[(int) ((n >> 32) & 0xffffu)];
+                    List<byte> bits4 = BitSetsIn16Bits[(int) ((n >> 48) & 0xffffu)];
 
                     if (bits4.Count > 0)
                     {
-                        return bits4[bits4.Count - 1] + 48 + i * 64;
+                        return bits4[bits4.Count - 1] + 48 + i*64;
                     }
-                    else if (bits3.Count > 0)
+                    if (bits3.Count > 0)
                     {
-                        return bits3[bits3.Count - 1] + 32 + i * 64;
+                        return bits3[bits3.Count - 1] + 32 + i*64;
                     }
-                    else if (bits2.Count > 0)
+                    if (bits2.Count > 0)
                     {
-                        return bits2[bits2.Count - 1] + 16 + i * 64;
+                        return bits2[bits2.Count - 1] + 16 + i*64;
                     }
-                    else
-                    {
-                        return bits1[bits1.Count - 1] + i * 64;
-                    }
+                    return bits1[bits1.Count - 1] + i*64;
                 }
             }
 
             return -1;
-        }        
+        }
     }
 }

@@ -23,20 +23,20 @@ namespace Platform.Links.DataBase.Core.Structures
 
         public static Link Create(ILink link)
         {
-            return new Link((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
+            return new Link((ulong) link.Source.GetHashCode(), (ulong) link.Target.GetHashCode());
         }
 
         public override int GetHashCode()
         {
             var hash = 17;
-            hash = hash * 31 + (int)Source;
-            hash = hash * 31 + (int)Target;
+            hash = hash*31 + (int) Source;
+            hash = hash*31 + (int) Target;
             return hash;
         }
 
         public override bool Equals(object other)
         {
-            return other is Link && Equals((Link)other);
+            return other is Link && Equals((Link) other);
         }
 
         public bool Equals(Link other)
@@ -47,7 +47,7 @@ namespace Platform.Links.DataBase.Core.Structures
 
         public static string ToString(ILink link)
         {
-            return ToString((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
+            return ToString((ulong) link.Source.GetHashCode(), (ulong) link.Target.GetHashCode());
         }
 
         private static string ToString(ulong source, ulong target)

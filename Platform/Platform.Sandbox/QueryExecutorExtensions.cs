@@ -6,25 +6,21 @@ using System.Linq.Expressions;
 namespace Platform.Sandbox
 {
     /// <summary>
-    /// Представляет класс-контейнер расширений для выполнения произвольных запросов над Links
+    ///     Представляет класс-контейнер расширений для выполнения произвольных запросов над Links
     /// </summary>
     public static class QueryExecutorExtensions
     {
-        private static class CompiledQueriesCache<T>
-        {
-            public static readonly ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>> compiledQueries = new ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>>();
-        }
-
         /// <summary>
-        /// Выполняет запрос query над links и возвращает результат запроса в виде перечисляемого объекта с элементами типа T.
+        ///     Выполняет запрос query над links и возвращает результат запроса в виде перечисляемого объекта с элементами типа T.
         /// </summary>
         /// <typeparam name="T">Тип элемента запроса.</typeparam>
         /// <param name="links">База данных связей, над которой будет выполняться запрос.</param>
         /// <param name="query">Запрос в виде Linq-выражения.</param>
         /// <returns>Результат запроса в виде перечисляемого объекта с элементами типа T.</returns>
-        public static IEnumerable<T> Execute<T>(this Links.DataBase.Core.Pairs.Links links, Expression<Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>> query)
+        public static IEnumerable<T> Execute<T>(this Links.DataBase.Core.Pairs.Links links,
+            Expression<Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>> query)
         {
-            var queryId = query.ToString();
+            string queryId = query.ToString();
             Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>> compiledQuery;
             if (!CompiledQueriesCache<T>.compiledQueries.TryGetValue(queryId, out compiledQuery))
             {
@@ -37,6 +33,13 @@ namespace Platform.Sandbox
             //yield return default(T);
 
             //return Enumerable.Empty<T>();
+        }
+
+        private static class CompiledQueriesCache<T>
+        {
+            public static readonly ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>>
+                compiledQueries =
+                    new ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>>();
         }
     }
 }

@@ -18,52 +18,14 @@ namespace Platform.Links.DataBase.CoreNet
     // Узнать почему нужен IComparable
     public class Node
     {
-        private Dictionary<IComparable, Node> m_ChildNodes;
-
-        public IComparable Key { get; set; }
-        public object Value { get; set; }
-        public bool CreateNullChildren { get; private set; }
-        public Node Parent { get; private set; }
-
-        public Dictionary<IComparable, Node> ChildNodes
-        {
-            get
-            {
-                if (m_ChildNodes == null)
-                {
-                    m_ChildNodes = new Dictionary<IComparable, Node>();
-                }
-                return m_ChildNodes;
-            }
-            private set
-            {
-                m_ChildNodes = value;
-            }
-        }
-
-        public Node this[IComparable key]
-        {
-            get
-            {
-                Node child = this.GetChild(key);
-                if (child == null && this.CreateNullChildren)
-                {
-                    child = this.AddChild(key);
-                }
-                return child;
-            }
-            set
-            {
-                this.SetChild(key);
-            }
-        }
+        private Dictionary<IComparable, Node> _childNodes;
 
         public Node(Node parent, IComparable key, object value, bool createNullChildren)
         {
-            this.Parent = parent;
-            this.Key = key;
-            this.Value = value;
-            this.CreateNullChildren = createNullChildren;
+            Parent = parent;
+            Key = key;
+            Value = value;
+            CreateNullChildren = createNullChildren;
         }
 
         public Node(IComparable key, object value, bool createNullChildren)
@@ -81,6 +43,38 @@ namespace Platform.Links.DataBase.CoreNet
         {
         }
 
+        public IComparable Key { get; set; }
+        public object Value { get; set; }
+        public bool CreateNullChildren { get; private set; }
+        public Node Parent { get; private set; }
+
+        public Dictionary<IComparable, Node> ChildNodes
+        {
+            get
+            {
+                if (_childNodes == null)
+                {
+                    _childNodes = new Dictionary<IComparable, Node>();
+                }
+                return _childNodes;
+            }
+            private set { _childNodes = value; }
+        }
+
+        public Node this[IComparable key]
+        {
+            get
+            {
+                Node child = GetChild(key);
+                if (child == null && CreateNullChildren)
+                {
+                    child = AddChild(key);
+                }
+                return child;
+            }
+            set { SetChild(key); }
+        }
+
         public Node AddChild(IComparable key)
         {
             return AddChild(key, null);
@@ -90,13 +84,13 @@ namespace Platform.Links.DataBase.CoreNet
         {
             //ValidateKeyAlreadyExists(key);
 
-            Node child = new Node(this, key, value, this.CreateNullChildren);
+            var child = new Node(this, key, value, CreateNullChildren);
             return AddChild(child);
         }
 
         private void ValidateKeyAlreadyExists(IComparable key)
         {
-            if (this.ChildNodes.ContainsKey(key))
+            if (ChildNodes.ContainsKey(key))
             {
                 throw new InvalidOperationException("Child collection already contains node with the same key.");
             }
@@ -106,7 +100,7 @@ namespace Platform.Links.DataBase.CoreNet
         {
             //ValidateKeyAlreadyExists(child.Key);
 
-            this.ChildNodes.Add(child.Key, child);
+            ChildNodes.Add(child.Key, child);
 
             return child;
         }
@@ -173,9 +167,9 @@ namespace Platform.Links.DataBase.CoreNet
         public Node SetChildValue(object value, IComparable key)
         {
             Node child;
-            if (!this.ChildNodes.TryGetValue(key, out child))
+            if (!ChildNodes.TryGetValue(key, out child))
             {
-                child = this.AddChild(key, value);
+                child = AddChild(key, value);
             }
             child.Value = value;
 

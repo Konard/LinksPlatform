@@ -25,7 +25,7 @@ namespace Platform.Links.System.Helpers
         public static T ToStructure<T>(byte[] bytes)
             where T : struct
         {
-            var structureType = typeof(T);
+            var structureType = typeof (T);
 
             var len = Marshal.SizeOf(structureType);
 
@@ -33,7 +33,7 @@ namespace Platform.Links.System.Helpers
 
             Marshal.Copy(bytes, 0, i, len);
 
-            var result = (T)Marshal.PtrToStructure(i, structureType);
+            var result = (T) Marshal.PtrToStructure(i, structureType);
 
             Marshal.FreeHGlobal(i);
 

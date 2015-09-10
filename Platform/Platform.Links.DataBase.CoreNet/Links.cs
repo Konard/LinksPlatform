@@ -9,6 +9,132 @@ namespace Platform.Links.DataBase.CoreNet
 {
     public class Links : ILinks<ILink>
     {
+        public Links()
+        {
+            _links = new HashSet<ILink>();
+            _linksBySource = new Dictionary<ILink, HashSet<ILink>>();
+            _linksByTarget = new Dictionary<ILink, HashSet<ILink>>();
+        }
+
+        public ILink Create(ILink source, ILink target)
+        {
+            var link = new Link(this, source, target);
+            _links.Add(link);
+            _linksBySource.Add(link, new HashSet<ILink>());
+            _linksByTarget.Add(link, new HashSet<ILink>());
+            _linksBySource[source].Add(link);
+            _linksByTarget[target].Add(link);
+            return link;
+        }
+
+        public void Delete(ref ILink link)
+        {
+            if (!_links.Contains(link))
+                throw new ArgumentException("Связь не находится в этом хранилище.");
+
+            _links.Remove(link);
+            _linksBySource[link.Source].Remove(link);
+            _linksByTarget[link.Target].Remove(link);
+            _linksBySource.Remove(link);
+            _linksByTarget.Remove(link);
+        }
+
+        public bool Exists(ILink link)
+        {
+            return _links.Contains(link);
+        }
+
+        public bool Each(ILink source, ILink target, Func<ILink, bool> handler)
+        {
+            if (source != null && !Exists(source))
+                throw new ArgumentLinkDoesNotExistsException<ILink>(source, "source");
+            if (target != null && !Exists(target))
+                throw new ArgumentLinkDoesNotExistsException<ILink>(target, "target");
+
+            if (source == null && target == null)
+                return _links.All(link => handler(link) != Break);
+            if (source == null)
+            {
+                HashSet<ILink> linksByTargetSet;
+                if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
+                    return true;
+
+                return linksByTargetSet.All(link => handler(link) != Break);
+            }
+            if (target == null)
+            {
+                HashSet<ILink> linksBySourceSet;
+                if (!_linksBySource.TryGetValue(source, out linksBySourceSet))
+                    return true;
+
+                return linksBySourceSet.All(link => handler(link) != Break);
+            }
+            {
+                ILink link = SearchCore(source, target);
+                if (link != null && handler(link) == Break)
+                    return false;
+            }
+
+            return true;
+        }
+
+        public ulong Total
+        {
+            get { return (ulong) _links.Count; }
+        }
+
+        public ILink GetSource(ILink link)
+        {
+            return link.Source;
+        }
+
+        public ILink GetTarget(ILink link)
+        {
+            return link.Target;
+        }
+
+        public ILink Search(ILink source, ILink target)
+        {
+            if (source == null || !Exists(source))
+                throw new ArgumentLinkDoesNotExistsException<ILink>(source, "source");
+            if (target == null || !Exists(target))
+                throw new ArgumentLinkDoesNotExistsException<ILink>(target, "target");
+
+            return SearchCore(source, target);
+        }
+
+        public Core.Structures.Link GetLink(ILink link)
+        {
+            return Core.Structures.Link.Create(link);
+        }
+
+        public void Update(ref ILink link, ILink newSource, ILink newTarget)
+        {
+            if (!_links.Contains(link))
+                throw new ArgumentException("Связь не находится в этом хранилище.");
+
+            Delete(ref link);
+            link = Create(newSource, newTarget);
+        }
+
+        private ILink SearchCore(ILink source, ILink target)
+        {
+            HashSet<ILink> linksBySourceSet;
+            if (!_linksBySource.TryGetValue(source, out linksBySourceSet))
+                return null;
+
+            HashSet<ILink> linksByTargetSet;
+            if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
+                return null;
+
+            HashSet<ILink> copy = linksBySourceSet.Count < linksByTargetSet.Count
+                ? new HashSet<ILink>(linksBySourceSet)
+                : new HashSet<ILink>(linksByTargetSet);
+
+            copy.IntersectWith(linksByTargetSet);
+            return copy.SingleOrDefault();
+        }
+
         public class Link : ILink, IEquatable<Link>
         {
             #region Structure
@@ -55,13 +181,13 @@ namespace Platform.Links.DataBase.CoreNet
 
             public void WalkThroughReferersBySource(Action<ILink> walker)
             {
-                foreach (var link in _links._linksBySource[this])
+                foreach (ILink link in _links._linksBySource[this])
                     walker(link);
             }
 
             public void WalkThroughReferersByTarget(Action<ILink> walker)
             {
-                foreach (var link in _links._linksByTarget[this])
+                foreach (ILink link in _links._linksByTarget[this])
                     walker(link);
             }
 
@@ -74,17 +200,6 @@ namespace Platform.Links.DataBase.CoreNet
 
             #region IEquatable
 
-            public override int GetHashCode()
-            {
-                // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
-                return base.GetHashCode();
-            }
-
-            public override bool Equals(object obj)
-            {
-                return Equals(obj as ILink);
-            }
-
             public bool Equals(Link other)
             {
                 return Equals(other as ILink);
@@ -96,6 +211,17 @@ namespace Platform.Links.DataBase.CoreNet
                     return false;
 
                 return _source.Equals(other.Source) && _target.Equals(other.Target);
+            }
+
+            public override int GetHashCode()
+            {
+                // ReSharper disable once BaseObjectGetHashCodeCallInGetHashCode
+                return base.GetHashCode();
+            }
+
+            public override bool Equals(object obj)
+            {
+                return Equals(obj as ILink);
             }
 
             #endregion
@@ -115,7 +241,10 @@ namespace Platform.Links.DataBase.CoreNet
         public const ulong Null = 0;
 
         /// <summary>Возвращает значение ulong, обозначающее любую связь.</summary>
-        /// <remarks>Возможно нужно зарезервировать отдельное значение, тогда можно будет создавать все варианты последовательностей в функции Create.</remarks>
+        /// <remarks>
+        ///     Возможно нужно зарезервировать отдельное значение, тогда можно будет создавать все варианты
+        ///     последовательностей в функции Create.
+        /// </remarks>
         public const ulong Any = 0;
 
         #endregion
@@ -127,129 +256,5 @@ namespace Platform.Links.DataBase.CoreNet
         private readonly Dictionary<ILink, HashSet<ILink>> _linksByTarget;
 
         #endregion
-
-        public Links()
-        {
-            _links = new HashSet<ILink>();
-            _linksBySource = new Dictionary<ILink, HashSet<ILink>>();
-            _linksByTarget = new Dictionary<ILink, HashSet<ILink>>();
-        }
-
-        public ILink Create(ILink source, ILink target)
-        {
-            var link = new Link(this, source, target);
-            _links.Add(link);
-            _linksBySource.Add(link, new HashSet<ILink>());
-            _linksByTarget.Add(link, new HashSet<ILink>());
-            _linksBySource[source].Add(link);
-            _linksByTarget[target].Add(link);
-            return link;
-        }
-
-        public void Update(ref ILink link, ILink newSource, ILink newTarget)
-        {
-            if (!_links.Contains(link))
-                throw new ArgumentException("Связь не находится в этом хранилище.");
-
-            Delete(ref link);
-            link = Create(newSource, newTarget);
-        }
-
-        public void Delete(ref ILink link)
-        {
-            if (!_links.Contains(link))
-                throw new ArgumentException("Связь не находится в этом хранилище.");
-
-            _links.Remove(link);
-            _linksBySource[link.Source].Remove(link);
-            _linksByTarget[link.Target].Remove(link);
-            _linksBySource.Remove(link);
-            _linksByTarget.Remove(link);
-        }
-
-        public bool Exists(ILink link)
-        {
-            return _links.Contains(link);
-        }
-
-        public bool Each(ILink source, ILink target, Func<ILink, bool> handler)
-        {
-            if (source != null && !Exists(source))
-                throw new ArgumentLinkDoesNotExistsException<ILink>(source, "source");
-            if (target != null && !Exists(target))
-                throw new ArgumentLinkDoesNotExistsException<ILink>(target, "target");
-
-            if (source == null && target == null)
-                return _links.All(link => handler(link) != Break);
-            else if (source == null)
-            {
-                HashSet<ILink> linksByTargetSet;
-                if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
-                    return true;
-
-                return linksByTargetSet.All(link => handler(link) != Break);
-            }
-            else if (target == null)
-            {
-                HashSet<ILink> linksBySourceSet;
-                if (!_linksBySource.TryGetValue(source, out linksBySourceSet))
-                    return true;
-
-                return linksBySourceSet.All(link => handler(link) != Break);
-            }
-            else //if(source != 0 && target != 0)
-            {
-                var link = SearchCore(source, target);
-                if (link != null && handler(link) == Break)
-                    return false;
-            }
-
-            return true;
-        }
-
-        public ulong Total { get { return (ulong)_links.Count; } }
-
-        public ILink GetSource(ILink link)
-        {
-            return link.Source;
-        }
-
-        public ILink GetTarget(ILink link)
-        {
-            return link.Target;
-        }
-
-        public ILink Search(ILink source, ILink target)
-        {
-            if (source == null || !Exists(source))
-                throw new ArgumentLinkDoesNotExistsException<ILink>(source, "source");
-            if (target == null || !Exists(target))
-                throw new ArgumentLinkDoesNotExistsException<ILink>(target, "target");
-
-            return SearchCore(source, target);
-        }
-
-        public Core.Structures.Link GetLink(ILink link)
-        {
-            return Core.Structures.Link.Create(link);
-        }
-
-        private ILink SearchCore(ILink source, ILink target)
-        {
-            HashSet<ILink> linksBySourceSet;
-            if (!_linksBySource.TryGetValue(source, out linksBySourceSet))
-                return null;
-
-            HashSet<ILink> linksByTargetSet;
-            if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
-                return null;
-
-            var copy = linksBySourceSet.Count < linksByTargetSet.Count ?
-                new HashSet<ILink>(linksBySourceSet) :
-                new HashSet<ILink>(linksByTargetSet);
-
-            copy.IntersectWith(linksByTargetSet);
-            return copy.SingleOrDefault();
-        }
     }
 }

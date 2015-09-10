@@ -53,20 +53,24 @@ namespace Platform.Links.DataBase.Core.Pairs
 
             protected override bool FirstIsToTheLeftOfSecond(ulong first, ulong second)
             {
-                return _links[first].Source < _links[second].Source || (_links[first].Source == _links[second].Source && _links[first].Target < _links[second].Target);
+                return _links[first].Source < _links[second].Source ||
+                       (_links[first].Source == _links[second].Source && _links[first].Target < _links[second].Target);
             }
 
             protected override bool FirstIsToTheRightOfSecond(ulong first, ulong second)
             {
-                return _links[first].Source > _links[second].Source || (_links[first].Source == _links[second].Source && _links[first].Target > _links[second].Target);
+                return _links[first].Source > _links[second].Source ||
+                       (_links[first].Source == _links[second].Source && _links[first].Target > _links[second].Target);
             }
 
-            private bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource, ulong secondTarget)
+            private bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
+                ulong secondTarget)
             {
                 return firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
             }
 
-            private bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource, ulong secondTarget)
+            private bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
+                ulong secondTarget)
             {
                 return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
             }
@@ -106,7 +110,11 @@ namespace Platform.Links.DataBase.Core.Pairs
             public ulong CalculateReferences(ulong link)
             {
                 ulong references = 0;
-                EachReference(link, x => { references++; return true; });
+                EachReference(link, x =>
+                {
+                    references++;
+                    return true;
+                });
                 return references;
             }
 
@@ -197,12 +205,14 @@ namespace Platform.Links.DataBase.Core.Pairs
 
             protected override bool FirstIsToTheLeftOfSecond(ulong first, ulong second)
             {
-                return _links[first].Target < _links[second].Target || (_links[first].Target == _links[second].Target && _links[first].Source < _links[second].Source);
+                return _links[first].Target < _links[second].Target ||
+                       (_links[first].Target == _links[second].Target && _links[first].Source < _links[second].Source);
             }
 
             protected override bool FirstIsToTheRightOfSecond(ulong first, ulong second)
             {
-                return _links[first].Target > _links[second].Target || (_links[first].Target == _links[second].Target && _links[first].Source > _links[second].Source);
+                return _links[first].Target > _links[second].Target ||
+                       (_links[first].Target == _links[second].Target && _links[first].Source > _links[second].Source);
             }
 
             /// <summary>
@@ -213,7 +223,11 @@ namespace Platform.Links.DataBase.Core.Pairs
             public ulong CalculateReferences(ulong link)
             {
                 ulong references = 0;
-                EachReference(link, x => { references++; return true; });
+                EachReference(link, x =>
+                {
+                    references++;
+                    return true;
+                });
                 return references;
             }
 

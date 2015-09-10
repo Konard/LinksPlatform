@@ -2,7 +2,7 @@
 
 namespace Platform.Links.DataBase.Core.Exceptions
 {
-    public class ArgumentLinkDoesNotExistsException<TLink> : ArgumentException 
+    public class ArgumentLinkDoesNotExistsException<TLink> : ArgumentException
     {
         public ArgumentLinkDoesNotExistsException(TLink link, string paramName)
             : base(FormatMessage(link, paramName), paramName)
