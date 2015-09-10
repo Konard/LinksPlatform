@@ -18,3 +18,7 @@ There also at least two variants of Link structure:
 
 
 Links Platform is a system, that combine simple database (Links) and execution engine (Triggers). So it is provide ability to program that system in any way, due to fact that all algorithms are data inside this database. Idea behind Links Platform is a model of associative memory of human mind. So it is actually copy most of it advantages and disadvantages.
+
+
+> Support development (поддержать разработку) / donations (пожертвования):
+> 3MXvFfEGWM9nzVKZQHgVL7ioqSsHeAFpdP (bitcoin address of project coordinator | биткоин адрес координатора проекта)
