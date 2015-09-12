@@ -110,6 +110,8 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
       <AssemblerOutput>All</AssemblerOutput>
+      <PreprocessToFile>true</PreprocessToFile>
+      <PreprocessKeepComments>true</PreprocessKeepComments>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>

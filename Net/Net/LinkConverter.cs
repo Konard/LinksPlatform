@@ -23,8 +23,8 @@ namespace NetLibrary
 
         static public List<Link> ToList(Link link)
         {
-            List<Link> list = new List<Link>();
-            SequenceWalker walker = new SequenceWalker(link, list.Add);
+            var list = new List<Link>();
+            var walker = new SequenceWalker(link, list.Add);
             walker.WalkFromLeftToRight();
             return list;
         }
@@ -117,24 +117,21 @@ namespace NetLibrary
         static public Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
         {
             int length = takeUntil - takeFrom;
-            if (length > 0)
-            {
-                Link[] copy = new Link[length];
-
-                for (int i = takeFrom, j = 0; i < takeUntil; i++, j++)
-                    copy[j] = converter(objects[i]);
-
-                return FromList(copy);
-            }
-            else
-            {
+            
+            if (length <= 0)
                 throw new ArgumentOutOfRangeException("length", "Нельзя преобразовать пустой список к связям.");
-            }
+            
+            var copy = new Link[length];
+
+            for (int i = takeFrom, j = 0; i < takeUntil; i++, j++)
+                copy[j] = converter(objects[i]);
+
+            return FromList(copy);
         }
 
         static public Link FromChars(string str)
         {
-            Link[] copy = new Link[str.Length];
+            var copy = new Link[str.Length];
 
             for (int i = 0; i < copy.Length; i++)
                 copy[i] = FromChar(str[i]);
@@ -144,7 +141,7 @@ namespace NetLibrary
 
         static public Link FromString(string str)
         {
-            Link[] copy = new Link[str.Length];
+            var copy = new Link[str.Length];
 
             for (int i = 0; i < copy.Length; i++)
                 copy[i] = FromChar(str[i]);
@@ -156,16 +153,14 @@ namespace NetLibrary
         static public string ToString(Link link)
         {
             if (link.IsString())
-            {
                 return ToString(ToList(link.Target));
-            }
-            else
-                throw new ArgumentOutOfRangeException("link", "Specified link is not a string.");
+
+            throw new ArgumentOutOfRangeException("link", "Specified link is not a string.");
         }
 
         static public string ToString(List<Link> charLinks)
         {
-            char[] chars = new char[charLinks.Count];
+            var chars = new char[charLinks.Count];
             for (int i = 0; i < charLinks.Count; i++)
                 chars[i] = ToChar(charLinks[i]);
 

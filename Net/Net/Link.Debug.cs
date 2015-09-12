@@ -7,14 +7,17 @@ namespace NetLibrary
     {
         #region Properties
 
+        // ReSharper disable InconsistentNaming
+        // ReSharper disable UnusedMember.Local
+
         [DebuggerDisplay(null, Name = "Source")]
-        private Link я_A { get { return this == null ? Link.Itself : this.Source; } }
+        private Link я_A { get { return this == null ? Itself : Source; } }
 
         [DebuggerDisplay(null, Name = "Linker")]
-        private Link я_B { get { return this == null ? Link.Itself : this.Linker; } }
+        private Link я_B { get { return this == null ? Itself : Linker; } }
 
         [DebuggerDisplay(null, Name = "Target")]
-        private Link я_C { get { return this == null ? Link.Itself : this.Target; } }
+        private Link я_C { get { return this == null ? Itself : Target; } }
 
         [DebuggerDisplay("Count = {я_DC}", Name = "ReferersBySource")]
         private Link[] я_D { get { return this.GetArrayOfRererersBySource(); } }
@@ -26,16 +29,19 @@ namespace NetLibrary
         private Link[] я_F { get { return this.GetArrayOfRererersByTarget(); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_DC { get { return this == null ? 0 : this.ReferersBySourceCount; } }
+        private long я_DC { get { return this == null ? 0 : ReferersBySourceCount; } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_EC { get { return this == null ? 0 : this.ReferersByLinkerCount; } }
+        private long я_EC { get { return this == null ? 0 : ReferersByLinkerCount; } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_FC { get { return this == null ? 0 : this.ReferersByTargetCount; } }
+        private long я_FC { get { return this == null ? 0 : ReferersByTargetCount; } }
 
 		[DebuggerDisplay(null, Name = "Timestamp")]
-		private DateTime я_H { get { return this == null ? DateTime.MinValue : this.Timestamp; } }
+		private DateTime я_H { get { return this == null ? DateTime.MinValue : Timestamp; } }
+
+        // ReSharper restore UnusedMember.Local
+        // ReSharper restore InconsistentNaming
 
         #endregion
 

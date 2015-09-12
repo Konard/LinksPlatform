@@ -8,15 +8,15 @@ namespace NetLibrary
 {
     static public class XmlGenerator
     {
-        static private readonly string SourceLabel = "Source";
-        static private readonly string LinkerLabel = "Linker";
-        static private readonly string TargetLabel = "Target";
+        private const string SourceLabel = "Source";
+        private const string LinkerLabel = "Linker";
+        private const string TargetLabel = "Target";
 
         static private HashSet<Link> CollectLinks(Func<Link, bool> linkMatch)
         {
-            HashSet<Link> matchingLinks = new HashSet<Link>();
+            var matchingLinks = new HashSet<Link>();
 
-            Link.WalkThroughAllLinks((link) =>
+            Link.WalkThroughAllLinks(link =>
                 {
                     if (linkMatch(link))
                     {
@@ -29,7 +29,7 @@ namespace NetLibrary
 
         static private HashSet<Link> CollectLinks()
         {
-            HashSet<Link> matchingLinks = new HashSet<Link>();
+            var matchingLinks = new HashSet<Link>();
 
             Link.WalkThroughAllLinks(x => { matchingLinks.Add(x); });
 
@@ -38,9 +38,9 @@ namespace NetLibrary
 
         static public string ToXml()
         {
-            HashSet<Link> matchingLinks = CollectLinks();
+            var matchingLinks = CollectLinks();
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
             using (var writer = XmlWriter.Create(sb))
             {
                 WriteXml(writer, matchingLinks);
@@ -50,7 +50,7 @@ namespace NetLibrary
 
         static public void ToFile(string path)
         {
-            HashSet<Link> matchingLinks = CollectLinks();
+            var matchingLinks = CollectLinks();
 
             Console.WriteLine("File write started.");
 
@@ -64,7 +64,7 @@ namespace NetLibrary
 
         static public void ToFile(string path, Func<Link, bool> filter)
         {
-            HashSet<Link> matchingLinks = CollectLinks(filter);
+            var matchingLinks = CollectLinks(filter);
 
             Console.WriteLine("File write started.");
 
@@ -82,13 +82,12 @@ namespace NetLibrary
 
             Gexf.Gexf.WriteXml(writer,
                 () => // graph
-                {
                     Graph.WriteXml(writer,
                         () => // nodes
                         {
                             foreach (Link matchingLink in matchingLinks)
                             {
-								Node.WriteXml(writer, matchingLink.GetPointer().ToInt64(), matchingLink.ToString());
+                                Node.WriteXml(writer, matchingLink.GetPointer().ToInt64(), matchingLink.ToString());
                             }
                         },
                         () => // edges
@@ -97,19 +96,18 @@ namespace NetLibrary
                             {
                                 if (matchingLinks.Contains(matchingLink.Source))
                                 {
-									Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Source.GetPointer().ToInt64(), SourceLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Source.GetPointer().ToInt64(), SourceLabel);
                                 }
                                 if (matchingLinks.Contains(matchingLink.Linker))
                                 {
-									Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Linker.GetPointer().ToInt64(), LinkerLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Linker.GetPointer().ToInt64(), LinkerLabel);
                                 }
                                 if (matchingLinks.Contains(matchingLink.Target))
                                 {
-									Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Target.GetPointer().ToInt64(), TargetLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Target.GetPointer().ToInt64(), TargetLabel);
                                 }
                             }
-                        });
-                });
+                        }));
         }
     }
 }

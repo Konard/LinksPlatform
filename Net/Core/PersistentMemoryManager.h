@@ -1,7 +1,7 @@
 #ifndef __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 #define __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 
-// Менеджер памяти (memory manager).
+// Persistent on drive memory manager (Менеджер хранимой на диске памяти).
 
 #include "Common.h"
 #include "Link.h"
@@ -10,38 +10,25 @@
 extern "C" {
 #endif
 
-// see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
+    PREFIX_DLL void InitPersistentMemoryManager();
+    PREFIX_DLL int OpenStorageFile(char *filename);
+    PREFIX_DLL int CloseStorageFile();
+    PREFIX_DLL int EnlargeStorageFile();
+    PREFIX_DLL int ShrinkStorageFile();
+    PREFIX_DLL int SetStorageFileMemoryMapping();
+    PREFIX_DLL int ResetStorageFileMemoryMapping();
+    PREFIX_DLL link_index GetMappedLink(int mappedIndex);
+    PREFIX_DLL void SetMappedLink(int mappedIndex, link_index linkIndex);
+    PREFIX_DLL void ReadTest();
+    PREFIX_DLL void WriteTest();
 
-#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__)
-#if defined(LINKS_DLL_EXPORT)
-#define PREFIX_DLL __declspec(dllexport)
-#else
-#define PREFIX_DLL __declspec(dllimport)
-#endif
-#elif defined(__linux__)
-// for Linux,Unix?
-#define PREFIX_DLL 
-#endif
+    link_index AllocateLink();
+    void FreeLink(link_index link);
 
-PREFIX_DLL void InitPersistentMemoryManager();
-PREFIX_DLL int OpenStorageFile(char *filename);
-PREFIX_DLL int CloseStorageFile();
-PREFIX_DLL unsigned long EnlargeStorageFile();
-PREFIX_DLL unsigned long ShrinkStorageFile();
-PREFIX_DLL int SetStorageFileMemoryMapping();
-PREFIX_DLL unsigned long ResetStorageFileMemoryMapping();
-PREFIX_DLL uint64_t GetMappedLink(int index);
-PREFIX_DLL void SetMappedLink(int index, uint64_t linkIndex);
-PREFIX_DLL void ReadTest();
-PREFIX_DLL void WriteTest();
+    PREFIX_DLL void WalkThroughAllLinks(visitor visitor);
+    PREFIX_DLL signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor);
 
-uint64_t AllocateLink();
-void FreeLink(Link *link);
-
-PREFIX_DLL void WalkThroughAllLinks(func);
-PREFIX_DLL int WalkThroughLinks(func);
-
-Link *GetLink(uint64_t linkIndex);
+    __forceinline Link *GetLink(link_index linkIndex);
 
 #if defined(__cplusplus)
 }

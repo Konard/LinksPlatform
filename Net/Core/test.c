@@ -1,22 +1,21 @@
 #include "Link.h"
 
 int main() {
-	InitPersistentMemoryManager();
-	OpenStorageFile("test.bin");
-	SetStorageFileMemoryMapping();
+    InitPersistentMemoryManager();
 
-//#define itself ((Link *)0)
+    OpenStorageFile("test.bin");
+    SetStorageFileMemoryMapping();
 
-uint64_t isA = CreateLink(itself, itself, itself);
-uint64_t isNotA = CreateLink(itself, itself, isA);
-uint64_t link = CreateLink(itself, isA, itself);
-uint64_t thing = CreateLink(itself, isNotA, link);
+    link_index isA = CreateLink(itself, itself, itself);
+    link_index isNotA = CreateLink(itself, itself, isA);
+    link_index link = CreateLink(itself, isA, itself);
+    link_index thing = CreateLink(itself, isNotA, link);
 
-UpdateLink(isA, isA, isA, link); // После этого минимальное ядро системы можно считать сформированным
+    UpdateLink(isA, isA, isA, link); // После этого минимальное ядро системы можно считать сформированным
 
-//DeleteLink(isA); // Одна эта операция удалит все 4 связи
+    //DeleteLink(isA); // Одна эта операция удалит все 4 связи
 
-	ResetStorageFileMemoryMapping();
-	CloseStorageFile();
-	return 0;
+    ResetStorageFileMemoryMapping();
+    CloseStorageFile();
+    return 0;
 }

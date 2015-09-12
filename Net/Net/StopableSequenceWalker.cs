@@ -51,18 +51,6 @@ namespace NetLibrary
                     Link source = element.Source;
                     Link target = element.Target;
 
-                    // Оптимизация проходов вправо вверх,
-                    // нет необходимости регистировать такие проходы в стэке.
-                    // Исключая из алгоритма только этот блок можно сохранить его работоспособность.
-                    //while (target.Linker == Net.And && source.Linker != Net.And)
-                    //{
-                    //    if (!_visit(source))
-                    //        return false;
-
-                    //    source = target.Source;
-                    //    target = target.Target;
-                    //}
-
                     // Обработка элемента
                     if (source.Linker != Net.And && !_visit(source))
                         return false;
@@ -103,18 +91,6 @@ namespace NetLibrary
 
                     Link target = element.Target;
                     Link source = element.Source;
-
-                    // Оптимизация проходов влево вверх,
-                    // нет необходимости регистировать такие проходы в стэке.
-                    // Исключая из алгоритма только этот блок можно сохранить его работоспособность.
-                    //while (source.Linker == Net.And && target.Linker != Net.And)
-                    //{
-                    //    if (!_visit(target))
-                    //        return false;
-
-                    //    target = source.Target;
-                    //    source = source.Source;
-                    //}
 
                     // Обработка элемента
                     if (target.Linker != Net.And && !_visit(target))

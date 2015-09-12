@@ -25,19 +25,19 @@
     <ClInclude Include="Common.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="SizeBalancedTree.h">
-      <Filter>Заголовочные файлы</Filter>
-    </ClInclude>
     <ClInclude Include="Link.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
     <ClInclude Include="PersistentMemoryManager.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
+    <ClInclude Include="Timestamp.h">
+      <Filter>Заголовочные файлы</Filter>
+    </ClInclude>
     <ClInclude Include="LinkLowLevel.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
-    <ClInclude Include="Timestamp.h">
+    <ClInclude Include="SizeBalancedTree.h">
       <Filter>Заголовочные файлы</Filter>
     </ClInclude>
   </ItemGroup>

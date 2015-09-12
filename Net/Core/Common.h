@@ -1,23 +1,42 @@
-#ifndef __LINKS_COMMON_H__
+﻿#ifndef __LINKS_COMMON_H__
 #define __LINKS_COMMON_H__
-
-// see http://stackoverflow.com/questions/163058/how-can-i-detect-if-im-compiling-for-a-64bits-architecture-in-c
-#if defined(_LP64) || defined(__amd64__) || defined(_M_X64)
-#else
-// what is for Windows? #warning "Links platform needs 64-bit CPU architecture."
-#endif
 
 #define false 0
 #define true 1
 #define bool unsigned
 
-#if defined(_MSC_VER)
-typedef __int32 int32_t;
-typedef unsigned __int32 uint32_t;
-typedef __int64 int64_t;
-typedef unsigned __int64 uint64_t;
-#else
 #include <stdint.h>
+
+// Size for basic types
+// Размер для основных типов
+typedef uint64_t unsigned_integer;
+typedef int64_t signed_integer;
+typedef unsigned_integer link_index; // Short for links' array index, unsigned integer (короткая форма для беззнакового индекса в массиве связей)
+
+#if defined(_MSC_VER) || defined(__MINGW32__) || defined(__MINGW64__) // Для Windows: получения .exe/.obj/.dll (Visual C++/MinGW32):
+#ifndef WINDOWS
+#define WINDOWS
+#endif
+#elif defined(__linux__)  // Для Linux: получения ./.o/.so:
+#ifndef LINUX
+#define LINUX
+#endif
+#endif
+
+// see http://stackoverflow.com/questions/538134/exporting-functions-from-a-dll-with-dllexport
+#if defined(WINDOWS)
+#if defined(LINKS_DLL_EXPORT) || defined (CORE_EXPORTS)
+#define PREFIX_DLL __declspec(dllexport)
+//#define _H __stdcall
+#define _H 
+#else
+#define PREFIX_DLL __declspec(dllimport)
+#define _H 
+#endif
+#elif defined(LINUX)
+// Linux,Unix
+#define PREFIX_DLL 
+#define _H 
 #endif
 
 #endif

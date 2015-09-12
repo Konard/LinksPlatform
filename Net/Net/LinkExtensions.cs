@@ -16,58 +16,56 @@ namespace NetLibrary
 
 		static public bool TryGetName(this Link link, out string str)
 		{
-			if (!LinksWithNamesGatheringProcess.Add(link))
+            // Защита от зацикливания
+		    if (!LinksWithNamesGatheringProcess.Add(link))
 			{
 				str = "...";
 				return true;
 			}
-			else
-			{
-				try
-				{
-					if (link != null)
-					{
-						if (link.Linker == Net.And)
-						{
-							str = SequenceHelpers.FormatSequence(link);
-							return true;
-						}
-						else if (link.IsGroup())
-						{
-							str = LinkConverter.ToString(LinkConverter.ToList(link.Target));
-							return true;
-						}
-						else if (link.IsChar())
-						{
-							str = LinkConverter.ToChar(link).ToString();
-							return true;
-						}
-						else if (TryGetSpecificName(link, out str))
-							return true;
+		    try
+		    {
+		        if (link != null)
+		        {
+		            if (link.Linker == Net.And)
+		            {
+		                str = SequenceHelpers.FormatSequence(link);
+		                return true;
+		            }
+		            else if (link.IsGroup())
+		            {
+		                str = LinkConverter.ToString(LinkConverter.ToList(link.Target));
+		                return true;
+		            }
+		            else if (link.IsChar())
+		            {
+		                str = LinkConverter.ToChar(link).ToString();
+		                return true;
+		            }
+		            else if (TryGetSpecificName(link, out str))
+		                return true;
 
-						if (link.Source == link || link.Linker == link || link.Target == link)
-							return false;
+		            if (link.Source == link || link.Linker == link || link.Target == link)
+		                return false;
 
-						string sourceName, linkerName, targetName;
-						if (TryGetName(link.Source, out sourceName) && TryGetName(link.Linker, out linkerName) && TryGetName(link.Target, out targetName))
-						{
-							var sb = new StringBuilder();
-							sb.Append(sourceName).Append(' ').Append(linkerName).Append(' ').Append(targetName);
-							str = sb.ToString();
-							return true;
-						}
-					}
-					str = null;
-					return false;
-				}
-				finally
-				{
-					LinksWithNamesGatheringProcess.Remove(link);
-				}
-			}
+		            string sourceName, linkerName, targetName;
+		            if (TryGetName(link.Source, out sourceName) && TryGetName(link.Linker, out linkerName) && TryGetName(link.Target, out targetName))
+		            {
+		                var sb = new StringBuilder();
+		                sb.Append(sourceName).Append(' ').Append(linkerName).Append(' ').Append(targetName);
+		                str = sb.ToString();
+		                return true;
+		            }
+		        }
+		        str = null;
+		        return false;
+		    }
+		    finally
+		    {
+		        LinksWithNamesGatheringProcess.Remove(link);
+		    }
 		}
 
-		static public bool TryGetSpecificName(this Link link, out string name)
+	    static public bool TryGetSpecificName(this Link link, out string name)
 		{
 			string nameLocal = null;
 			if (Net.Name.ReferersBySourceCount < link.ReferersBySourceCount)
@@ -160,7 +158,7 @@ namespace NetLibrary
 				return new Link[0];
 			else
 			{
-				Link[] array = new Link[link.ReferersBySourceCount];
+				var array = new Link[link.ReferersBySourceCount];
 				int index = 0;
 				link.WalkThroughReferersBySource(referer => array[index++] = referer);
 				return array;
@@ -173,7 +171,7 @@ namespace NetLibrary
 				return new Link[0];
 			else
 			{
-				Link[] array = new Link[link.ReferersByLinkerCount];
+				var array = new Link[link.ReferersByLinkerCount];
 				int index = 0;
 				link.WalkThroughReferersByLinker(referer => array[index++] = referer);
 				return array;
@@ -186,7 +184,7 @@ namespace NetLibrary
 				return new Link[0];
 			else
 			{
-				Link[] array = new Link[link.ReferersByTargetCount];
+				var array = new Link[link.ReferersByTargetCount];
 				int index = 0;
 				link.WalkThroughReferersByTarget(referer => array[index++] = referer);
 				return array;

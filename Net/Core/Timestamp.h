@@ -5,6 +5,6 @@
 
 #include "Common.h"
 
-int64_t GetTimestamp();
+signed_integer GetTimestamp();
 
 #endif
