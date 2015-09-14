@@ -22,8 +22,6 @@
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-#include <stdio.h>
-
 // Дескриптор файла базы данных и дескриптор объекта отображения (map)
 #if defined(WINDOWS)
 HANDLE              storageFileHandle;
@@ -31,179 +29,264 @@ HANDLE              storageFileMappingHandle;
 #elif defined(LINUX)
 signed_integer      storageFileHandle;                  // для open()
 #endif
-unsigned_integer    storageFileSizeInBytes;             // <- off_t
-
-
-// Константы, рассчитываемые при запуске приложения
-unsigned_integer    currentMemoryPageSizeInBytes;       // Размер страницы в операционной системе
-unsigned_integer    serviceBlockSizeInBytes;            // Размер сервисных данных, (две страницы)
-unsigned_integer    baseLinksSizeInBytes;
-unsigned_integer    baseBlockSizeInBytes;               // Базовый размер блока данных (является минимальным размером файла, а также шагом при росте этого файла)
-unsigned_integer    storageFileMinSizeInBytes;
+int64_t             storageFileSizeInBytes;             // <- off_t
 
 void*               pointerToMappedRegion;              // указатель на начало региона памяти - результата mmap()
 
-int*                pointerToMappingLinksMaxSize;
-link_index**        pointerToPointerToMappingLinks;     // инициализируется в SetStorageFileMemoryMapping()
-link_index*         pointerToLinksMaxSize;
-link_index*         pointerToLinksSize;
+// Константы, рассчитываемые при запуске приложения
+int64_t             currentMemoryPageSizeInBytes;       // Размер страницы в операционной системе. Инициализируется в InitPersistentMemoryManager();
+int64_t             serviceBlockSizeInBytes;            // Размер сервисных данных, (две страницы). Инициализируется в InitPersistentMemoryManager();
+int64_t             baseLinksSizeInBytes;               // Размер массива базовых (привязанных) связей.
+int64_t             baseBlockSizeInBytes;               // Базовый размер блока данных (шаг роста файла базы данных)
+int64_t             storageFileMinSizeInBytes;          // Минимально возможный размер файла базы данных (Базовый размер блока (шага) + размер сервисного блока)
+
+
+uint64_t*           pointerToDataSeal;                  // Указатель на уникальную печать, если она установлена, значит база данных открывается во второй или более раз.
+uint64_t*           pointerToLinkIndexSize;             // Указатель на размер одного индекса связи.
+uint64_t*           pointerToMappingLinksMaxSize;       // Указатель на максимальный размер массива базовых (привязанных) связей.
+link_index*         pointerToPointerToMappingLinks;     // Указатель на начало массива базовых (привязанных) связей. Инициализируется в SetStorageFileMemoryMapping().
+link_index*         pointerToLinksMaxSize;              // Указатель на максимальный размер массива связей.
+link_index*         pointerToLinksSize;                 // Указатель на текущий размер массива связей.
+Link*               pointerToLinks;                     // Указатель на начало массива связей. Инициализируется в SetStorageFileMemoryMapping().
 
 /* Неиспользуемый блок памяти, с размером (sizeof(Link) - 16) ?? */
 
-Link*               pointerToUnusedMarker;              // инициализируется в SetStorageFileMemoryMapping()
-Link*               pointerToLinks;                     // здесь хранятся линки, инициализируется в SetStorageFileMemoryMapping()
-
+Link*               pointerToUnusedMarker;              // Инициализируется в SetStorageFileMemoryMapping()
 
 // TODO: Make a const list of all possible errors
 
 /***  Работа с памятью  ***/
 
-void PrintLinksTableSize()
+void PrintLinksDataBaseSize()
 {
-#if defined(_MSC_VER)
-    printf("Links table size: %I64d links, %I64d bytes.\n",
-        *pointerToLinksSize,
-        *pointerToLinksSize * sizeof(Link));
-#elif defined(__MINGW32__) || defined(__MINGW64__) || defined(LINUX)
-    printf("Links table size: %llu links, %llu bytes.\n",
-        (long long unsigned int)(*pointerToLinksSize),
-        (long long unsigned int)(*pointerToLinksSize * sizeof(Link)));
+    printf("Links databse size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
+        (uint64_t)(*pointerToLinksSize),
+        (uint64_t)(*pointerToLinksSize * sizeof(Link)),
+        (uint64_t)serviceBlockSizeInBytes);
+}
+
+unsigned_integer GetCurrentSystemPageSize()
+{
+#if defined(WINDOWS)
+
+    //  typedef struct _SYSTEM_INFO {
+    //      union {
+    //          DWORD  dwOemId;
+    //          struct {
+    //              WORD wProcessorArchitecture;
+    //              WORD wReserved;
+    //          };
+    //      };
+    //      DWORD     dwPageSize;
+    //      LPVOID    lpMinimumApplicationAddress;
+    //      LPVOID    lpMaximumApplicationAddress;
+    //      DWORD_PTR dwActiveProcessorMask;
+    //      DWORD     dwNumberOfProcessors;
+    //      DWORD     dwProcessorType;
+    //      DWORD     dwAllocationGranularity;
+    //      WORD      wProcessorLevel;
+    //      WORD      wProcessorRevision;
+    //  } SYSTEM_INFO;
+
+    SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
+    GetSystemInfo(&info);
+    return info.dwPageSize;
+
+#elif defined(LINUX)
+
+    long pageSize = sysconf(_SC_PAGESIZE);
+    return pageSize;
+
 #endif
+}
+
+void ResetStorageFile()
+{
+#if defined(WINDOWS)
+    storageFileHandle = INVALID_HANDLE_VALUE;
+#elif defined(LINUX)
+    storageFileHandle = -1;
+#endif
+    storageFileSizeInBytes = 0;
+}
+
+bool IsStorageFileOpened()
+{
+#if defined(WINDOWS)
+    return storageFileHandle != INVALID_HANDLE_VALUE;
+#elif defined(LINUX)
+    return storageFileHandle != -1;
+#endif
+}
+
+signed_integer EnsureStorageFileOpened()
+{
+    if (!IsStorageFileOpened())
+        return Error("Storage file is not open.");
+    return SUCCESS_RESULT;
+}
+
+signed_integer EnsureStorageFileClosed()
+{
+    if (IsStorageFileOpened())
+        return Error("Storage file is not closed.");
+    return SUCCESS_RESULT;
+}
+
+signed_integer ResetStorageFileMapping()
+{
+#if defined(WINDOWS)
+    storageFileMappingHandle = INVALID_HANDLE_VALUE;
+    pointerToMappedRegion = NULL;
+#elif defined(LINUX)
+    pointerToMappedRegion = MAP_FAILED;
+#endif
+    return (signed_integer)UINT64_MAX;
+}
+
+bool IsStorageFileMapped()
+{
+#if defined(WINDOWS)
+    return storageFileMappingHandle != INVALID_HANDLE_VALUE && pointerToMappedRegion != NULL;
+#elif defined(LINUX)
+    return pointerToMappedRegion != MAP_FAILED;
+#endif
+}
+
+signed_integer EnsureStorageFileMapped()
+{
+    if (!IsStorageFileMapped())
+        return Error("Storage file is not mapped.");
+    return SUCCESS_RESULT;
+}
+
+signed_integer EnsureStorageFileUnmapped()
+{
+    if (IsStorageFileMapped())
+        return Error("Storage file already mapped.");
+    return SUCCESS_RESULT;
 }
 
 void InitPersistentMemoryManager()
 {
-
-#if defined(WINDOWS)
-
-    /*
-    typedef struct _SYSTEM_INFO {
-    union {
-    DWORD  dwOemId;
-    struct {
-    WORD wProcessorArchitecture;
-    WORD wReserved;
-    };
-    };
-    DWORD     dwPageSize;
-    LPVOID    lpMinimumApplicationAddress;
-    LPVOID    lpMaximumApplicationAddress;
-    DWORD_PTR dwActiveProcessorMask;
-    DWORD     dwNumberOfProcessors;
-    DWORD     dwProcessorType;
-    DWORD     dwAllocationGranularity;
-    WORD      wProcessorLevel;
-    WORD      wProcessorRevision;
-    } SYSTEM_INFO;
-    */
-
-    SYSTEM_INFO info; // см. http://msdn.microsoft.com/en-us/library/windows/desktop/ms724958%28v=vs.85%29.aspx
-    GetSystemInfo(&info);
-    currentMemoryPageSizeInBytes = info.dwPageSize;
-    serviceBlockSizeInBytes = info.dwPageSize * 2;
-
-#elif defined(LINUX)
-
-    long sz = sysconf(_SC_PAGESIZE);
-    currentMemoryPageSizeInBytes = sz; // ? привести к одному типу
-    serviceBlockSizeInBytes = sz * 2;
-    printf("_SC_PAGESIZE = %lu\n", sz);
-
-#endif
+    currentMemoryPageSizeInBytes = GetCurrentSystemPageSize();
+    serviceBlockSizeInBytes = currentMemoryPageSizeInBytes * 2;
 
     baseLinksSizeInBytes = serviceBlockSizeInBytes - 12;
     baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 
     storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
 
-    printf("storageFileMinSizeInBytes = %llu\n",
-        (long long unsigned int)storageFileMinSizeInBytes);
-
-#if defined(WINDOWS)
-    storageFileHandle = INVALID_HANDLE_VALUE;
-#elif defined(LINUX)
-    storageFileHandle = -1;
+#ifdef DEBUG
+    printf("storageFileMinSizeInBytes = %llu\n", (uint64_t)storageFileMinSizeInBytes);
 #endif
+
+    ResetStorageFile();
+    ResetStorageFileMapping();
+
     return;
 }
 
-// DWORD == int
-int OpenStorageFile(char *filename)
+signed_integer OpenStorageFile(char* filename)
 {
-    printf("Opening file...\n");
+    if (failed(EnsureStorageFileClosed()))
+        return ERROR_RESULT;
+
+    DebugInfo("Opening file...");
 
 #if defined(WINDOWS)
     // см. MSDN "CreateFile function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa363858%28v=vs.85%29.aspx
     storageFileHandle = CreateFile(filename, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
     if (storageFileHandle == INVALID_HANDLE_VALUE)
-    {
         // см. MSDN "GetLastError function", http://msdn.microsoft.com/en-us/library/windows/desktop/ms679360%28v=vs.85%29.aspx
-        int error = GetLastError();
-        printf("File opening failed. Error code: %d.\n", error);
-        return error;
-    }
+        return ErrorWithCode("Failed to open file.", GetLastError());
+
     // см. MSDN "GetFileSize function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa364955%28v=vs.85%29.aspx
     // не знаю, как поправить здесь:
     // warning: dereferencing type-punned pointer will break strict-aliasing rules
-
     *((LPDWORD)&storageFileSizeInBytes) = GetFileSize(storageFileHandle, (LPDWORD)&storageFileSizeInBytes + 1);
     if (storageFileSizeInBytes == INVALID_FILE_SIZE)
-    {
-        int error = GetLastError();
-        printf("File size get failed. Error code: %d.\n", error);
-        return error;
-    }
+        return ErrorWithCode("Failed to get file size.", GetLastError());
 
 #elif defined(LINUX)
     storageFileHandle = open(filename, O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
-    if (storageFileHandle == -1) {
-        int error = errno;
-        printf("File opening failed. Error code: %d.\n", error);
-        return error;
-    }
+    if (storageFileHandle == -1)
+        return ErrorWithCode("Failed to open file.", errno);
+
     struct stat statbuf;
     if (fstat(storageFileHandle, &statbuf) != 0)
-    {
-        int error = errno;
-        printf("File size get failed. Error code: %d.\n", error);
-        return error;
-    }
-    storageFileSizeInBytes = statbuf.st_size; // ? index = off_t
+        return ErrorWithCode("Failed to get file size.", errno);
 
+    storageFileSizeInBytes = statbuf.st_size; // ? uint64_t = off_t
 #endif
 
-    // по-крайней мере - минимальный блок для линков + сервисный блок
-    if (storageFileSizeInBytes < storageFileMinSizeInBytes) {
-        printf("enlarge\n");
-        storageFileSizeInBytes = storageFileMinSizeInBytes;
+#ifdef DEBUG
+    printf("storageFileSizeInBytes = %llu\n", (uint64_t)storageFileSizeInBytes);
+
+    printf("File %s opened.\n\n", filename);
+#endif
+
+    return SUCCESS_RESULT;
+}
+
+// Используется storageFileHandle и storageFileSizeInBytes для установки нового размера
+signed_integer ResizeStorageFile()
+{
+    if (succeeded(EnsureStorageFileOpened()))
+    {
+        if (succeeded(EnsureStorageFileUnmapped()))
+        {
+#if defined(WINDOWS)
+            LARGE_INTEGER distanceToMoveFilePointer = { 0 };
+            LARGE_INTEGER currentFilePointer = { 0 };
+            if (!SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, &currentFilePointer, FILE_CURRENT))
+                return ErrorWithCode("Failed to get current file pointer.", GetLastError());
+
+            distanceToMoveFilePointer.QuadPart = storageFileSizeInBytes - currentFilePointer.QuadPart;
+
+            if (!SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END))
+                return ErrorWithCode("Failed to set file pointer.", GetLastError());
+            if (!SetEndOfFile(storageFileHandle))
+                return ErrorWithCode("Failed to set end of file.", GetLastError());
+#elif defined(LINUX)
+            // см. также под Linux, MAP_POPULATE
+            // см. также mmap64() (size_t?)
+            if (ftruncate(storageFileHandle, storageFileSizeInBytes) == -1)
+                return ErrorWithCode("Failed to resize file.", errno);
+#endif
+
+            return SUCCESS_RESULT;
+        }
     }
+
+    return ERROR_RESULT;
+}
+
+signed_integer SetStorageFileMemoryMapping()
+{
+    if (failed(EnsureStorageFileOpened()))
+        return ERROR_RESULT;
+
+    if (failed(EnsureStorageFileUnmapped()))
+        return ERROR_RESULT;
+
+    DebugInfo("Setting memory mapping of storage file..");
+
+    // по-крайней мере - минимальный блок для линков + сервисный блок
+    if (storageFileSizeInBytes < storageFileMinSizeInBytes)
+        storageFileSizeInBytes = storageFileMinSizeInBytes;
 
     // если блок линков выравнен неправильно (не кратен базовому размеру блока), выравниваем "вверх"
     if (((storageFileSizeInBytes - serviceBlockSizeInBytes) % baseBlockSizeInBytes) > 0)
-        storageFileSizeInBytes = (((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseBlockSizeInBytes) * baseBlockSizeInBytes) + baseBlockSizeInBytes;
+        storageFileSizeInBytes = (((storageFileSizeInBytes - serviceBlockSizeInBytes) / baseBlockSizeInBytes) * baseBlockSizeInBytes) + storageFileMinSizeInBytes;
 
-    printf("storageFileSizeInBytes = %llu\n",
-        (long long unsigned int)storageFileSizeInBytes);
-
-    printf("File %s opened.\n\n", filename);
-
-    return 0;
-}
-
-// стандартный тип ошибки - int
-int SetStorageFileMemoryMapping()
-{
-    printf("Setting memory mapping of storage file...\n");
+    ResizeStorageFile();
 
 #if defined(WINDOWS)
     // см. MSDN "CreateFileMapping function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366537%28v=vs.85%29.aspx
     storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
-    if (storageFileMappingHandle == NULL)
-    {
-        unsigned long error = GetLastError();
-        printf("Mapping creation failed. Error code: %lu.\n\n", error);
-        return error;
-    }
+    if (storageFileMappingHandle == INVALID_HANDLE_VALUE)
+        return ErrorWithCode("Mapping creation failed.", GetLastError());
 
     // аналог mmap(),
     // см. MSDN "MapViewOfFileEx function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366763%28v=vs.85%29.aspx
@@ -211,221 +294,225 @@ int SetStorageFileMemoryMapping()
     // hFileMappingObject [in] A handle to a file mapping object. The CreateFileMapping and OpenFileMapping functions return this handle.
     pointerToMappedRegion = MapViewOfFileEx(storageFileMappingHandle, FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0, pointerToMappedRegion);
     if (pointerToMappedRegion == NULL)
-    {
-        unsigned long error = GetLastError();
-        printf("Mapping view set failed. Error code: %lu.\n\n", error);
-        return error;
-    }
+        return ErrorWithCode("Failed to set map view of file.", GetLastError());
+
 #elif defined(LINUX)
-    // см. также под Linux, MAP_POPULATE
-    // см. также mmap64() (size_t?)
-    ftruncate(storageFileHandle, storageFileSizeInBytes);
     pointerToMappedRegion = mmap(NULL, storageFileSizeInBytes, PROT_READ | PROT_WRITE, MAP_SHARED, storageFileHandle, 0);
 
     if (pointerToMappedRegion == MAP_FAILED)
-    {
-        int error = errno;
-        printf("Mapping view set failed. Error code: %d.\n\n", error);
-        return error;
-    }
-    else {
-        printf("mmap() passed\n");
-    }
+        return ErrorWithCode("Failed to set map view of file.", errno);
 #endif
 
-    pointerToMappingLinksMaxSize = (int*)((unsigned char *)pointerToMappedRegion + 8 + 4);
-    pointerToPointerToMappingLinks = (Link**)((unsigned char *)pointerToMappedRegion + 8 + 4 + 4);
+    //       Storage File Structure
+    //    ============================
+    //   | Service Block              | *
+    //   | DataSeal            !64bit | |
+    //   | LinkIndexSize       !64bit | |
+    //   | MappingLinksMaxSize !64bit | |
+    //   | LinksMaxSize         64bit | |
+    //   | LinksActualSize      64bit | | 2 * (System Page Size)
+    //   |              *             | |
+    //   |   Base       |    Link     | |
+    //   |  (Mapped)    |  indicies   | |
+    //   |              *             | *
+    //   | Links Block                | *
+    //   |              *             | | Min after save: 1 * (Link Size) // Needed for null link (unused link marker)
+    //   |   Actual     |    Link     | | Min on open: (BaseBlockSizeInBytes) // Grow step (default is 512 mb)
+    //   |   Data       |  Structures | |
+    //   |              |             | |
+    //   |              *             | *
+    //    ============================
+    //    ! means it is always that size (does not depend on link_index size)
 
-    pointerToLinksMaxSize = (link_index *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes);
-    pointerToLinksSize = (link_index *)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 8);
-    /* Далее следует неиспользуемый блок памяти, с размером (sizeof(Link) - 16) */
-    pointerToUnusedMarker = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + sizeof(Link));
-    pointerToLinks = (Link*)((unsigned char *)pointerToMappedRegion + serviceBlockSizeInBytes + 2 * sizeof(Link));
+    char* pointers[7] = {
+        // Service Block
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 0, // 0
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 1, // 1
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 2, // 2
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 3 + sizeof(link_index) * 0, // 3
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 3 + sizeof(link_index) * 1, // 4
+        (char*)pointerToMappedRegion + sizeof(uint64_t) * 3 + sizeof(link_index) * 2, // 5
 
-    printf("pointerToMappingLinksMaxSize = %d\n", *pointerToMappingLinksMaxSize);
-    printf("pointerToLinksMaxSize = %llu\n",
-        (long long unsigned int)*pointerToLinksMaxSize);
-    printf("pointerToLinksSize = %llu\n",
-        (long long unsigned int)*pointerToLinksSize);
+        // Links Block
+        (char*)pointerToMappedRegion + serviceBlockSizeInBytes // 6
+    };
 
+    pointerToDataSeal = pointers[0];
+    pointerToLinkIndexSize = pointers[1];
+    pointerToMappingLinksMaxSize = pointers[2];
+    pointerToLinksMaxSize = pointers[3];
+    pointerToLinksSize = pointers[4];
+    pointerToPointerToMappingLinks = pointers[5];
 
-    // Выполняем первоначальную инициализацию и валидацию основных вспомогательных счётчиков и значений
+    pointerToLinks = pointers[6];
+    pointerToUnusedMarker = pointerToLinks;
 
+    printf("DataSeal            = %llu\n", *pointerToDataSeal);
+    printf("LinkIndexSize       = %llu\n", *pointerToLinkIndexSize);
+    printf("MappingLinksMaxSize = %llu\n", *pointerToMappingLinksMaxSize);
+    printf("LinksMaxSize        = %llu\n", (uint64_t)*pointerToLinksMaxSize);
+    printf("LinksSize           = %llu\n", (uint64_t)*pointerToLinksSize);
 
+    uint64_t expectedMappingLinksMaxSize = (serviceBlockSizeInBytes - sizeof(uint64_t) * 3 - sizeof(link_index) * 2) / sizeof(link_index);
 
-    if (*pointerToMappingLinksMaxSize == 0)
-        *pointerToMappingLinksMaxSize = (baseLinksSizeInBytes - 4) / 8; // ? почему так
+    if (*pointerToDataSeal == LINKS_DATA_SEAL_64BIT)
+    { // opening
+        DebugInfo("Storage file opened.");
 
-    if (*pointerToLinksMaxSize == 0)
-        *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
-    // <- число линков, после Marker, объем "памяти" (в линках)
-    // если переменная установлена неправильно, исправляем
-    else if (*pointerToLinksMaxSize != (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link))
-        *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
+        if (*pointerToLinkIndexSize != sizeof(link_index))
+            return ResetStorageFileMapping() & Error("Opening storage file with different link index size is not supported yet.") & CloseStorageFile();
 
-    // число линков почему-то превышает заданный размер (может быть, реакция должна быть не такой?)
-    if (*pointerToLinksSize > *pointerToLinksMaxSize)
-    {
-        signed_integer error = -3;
-        printf("Saved links table size counter is set to bigger value than maximum allowed table size.\n\n");
-        return error;
+        if (*pointerToMappingLinksMaxSize != expectedMappingLinksMaxSize)
+            return ResetStorageFileMapping() & Error("Opening storage file with different system page size is not supported yet.") & CloseStorageFile();
+
+        if (*pointerToLinksSize > *pointerToLinksMaxSize)
+            return ResetStorageFileMapping() & Error("Saved links size counter is set to bigger value than maximum allowed size. Storage file is damaged.") & CloseStorageFile();
+
+        *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes) / sizeof(Link);
+
+        // TODO: Varidate all mapped links are exist (otherwise reset them to 0)
+    }
+    else
+    { // creation
+        DebugInfo("Storage file created.");
+
+        *pointerToLinkIndexSize = sizeof(link_index);
+        *pointerToMappingLinksMaxSize = expectedMappingLinksMaxSize;
+        *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes) / sizeof(Link);
+        *pointerToLinksSize = 1; // null element (unused link marker) always exists
+
+        // TODO: Initialize all mapped links with zeros
     }
 
-    printf("Memory mapping of storage file is set.\n");
+    DebugInfo("Memory mapping of storage file is set.");
 
     PrintLinksTableSize();
 
-    printf("\n");
-
-    return 0;
+    return SUCCESS_RESULT;
 }
 
-int CloseStorageFile()
+signed_integer EnlargeStorageFile()
 {
-    printf("Closing storage file...\n");
-
-    // При освобождении лишнего места, можно уменьшать размер файла, для этого используется функция SetEndOfFile(fh); 
-    // По завершению работы с файлом можно устанавливать ограничение на размер реальных данных файла SetFileValidData(fh,newFileLen); 
-
-#if defined(WINDOWS)
-    if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
+    if (succeeded(EnsureStorageFileOpened()))
     {
-        // убрал принудительный выход, так как даже в случае неправильного дескриптора, его можно попытаться закрыть
-        // unsigned long error = -1;
-        printf("Storage file is not open or already closed.\n\n");
-        // return error;
-    }
-
-    CloseHandle(storageFileHandle);
-    storageFileHandle = INVALID_HANDLE_VALUE;
-    storageFileSizeInBytes = 0;
-#elif defined(LINUX)
-    if (storageFileHandle == -1)
-    {
-        printf("Storage file is not open or already closed.\n\n");
-        return -1;
-    }
-
-    close(storageFileHandle);
-    storageFileHandle = -1;
-    storageFileSizeInBytes = 0;
-#endif
-
-    printf("Storage file closed.\n\n");
-
-    return 0;
-}
-
-unsigned long EnlargeStorageFile()
-{
-#if defined(WINDOWS)
-    if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(LINUX)
-    if (storageFileHandle == -1)
-#endif
-    {
-        signed_integer error = -1;
-        printf("Storage file is not open.\n");
-        return error;
-    }
-
-    if (storageFileSizeInBytes >= storageFileMinSizeInBytes)
-    {
-        signed_integer error = 0;
-
-        error = ResetStorageFileMemoryMapping();
-        if (error != 0)
-            return error;
-
-        storageFileSizeInBytes += baseBlockSizeInBytes;
-
-        // там происходит увеличение через ftruncate(), под Linux
-        error = SetStorageFileMemoryMapping();
-        if (error != 0)
-            return error;
-    }
-
-    return 0;
-}
-
-int ShrinkStorageFile()
-{
-#if defined(WINDOWS)
-    if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(LINUX)
-    if (storageFileHandle == -1)
-#endif
-    {
-        int error = -1;
-        printf("Storage file is not open.\n");
-        return error;
-    }
-
-    if (storageFileSizeInBytes > storageFileMinSizeInBytes)
-    {
-        int error = 0;
-        unsigned long long linksTableNewMaxSize = (storageFileSizeInBytes - baseBlockSizeInBytes - serviceBlockSizeInBytes - 2 * sizeof(Link)) / sizeof(Link);
-
-        if (*pointerToLinksSize < linksTableNewMaxSize)
+        if (succeeded(EnsureStorageFileMapped()))
         {
-            error = ResetStorageFileMemoryMapping();
-            if (error != 0)
-                return error;
-
-#if defined(WINDOWS)
+            if (succeeded(ResetStorageFileMemoryMapping()))
             {
-                LARGE_INTEGER distanceToMoveFilePointer;
-                distanceToMoveFilePointer.QuadPart = -((long long)baseBlockSizeInBytes);
+                if (storageFileSizeInBytes >= storageFileMinSizeInBytes)
+                    storageFileSizeInBytes += baseBlockSizeInBytes;
+                else
+                    return Error("File size is less than minimum allowed size.");
 
-                storageFileSizeInBytes -= baseBlockSizeInBytes;
-
-                SetFilePointerEx(storageFileHandle, distanceToMoveFilePointer, NULL, FILE_END);
-                SetEndOfFile(storageFileHandle);
+                if (succeeded(SetStorageFileMemoryMapping()))
+                    return SUCCESS_RESULT;
             }
-#elif defined(LINUX)
-            storageFileSizeInBytes -= baseBlockSizeInBytes;
-#endif
-
-            // уменьшение через ftruncate()
-            error = SetStorageFileMemoryMapping();
-            if (error != 0)
-                return error;
         }
     }
 
-    return 0;
+    return ERROR_RESULT;
 }
 
-
-int ResetStorageFileMemoryMapping()
+signed_integer ShrinkStorageFile()
 {
-    printf("Resetting memory mapping of storage file...\n");
-
-#if defined(WINDOWS)
-    if (storageFileHandle == INVALID_HANDLE_VALUE)
-#elif defined(LINUX)
-    if (storageFileHandle == -1)
-#endif
+    if (succeeded(EnsureStorageFileOpened()))
     {
-        int error = -1;
-        printf("Memory mapping of storage file is not set or already reset.\n");
-        return error;
+        if (succeeded(EnsureStorageFileMapped()))
+        {
+            if (storageFileSizeInBytes > storageFileMinSizeInBytes)
+            {
+                link_index linksTableNewMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes - baseBlockSizeInBytes) / sizeof(Link);
+
+                if (*pointerToLinksSize < linksTableNewMaxSize)
+                {
+                    if (succeeded(ResetStorageFileMemoryMapping()))
+                    {
+                        storageFileSizeInBytes -= baseBlockSizeInBytes;
+
+                        if (succeeded(SetStorageFileMemoryMapping()))
+                            return SUCCESS_RESULT;
+                    }
+                }
+            }
+        }
     }
 
-    PrintLinksTableSize();
+    return ERROR_RESULT;
+}
+
+signed_integer ResetStorageFileMemoryMapping()
+{
+    if (succeeded(EnsureStorageFileOpened()))
+    {
+        if (succeeded(EnsureStorageFileMapped()))
+        {
+            printf("Resetting memory mapping of storage file...\n");
+
+            PrintLinksTableSize();
+
+            if (*pointerToDataSeal != LINKS_DATA_SEAL_64BIT)
+            {
+                *pointerToDataSeal = LINKS_DATA_SEAL_64BIT; // Запечатываем файл
+                DebugInfo("Storage file sealed.");
+            }
+
+            // Считаем реальный размер файла
+            int64_t lastFileSizeInBytes = *pointerToDataSeal == LINKS_DATA_SEAL_64BIT ? serviceBlockSizeInBytes + *pointerToLinksSize * sizeof(Link) : storageFileSizeInBytes;
 
 #if defined(WINDOWS)
-    UnmapViewOfFile(pointerToMappedRegion);
-    CloseHandle(storageFileMappingHandle);
-    storageFileMappingHandle = INVALID_HANDLE_VALUE;
+            UnmapViewOfFile(pointerToMappedRegion);
+            CloseHandle(storageFileMappingHandle);
 #elif defined(LINUX)
-    munmap(pointerToMappedRegion, storageFileSizeInBytes);
-    // storageFileHandle = -1; // некорректно так делать
+            munmap(pointerToMappedRegion, storageFileSizeInBytes);
 #endif
 
-    printf("Memory mapping of storage file is reset.\n\n");
+            ResetStorageFileMapping();
 
-    return 0;
+            // Обновляем текущий размер файла в соответствии с реальным (чтобы при закрытии файла сделать его размер минимальным).
+            storageFileSizeInBytes = lastFileSizeInBytes;
+
+            DebugInfo("Memory mapping of storage file is reset.");
+
+            return SUCCESS_RESULT;
+        }
+    }
+
+    return ERROR_RESULT;
+}
+
+signed_integer CloseStorageFile()
+{
+    if (succeeded(EnsureStorageFileOpened()))
+    {
+        if (succeeded(EnsureStorageFileUnmapped()))
+        {
+            DebugInfo("Closing storage file...");
+
+            // Перед закрытием файла обновляем его размер файла (это гарантирует его минимальный размер).
+            ResizeStorageFile();
+
+#if defined(WINDOWS)
+            if (storageFileHandle == INVALID_HANDLE_VALUE) // т.к. например STDIN_FILENO == 0 - для stdin (под Linux)
+                // Убран принудительный выход, так как даже в случае неправильного дескриптора, его можно попытаться закрыть
+                DebugInfo("Storage file is not open or already closed. Let's try to close it anyway.");
+
+            CloseHandle(storageFileHandle);
+#elif defined(LINUX)
+            if (storageFileHandle == -1)
+                return Error("Storage file is not open or already closed.");
+
+            close(storageFileHandle);
+#endif
+
+            ResetStorageFile();
+
+            DebugInfo("Storage file closed.");
+
+            return SUCCESS_RESULT;
+        }
+    }
+
+    return ERROR_RESULT;
 }
 
 /***  Работа с линками  ***/
@@ -433,7 +520,7 @@ int ResetStorageFileMemoryMapping()
 link_index AllocateFromUnusedLinks()
 {
     link_index unusedLinkIndex = pointerToUnusedMarker->ByLinkerRootIndex;
-    DetachLinkFromUnusedMarker(GetLink(unusedLinkIndex));
+    DetachLinkFromUnusedMarker(unusedLinkIndex);
     return unusedLinkIndex;
 }
 
@@ -455,8 +542,12 @@ link_index AllocateLink()
     return null;
 }
 
-void FreeLink(Link *link)
+void FreeLink(link_index linkIndex)
 {
+    if (linkIndex == null) return;
+
+    Link *link = GetLink(linkIndex);
+
     DetachLink(link);
 
     while (link->BySourceRootIndex != null) FreeLink(GetLink(link->BySourceRootIndex));
@@ -476,7 +567,7 @@ void FreeLink(Link *link)
 
             while ((--lastUsedLink)->LinkerIndex == null) // здесь было сравнение с pointerToUnusedMarker
             {
-                DetachLinkFromUnusedMarker(lastUsedLink);
+                DetachLinkFromUnusedMarker(GetIndex(lastUsedLink));
                 --*pointerToLinksSize;
             }
 
@@ -487,11 +578,11 @@ void FreeLink(Link *link)
 
 void WalkThroughAllLinks(visitor visitor)
 {
-    Link *currentLink = pointerToLinks;
+    Link* currentLink = pointerToLinks;
     Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
     do {
-        //if (currentLink->Linker != pointerToUnusedMarker)
+        if (currentLink->LinkerIndex != null)
         {
             visitor(currentLink);
         }
@@ -500,11 +591,11 @@ void WalkThroughAllLinks(visitor visitor)
 
 signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor)
 {
-    Link *currentLink = pointerToLinks;
+    Link* currentLink = pointerToLinks;
     Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
     do {
-        //if (currentLink->Linker != pointerToUnusedMarker)
+        if (currentLink->LinkerIndex != null)
         {
             if (!stoppableVisitor(currentLink)) return false;
         }
@@ -514,29 +605,28 @@ signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor)
 }
 
 // работа с опорными (базовыми) связями; их не должно быть много
-link_index GetMappingLink(int index)
+link_index GetMappingLink(signed_integer index)
 {
     if (index < *pointerToMappingLinksMaxSize)
-        return (*pointerToPointerToMappingLinks)[index];
+        return pointerToPointerToMappingLinks[index];
     else
         return null;
 }
 
-void SetMappingLink(int index, link_index linkIndex)
+void SetMappingLink(signed_integer index, link_index linkIndex)
 {
     if (index < *pointerToMappingLinksMaxSize)
-        (*pointerToPointerToMappingLinks)[index] = linkIndex;
+        pointerToPointerToMappingLinks[index] = linkIndex;
 }
 
 // TODO: Test this
-__forceinline Link *GetLink(link_index linkIndex)
+__forceinline Link* GetLink(link_index linkIndex)
 {
     return pointerToLinks + linkIndex;
 }
 
 // TODO: Test this
-__forceinline link_index GetIndex(Link *link)
+__forceinline link_index GetIndex(Link* link)
 {
     return link - pointerToLinks;
 }
-

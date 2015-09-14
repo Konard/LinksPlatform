@@ -6,7 +6,7 @@
 #if defined(WINDOWS) 
 #include <windows.h>
 #endif
-#ifdef defined(LINUX)
+#if defined(LINUX)
 #include <time.h>
 #define DELTA_EPOCH_IN_MICROSECS  11644473600000000ULL
 #endif

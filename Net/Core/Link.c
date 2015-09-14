@@ -16,18 +16,27 @@
 
 // подчиненная CreateLink/UpdateLink/.. функция
 
-void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+link_index public_calling_convention GetSource(link_index linkIndex)
 {
-    link->SourceIndex = sourceIndex;
-    link->LinkerIndex = linkerIndex;
-    link->TargetIndex = targetIndex;
-
-    //SubscribeAsRefererToSource(link, sourceIndex);
-    //SubscribeAsRefererToLinker(link, linkerIndex);
-    //SubscribeAsRefererToTarget(link, targetIndex);
+    return GetLink(linkIndex)->SourceIndex;
 }
 
-uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+link_index public_calling_convention GetLinker(link_index linkIndex)
+{
+    return GetLink(linkIndex)->LinkerIndex;
+}
+
+link_index public_calling_convention GetTarget(link_index linkIndex)
+{
+    return GetLink(linkIndex)->TargetIndex;
+}
+
+signed_integer public_calling_convention GetTimespan(link_index linkIndex)
+{
+    return GetLink(linkIndex)->Timestamp;
+}
+
+uint64_t public_calling_convention CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     if (sourceIndex != itself &&
         linkerIndex != itself &&
@@ -62,30 +71,7 @@ uint64_t _H CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
     }
 }
 
-void DetachLink(link_index linkIndex)
-{
-    Link* link = GetLink(linkIndex);
-
-    //UnSubscribeFromSource(linkIndex, link->SourceIndex);
-    //UnSubscribeFromLinker(linkIndex, link->LinkerIndex);
-    //UnSubscribeFromTarget(linkIndex, link->TargetIndex);
-
-    link->SourceIndex = null;
-    link->LinkerIndex = null;
-    link->TargetIndex = null;
-}
-
-void AttachLinkToUnusedMarker(Link *link)
-{
-    //SubscribeToListOfReferersBy(LinkerIndex, link, null);
-}
-
-void DetachLinkFromUnusedMarker(Link* link)
-{
-    //UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
-}
-
-uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+uint64_t public_calling_convention SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     // смотря, какое дерево меньше (target или source); по linker - список
     if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
@@ -97,7 +83,7 @@ uint64_t _H SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targ
 // в функции Replace почти ничего нет - вся работа происходит в Update;
 // Replace - функция-координатор
 
-uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
+uint64_t public_calling_convention ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 {
     Link *link = GetLink(linkIndex);
     Link *replacement = GetLink(replacementIndex);
@@ -142,7 +128,7 @@ uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
             firstRefererByTargetIndex = link->ByTargetRootIndex;
         }
 
-        FreeLink(link);
+        FreeLink(linkIndex);
 
         replacement->Timestamp = GetTimestamp();
     }
@@ -150,7 +136,7 @@ uint64_t _H ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
 }
 
 
-uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+uint64_t public_calling_convention UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     Link *link = GetLink(linkIndex);
     if (link->SourceIndex == sourceIndex && link->LinkerIndex == linkerIndex && link->TargetIndex == targetIndex)
@@ -189,10 +175,9 @@ uint64_t _H UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linker
     }
 }
 
-
-void _H DeleteLink(uint64_t linkIndex)
+void public_calling_convention DeleteLink(uint64_t linkIndex)
 {
-    FreeLink(GetLink(linkIndex));
+    FreeLink(linkIndex);
 }
 
 /*
@@ -290,3 +275,38 @@ if (root != null) return WalkThroughReferersByTargetCore(root->FirstRefererByTar
 else return true;
 }
 */
+
+
+void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+{
+    link->SourceIndex = sourceIndex;
+    link->LinkerIndex = linkerIndex;
+    link->TargetIndex = targetIndex;
+
+    //SubscribeAsRefererToSource(link, sourceIndex);
+    //SubscribeAsRefererToLinker(link, linkerIndex);
+    //SubscribeAsRefererToTarget(link, targetIndex);
+}
+
+void DetachLink(link_index linkIndex)
+{
+    Link* link = GetLink(linkIndex);
+
+    //UnSubscribeFromSource(linkIndex, link->SourceIndex);
+    //UnSubscribeFromLinker(linkIndex, link->LinkerIndex);
+    //UnSubscribeFromTarget(linkIndex, link->TargetIndex);
+
+    link->SourceIndex = null;
+    link->LinkerIndex = null;
+    link->TargetIndex = null;
+}
+
+void AttachLinkToUnusedMarker(Link *link)
+{
+    SubscribeToListOfReferersBy(LinkerIndex, link, null);
+}
+
+void DetachLinkFromUnusedMarker(Link* link)
+{
+    UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
+}
