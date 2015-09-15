@@ -68,8 +68,8 @@ extern "C" {
     void AttachLinkToUnusedMarker(link_index linkIndex);
     void DetachLinkFromUnusedMarker(link_index linkIndex);
 
-    // TODO: Check if it is actually usefull
-    //void DetachLink(link_index link);
+    void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+    void DetachLink(link_index link);
 
 #if defined(__cplusplus)
 }

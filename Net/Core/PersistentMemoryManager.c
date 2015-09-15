@@ -51,12 +51,14 @@ Link*               pointerToLinks;                     // Указатель н
 
 Link*               pointerToUnusedMarker;              // Инициализируется в SetStorageFileMemoryMapping()
 
-void PrintLinksDataBaseSize()
+__forceinline void PrintLinksDataBaseSize()
 {
+#ifdef DEBUG
     printf("Links databse size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
         (uint64_t)(*pointerToLinksSize),
         (uint64_t)(*pointerToLinksSize * sizeof(Link)),
         (uint64_t)serviceBlockSizeInBytes);
+#endif
 }
 
 unsigned_integer GetCurrentSystemPageSize()
@@ -341,11 +343,13 @@ signed_integer SetStorageFileMemoryMapping()
     pointerToLinks = pointers[6];
     pointerToUnusedMarker = pointerToLinks;
 
+#ifdef DEBUG
     printf("DataSeal            = %llu\n", *pointerToDataSeal);
     printf("LinkIndexSize       = %llu\n", *pointerToLinkIndexSize);
     printf("MappingLinksMaxSize = %llu\n", *pointerToMappingLinksMaxSize);
     printf("LinksMaxSize        = %llu\n", (uint64_t)*pointerToLinksMaxSize);
     printf("LinksSize           = %llu\n", (uint64_t)*pointerToLinksSize);
+#endif
 
     uint64_t expectedMappingLinksMaxSize = baseLinksSizeInBytes / sizeof(link_index);
 
@@ -386,7 +390,7 @@ signed_integer SetStorageFileMemoryMapping()
 
     DebugInfo("Memory mapping of storage file is set.");
 
-    PrintLinksTableSize();
+    PrintLinksDataBaseSize();
 
     return SUCCESS_RESULT;
 }
@@ -446,9 +450,9 @@ signed_integer ResetStorageFileMemoryMapping()
     {
         if (succeeded(EnsureStorageFileMapped()))
         {
-            printf("Resetting memory mapping of storage file...\n");
+            DebugInfo("Resetting memory mapping of storage file...");
 
-            PrintLinksTableSize();
+            PrintLinksDataBaseSize();
 
             if (*pointerToDataSeal != LINKS_DATA_SEAL_64BIT)
             {

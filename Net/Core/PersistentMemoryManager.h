@@ -29,6 +29,7 @@ extern "C" {
     void FreeLink(link_index link);
 
     __forceinline Link* GetLink(link_index linkIndex);
+    __forceinline link_index GetLinkIndex(Link* link);
 
 #if defined(__cplusplus)
 }

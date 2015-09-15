@@ -74,10 +74,10 @@ uint64_t public_calling_convention CreateLink(uint64_t sourceIndex, uint64_t lin
 uint64_t public_calling_convention SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     // смотря, какое дерево меньше (target или source); по linker - список
-    if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
-        return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
-    else
-        return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
+    //if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
+    //    return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
+    //else
+    //    return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
 }
 
 // в функции Replace почти ничего нет - вся работа происходит в Update;
@@ -276,7 +276,6 @@ else return true;
 }
 */
 
-
 void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
 {
     link->SourceIndex = sourceIndex;
@@ -301,12 +300,12 @@ void DetachLink(link_index linkIndex)
     link->TargetIndex = null;
 }
 
-void AttachLinkToUnusedMarker(Link *link)
+void AttachLinkToUnusedMarker(link_index linkIndex)
 {
-    SubscribeToListOfReferersBy(LinkerIndex, link, null);
+    //SubscribeToListOfReferersBy(LinkerIndex, link, null);
 }
 
-void DetachLinkFromUnusedMarker(Link* link)
+void DetachLinkFromUnusedMarker(link_index linkIndex)
 {
-    UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
+    //UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
 }
