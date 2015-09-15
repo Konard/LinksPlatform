@@ -29,7 +29,7 @@ HANDLE              storageFileMappingHandle;
 #elif defined(LINUX)
 signed_integer      storageFileHandle;                  // для open()
 #endif
-int64_t             storageFileSizeInBytes;             // <- off_t
+int64_t             storageFileSizeInBytes;             // Текущий размер файла.
 
 void*               pointerToMappedRegion;              // указатель на начало региона памяти - результата mmap()
 
@@ -49,13 +49,7 @@ link_index*         pointerToLinksMaxSize;              // Указатель н
 link_index*         pointerToLinksSize;                 // Указатель на текущий размер массива связей.
 Link*               pointerToLinks;                     // Указатель на начало массива связей. Инициализируется в SetStorageFileMemoryMapping().
 
-/* Неиспользуемый блок памяти, с размером (sizeof(Link) - 16) ?? */
-
 Link*               pointerToUnusedMarker;              // Инициализируется в SetStorageFileMemoryMapping()
-
-// TODO: Make a const list of all possible errors
-
-/***  Работа с памятью  ***/
 
 void PrintLinksDataBaseSize()
 {
@@ -172,7 +166,7 @@ void InitPersistentMemoryManager()
     currentMemoryPageSizeInBytes = GetCurrentSystemPageSize();
     serviceBlockSizeInBytes = currentMemoryPageSizeInBytes * 2;
 
-    baseLinksSizeInBytes = serviceBlockSizeInBytes - 12;
+    baseLinksSizeInBytes = serviceBlockSizeInBytes - sizeof(uint64_t) * 3 - sizeof(link_index) * 2;
     baseBlockSizeInBytes = currentMemoryPageSizeInBytes * 256 * 4 * sizeof(Link); // ~ 512 mb
 
     storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
@@ -353,7 +347,7 @@ signed_integer SetStorageFileMemoryMapping()
     printf("LinksMaxSize        = %llu\n", (uint64_t)*pointerToLinksMaxSize);
     printf("LinksSize           = %llu\n", (uint64_t)*pointerToLinksSize);
 
-    uint64_t expectedMappingLinksMaxSize = (serviceBlockSizeInBytes - sizeof(uint64_t) * 3 - sizeof(link_index) * 2) / sizeof(link_index);
+    uint64_t expectedMappingLinksMaxSize = baseLinksSizeInBytes / sizeof(link_index);
 
     if (*pointerToDataSeal == LINKS_DATA_SEAL_64BIT)
     { // opening
@@ -370,7 +364,9 @@ signed_integer SetStorageFileMemoryMapping()
 
         *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes) / sizeof(Link);
 
-        // TODO: Varidate all mapped links are exist (otherwise reset them to 0)
+        // TODO: Varidate all mapped links are exist (otherwise reset them to 0) (fast)
+        // TODO: Varidate all freed link (holes). (slower)
+        // TODO: Varidate all links. (slowest)
     }
     else
     { // creation
@@ -381,7 +377,11 @@ signed_integer SetStorageFileMemoryMapping()
         *pointerToLinksMaxSize = (storageFileSizeInBytes - serviceBlockSizeInBytes) / sizeof(Link);
         *pointerToLinksSize = 1; // null element (unused link marker) always exists
 
-        // TODO: Initialize all mapped links with zeros
+        // Only if mmap does not put zeros
+        if (*pointerToPointerToMappingLinks)
+            memset(pointerToPointerToMappingLinks, 0, baseLinksSizeInBytes);
+        if (!IsNullLinkEmpty())
+            memset(pointerToLinks, 0, sizeof(Link));
     }
 
     DebugInfo("Memory mapping of storage file is set.");
@@ -515,8 +515,6 @@ signed_integer CloseStorageFile()
     return ERROR_RESULT;
 }
 
-/***  Работа с линками  ***/
-
 link_index AllocateFromUnusedLinks()
 {
     link_index unusedLinkIndex = pointerToUnusedMarker->ByLinkerRootIndex;
@@ -524,13 +522,12 @@ link_index AllocateFromUnusedLinks()
     return unusedLinkIndex;
 }
 
-// пока что программа - однопоточная, не надо использовать mutex'и
 link_index AllocateFromFreeLinks()
 {
     if (*pointerToLinksMaxSize == *pointerToLinksSize)
         EnlargeStorageFile();
 
-    return (*pointerToLinksSize)++; // freeLinkIndex
+    return (*pointerToLinksSize)++;
 }
 
 link_index AllocateLink()
@@ -550,9 +547,9 @@ void FreeLink(link_index linkIndex)
 
     DetachLink(link);
 
-    while (link->BySourceRootIndex != null) FreeLink(GetLink(link->BySourceRootIndex));
-    while (link->ByLinkerRootIndex != null) FreeLink(GetLink(link->ByLinkerRootIndex));
-    while (link->ByTargetRootIndex != null) FreeLink(GetLink(link->ByTargetRootIndex));
+    while (link->BySourceRootIndex != null) FreeLink(link->BySourceRootIndex);
+    while (link->ByLinkerRootIndex != null) FreeLink(link->ByLinkerRootIndex);
+    while (link->ByTargetRootIndex != null) FreeLink(link->ByTargetRootIndex);
 
     {
         Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
@@ -565,9 +562,9 @@ void FreeLink(link_index linkIndex)
         {
             --*pointerToLinksSize;
 
-            while ((--lastUsedLink)->LinkerIndex == null) // здесь было сравнение с pointerToUnusedMarker
+            while (!ExistsLink(--lastUsedLink))
             {
-                DetachLinkFromUnusedMarker(GetIndex(lastUsedLink));
+                DetachLinkFromUnusedMarker(GetLinkIndex(lastUsedLink));
                 --*pointerToLinksSize;
             }
 
@@ -578,55 +575,67 @@ void FreeLink(link_index linkIndex)
 
 void WalkThroughAllLinks(visitor visitor)
 {
-    Link* currentLink = pointerToLinks;
+    if (*pointerToLinksSize <= 1)
+        return;
+
+    Link* currentLink = pointerToLinks + 1;
     Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
     do {
-        if (currentLink->LinkerIndex != null)
-        {
-            visitor(currentLink);
-        }
+        if (ExistsLink(currentLink)) visitor(GetLinkIndex(currentLink));
     } while (++currentLink <= lastLink);
 }
 
 signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor)
 {
-    Link* currentLink = pointerToLinks;
+    if (*pointerToLinksSize <= 1)
+        return true;
+
+    Link* currentLink = pointerToLinks + 1;
     Link* lastLink = pointerToLinks + *pointerToLinksSize - 1;
 
     do {
-        if (currentLink->LinkerIndex != null)
-        {
-            if (!stoppableVisitor(currentLink)) return false;
-        }
+        if (ExistsLink(currentLink) && !stoppableVisitor(GetLinkIndex(currentLink))) return false;
     } while (++currentLink <= lastLink);
 
     return true;
 }
 
-// работа с опорными (базовыми) связями; их не должно быть много
-link_index GetMappingLink(signed_integer index)
+link_index GetMappingLink(signed_integer mappingIndex)
 {
-    if (index < *pointerToMappingLinksMaxSize)
-        return pointerToPointerToMappingLinks[index];
+    if (mappingIndex >= 0 && mappingIndex < *pointerToMappingLinksMaxSize)
+        return pointerToPointerToMappingLinks[mappingIndex];
     else
         return null;
 }
 
-void SetMappingLink(signed_integer index, link_index linkIndex)
+void SetMappingLink(signed_integer mappingIndex, link_index linkIndex)
 {
-    if (index < *pointerToMappingLinksMaxSize)
-        pointerToPointerToMappingLinks[index] = linkIndex;
+    if (mappingIndex >= 0 && mappingIndex < *pointerToMappingLinksMaxSize)
+        pointerToPointerToMappingLinks[mappingIndex] = linkIndex;
 }
 
-// TODO: Test this
+__forceinline bool ExistsLinkIndex(link_index linkIndex)
+{
+    return ExistsLink(GetLink(linkIndex));
+}
+
+__forceinline bool ExistsLink(Link* link)
+{
+    return link && pointerToLinks != link && link->LinkerIndex; //link->SourceIndex && link->LinkerIndex && link->TargetIndex;
+}
+
+__forceinline bool IsNullLinkEmpty()
+{
+    return !pointerToLinks->SourceIndex && !pointerToLinks->LinkerIndex && !pointerToLinks->TargetIndex;
+}
+
 __forceinline Link* GetLink(link_index linkIndex)
 {
     return pointerToLinks + linkIndex;
 }
 
-// TODO: Test this
-__forceinline link_index GetIndex(Link* link)
+__forceinline link_index GetLinkIndex(Link* link)
 {
     return link - pointerToLinks;
 }
