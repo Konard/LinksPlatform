@@ -49,5 +49,28 @@ namespace CoreTests
 
             remove(filename);
         }
+
+        TEST_METHOD(AllocateFreeLinkTest)
+        {
+            char* filename = "db.links";
+
+            remove(filename);
+
+            InitPersistentMemoryManager();
+
+            Assert::IsTrue(succeeded(OpenStorageFile(filename)));
+
+            Assert::IsTrue(succeeded(SetStorageFileMemoryMapping()));
+
+            link_index link = AllocateLink();
+
+            FreeLink(link);
+
+            Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
+
+            Assert::IsTrue(succeeded(CloseStorageFile()));
+
+            remove(filename);
+        }
     };
 }

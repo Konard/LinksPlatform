@@ -48,20 +48,20 @@
 // Заменил Next на Right
 // Аргумент byWhat == SourceIndex, например
 // newValue - это уже индекс, а не ссылка
-#define _GetNextSiblingRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(RightBy,byWhat)
-#define _SetNextSiblingRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(RightBy,byWhat) = newValue
+#define _GetNextSiblingRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat3(By,byWhat,RightIndex)
+#define _SetNextSiblingRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,byWhat,RightIndex) = newValue
 
 // Заменил Prev на Left
-#define _GetPreviousSiblingRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(LeftBy,byWhat)
-#define _SetPreviousSiblingRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(LeftBy,byWhat) = newValue
+#define _GetPreviousSiblingRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat3(By,byWhat,LeftIndex)
+#define _SetPreviousSiblingRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,byWhat,LeftIndex) = newValue
 
 // ByLinker, например
-#define _GetFirstRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat(By,byWhat)
-#define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat(By,byWhat) = newValue
+#define _GetFirstRefererBy(byWhat, linkIndex) GetLink(linkIndex)->Concat3(By,byWhat,RootIndex)
+#define _SetFirstRefererBy(byWhat, linkIndex, newValue) GetLink(linkIndex)->Concat3(By,byWhat,RootIndex) = newValue
 
 // BySourceCount, например
-#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat(CountBy,whichRererersBy)++
-#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat(CountBy,whichRererersBy)--
+#define _IncrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count)++
+#define _DecrementNumberOfReferers(whichRererersBy, linkIndex) GetLink(linkIndex)->Concat3(By,whichRererersBy,Count)--
 
 // ByLinkerCount, например
 #define _GetNumberOfReferersBy(that, linkIndex) GetLink(linkIndex)->Concat(CountBy,that)
@@ -112,7 +112,7 @@
 #define BeginWalkThroughLinksList(elementIndex, firstIndex)																		\
 {																														\
 	link_index firstElementIndex = firstIndex;																							\
-	if (firstElementIndex != LINK_0) 																							\
+	if (firstElementIndex != null) 																							\
 	{																													\
 		link_index elementIndex = firstElementIndex;																					\
 		do																												\
@@ -142,11 +142,11 @@
 			_SetFirstRefererBy(that, of(previousValue), to(nextRefererIndex));												\
 	}																													\
 	else if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)														\
-		_SetFirstRefererBy(that, of(previousValue), to(LINK_0)); 															\
+		_SetFirstRefererBy(that, of(previousValue), to(null)); 															\
 																														\
 	_DecrementNumberOfReferers(that, of(previousValue));																	 \
-	_SetNextSiblingRefererBy(that, of(linkIndex), to(LINK_0));																		  \
-	_SetPreviousSiblingRefererBy(that, of(linkIndex), to(LINK_0));																	  \
+	_SetNextSiblingRefererBy(that, of(linkIndex), to(null));																		  \
+	_SetPreviousSiblingRefererBy(that, of(linkIndex), to(null));																	  \
 }																														
 
 // +Index
@@ -154,7 +154,7 @@
 {																														\
 	link_index previousFirstRefererIndex = _GetFirstRefererBy(that, of(newValue));												\
 																														\
-	if (previousFirstRefererIndex != LINK_0)																					\
+	if (previousFirstRefererIndex != null)																					\
 	{																													\
 		link_index previousLastRefererIndex = _GetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex));						\
 																														\
@@ -298,7 +298,7 @@ link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetI
 		if (GetTargetIndex(referer) == refererTargetIndex && GetLinkerIndex(referer) == refererLinkerIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 // Link * -> link_index
@@ -309,7 +309,7 @@ link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceI
 		if (GetSourceIndex(referer) == refererSourceIndex && GetTargetIndex(referer) == refererTargetIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 // Link * -> link_index
@@ -320,7 +320,7 @@ link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceI
 		if (GetSourceIndex(referer) == refererSourceIndex && GetLinkerIndex(referer) == refererLinkerIndex)								 \
 			return referer;																						 \
 	EndWalkThroughReferersByTarget(referer);																	 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 #define DefineSearchInTreeOfReferersBySourceMethod()															 \
@@ -336,7 +336,7 @@ link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetI
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 #define DefineSearchInTreeOfReferersByLinkerMethod()															 \
@@ -352,7 +352,7 @@ link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceI
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 #define DefineSearchInTreeOfReferersByTargetMethod()															 \
@@ -368,7 +368,7 @@ link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceI
 		else																									 \
 			return currentNode;																					 \
 																												 \
-	return LINK_0;																								 \
+	return null;																								 \
 }
 
 // OK

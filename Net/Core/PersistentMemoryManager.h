@@ -25,8 +25,8 @@ extern "C" {
     PREFIX_DLL void WalkThroughAllLinks(visitor visitor);
     PREFIX_DLL signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor);
 
-    link_index AllocateLink();
-    void FreeLink(link_index link);
+    PREFIX_DLL link_index AllocateLink();
+    PREFIX_DLL void FreeLink(link_index link);
 
     __forceinline Link* GetLink(link_index linkIndex);
     __forceinline link_index GetLinkIndex(Link* link);

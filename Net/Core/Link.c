@@ -302,10 +302,10 @@ void DetachLink(link_index linkIndex)
 
 void AttachLinkToUnusedMarker(link_index linkIndex)
 {
-    //SubscribeToListOfReferersBy(LinkerIndex, link, null);
+    SubscribeToListOfReferersBy(Linker, linkIndex, null);
 }
 
 void DetachLinkFromUnusedMarker(link_index linkIndex)
 {
-    //UnSubscribeFromListOfReferersBy(LinkerIndex, link, null);
+    UnSubscribeFromListOfReferersBy(Linker, linkIndex, null);
 }

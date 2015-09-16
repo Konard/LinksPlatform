@@ -549,7 +549,7 @@ void FreeLink(link_index linkIndex)
 
     Link *link = GetLink(linkIndex);
 
-    DetachLink(link);
+    DetachLink(linkIndex);
 
     while (link->BySourceRootIndex != null) FreeLink(link->BySourceRootIndex);
     while (link->ByLinkerRootIndex != null) FreeLink(link->ByLinkerRootIndex);
@@ -566,7 +566,7 @@ void FreeLink(link_index linkIndex)
         {
             --*pointerToLinksSize;
 
-            while (!ExistsLink(--lastUsedLink))
+            while (!ExistsLink(--lastUsedLink) && pointerToLinks != lastUsedLink)
             {
                 DetachLinkFromUnusedMarker(GetLinkIndex(lastUsedLink));
                 --*pointerToLinksSize;
