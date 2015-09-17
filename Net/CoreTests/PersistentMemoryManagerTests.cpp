@@ -72,5 +72,54 @@ namespace CoreTests
 
             remove(filename);
         }
+
+        TEST_METHOD(AttachToUnusedLinkTest)
+        {
+            char* filename = "db.links";
+
+            remove(filename);
+
+            InitPersistentMemoryManager();
+
+            Assert::IsTrue(succeeded(OpenStorageFile(filename)));
+
+            Assert::IsTrue(succeeded(SetStorageFileMemoryMapping()));
+
+            link_index link1 = AllocateLink();
+            link_index link2 = AllocateLink();
+
+            FreeLink(link1);
+
+            Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
+
+            Assert::IsTrue(succeeded(CloseStorageFile()));
+
+            remove(filename);
+        }
+
+        TEST_METHOD(DetachToUnusedLinkTest)
+        {
+            char* filename = "db.links";
+
+            remove(filename);
+
+            InitPersistentMemoryManager();
+
+            Assert::IsTrue(succeeded(OpenStorageFile(filename)));
+
+            Assert::IsTrue(succeeded(SetStorageFileMemoryMapping()));
+
+            link_index link1 = AllocateLink();
+            link_index link2 = AllocateLink();
+
+            FreeLink(link1);
+            FreeLink(link2);
+
+            Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
+
+            Assert::IsTrue(succeeded(CloseStorageFile()));
+
+            remove(filename);
+        }
     };
 }

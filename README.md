@@ -13,11 +13,13 @@ There also at least two variants of Link structure:
 Также существует как минимум два варианта структуры Связи:
 
 > ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png "Source-Target link, untyped")
+> ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png "Source-Target link, untyped")
 
 - Untyped, the simplest yet, each link contains only Source (Beginning) and Target (Ending).
 - Нетипизированная, простейшая (пока ещё), каждая связь содержит только Source (Начало) и Target (Конец).
 
 > ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png "Source-Linker-Target link, typed")
+> ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png "Source-Linker-Target link, typed")
 
 - Typed, with added Linker (Verb, Type) definition, so any additional info about type of connection between two links can be stored here.
 - Типизированная, с добавленным поле Linker (Глагол, Тип, Связка, Предикат), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.

@@ -560,13 +560,13 @@ void FreeLink(link_index linkIndex)
 
         if (link < lastUsedLink)
         {
-            AttachLinkToUnusedMarker(link);
+            AttachLinkToUnusedMarker(linkIndex);
         }
         else if (link == lastUsedLink)
         {
             --*pointerToLinksSize;
 
-            while (!ExistsLink(--lastUsedLink) && pointerToLinks != lastUsedLink)
+            while ((--lastUsedLink)->LinkerIndex == null && pointerToLinks != lastUsedLink) // Не существует и не является 0-й связью
             {
                 DetachLinkFromUnusedMarker(GetLinkIndex(lastUsedLink));
                 --*pointerToLinksSize;
