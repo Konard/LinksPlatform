@@ -36,10 +36,10 @@ typedef void(*visitor)(link_index); // Visitor callback (Неостанавли�
 extern "C" {
 #endif
 
-    PREFIX_DLL link_index GetSource(link_index linkIndex);
-    PREFIX_DLL link_index GetLinker(link_index linkIndex);
-    PREFIX_DLL link_index GetTarget(link_index linkIndex);
-    PREFIX_DLL signed_integer GetTimespan(link_index linkIndex);
+    PREFIX_DLL link_index GetSourceIndex(link_index linkIndex);
+    PREFIX_DLL link_index GetLinkerIndex(link_index linkIndex);
+    PREFIX_DLL link_index GetTargetIndex(link_index linkIndex);
+    PREFIX_DLL signed_integer GetTime(link_index linkIndex);
 
     PREFIX_DLL link_index CreateLink(link_index sourceIndex, link_index linkerIndex, link_index targetIndex);
 
@@ -68,8 +68,8 @@ extern "C" {
     void AttachLinkToUnusedMarker(link_index linkIndex);
     void DetachLinkFromUnusedMarker(link_index linkIndex);
 
-    void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
-    void DetachLink(link_index link);
+    void AttachLink(link_index linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex);
+    void DetachLink(link_index linkIndex);
 
 #if defined(__cplusplus)
 }

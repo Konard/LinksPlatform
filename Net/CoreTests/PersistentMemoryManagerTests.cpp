@@ -88,7 +88,7 @@ namespace CoreTests
             link_index link1 = AllocateLink();
             link_index link2 = AllocateLink();
 
-            FreeLink(link1);
+            FreeLink(link1); // Creates "hole" and forces "Attach" to be executed
 
             Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
 
@@ -112,8 +112,8 @@ namespace CoreTests
             link_index link1 = AllocateLink();
             link_index link2 = AllocateLink();
 
-            FreeLink(link1);
-            FreeLink(link2);
+            FreeLink(link1); // Creates "hole" and forces "Attach" to be executed
+            FreeLink(link2); // Removes both links, all "Attached" links forced to be "Detached" here
 
             Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
 

@@ -28,6 +28,8 @@ extern "C" {
     PREFIX_DLL link_index AllocateLink();
     PREFIX_DLL void FreeLink(link_index link);
 
+    PREFIX_DLL unsigned_integer GetLinksCount();
+
     __forceinline Link* GetLink(link_index linkIndex);
     __forceinline link_index GetLinkIndex(Link* link);
 

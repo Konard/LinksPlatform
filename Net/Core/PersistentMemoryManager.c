@@ -61,6 +61,36 @@ __forceinline void PrintLinksDataBaseSize()
 #endif
 }
 
+__forceinline bool ExistsLink(Link* link)
+{
+    return link && pointerToLinks != link && link->LinkerIndex; //link->SourceIndex && link->LinkerIndex && link->TargetIndex;
+}
+
+__forceinline bool ExistsLinkIndex(link_index linkIndex)
+{
+    return ExistsLink(GetLink(linkIndex));
+}
+
+__forceinline bool IsNullLinkEmpty()
+{
+    return !pointerToLinks->SourceIndex && !pointerToLinks->LinkerIndex && !pointerToLinks->TargetIndex;
+}
+
+__forceinline Link* GetLink(link_index linkIndex)
+{
+    return pointerToLinks + linkIndex;
+}
+
+__forceinline link_index GetLinkIndex(Link* link)
+{
+    return link - pointerToLinks;
+}
+
+unsigned_integer GetLinksCount()
+{
+    return *pointerToLinksSize - 1;
+}
+
 unsigned_integer GetCurrentSystemPageSize()
 {
 #if defined(WINDOWS)
@@ -280,7 +310,7 @@ signed_integer SetStorageFileMemoryMapping()
 
 #if defined(WINDOWS)
     // см. MSDN "CreateFileMapping function", http://msdn.microsoft.com/en-us/library/windows/desktop/aa366537%28v=vs.85%29.aspx
-    storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, storageFileSizeInBytes, NULL);
+    storageFileMappingHandle = CreateFileMapping(storageFileHandle, NULL, PAGE_READWRITE, 0, (DWORD)storageFileSizeInBytes, NULL);
     if (storageFileMappingHandle == INVALID_HANDLE_VALUE)
         return ErrorWithCode("Mapping creation failed.", GetLastError());
 
@@ -333,14 +363,14 @@ signed_integer SetStorageFileMemoryMapping()
         (char*)pointerToMappedRegion + serviceBlockSizeInBytes // 6
     };
 
-    pointerToDataSeal = pointers[0];
-    pointerToLinkIndexSize = pointers[1];
-    pointerToMappingLinksMaxSize = pointers[2];
-    pointerToLinksMaxSize = pointers[3];
-    pointerToLinksSize = pointers[4];
-    pointerToPointerToMappingLinks = pointers[5];
+    pointerToDataSeal = (uint64_t*)pointers[0];
+    pointerToLinkIndexSize = (uint64_t*)pointers[1];
+    pointerToMappingLinksMaxSize = (uint64_t*)pointers[2];
+    pointerToLinksMaxSize = (link_index*)pointers[3];
+    pointerToLinksSize = (link_index*)pointers[4];
+    pointerToPointerToMappingLinks = (link_index*)pointers[5];
 
-    pointerToLinks = pointers[6];
+    pointerToLinks = (Link*)pointers[6];
     pointerToUnusedMarker = pointerToLinks;
 
 #ifdef DEBUG
@@ -547,9 +577,9 @@ void FreeLink(link_index linkIndex)
 {
     if (linkIndex == null) return;
 
-    Link *link = GetLink(linkIndex);
-
     DetachLink(linkIndex);
+
+    Link *link = GetLink(linkIndex);
 
     while (link->BySourceRootIndex != null) FreeLink(link->BySourceRootIndex);
     while (link->ByLinkerRootIndex != null) FreeLink(link->ByLinkerRootIndex);
@@ -607,7 +637,7 @@ signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor)
 
 link_index GetMappingLink(signed_integer mappingIndex)
 {
-    if (mappingIndex >= 0 && mappingIndex < *pointerToMappingLinksMaxSize)
+    if (mappingIndex >= 0 && mappingIndex < (signed_integer)*pointerToMappingLinksMaxSize)
         return pointerToPointerToMappingLinks[mappingIndex];
     else
         return null;
@@ -615,31 +645,6 @@ link_index GetMappingLink(signed_integer mappingIndex)
 
 void SetMappingLink(signed_integer mappingIndex, link_index linkIndex)
 {
-    if (mappingIndex >= 0 && mappingIndex < *pointerToMappingLinksMaxSize)
+    if (mappingIndex >= 0 && mappingIndex < (signed_integer)*pointerToMappingLinksMaxSize)
         pointerToPointerToMappingLinks[mappingIndex] = linkIndex;
-}
-
-__forceinline bool ExistsLinkIndex(link_index linkIndex)
-{
-    return ExistsLink(GetLink(linkIndex));
-}
-
-__forceinline bool ExistsLink(Link* link)
-{
-    return link && pointerToLinks != link && link->LinkerIndex; //link->SourceIndex && link->LinkerIndex && link->TargetIndex;
-}
-
-__forceinline bool IsNullLinkEmpty()
-{
-    return !pointerToLinks->SourceIndex && !pointerToLinks->LinkerIndex && !pointerToLinks->TargetIndex;
-}
-
-__forceinline Link* GetLink(link_index linkIndex)
-{
-    return pointerToLinks + linkIndex;
-}
-
-__forceinline link_index GetLinkIndex(Link* link)
-{
-    return link - pointerToLinks;
 }

@@ -8,35 +8,32 @@
 #include "SizeBalancedTree.h"
 #include "LinkLowLevel.h"
 
-//DefineAllReferersTreeMethods(Source)
-//DefineAllReferersTreeMethods(Source)
-//DefineAllReferersTreeMethods(Linker)
-//DefineAllReferersTreeMethods(Target)
-//DefineAllSearchMethods()
+DefineAllReferersTreeMethods(Source)
+DefineAllReferersTreeMethods(Linker)
+DefineAllReferersTreeMethods(Target)
+DefineAllSearchMethods()
 
-// подчиненная CreateLink/UpdateLink/.. функция
-
-link_index public_calling_convention GetSource(link_index linkIndex)
+link_index public_calling_convention GetSourceIndex(link_index linkIndex)
 {
     return GetLink(linkIndex)->SourceIndex;
 }
 
-link_index public_calling_convention GetLinker(link_index linkIndex)
+link_index public_calling_convention GetLinkerIndex(link_index linkIndex)
 {
     return GetLink(linkIndex)->LinkerIndex;
 }
 
-link_index public_calling_convention GetTarget(link_index linkIndex)
+link_index public_calling_convention GetTargetIndex(link_index linkIndex)
 {
     return GetLink(linkIndex)->TargetIndex;
 }
 
-signed_integer public_calling_convention GetTimespan(link_index linkIndex)
+signed_integer public_calling_convention GetTime(link_index linkIndex)
 {
     return GetLink(linkIndex)->Timestamp;
 }
 
-uint64_t public_calling_convention CreateLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+link_index public_calling_convention CreateLink(link_index sourceIndex, link_index linkerIndex, link_index targetIndex)
 {
     if (sourceIndex != itself &&
         linkerIndex != itself &&
@@ -50,7 +47,7 @@ uint64_t public_calling_convention CreateLink(uint64_t sourceIndex, uint64_t lin
             {
                 Link *link = GetLink(linkIndex);
                 link->Timestamp = GetTimestamp();
-                AttachLink(link, sourceIndex, linkerIndex, targetIndex);
+                AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
             }
         }
         return linkIndex;
@@ -65,25 +62,22 @@ uint64_t public_calling_convention CreateLink(uint64_t sourceIndex, uint64_t lin
             sourceIndex = (sourceIndex == itself ? linkIndex : sourceIndex);
             linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
             targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
-            AttachLink(link, sourceIndex, linkerIndex, targetIndex);
+            AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
         }
         return linkIndex;
     }
 }
 
-uint64_t public_calling_convention SearchLink(uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+link_index public_calling_convention SearchLink(link_index sourceIndex, link_index linkerIndex, link_index targetIndex)
 {
     // смотря, какое дерево меньше (target или source); по linker - список
-    //if (GetLinkNumberOfReferersByTarget(targetIndex) <= GetLinkNumberOfReferersBySource(sourceIndex))
-    //    return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
-    //else
-    //    return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
+    if (GetNumberOfReferersByTarget(targetIndex) <= GetNumberOfReferersBySource(sourceIndex))
+        return SearchRefererOfTarget(targetIndex, sourceIndex, linkerIndex);
+    else
+        return SearchRefererOfSource(sourceIndex, targetIndex, linkerIndex);
 }
 
-// в функции Replace почти ничего нет - вся работа происходит в Update;
-// Replace - функция-координатор
-
-uint64_t public_calling_convention ReplaceLink(uint64_t linkIndex, uint64_t replacementIndex)
+link_index public_calling_convention ReplaceLink(link_index linkIndex, link_index replacementIndex)
 {
     Link *link = GetLink(linkIndex);
     Link *replacement = GetLink(replacementIndex);
@@ -135,8 +129,7 @@ uint64_t public_calling_convention ReplaceLink(uint64_t linkIndex, uint64_t repl
     return replacementIndex;
 }
 
-
-uint64_t public_calling_convention UpdateLink(uint64_t linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+link_index public_calling_convention UpdateLink(link_index linkIndex, link_index sourceIndex, link_index linkerIndex, link_index targetIndex)
 {
     Link *link = GetLink(linkIndex);
     if (link->SourceIndex == sourceIndex && link->LinkerIndex == linkerIndex && link->TargetIndex == targetIndex)
@@ -145,11 +138,10 @@ uint64_t public_calling_convention UpdateLink(uint64_t linkIndex, uint64_t sourc
     if (sourceIndex != itself && linkerIndex != itself && targetIndex != itself)
     {
         uint64_t existingLinkIndex = SearchLink(sourceIndex, linkerIndex, targetIndex);
-        // Link* existingLink = GetLink(existingLinkIndex);
         if (existingLinkIndex == null)
         {
-            DetachLink(link);
-            AttachLink(link, sourceIndex, linkerIndex, targetIndex);
+            DetachLink(linkIndex);
+            AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
 
             link->Timestamp = GetTimestamp();
 
@@ -166,8 +158,8 @@ uint64_t public_calling_convention UpdateLink(uint64_t linkIndex, uint64_t sourc
         linkerIndex = (linkerIndex == itself ? linkIndex : linkerIndex);
         targetIndex = (targetIndex == itself ? linkIndex : targetIndex);
 
-        DetachLink(link);
-        AttachLink(link, sourceIndex, linkerIndex, targetIndex);
+        DetachLink(linkIndex);
+        AttachLink(linkIndex, sourceIndex, linkerIndex, targetIndex);
 
         link->Timestamp = GetTimestamp();
 
@@ -175,125 +167,129 @@ uint64_t public_calling_convention UpdateLink(uint64_t linkIndex, uint64_t sourc
     }
 }
 
-void public_calling_convention DeleteLink(uint64_t linkIndex)
+void public_calling_convention DeleteLink(link_index linkIndex)
 {
+    GetLink(linkIndex)->Timestamp = 0;
     FreeLink(linkIndex);
 }
 
-/*
+unsigned_integer public_calling_convention GetLinkNumberOfReferersBySource(link_index linkIndex) { return GetNumberOfReferersBySource(linkIndex); }
+unsigned_integer public_calling_convention GetLinkNumberOfReferersByLinker(link_index linkIndex) { return GetNumberOfReferersByLinker(linkIndex); }
+unsigned_integer public_calling_convention GetLinkNumberOfReferersByTarget(link_index linkIndex) { return GetNumberOfReferersByTarget(linkIndex); }
 
-uint64_t _H GetLinkNumberOfReferersBySource(Link *link) { return GetNumberOfReferersBySource(link); }
-uint64_t _H GetLinkNumberOfReferersByLinker(Link *link) { return GetNumberOfReferersByLinker(link); }
-uint64_t _H GetLinkNumberOfReferersByTarget(Link *link) { return GetNumberOfReferersByTarget(link); }
-
-void WalkThroughAllReferersBySourceCore(Link* root, action a)
+void WalkThroughAllReferersBySourceCore(link_index rootIndex, visitor visitor)
 {
-if (root != null)
-{
-WalkThroughAllReferersBySourceCore(root->PreviousSiblingRefererBySource, a);
-a(root);
-WalkThroughAllReferersBySourceCore(root->NextSiblingRefererBySource, a);
-}
-}
-
-int WalkThroughReferersBySourceCore(Link* root, func f)
-{
-if (root != null)
-{
-if(!WalkThroughReferersBySourceCore(root->PreviousSiblingRefererBySource, f)) return false;
-if(!f(root)) return false;
-if(!WalkThroughReferersBySourceCore(root->NextSiblingRefererBySource, f)) return false;
-}
-return true;
+    if (rootIndex != null)
+    {
+        Link* root = GetLink(rootIndex);
+        WalkThroughAllReferersBySourceCore(root->BySourceLeftIndex, visitor);
+        visitor(rootIndex);
+        WalkThroughAllReferersBySourceCore(root->BySourceRightIndex, visitor);
+    }
 }
 
-void _H WalkThroughAllReferersBySource(Link* root, action a)
+int WalkThroughReferersBySourceCore(link_index rootIndex, stoppable_visitor stoppableVisitor)
 {
-if (root != null) WalkThroughAllReferersBySourceCore(root->FirstRefererBySource, a);
+    if (rootIndex != null)
+    {
+        Link* root = GetLink(rootIndex);
+        if (!WalkThroughReferersBySourceCore(root->BySourceLeftIndex, stoppableVisitor)) return false;
+        if (!stoppableVisitor(rootIndex)) return false;
+        if (!WalkThroughReferersBySourceCore(root->BySourceRightIndex, stoppableVisitor)) return false;
+    }
+    return true;
 }
 
-int _H WalkThroughReferersBySource(Link* root, func f)
+void public_calling_convention WalkThroughAllReferersBySource(link_index rootIndex, visitor visitor)
 {
-if (root != null) return WalkThroughReferersBySourceCore(root->FirstRefererBySource, f);
-else return true;
+    if (rootIndex != null) WalkThroughAllReferersBySourceCore(GetLink(rootIndex)->BySourceRootIndex, visitor);
 }
 
-void _H WalkThroughAllReferersByLinker(Link* root, action a)
+signed_integer public_calling_convention WalkThroughReferersBySource(link_index rootIndex, stoppable_visitor stoppableVisitor)
 {
-if(root != null)
-{
-BeginWalkThroughReferersByLinker(element, root)
-{
-a(element);
-}
-EndWalkThroughReferersByLinker(element);
-}
+    if (rootIndex != null) return WalkThroughReferersBySourceCore(GetLink(rootIndex)->BySourceRootIndex, stoppableVisitor);
+    else return true;
 }
 
-int _H WalkThroughReferersByLinker(Link* root, func f)
+void public_calling_convention WalkThroughAllReferersByLinker(link_index rootIndex, visitor visitor)
 {
-if(root != null)
-{
-BeginWalkThroughReferersByLinker(element, root)
-{
-if(!f(element)) return false;
-}
-EndWalkThroughReferersByLinker(element);
-}
-return true;
-}
-
-void WalkThroughAllReferersByTargetCore(Link* root, action a)
-{
-if (root != null)
-{
-WalkThroughAllReferersByTargetCore(root->PreviousSiblingRefererByTarget, a);
-a(root);
-WalkThroughAllReferersByTargetCore(root->NextSiblingRefererByTarget, a);
-}
+    if (rootIndex != null)
+    {
+        BeginWalkThroughReferersByLinker(element, rootIndex)
+        {
+            visitor(element);
+        }
+        EndWalkThroughReferersByLinker(element);
+    }
 }
 
-int WalkThroughReferersByTargetCore(Link* root, func f)
+signed_integer public_calling_convention WalkThroughReferersByLinker(link_index rootIndex, stoppable_visitor stoppableVisitor)
 {
-if(root != null)
-{
-if(!WalkThroughReferersByTargetCore(root->PreviousSiblingRefererByTarget, f)) return false;
-if(!f(root)) return false;
-if(!WalkThroughReferersByTargetCore(root->NextSiblingRefererByTarget, f)) return false;
-}
-return true;
-}
-
-void _H WalkThroughAllReferersByTarget(Link* root, action a)
-{
-if (root != null) WalkThroughAllReferersByTargetCore(root->FirstRefererByTarget, a);
+    if (rootIndex != null)
+    {
+        BeginWalkThroughReferersByLinker(element, rootIndex)
+        {
+            if (!stoppableVisitor(element)) return false;
+        }
+        EndWalkThroughReferersByLinker(element);
+    }
+    return true;
 }
 
-int _H WalkThroughReferersByTarget(Link* root, func f)
+void WalkThroughAllReferersByTargetCore(link_index rootIndex, visitor visitor)
 {
-if (root != null) return WalkThroughReferersByTargetCore(root->FirstRefererByTarget, f);
-else return true;
+    if (rootIndex != null)
+    {
+        Link* root = GetLink(rootIndex);
+        WalkThroughAllReferersByTargetCore(root->ByTargetLeftIndex, visitor);
+        visitor(rootIndex);
+        WalkThroughAllReferersByTargetCore(root->ByTargetRightIndex, visitor);
+    }
 }
-*/
 
-void AttachLink(Link *link, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+int WalkThroughReferersByTargetCore(link_index rootIndex, stoppable_visitor stoppableVisitor)
 {
+    if (rootIndex != null)
+    {
+        Link* root = GetLink(rootIndex);
+        if (!WalkThroughReferersByTargetCore(root->ByTargetLeftIndex, stoppableVisitor)) return false;
+        if (!stoppableVisitor(rootIndex)) return false;
+        if (!WalkThroughReferersByTargetCore(root->ByTargetRightIndex, stoppableVisitor)) return false;
+    }
+    return true;
+}
+
+void public_calling_convention WalkThroughAllReferersByTarget(link_index rootIndex, visitor visitor)
+{
+    if (rootIndex != null) WalkThroughAllReferersByTargetCore(GetLink(rootIndex)->ByTargetRootIndex, visitor);
+}
+
+signed_integer public_calling_convention WalkThroughReferersByTarget(link_index rootIndex, stoppable_visitor stoppableVisitor)
+{
+    if (rootIndex != null) return WalkThroughReferersByTargetCore(GetLink(rootIndex)->ByTargetRootIndex, stoppableVisitor);
+    else return true;
+}
+
+void AttachLink(link_index linkIndex, uint64_t sourceIndex, uint64_t linkerIndex, uint64_t targetIndex)
+{
+    Link* link = GetLink(linkIndex);
+
     link->SourceIndex = sourceIndex;
     link->LinkerIndex = linkerIndex;
     link->TargetIndex = targetIndex;
 
-    //SubscribeAsRefererToSource(link, sourceIndex);
-    //SubscribeAsRefererToLinker(link, linkerIndex);
-    //SubscribeAsRefererToTarget(link, targetIndex);
+    SubscribeAsRefererToSource(linkIndex, sourceIndex);
+    SubscribeAsRefererToLinker(linkIndex, linkerIndex);
+    SubscribeAsRefererToTarget(linkIndex, targetIndex);
 }
 
 void DetachLink(link_index linkIndex)
 {
     Link* link = GetLink(linkIndex);
 
-    //UnSubscribeFromSource(linkIndex, link->SourceIndex);
-    //UnSubscribeFromLinker(linkIndex, link->LinkerIndex);
-    //UnSubscribeFromTarget(linkIndex, link->TargetIndex);
+    UnSubscribeFromSource(linkIndex, link->SourceIndex);
+    UnSubscribeFromLinker(linkIndex, link->LinkerIndex);
+    UnSubscribeFromTarget(linkIndex, link->TargetIndex);
 
     link->SourceIndex = null;
     link->LinkerIndex = null;

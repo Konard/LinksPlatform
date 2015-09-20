@@ -2,134 +2,134 @@
 #define __LINKS_SIZE_BALANCED_TREE_H__
 
 #define DefineTreeLeftRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)		  \
-void methodName(elementType rootIndex)																												  \
+void methodName(elementType* rootIndex)																												  \
 { 																																				  \
-	elementType rightNodeIndex = GetRightNode(rootIndex);																								  \
-	if (rightNode == NULL) return; 																												  \
-	SetRightNode(*root, GetLeftNode(rightNode)); 																								  \
-	SetLeftNode(rightNode, *root); 																											  \
-	SetNodeSize(rightNode, GetNodeSize(*root));																									  \
-	SetNodeSize(*root, (GetLeftNode(*root) ? GetNodeSize(GetLeftNode(*root)) : 0) + (GetRightNode(*root) ? GetNodeSize(GetRightNode(*root)) : 0) + 1);						  \
-	*root = rightNode;																												  \
+	elementType rightNodeIndex = GetRightNode(*rootIndex);																								  \
+	if (rightNodeIndex == null) return; 																												  \
+	SetRightNode(*rootIndex, GetLeftNode(rightNodeIndex)); 																								  \
+	SetLeftNode(rightNodeIndex, *rootIndex); 																											  \
+	SetNodeSize(rightNodeIndex, GetNodeSize(*rootIndex));																									  \
+	SetNodeSize(*rootIndex, (GetLeftNode(*rootIndex) ? GetNodeSize(GetLeftNode(*rootIndex)) : 0) + (GetRightNode(*rootIndex) ? GetNodeSize(GetRightNode(*rootIndex)) : 0) + 1);						  \
+	*rootIndex = rightNodeIndex;																												  \
 }
 
 #define DefineTreeRightRotateMethod(methodName, elementType, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize)	  \
-void methodName(elementType** root)																												  \
+void methodName(elementType* rootIndex)																												  \
 { 																																				  \
-	elementType* leftNode = GetLeftNode(*root);																									  \
-	if(leftNode == NULL) return;																													  \
-	SetLeftNode(*root, GetRightNode(leftNode));																									  \
-	SetRightNode(leftNode, *root);																												  \
-	SetNodeSize(leftNode, GetNodeSize(*root));																									  \
-	SetNodeSize(*root, (GetLeftNode(*root) ? GetNodeSize(GetLeftNode(*root)) : 0) + (GetRightNode(*root) ? GetNodeSize(GetRightNode(*root)) : 0) + 1);															  \
-	*root = leftNode;																															  \
+	elementType leftNodeIndex = GetLeftNode(*rootIndex);																									  \
+	if(leftNodeIndex == null) return;																													  \
+	SetLeftNode(*rootIndex, GetRightNode(leftNodeIndex));																									  \
+	SetRightNode(leftNodeIndex, *rootIndex);																												  \
+	SetNodeSize(leftNodeIndex, GetNodeSize(*rootIndex));																									  \
+	SetNodeSize(*rootIndex, (GetLeftNode(*rootIndex) ? GetNodeSize(GetLeftNode(*rootIndex)) : 0) + (GetRightNode(*rootIndex) ? GetNodeSize(GetRightNode(*rootIndex)) : 0) + 1);															  \
+	*rootIndex = leftNodeIndex;																															  \
 }
 
 #define DefineTreeMaintainMethodsHeaders(LeftMaintain, RightMaintain, elementType)					\
-	void LeftMaintain(elementType** root);															\
-	void RightMaintain(elementType** root);
+	void LeftMaintain(elementType* rootIndex);															\
+	void RightMaintain(elementType* rootIndex);
 
 #define DefineTreeLeftMaintainMethod(methodName, RightMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)								 \
-void methodName(elementType** root)																																			 \
+void methodName(elementType* rootIndex)																																			 \
 { 																																											 \
-	if (*root) 																																								 \
+	if (*rootIndex) 																																								 \
 	{ 																																										 \
-		elementType* rootLeftNode = GetLeftNode(*root);																														 \
-		if (rootLeftNode) 																																					 \
+		elementType rootLeftNodeIndex = GetLeftNode(*rootIndex);																														 \
+		if (rootLeftNodeIndex) 																																					 \
 		{ 																																									 \
-			elementType* rootRightNode = GetRightNode(*root);																												 \
-			elementType* rootLeftNodeLeftNode = GetLeftNode(rootLeftNode);																									 \
-			if(rootLeftNodeLeftNode && (!rootRightNode || GetNodeSize(rootLeftNodeLeftNode) > GetNodeSize(rootRightNode)))													 \
-				RightRotate(root); 																																			 \
+			elementType rootRightNodeIndex = GetRightNode(*rootIndex);																												 \
+			elementType rootLeftNodeLeftNodeIndex = GetLeftNode(rootLeftNodeIndex);																									 \
+			if(rootLeftNodeLeftNodeIndex && (!rootRightNodeIndex || GetNodeSize(rootLeftNodeLeftNodeIndex) > GetNodeSize(rootRightNodeIndex)))													 \
+				RightRotate(rootIndex); 																																			 \
 			else																																							 \
 			{																																								 \
-				elementType* rootLeftNodeRightNode = GetRightNode(rootLeftNode);																							 \
-				if(rootLeftNodeRightNode && (!rootRightNode || GetNodeSize(rootLeftNodeRightNode) > GetNodeSize(rootRightNode))) 											 \
-					LeftRotate(&GetLeftNode(*root)), RightRotate(root);																										 \
+				elementType rootLeftNodeRightNodeIndex = GetRightNode(rootLeftNodeIndex);																							 \
+				if(rootLeftNodeRightNodeIndex && (!rootRightNodeIndex || GetNodeSize(rootLeftNodeRightNodeIndex) > GetNodeSize(rootRightNodeIndex))) 											 \
+					LeftRotate(&GetLeftNode(*rootIndex)), RightRotate(rootIndex);																										 \
 				else																																						 \
 					return; 																																				 \
 			}																																								 \
-			methodName(&GetLeftNode(*root));																																 \
-			RightMaintain(&GetRightNode(*root));																															 \
-			methodName(root);																																				 \
-			RightMaintain(root);																																			 \
+			methodName(&GetLeftNode(*rootIndex));																																 \
+			RightMaintain(&GetRightNode(*rootIndex));																															 \
+			methodName(rootIndex);																																				 \
+			RightMaintain(rootIndex);																																			 \
 		} 																																									 \
 	}																																										 \
 }
 
 #define DefineTreeRightMaintainMethod(methodName, LeftMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)								 \
-void methodName(elementType** root)																																			 \
+void methodName(elementType* rootIndex)																																			 \
 { 																																											 \
-	if (*root) 																																								 \
+	if (*rootIndex) 																																								 \
 	{ 																																										 \
-		elementType* rootRightNode = GetRightNode(*root);																													 \
-		if (rootRightNode)																																					 \
+		elementType rootRightNodeIndex = GetRightNode(*rootIndex);																													 \
+		if (rootRightNodeIndex)																																					 \
 		{																																									 \
-			elementType* rootLeftNode = GetLeftNode(*root);																													 \
-			elementType* rootRightNodeRightNode = GetRightNode(rootRightNode);																								 \
-			if (rootRightNodeRightNode && (!rootLeftNode || GetNodeSize(rootRightNodeRightNode) > GetNodeSize(rootLeftNode)))												 \
-				LeftRotate(root);																																			 \
+			elementType rootLeftNodeIndex = GetLeftNode(*rootIndex);																													 \
+			elementType rootRightNodeRightNodeIndex = GetRightNode(rootRightNodeIndex);																								 \
+			if (rootRightNodeRightNodeIndex && (!rootLeftNodeIndex || GetNodeSize(rootRightNodeRightNodeIndex) > GetNodeSize(rootLeftNodeIndex)))												 \
+				LeftRotate(rootIndex);																																			 \
 			else 																																							 \
 			{																																								 \
-				elementType* rootRightNodeLeftNode = GetLeftNode(rootRightNode);																							 \
-				if (rootRightNodeLeftNode && (!rootLeftNode || GetNodeSize(rootRightNodeLeftNode) > GetNodeSize(rootLeftNode))) 											 \
-					RightRotate(&GetRightNode(*root)), LeftRotate(root); 																									 \
+				elementType rootRightNodeLeftNodeIndex = GetLeftNode(rootRightNodeIndex);																							 \
+				if (rootRightNodeLeftNodeIndex && (!rootLeftNodeIndex || GetNodeSize(rootRightNodeLeftNodeIndex) > GetNodeSize(rootLeftNodeIndex))) 											 \
+					RightRotate(&GetRightNode(*rootIndex)), LeftRotate(rootIndex); 																									 \
 				else																																						 \
 					return;																																					 \
 			}																																								 \
-			LeftMaintain(&GetLeftNode(*root));																															 \
-			methodName(&GetRightNode(*root));																																 \
-			LeftMaintain(root);																																				 \
-			methodName(root);																																			 \
+			LeftMaintain(&GetLeftNode(*rootIndex));																															 \
+			methodName(&GetRightNode(*rootIndex));																																 \
+			LeftMaintain(rootIndex);																																				 \
+			methodName(rootIndex);																																			 \
 		}																																									 \
 	}																																										 \
 }
 
 #define DefineTreeMaintainMethods(LeftMaintain, RightMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)							\
-	void LeftMaintain(elementType** root);																																\
-	void RightMaintain(elementType** root);																																\
+	void LeftMaintain(elementType* rootIndex);																																\
+	void RightMaintain(elementType* rootIndex);																																\
 	DefineTreeLeftMaintainMethod(LeftMaintain, RightMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)								\
 	DefineTreeRightMaintainMethod(RightMaintain, LeftMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)							
 
 #define DefineTreeInsertMethod(methodName, elementType, LeftMaintain, RightMaintain, IsElementLessThanOtherElement, GetLeftNode, GetRightNode, GetNodeSize, SetNodeSize)	 \
-void methodName(elementType** root, elementType* newNode)																													 \
+void methodName(elementType* rootIndex, elementType newNodeIndex)																													 \
 { 																																											 \
-	if (!*root)																																								 \
+	if (*rootIndex == null)																																								 \
 	{ 																																										 \
-		*root = newNode;																																					 \
-		SetNodeSize(*root, GetNodeSize(*root) + 1);																															 \
+		*rootIndex = newNodeIndex;																																					 \
+		SetNodeSize(*rootIndex, GetNodeSize(*rootIndex) + 1); /* replace with increment */																															 \
 	}																																										 \
 	else 																																									 \
 	{ 																																										 \
-		SetNodeSize(*root, GetNodeSize(*root) + 1);																															 \
+		SetNodeSize(*rootIndex, GetNodeSize(*rootIndex) + 1); /* replace with increment */																															 \
 																																											 \
-		if(IsElementLessThanOtherElement(newNode, *root))																													 \
+		if (IsElementLessThanOtherElement(newNodeIndex, *rootIndex))																													 \
 		{																																									 \
-			methodName(&GetLeftNode(*root), newNode);																														 \
-		 	LeftMaintain(root);																																				 \
+			methodName(&GetLeftNode(*rootIndex), newNodeIndex);																														 \
+		 	LeftMaintain(rootIndex);																																				 \
 		}																																									 \
 		else																																								 \
 		{																																									 \
-			methodName(&GetRightNode(*root), newNode);																														 \
-			RightMaintain(root);																																			 \
+			methodName(&GetRightNode(*rootIndex), newNodeIndex);																														 \
+			RightMaintain(rootIndex);																																			 \
 		}																																									 \
 	}																																										 \
 }
 
 #define DefineUnsafeDetachFromTreeMethod(methodName, elementType, IsElementLessThanOtherElement, IsElementGreaterThanOtherElement, GetLeftNode, SetLeftNode, GetRightNode, SetRightNode, GetNodeSize, SetNodeSize) \
-void methodName(elementType** root, elementType* nodeToDetach)																																					   \
+void methodName(elementType* rootIndex, elementType nodeToDetach)																																					   \
 {																																																				   \
-	if (!*root) 																																																   \
+	if (*rootIndex == null) 																																																   \
 		return;																																																	   \
 	else																																																		   \
 	{																																																			   \
-		elementType* currentNode = *root;																																										   \
-		elementType* parent = null; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */																								   \
-		elementType* replacementNode = null;																																									   \
+		elementType currentNode = *rootIndex;																																										   \
+		elementType parent = null; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */																								   \
+		elementType replacementNode = null;																																									   \
 																																																				   \
 		while (currentNode != nodeToDetach)																																										   \
 		{																																																		   \
-			SetNodeSize(currentNode, GetNodeSize(currentNode) - 1);																																				   \
+			SetNodeSize(currentNode, GetNodeSize(currentNode) - 1);	/* replace with decrement */																																			   \
 			if (IsElementLessThanOtherElement(nodeToDetach, currentNode))																																		   \
 				parent = currentNode, currentNode = GetLeftNode(currentNode);																																	   \
 			else if (IsElementGreaterThanOtherElement(nodeToDetach, currentNode))																																   \
@@ -140,7 +140,7 @@ void methodName(elementType** root, elementType* nodeToDetach)																		
 																																																				   \
 		if (GetLeftNode(nodeToDetach) && GetRightNode(nodeToDetach))																																			   \
 		{																																																		   \
-			elementType* minNode = GetRightNode(nodeToDetach);																																					   \
+			elementType minNode = GetRightNode(nodeToDetach);																																					   \
 			while (GetLeftNode(minNode)) minNode = GetLeftNode(minNode); /* Передвигаемся до минимума */																										   \
 																																																				   \
 			methodName(&GetRightNode(nodeToDetach), minNode);																																					   \
@@ -152,7 +152,7 @@ void methodName(elementType** root, elementType* nodeToDetach)																		
 				SetNodeSize(minNode, GetNodeSize(GetLeftNode(nodeToDetach)) + GetNodeSize(GetRightNode(nodeToDetach)) + 1);																						   \
 			}																																																	   \
 			else																																																   \
-				SetNodeSize(minNode, GetNodeSize(GetLeftNode(nodeToDetach)) + 1);																																   \
+				SetNodeSize(minNode, GetNodeSize(GetLeftNode(nodeToDetach)) + 1); /* replace with increment */																																   \
 																																																				   \
 			replacementNode = minNode;																																											   \
 		}																																																		   \
@@ -162,7 +162,7 @@ void methodName(elementType** root, elementType* nodeToDetach)																		
 			replacementNode = GetRightNode(nodeToDetach);																																						   \
 																																																				   \
 		if(!parent)																																																   \
-			*root = replacementNode;																																											   \
+			*rootIndex = replacementNode;																																											   \
 		else if(GetLeftNode(parent) == nodeToDetach)																																							   \
 			SetLeftNode(parent, replacementNode);																																								   \
 		else if(GetRightNode(parent) == nodeToDetach)																																							   \
@@ -178,7 +178,7 @@ void methodName(elementType** root, elementType* nodeToDetach)																		
 // оптимизировать, до тех пор пока нет точной уверенности в своих знаниях асма, лучше не соваться в дебри.
 #define BeginWalkThroughtTree(elementType, element, root, GetLeftNode)			    \
 {																					\
-	register elementType* element = root;											\
+	register elementType element = root;											\
 	register initialStackPointer;													\
 																					\
 	__asm { mov initialStackPointer, ESP }											\
