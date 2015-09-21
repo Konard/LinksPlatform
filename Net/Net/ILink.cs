@@ -15,10 +15,10 @@ namespace NetLibrary
 
 		// И статические методы (общие для всех связей)
 
-		static public ILink Create(ILink source, ILink linker, ILink target);
-		static public void Update(ref ILink link, ILink newSource, ILink newLinker, ILink newTarget);
-		static public void Delete(ref ILink link);
-		static public ILink Search(ILink source, ILink linker, ILink target);
+		public static ILink Create(ILink source, ILink linker, ILink target);
+		public static void Update(ref ILink link, ILink newSource, ILink newLinker, ILink newTarget);
+		public static void Delete(ref ILink link);
+		public static ILink Search(ILink source, ILink linker, ILink target);
 	}
 }
 

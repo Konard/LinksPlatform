@@ -56,7 +56,7 @@ namespace Gexf
             WriteXml(writer, writeNodes, writeEdges, Mode, DefaultEdgeType);
         }
 
-        static public void WriteXml(XmlWriter writer, Action writeNodes, Action writeEdges, GraphMode mode = GraphMode.Static, GraphDefaultEdgeType defaultEdgeType = GraphDefaultEdgeType.Directed)
+        public static void WriteXml(XmlWriter writer, Action writeNodes, Action writeEdges, GraphMode mode = GraphMode.Static, GraphDefaultEdgeType defaultEdgeType = GraphDefaultEdgeType.Directed)
         {
             writer.WriteStartElement(ElementName);
 

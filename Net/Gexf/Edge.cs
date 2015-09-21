@@ -28,7 +28,7 @@ namespace Gexf
             WriteXml(writer, Id, Source, Target, Label);
         }
 
-        static public void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label)
+        public static void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label)
         {
             writer.WriteStartElement(ElementName);
 

@@ -9,9 +9,9 @@ namespace ConsoleTester
         const string StatementPart = @"(?<part>((?<word>\w+)|""(?<string>[^""]+)""))";
         const string Statement = "^(" + StatementTermPart + "|" + StatementPart + @")(\s+" + StatementPart + @")+\.$";
 
-        static private readonly Regex StatementRegex = new Regex(Statement, RegexOptions.Compiled);
+        private static readonly Regex StatementRegex = new Regex(Statement, RegexOptions.Compiled);
 
-        static public void ParseStatement(string statement)
+        public static void ParseStatement(string statement)
         {
             var match = StatementRegex.Match(statement);
             if (match.Success)

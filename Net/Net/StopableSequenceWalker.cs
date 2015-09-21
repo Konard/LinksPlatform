@@ -21,7 +21,7 @@ namespace NetLibrary
             _stack = new Stack<Link>();
         }
 
-        static public bool WalkRight(Link sequence, Func<Link, bool> visit)
+        public static bool WalkRight(Link sequence, Func<Link, bool> visit)
         {
             return (new StopableSequenceWalker(sequence, visit)).WalkFromLeftToRight();
         }
@@ -62,7 +62,7 @@ namespace NetLibrary
             }
         }
 
-        static public bool WalkLeft(Link sequence, Func<Link, bool> visit)
+        public static bool WalkLeft(Link sequence, Func<Link, bool> visit)
         {
             return (new StopableSequenceWalker(sequence, visit)).WalkFromRightToLeft();
         }

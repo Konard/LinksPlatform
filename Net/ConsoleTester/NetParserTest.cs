@@ -4,7 +4,7 @@ namespace ConsoleTester
 {
     public class NetParserTest
     {
-        static public void Run()
+        public static void Run()
         {
             Console.WriteLine("Start typing into the net:");
 

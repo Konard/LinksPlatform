@@ -8,11 +8,11 @@ namespace NetLibrary
     {
         public const int MaxSequenceFormatSize = 20;
 
-        //static public void DeleteSequence(Link sequence)
+        //public static void DeleteSequence(Link sequence)
         //{
         //}
 
-        static public string FormatSequence(Link sequence)
+        public static string FormatSequence(Link sequence)
         {
             int visitedElements = 0;
 
@@ -47,7 +47,7 @@ namespace NetLibrary
             return sb.ToString();
         }
 
-        static public List<Link> CollectMatchingSequences(List<Link> links)
+        public static List<Link> CollectMatchingSequences(List<Link> links)
         {
             if (links.Count == 1)
             {
@@ -65,7 +65,7 @@ namespace NetLibrary
             return results;
         }
 
-        static private void CollectMatchingSequences(Link leftLink, int leftBound, List<Link> middleLinks, Link rightLink, int rightBound, ref List<Link> results)
+        private static void CollectMatchingSequences(Link leftLink, int leftBound, List<Link> middleLinks, Link rightLink, int rightBound, ref List<Link> results)
         {
             long leftLinkTotalReferers = leftLink.ReferersBySourceCount + leftLink.ReferersByTargetCount;
             long rightLinkTotalReferers = rightLink.ReferersBySourceCount + rightLink.ReferersByTargetCount;
@@ -129,7 +129,7 @@ namespace NetLibrary
             }
         }
 
-        static public Link[] GetRightElements(Link startLink, Link rightLink)
+        public static Link[] GetRightElements(Link startLink, Link rightLink)
         {
             var result = new Link[4];
 
@@ -147,7 +147,7 @@ namespace NetLibrary
             return result;
         }
 
-        static public bool TryStepRight(Link startLink, Link rightLink, Link[] result, int offset)
+        public static bool TryStepRight(Link startLink, Link rightLink, Link[] result, int offset)
         {
             int added = 0;
 
@@ -176,7 +176,7 @@ namespace NetLibrary
             return added > 0;
         }
 
-        static public Link[] GetLeftElements(Link startLink, Link leftLink)
+        public static Link[] GetLeftElements(Link startLink, Link leftLink)
         {
             var result = new Link[4];
 
@@ -194,7 +194,7 @@ namespace NetLibrary
             return result;
         }
 
-        static public bool TryStepLeft(Link startLink, Link leftLink, Link[] result, int offset)
+        public static bool TryStepLeft(Link startLink, Link leftLink, Link[] result, int offset)
         {
             int added = 0;
 

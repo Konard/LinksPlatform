@@ -4,7 +4,7 @@ namespace NetLibrary
 {
     public class CompressionExperiments
     {
-        static public void RightJoin(ref Link subject, Link @object)
+        public static void RightJoin(ref Link subject, Link @object)
         {
             if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
             {
@@ -18,7 +18,7 @@ namespace NetLibrary
             subject = Link.Create(subject, Net.And, @object);
         }
 
-        //static public Link RightJoinUnsafe(Link subject, Link @object)
+        //public static Link RightJoinUnsafe(Link subject, Link @object)
         //{
         //    if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
         //    {
@@ -32,7 +32,7 @@ namespace NetLibrary
         //    return Link.Create(subject, Net.And, @object);
         //}
 
-        ////static public void LeftJoin(ref Link subject, Link @object)
+        ////public static void LeftJoin(ref Link subject, Link @object)
         ////{
         ////    if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
         ////    {
@@ -46,7 +46,7 @@ namespace NetLibrary
         ////    subject = Link.Create(@object, Net.And, subject);
         ////}
 
-        static public void LeftJoin(ref Link subject, Link @object)
+        public static void LeftJoin(ref Link subject, Link @object)
         {
             if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
             {
@@ -69,7 +69,7 @@ namespace NetLibrary
 
         // Сначала сжатие налево, а затем направо (так эффективнее)
         // Не приятный момент, что обе связи, и первая и вторая могут быть изменены в результате алгоритма.
-        //static public Link CombinedJoin(ref Link first, ref Link second)
+        //public static Link CombinedJoin(ref Link first, ref Link second)
         //{
         //    Link atomicConnection = Link.Search(first, Net.And, second);
         //    if (atomicConnection != null)
@@ -154,9 +154,9 @@ namespace NetLibrary
         //    }
         //}
 
-        static public int CompressionsCount = 0;
+        public static int CompressionsCount = 0;
 
-        static public Link CombinedJoin(ref Link first, ref Link second)
+        public static Link CombinedJoin(ref Link first, ref Link second)
         {
             // Перестроение работает хорошо только когда одна из связей является парой и аккумулятором одновременно
             // Когда обе связи - пары - нужно использовать другой алгоритм, иначе сжатие будет отсутствовать.
@@ -367,7 +367,7 @@ namespace NetLibrary
             return directConnection;
         }
 
-        static private Link TryReconstructConnection(Link first, Link second)
+        private static Link TryReconstructConnection(Link first, Link second)
         {
             Link directConnection = null;
 
@@ -488,7 +488,7 @@ namespace NetLibrary
             return directConnection;
         }
 
-        ////static public Link CombinedJoin(Link left, Link right)
+        ////public static Link CombinedJoin(Link left, Link right)
         ////{
         ////    Link rightSubJoint = Link.Search(left, Net.And, right.Source);
         ////    if (rightSubJoint != null && rightSubJoint != right)
@@ -529,7 +529,7 @@ namespace NetLibrary
         ////    return Link.Create(left, Net.And, right);
         ////}
 
-        //static public Link CombinedJoin(Link left, Link right)
+        //public static Link CombinedJoin(Link left, Link right)
         //{
         //    long leftReferers = left.TotalReferers;
 
@@ -548,7 +548,7 @@ namespace NetLibrary
 
         //}
 
-        //static public Link LeftJoinUnsafe(Link subject, Link @object)
+        //public static Link LeftJoinUnsafe(Link subject, Link @object)
         //{
         //    if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
         //    {
@@ -562,9 +562,9 @@ namespace NetLibrary
         //    return Link.Create(@object, Net.And, subject);
         //}
 
-        static public int ChunkSize = 2;
+        public static int ChunkSize = 2;
 
-        //static public Link FromList(List<Link> links)
+        //public static Link FromList(List<Link> links)
         //{
         //    Link element = links[0];
         //    for (int i = 1; i < links.Count; i += ChunkSize)
@@ -580,7 +580,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(Link[] links)
+        //public static Link FromList(Link[] links)
         //{
         //    Link element = links[0];
         //    for (int i = 1; i < links.Length; i += ChunkSize)
@@ -596,7 +596,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(IList<Link> links)
+        //public static Link FromList(IList<Link> links)
         //{
         //    Link element = links[0];
         //    for (int i = 1; i < links.Count; i += ChunkSize)
@@ -616,7 +616,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(IList<Link> links)
+        //public static Link FromList(IList<Link> links)
         //{
         //    int i = 0;
         //    Link element = links[i++];
@@ -633,12 +633,12 @@ namespace NetLibrary
         //}
 
         // Заглушка, возможно опасная
-        static private Link CombinedJoin(Link element, Link link)
+        private static Link CombinedJoin(Link element, Link link)
         {
             return CombinedJoin(ref element, ref link);
         }
 
-        //static public Link FromList(List<Link> links)
+        //public static Link FromList(List<Link> links)
         //{
         //    int i = links.Count - 1;
         //    Link element = links[i];
@@ -646,7 +646,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(Link[] links)
+        //public static Link FromList(Link[] links)
         //{
         //    int i = links.Length - 1;
         //    Link element = links[i];
@@ -654,7 +654,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(List<Link> links)
+        //public static Link FromList(List<Link> links)
         //{
         //    Link element = links[0];
         //    for (int i = 1; i < links.Count; i += ChunkSize)
@@ -670,7 +670,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(Link[] links)
+        //public static Link FromList(Link[] links)
         //{
         //    Link element = links[0];
         //    for (int i = 1; i < links.Length; i += ChunkSize)
@@ -686,7 +686,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        //static public Link FromList(IList<Link> links)
+        //public static Link FromList(IList<Link> links)
         //{
         //    int leftBound = 0;
         //    int rightBound = links.Count - 1;
@@ -742,7 +742,7 @@ namespace NetLibrary
         //    }
         //}
 
-        //static public Link FromList(IList<Link> links)
+        //public static Link FromList(IList<Link> links)
         //{
         //    int i = links.Count - 1;
         //    Link element = links[i];
@@ -753,7 +753,7 @@ namespace NetLibrary
         //    return element;
         //}
 
-        static public Link FromList(List<Link> links)
+        public static Link FromList(List<Link> links)
         {
             int i = links.Count - 1;
             Link element = links[i];
@@ -765,7 +765,7 @@ namespace NetLibrary
             return element;
         }
 
-        static public Link FromList(Link[] links)
+        public static Link FromList(Link[] links)
         {
             int i = links.Length - 1;
             Link element = links[i];

@@ -42,8 +42,8 @@ namespace ConsoleTester
         //    Link text = Link.Create(Link.Itself, Net.IsA, Net.Text);
         //    if (_state.ResultSequence != null)
         //    {
-                
-                
+
+
         //    }
         //    else
         //    {

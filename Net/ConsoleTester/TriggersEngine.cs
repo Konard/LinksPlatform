@@ -1,6 +1,6 @@
 ﻿namespace ConsoleTester
 {
-	class TriggersEngine
-	{
-	}
+    class TriggersEngine
+    {
+    }
 }

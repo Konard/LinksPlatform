@@ -32,87 +32,87 @@ namespace NetLibrary
     {
         // TODO: Заменить на очередь событий, по примеру Node.js (+сделать выключаемым)
         public delegate void CreatedDelegate(LinkDefinition createdLink);
-        static public event CreatedDelegate CreatedEvent = (createdLink) => { };
+        public static event CreatedDelegate CreatedEvent = (createdLink) => { };
 
         public delegate void UpdatedDelegate(LinkDefinition linkBeforeUpdate, LinkDefinition linkAfterUpdate);
-        static public event UpdatedDelegate UpdatedEvent = (linkBeforeUpdate, linkAfterUpdate) => { };
+        public static event UpdatedDelegate UpdatedEvent = (linkBeforeUpdate, linkAfterUpdate) => { };
 
         public delegate void DeletedDelegate(LinkDefinition deletedLink);
-        static public event DeletedDelegate DeletedEvent = (deletedLink) => { };
+        public static event DeletedDelegate DeletedEvent = (deletedLink) => { };
 
         #region Low Level
 
         #region Basic Operations
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetSourceIndex(LinkIndex link);
+        private static extern LinkIndex GetSourceIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetLinkerIndex(LinkIndex link);
+        private static extern LinkIndex GetLinkerIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetTargetIndex(LinkIndex link);
+        private static extern LinkIndex GetTargetIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetFirstRefererBySourceIndex(LinkIndex link);
+        private static extern LinkIndex GetFirstRefererBySourceIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetFirstRefererByLinkerIndex(LinkIndex link);
+        private static extern LinkIndex GetFirstRefererByLinkerIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetFirstRefererByTargetIndex(LinkIndex link);
+        private static extern LinkIndex GetFirstRefererByTargetIndex(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern Int GetTime(LinkIndex link);
+        private static extern Int GetTime(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex CreateLink(LinkIndex source, LinkIndex linker, LinkIndex target);
+        private static extern LinkIndex CreateLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex UpdateLink(LinkIndex link, LinkIndex newSource, LinkIndex newLinker, LinkIndex newTarget);
+        private static extern LinkIndex UpdateLink(LinkIndex link, LinkIndex newSource, LinkIndex newLinker, LinkIndex newTarget);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void DeleteLink(LinkIndex link);
+        private static extern void DeleteLink(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex ReplaceLink(LinkIndex link, LinkIndex replacement);
+        private static extern LinkIndex ReplaceLink(LinkIndex link, LinkIndex replacement);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex SearchLink(LinkIndex source, LinkIndex linker, LinkIndex target);
+        private static extern LinkIndex SearchLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern LinkIndex GetMappedLink(Int mappedIndex);
+        private static extern LinkIndex GetMappedLink(Int mappedIndex);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void SetMappedLink(Int mappedIndex, LinkIndex linkIndex);
+        private static extern void SetMappedLink(Int mappedIndex, LinkIndex linkIndex);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void InitPersistentMemoryManager();
+        private static extern void InitPersistentMemoryManager();
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern Int OpenStorageFile(string filename);
+        private static extern Int OpenStorageFile(string filename);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern Int CloseStorageFile();
+        private static extern Int CloseStorageFile();
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern Int SetStorageFileMemoryMapping();
+        private static extern Int SetStorageFileMemoryMapping();
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern Int ResetStorageFileMemoryMapping();
+        private static extern Int ResetStorageFileMemoryMapping();
 
         #endregion
 
         #region Referers Count Selectors
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern UInt GetLinkNumberOfReferersBySource(LinkIndex link);
+        private static extern UInt GetLinkNumberOfReferersBySource(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern UInt GetLinkNumberOfReferersByLinker(LinkIndex link);
+        private static extern UInt GetLinkNumberOfReferersByLinker(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern UInt GetLinkNumberOfReferersByTarget(LinkIndex link);
+        private static extern UInt GetLinkNumberOfReferersByTarget(LinkIndex link);
 
         #endregion
 
@@ -122,28 +122,28 @@ namespace NetLibrary
         private delegate Int StopableVisitor(LinkIndex link);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void WalkThroughAllReferersBySource(LinkIndex root, Visitor action);
+        private static extern void WalkThroughAllReferersBySource(LinkIndex root, Visitor action);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern int WalkThroughReferersBySource(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersBySource(LinkIndex root, StopableVisitor func);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void WalkThroughAllReferersByLinker(LinkIndex root, Visitor action);
+        private static extern void WalkThroughAllReferersByLinker(LinkIndex root, Visitor action);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern int WalkThroughReferersByLinker(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersByLinker(LinkIndex root, StopableVisitor func);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void WalkThroughAllReferersByTarget(LinkIndex root, Visitor action);
+        private static extern void WalkThroughAllReferersByTarget(LinkIndex root, Visitor action);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern int WalkThroughReferersByTarget(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersByTarget(LinkIndex root, StopableVisitor func);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern void WalkThroughAllLinks(Visitor action);
+        private static extern void WalkThroughAllLinks(Visitor action);
 
         [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        static private extern int WalkThroughLinks(StopableVisitor func);
+        private static extern int WalkThroughLinks(StopableVisitor func);
 
         #endregion
 
@@ -151,16 +151,17 @@ namespace NetLibrary
 
         #region Constains
 
-        static public readonly Link Itself = null;
-        static public readonly bool Continue = true;
-        static public readonly bool Stop = false;
+        public static readonly Link Itself = null;
+        public static readonly bool Continue = true;
+        public static readonly bool Stop = false;
 
         #endregion
 
         #region Static Fields
 
-        static private bool MemoryManagerIsReady = false;
-        static private readonly Dictionary<LinkIndex, Int> LinkToMappingIndex = new Dictionary<LinkIndex, Int>();
+        private static readonly object LockObject = new object();
+        private static bool MemoryManagerIsReady = false;
+        private static readonly Dictionary<LinkIndex, Int> LinkToMappingIndex = new Dictionary<LinkIndex, Int>();
 
         #endregion
 
@@ -215,83 +216,97 @@ namespace NetLibrary
             _link = link;
         }
 
-        static public void StartMemoryManager(string storageFilename)
+        public static void StartMemoryManager(string storageFilename)
         {
-            InitPersistentMemoryManager();
-            if (OpenStorageFile(storageFilename) == 0)
-                throw new Exception("Файл хранилища с указанным именем не может быть открыт.");
-            if (SetStorageFileMemoryMapping() == 0)
-                throw new Exception(string.Format("Файл ({0}) хранилища не удалось отразить на оперативную память.", storageFilename));
+            lock (LockObject)
+            {
+                if (!MemoryManagerIsReady)
+                {
+                    InitPersistentMemoryManager();
+                    if (OpenStorageFile(storageFilename) == 0)
+                        throw new Exception("Файл хранилища с указанным именем не может быть открыт.");
+                    if (SetStorageFileMemoryMapping() == 0)
+                        throw new Exception(string.Format(
+                            "Файл ({0}) хранилища не удалось отразить на оперативную память.", storageFilename));
 
-            MemoryManagerIsReady = true;
+                    MemoryManagerIsReady = true;
+                }
+            }
         }
 
-        static public void StopMemoryManager()
+        public static void StopMemoryManager()
         {
-            if (ResetStorageFileMemoryMapping() == 0)
-                throw new Exception("Отображение файла хранилища на оперативную память не удалось снять.");
-            if (CloseStorageFile() == 0)
-                throw new Exception("Файл хранилища не удалось закрыть, возможно он был уже закрыт, или не открывался вовсе.");
+            lock (LockObject)
+            {
+                if (MemoryManagerIsReady)
+                {
+                    if (ResetStorageFileMemoryMapping() == 0)
+                        throw new Exception("Отображение файла хранилища на оперативную память не удалось снять.");
+                    if (CloseStorageFile() == 0)
+                        throw new Exception(
+                            "Файл хранилища не удалось закрыть, возможно он был уже закрыт, или не открывался вовсе.");
 
-            MemoryManagerIsReady = false;
+                    MemoryManagerIsReady = false;
+                }
+            }
         }
 
-        static public implicit operator UInt?(Link link)
+        public static implicit operator UInt?(Link link)
         {
             return link._link == 0 ? (UInt?)null : link._link;
         }
 
-        static public implicit operator Link(UInt? link)
+        public static implicit operator Link(UInt? link)
         {
             return new Link(link == null ? 0 : (LinkIndex)link);
         }
 
-        static public implicit operator Int(Link link)
+        public static implicit operator Int(Link link)
         {
             return (Int)link._link;
         }
 
-        static public implicit operator Link(Int link)
+        public static implicit operator Link(Int link)
         {
             return new Link((LinkIndex)link);
         }
 
-        static public implicit operator LinkIndex(Link link)
+        public static implicit operator LinkIndex(Link link)
         {
             return link._link;
         }
 
-        static public implicit operator Link(LinkIndex link)
+        public static implicit operator Link(LinkIndex link)
         {
             return new Link(link);
         }
 
-        static public explicit operator Link(List<Link> links)
+        public static explicit operator Link(List<Link> links)
         {
             return LinkConverter.FromList(links);
         }
 
-        static public explicit operator Link(Link[] links)
+        public static explicit operator Link(Link[] links)
         {
             return LinkConverter.FromList(links);
         }
 
-        static public explicit operator Link(string @string)
+        public static explicit operator Link(string @string)
         {
             return LinkConverter.FromString(@string);
         }
 
-        static public bool operator ==(Link first, Link second)
+        public static bool operator ==(Link first, Link second)
         {
             return first.Equals(second);
         }
 
-        static public bool operator !=(Link first, Link second)
+        public static bool operator !=(Link first, Link second)
         {
             return !first.Equals(second);
         }
 
-        static public Link operator &(Link first, Link second)
+        public static Link operator &(Link first, Link second)
         {
             return Create(first, Net.And, second);
         }
@@ -311,12 +326,12 @@ namespace NetLibrary
             return base.GetHashCode();
         }
 
-        static private bool LinkDoesNotExist(LinkIndex link)
+        private static bool LinkDoesNotExist(LinkIndex link)
         {
             return link == 0 || GetLinkerIndex(link) == 0;
         }
 
-        static private bool LinkWasDeleted(LinkIndex link)
+        private static bool LinkWasDeleted(LinkIndex link)
         {
             return link != 0 && GetLinkerIndex(link) == 0;
         }
@@ -342,7 +357,7 @@ namespace NetLibrary
 
         #region Basic Operations
 
-        static public Link Create(Link source, Link linker, Link target)
+        public static Link Create(Link source, Link linker, Link target)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -366,7 +381,7 @@ namespace NetLibrary
             return Restore((LinkIndex)index);
         }
 
-        static public Link Restore(LinkIndex index)
+        public static Link Restore(LinkIndex index)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -387,12 +402,12 @@ namespace NetLibrary
             }
         }
 
-        static public Link CreateMapped(Link source, Link linker, Link target, object mappingIndex)
+        public static Link CreateMapped(Link source, Link linker, Link target, object mappingIndex)
         {
             return CreateMapped(source, linker, target, Convert.ToInt64(mappingIndex));
         }
 
-        static public Link CreateMapped(Link source, Link linker, Link target, Int mappingIndex)
+        public static Link CreateMapped(Link source, Link linker, Link target, Int mappingIndex)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -417,7 +432,7 @@ namespace NetLibrary
             return mappedLink;
         }
 
-        static public bool TrySetMapped(Link link, Int mappingIndex, bool rewrite = false)
+        public static bool TrySetMapped(Link link, Int mappingIndex, bool rewrite = false)
         {
             Link mappedLink = GetMappedLink(mappingIndex);
 
@@ -439,12 +454,12 @@ namespace NetLibrary
             return true;
         }
 
-        static public Link GetMapped(object mappingIndex)
+        public static Link GetMapped(object mappingIndex)
         {
             return GetMapped(Convert.ToInt64(mappingIndex));
         }
 
-        static public Link GetMapped(Int mappingIndex)
+        public static Link GetMapped(Int mappingIndex)
         {
             Link mappedLink;
             if (!TryGetMapped(mappingIndex, out mappedLink))
@@ -452,12 +467,12 @@ namespace NetLibrary
             return mappedLink;
         }
 
-        static public bool TryGetMapped(object mappingIndex, out Link mappedLink)
+        public static bool TryGetMapped(object mappingIndex, out Link mappedLink)
         {
             return TryGetMapped(Convert.ToInt64(mappingIndex), out mappedLink);
         }
 
-        static public bool TryGetMapped(Int mappingIndex, out Link mappedLink)
+        public static bool TryGetMapped(Int mappingIndex, out Link mappedLink)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -468,7 +483,7 @@ namespace NetLibrary
             return mappedLink != null;
         }
 
-        static public void Update(ref Link link, Link newSource, Link newLinker, Link newTarget)
+        public static void Update(ref Link link, Link newSource, Link newLinker, Link newTarget)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -497,7 +512,7 @@ namespace NetLibrary
             UpdatedEvent(previousDefinition, new LinkDefinition(link));
         }
 
-        static public void Delete(ref Link link)
+        public static void Delete(ref Link link)
         {
             if (LinkDoesNotExist(link))
                 return;
@@ -518,7 +533,7 @@ namespace NetLibrary
             DeletedEvent(previousDefinition);
         }
 
-        //static public void Replace(ref Link link, Link replacement)
+        //public static void Replace(ref Link link, Link replacement)
         //{
         //    if (!MemoryManagerIsReady)
         //        throw new Exception("Менеджер памяти ещё не готов.");
@@ -530,7 +545,7 @@ namespace NetLibrary
         //    link = ReplaceLink(link, replacement);
         //}
 
-        static public Link Search(Link source, Link linker, Link target)
+        public static Link Search(Link source, Link linker, Link target)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -539,7 +554,7 @@ namespace NetLibrary
             return SearchLink(source, linker, target);
         }
 
-        static public bool Exists(Link source, Link linker, Link target)
+        public static bool Exists(Link source, Link linker, Link target)
         {
             return SearchLink(source, linker, target) != 0;
         }
@@ -680,12 +695,12 @@ namespace NetLibrary
             WalkThroughReferersByTarget(this, wrapper);
         }
 
-        static public bool WalkThroughAllLinks(Func<Link, bool> walker)
+        public static bool WalkThroughAllLinks(Func<Link, bool> walker)
         {
             return WalkThroughLinks(x => walker(x) ? 1 : 0) != 0;
         }
 
-        static public void WalkThroughAllLinks(Action<Link> walker)
+        public static void WalkThroughAllLinks(Action<Link> walker)
         {
             WalkThroughAllLinks(new Visitor(x => walker(x)));
         }

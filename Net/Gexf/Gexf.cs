@@ -36,7 +36,7 @@ namespace Gexf
             WriteXml(writer, writeGraph, Version);
         }
 
-        static public void WriteXml(XmlWriter writer, Action writeGraph, string version = CurrentVersion)
+        public static void WriteXml(XmlWriter writer, Action writeGraph, string version = CurrentVersion)
         {
             writer.WriteStartDocument();
             writer.WriteStartElement(ElementName, Namespace);

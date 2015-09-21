@@ -6,7 +6,7 @@
 
     public class TextSearchTest
     {
-        static public void Run()
+        public static void Run()
         {
             List<Artist> artists = new List<Artist>();
 
@@ -57,7 +57,7 @@
 
         public class Artist
         {
-            static public readonly Link Link;
+            public static readonly Link Link;
 
             static Artist()
             {
@@ -78,7 +78,7 @@
                         (Link)this.Tracks.Select(x => x.ToLink()).ToList())); // Будет работать только есть как минимум один трек.
             }
 
-            static public Artist FromLink(Link link)
+            public static Artist FromLink(Link link)
             {
                 if (IsArtistLink(link))
                 {
@@ -98,7 +98,7 @@
                 }
             }
 
-            static public bool IsArtistLink(Link link)
+            public static bool IsArtistLink(Link link)
             {
                 return link.Source == Artist.Link
                     && link.Linker == Net.WhoHas
@@ -108,7 +108,7 @@
 
         public class Track
         {
-            static public readonly Link Link;
+            public static readonly Link Link;
 
             static Track()
             {
@@ -127,7 +127,7 @@
                     Link.Create(Net.Name, Net.ConsistsOf, (Link)this.Name));
             }
 
-            static public Track FromLink(Link link)
+            public static Track FromLink(Link link)
             {
                 if (IsTrackLink(link))
                 {
@@ -145,16 +145,16 @@
                 }
             }
 
-            static public bool IsTrackLink(Link link)
+            public static bool IsTrackLink(Link link)
             {
                 return link.Source == Track.Link
                     && link.Linker == Net.WhichHas;
             }
         }
 
-        static private Random r = new Random();
+        private static Random r = new Random();
 
-        static private Artist GenerateArtist()
+        private static Artist GenerateArtist()
         {
             var artist = new Artist();
 
@@ -173,7 +173,7 @@
             return artist;
         }
 
-        static private string GenerateString()
+        private static string GenerateString()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -191,7 +191,7 @@
             return sb.ToString();
         }
 
-        static private string GenerateWord()
+        private static string GenerateWord()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -207,9 +207,9 @@
             return sb.ToString();
         }
 
-        static public readonly int[] PowersOfTwo = CreatePowersOfTwo();
+        public static readonly int[] PowersOfTwo = CreatePowersOfTwo();
 
-        static public int[] CreatePowersOfTwo()
+        public static int[] CreatePowersOfTwo()
         {
             int[] result = new int[32];
             for (int i = 0; i < 32; i++)
@@ -218,7 +218,7 @@
         }
 
 
-        static public List<Artist> Search(string request, bool useArtistName)
+        public static List<Artist> Search(string request, bool useArtistName)
         {
             string[] words = request.Split(' ');
 
@@ -257,14 +257,14 @@
             return result;
         }
 
-        static private List<Link> GetStringsWithSubstring(Link substring)
+        private static List<Link> GetStringsWithSubstring(Link substring)
         {
             List<Link> result = new List<Link>();
             substring.WalkThroughReferersByTarget(referer => StringsBySubstringCollector(referer, result));
             return result;
         }
 
-        static private void StringsBySubstringCollector(Link currentLink, List<Link> collection)
+        private static void StringsBySubstringCollector(Link currentLink, List<Link> collection)
         {
             if (currentLink.IsString())
             {
@@ -277,7 +277,7 @@
             }
         }
 
-        static private List<Link> GetArtistsWithString(Link @string)
+        private static List<Link> GetArtistsWithString(Link @string)
         {
             HashSet<Link> result = new HashSet<Link>();
             @string.WalkThroughReferersByTarget(referer => ArtistsByStringCollector(referer, result));
@@ -285,7 +285,7 @@
         }
 
         // TODO: Доделать функцию поиска артиста по строке названия
-        static private void ArtistsByStringCollector(Link currentLink, HashSet<Link> storage)
+        private static void ArtistsByStringCollector(Link currentLink, HashSet<Link> storage)
         {
             if (Artist.IsArtistLink(currentLink))
             {
@@ -303,14 +303,14 @@
             }
         }
 
-        static private List<Link> GetSubstringsWith(string word)
+        private static List<Link> GetSubstringsWith(string word)
         {
             List<Link> charLinks = word.Select(x => LinkConverter.FromChar(x)).ToList();
 
             return SequenceHelpers.CollectMatchingSequences(charLinks);
         }
 
-        static public List<Artist> Search(List<Artist> source, string request, bool useArtistName)
+        public static List<Artist> Search(List<Artist> source, string request, bool useArtistName)
         {
             string[] words = request.Split(' ');
 
@@ -331,7 +331,7 @@
             return result;
         }
 
-        static public bool MatchArtist(Artist artist, string[] words, int mask, bool useArtistName)
+        public static bool MatchArtist(Artist artist, string[] words, int mask, bool useArtistName)
         {
             int matchedWords = 0;
 
@@ -354,7 +354,7 @@
             return false;
         }
 
-        static public void MatchWords(ref int matchedWords, string str, string[] words, int mask)
+        public static void MatchWords(ref int matchedWords, string str, string[] words, int mask)
         {
             for (int i = words.Length - 1; i >= 0; i--)
             {

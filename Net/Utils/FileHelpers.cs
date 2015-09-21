@@ -2,9 +2,9 @@
 
 namespace Utils
 {
-    static public class FileHelpers
+    public static class FileHelpers
     {
-        static public char[] ReadAllChars(string path)
+        public static char[] ReadAllChars(string path)
         {
             return File.ReadAllText(path).ToCharArray();
         }

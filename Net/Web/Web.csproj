@@ -223,7 +223,9 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /y "$(SolutionDir)x64\Debug\Core.dll" "$(TargetDir)"</PreBuildEvent>
+    <PreBuildEvent>xcopy /y "$(SolutionDir)x64\Debug\Core.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)x64\Debug\Core.pdb" "$(TargetDir)"
+</PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
        Other similar extension points exist, see Microsoft.Common.targets.

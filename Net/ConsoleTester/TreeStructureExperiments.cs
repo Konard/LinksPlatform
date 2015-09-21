@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace ConsoleTester
 {
-    static public class TreeStructureExperiments
+    public static class TreeStructureExperiments
     {
         class TreeNode
         {
@@ -62,7 +62,7 @@ namespace ConsoleTester
             }
         }
 
-        static private void LeftRotate(ref TreeNode root)
+        private static void LeftRotate(ref TreeNode root)
         {
             TreeNode newRoot = root.Right;
             if (newRoot == null) return;
@@ -73,7 +73,7 @@ namespace ConsoleTester
             root = newRoot;
         }
 
-        static private void RightRotate(ref TreeNode root)
+        private static void RightRotate(ref TreeNode root)
         {
             TreeNode newRoot = root.Left;
             if (newRoot == null) return;
@@ -86,7 +86,7 @@ namespace ConsoleTester
 
         // Добавление элемента "не безопасное", так как функция расчитывает на то, что элемент действительно не существует в дереве
         // Мне такой реализации будет достаточно.
-        static private void UnsafeInsert(ref TreeNode treeRoot, int value, TreeNode leftThread = null, TreeNode rightThread = null)
+        private static void UnsafeInsert(ref TreeNode treeRoot, int value, TreeNode leftThread = null, TreeNode rightThread = null)
         {
             // Используется для отладки
             if (!treeRoot.Validate())
@@ -179,19 +179,19 @@ namespace ConsoleTester
             }
         }
 
-        static private bool IsRightThreaded(TreeNode node)
+        private static bool IsRightThreaded(TreeNode node)
         {
             return node.Right == null || node.Size <= node.Right.Size;
         }
 
-        static private bool IsLeftThreaded(TreeNode node)
+        private static bool IsLeftThreaded(TreeNode node)
         {
             return node.Left == null || node.Size <= node.Left.Size;
         }
 
         // Удаление элемента "не безопасное", так как функция расчитывает на то, что элемент действительно существует в дереве
         // Мне такой реализации будет достаточно.
-        //static private void UnsafeRemove(ref TreeNode treeRoot, int value)
+        //private static void UnsafeRemove(ref TreeNode treeRoot, int value)
         //{
         //    if (value > treeRoot.Value)
         //    {
@@ -311,7 +311,7 @@ namespace ConsoleTester
         //    }
         //}
 
-        static private TreeNode Search(TreeNode treeRoot, int value)
+        private static TreeNode Search(TreeNode treeRoot, int value)
         {
             TreeNode currentNode = treeRoot;
 
@@ -332,21 +332,21 @@ namespace ConsoleTester
             }
         }
 
-        static private TreeNode GetFirstNode(TreeNode treeRoot)
+        private static TreeNode GetFirstNode(TreeNode treeRoot)
         {
             TreeNode currentNode = treeRoot;
             while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size) currentNode = currentNode.Left;
             return currentNode;
         }
 
-        static private TreeNode GetLastNode(TreeNode treeRoot)
+        private static TreeNode GetLastNode(TreeNode treeRoot)
         {
             TreeNode currentNode = treeRoot;
             while (currentNode.Right != null && currentNode.Size >= currentNode.Right.Size) currentNode = currentNode.Right;
             return currentNode;
         }
 
-        static private TreeNode GetNextNode(TreeNode currentNode)
+        private static TreeNode GetNextNode(TreeNode currentNode)
         {
             if (currentNode.Right != null)
             {
@@ -367,7 +367,7 @@ namespace ConsoleTester
             }
         }
 
-        static private void Travel(TreeNode treeRoot, Action<int> action)
+        private static void Travel(TreeNode treeRoot, Action<int> action)
         {
             TreeNode currentNode = GetFirstNode(treeRoot);
 
@@ -379,7 +379,7 @@ namespace ConsoleTester
             }
         }
 
-        static private IEnumerable<int> GetNodesEnumerator(TreeNode treeRoot)
+        private static IEnumerable<int> GetNodesEnumerator(TreeNode treeRoot)
         {
             TreeNode currentNode = GetFirstNode(treeRoot);
 
@@ -391,39 +391,39 @@ namespace ConsoleTester
             }
         }
 
-        static public void RunExperiment()
+        public static void RunExperiment()
         {
             int seed = 0;
 
             //for (; seed < 10000; seed++)
             //{
-                Random rnd = new Random(seed);
+            Random rnd = new Random(seed);
 
-                // Fill the tree
+            // Fill the tree
 
-                TreeNode treeRoot = new TreeNode()
-                {
-                    Size = 1,
-                    Value = rnd.Next(1000)
-                };
+            TreeNode treeRoot = new TreeNode()
+            {
+                Size = 1,
+                Value = rnd.Next(1000)
+            };
 
-                for (int i = 0; i < 128; i++)
-                {
-                    int value = rnd.Next(1000);
+            for (int i = 0; i < 128; i++)
+            {
+                int value = rnd.Next(1000);
 
-                    if (Search(treeRoot, value) == null)
-                        UnsafeInsert(ref treeRoot, value);
-                    //else
-                    //    UnsafeRemove(ref treeRoot, value);
-                }
+                if (Search(treeRoot, value) == null)
+                    UnsafeInsert(ref treeRoot, value);
+                //else
+                //    UnsafeRemove(ref treeRoot, value);
+            }
 
-                //Console.WriteLine(seed);
+            //Console.WriteLine(seed);
 
 
-                Travel(treeRoot, (value) =>
-                {
-                    Console.WriteLine(value);
-                });
+            Travel(treeRoot, (value) =>
+            {
+                Console.WriteLine(value);
+            });
 
             //}
         }

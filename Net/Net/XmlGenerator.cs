@@ -6,13 +6,13 @@ using System.Xml;
 
 namespace NetLibrary
 {
-    static public class XmlGenerator
+    public static class XmlGenerator
     {
         private const string SourceLabel = "Source";
         private const string LinkerLabel = "Linker";
         private const string TargetLabel = "Target";
 
-        static private HashSet<Link> CollectLinks(Func<Link, bool> linkMatch)
+        private static HashSet<Link> CollectLinks(Func<Link, bool> linkMatch)
         {
             var matchingLinks = new HashSet<Link>();
 
@@ -27,7 +27,7 @@ namespace NetLibrary
             return matchingLinks;
         }
 
-        static private HashSet<Link> CollectLinks()
+        private static HashSet<Link> CollectLinks()
         {
             var matchingLinks = new HashSet<Link>();
 
@@ -36,7 +36,7 @@ namespace NetLibrary
             return matchingLinks;
         }
 
-        static public string ToXml()
+        public static string ToXml()
         {
             var matchingLinks = CollectLinks();
 
@@ -48,7 +48,7 @@ namespace NetLibrary
             return sb.ToString();
         }
 
-        static public void ToFile(string path)
+        public static void ToFile(string path)
         {
             var matchingLinks = CollectLinks();
 
@@ -62,7 +62,7 @@ namespace NetLibrary
             Console.WriteLine("File write finished.");
         }
 
-        static public void ToFile(string path, Func<Link, bool> filter)
+        public static void ToFile(string path, Func<Link, bool> filter)
         {
             var matchingLinks = CollectLinks(filter);
 
@@ -76,7 +76,7 @@ namespace NetLibrary
             Console.WriteLine("File write finished");
         }
 
-        static private void WriteXml(XmlWriter writer, HashSet<Link> matchingLinks)
+        private static void WriteXml(XmlWriter writer, HashSet<Link> matchingLinks)
         {
             int edgesCounter = 0;
 

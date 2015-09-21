@@ -3,13 +3,13 @@ using System.Collections.Generic;
 
 namespace NetLibrary
 {
-    static public class CharacterHelpers
+    public static class CharacterHelpers
     {
-		public enum CharacterMapping : long
-		{
-			LatinAlphabet = 100,
-			CyrillicAlphabet
-		}
+        public enum CharacterMapping : long
+        {
+            LatinAlphabet = 100,
+            CyrillicAlphabet
+        }
 
         const char FirstLowerСaseLatinLetter = 'a';
         const char LastLowerСaseLatinLetter = 'z';
@@ -23,26 +23,52 @@ namespace NetLibrary
         const char YoLowerCaseCyrillicLetter = 'ё';
         const char YoUpperCaseCyrillicLetter = 'Ё';
 
-        static private Link[] CharactersToLinks;
-        static private Dictionary<Link, char> LinksToCharacters;
+        private static Link[] CharactersToLinks;
+        private static Dictionary<Link, char> LinksToCharacters;
 
         static CharacterHelpers()
         {
             Create();
         }
 
-        static private void Create()
+        private static void Create()
         {
             CharactersToLinks = new Link[char.MaxValue];
             LinksToCharacters = new Dictionary<Link, char>();
+
+            // Create or restore characters
+            CreateLatinAlphabet();
+            CreateCyrillicAlphabet();
+
+            RegisterExistingCharacters();
         }
 
-        static public void Recreate()
+        private static void RegisterExistingCharacters()
+        {
+            Net.Character.WalkThroughReferersBySource(referer => RegisterExistingCharacter(referer));
+        }
+
+        private static void RegisterExistingCharacter(Link character)
+        {
+            if (character.Source == Net.Character && character.Linker == Net.ThatHas)
+            {
+                Link code = character.Target;
+                if (code.Source == Net.Code && code.Linker == Net.ThatIsRepresentedBy)
+                {
+                    var charCode = (char)LinkConverter.ToNumber(code.Target);
+
+                    CharactersToLinks[charCode] = character;
+                    LinksToCharacters[character] = charCode;
+                }
+            }
+        }
+
+        public static void Recreate()
         {
             Create();
         }
 
-        static private void CreateLatinAlphabet()
+        private static void CreateLatinAlphabet()
         {
             char[] lettersCharacters = new char[]
             {
@@ -50,11 +76,11 @@ namespace NetLibrary
                 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
                 'u', 'v', 'w', 'x', 'y', 'z'
             };
-            
+
             CreateAlphabet(lettersCharacters, "latin alphabet", CharacterMapping.LatinAlphabet);
         }
 
-        static private void CreateCyrillicAlphabet()
+        private static void CreateCyrillicAlphabet()
         {
             char[] lettersCharacters = new char[]
             {
@@ -67,90 +93,90 @@ namespace NetLibrary
             CreateAlphabet(lettersCharacters, "cyrillic alphabet", CharacterMapping.CyrillicAlphabet);
         }
 
-        static private void CreateAlphabet(char[] lettersCharacters, string alphabetName, CharacterMapping mapping)
+        private static void CreateAlphabet(char[] lettersCharacters, string alphabetName, CharacterMapping mapping)
         {
             Link alphabet;
-			if(Link.TryGetMapped(mapping, out alphabet))
-			{
-				Link letters = alphabet.Target;
+            if (Link.TryGetMapped(mapping, out alphabet))
+            {
+                Link letters = alphabet.Target;
 
-				letters.WalkThroughSequence(letter =>
-				{
-					Link lowerCaseLetter = Link.Search(Net.LowerCase, Net.Of, letter);
-					Link upperCaseLetter = Link.Search(Net.UpperCase, Net.Of, letter);
+                letters.WalkThroughSequence(letter =>
+                {
+                    Link lowerCaseLetter = Link.Search(Net.LowerCase, Net.Of, letter);
+                    Link upperCaseLetter = Link.Search(Net.UpperCase, Net.Of, letter);
 
-					if (lowerCaseLetter != null && upperCaseLetter != null)
-					{
-						RegisterExistingLetter(lowerCaseLetter);
-						RegisterExistingLetter(upperCaseLetter);
-					}
-					else
-					{
-						RegisterExistingLetter(letter);
-					}
-				});
-			}
-			else
-			{
-				alphabet = Net.CreateMappedThing(mapping);
-				Link letterOfAlphabet = Link.Create(Net.Letter, Net.Of, alphabet);
-				Link[] lettersLinks = new Link[lettersCharacters.Length];
+                    if (lowerCaseLetter != null && upperCaseLetter != null)
+                    {
+                        RegisterExistingLetter(lowerCaseLetter);
+                        RegisterExistingLetter(upperCaseLetter);
+                    }
+                    else
+                    {
+                        RegisterExistingLetter(letter);
+                    }
+                });
+            }
+            else
+            {
+                alphabet = Net.CreateMappedThing(mapping);
+                Link letterOfAlphabet = Link.Create(Net.Letter, Net.Of, alphabet);
+                Link[] lettersLinks = new Link[lettersCharacters.Length];
 
-				GenerateAlphabetBasis(ref alphabet, ref letterOfAlphabet, lettersLinks);
+                GenerateAlphabetBasis(ref alphabet, ref letterOfAlphabet, lettersLinks);
 
-				for (int i = 0; i < lettersCharacters.Length; i++)
-				{
-					char lowerCaseCharacter = lettersCharacters[i];
-					Link lowerCaseLink, upperCaseLink;
-					SetLetterCodes(lettersLinks[i], lowerCaseCharacter, out lowerCaseLink, out upperCaseLink);
+                for (int i = 0; i < lettersCharacters.Length; i++)
+                {
+                    char lowerCaseCharacter = lettersCharacters[i];
+                    Link lowerCaseLink, upperCaseLink;
+                    SetLetterCodes(lettersLinks[i], lowerCaseCharacter, out lowerCaseLink, out upperCaseLink);
 
-					CharactersToLinks[lowerCaseCharacter] = lowerCaseLink;
-					LinksToCharacters[lowerCaseLink] = lowerCaseCharacter;
+                    CharactersToLinks[lowerCaseCharacter] = lowerCaseLink;
+                    LinksToCharacters[lowerCaseLink] = lowerCaseCharacter;
 
-					if (upperCaseLink != null)
-					{
-						char upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
-						CharactersToLinks[upperCaseCharacter] = upperCaseLink;
-						LinksToCharacters[upperCaseLink] = upperCaseCharacter;
-					}
-				}
+                    if (upperCaseLink != null)
+                    {
+                        char upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
+                        CharactersToLinks[upperCaseCharacter] = upperCaseLink;
+                        LinksToCharacters[upperCaseLink] = upperCaseCharacter;
+                    }
+                }
 
-				alphabet.SetName(alphabetName);
+                alphabet.SetName(alphabetName);
 
-				for (int i = 0; i < lettersCharacters.Length; i++)
-				{
-					char lowerCaseCharacter = lettersCharacters[i];
-					char upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
+                for (int i = 0; i < lettersCharacters.Length; i++)
+                {
+                    char lowerCaseCharacter = lettersCharacters[i];
+                    char upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
 
-					if (lowerCaseCharacter != upperCaseCharacter)
-					{
-						lettersLinks[i].SetName("{" + upperCaseCharacter + " " + lowerCaseCharacter + "}");
-					}
-					else
-					{
-						lettersLinks[i].SetName("{" + lowerCaseCharacter + "}");
-					}
-				}
-			}
+                    if (lowerCaseCharacter != upperCaseCharacter)
+                    {
+                        lettersLinks[i].SetName("{" + upperCaseCharacter + " " + lowerCaseCharacter + "}");
+                    }
+                    else
+                    {
+                        lettersLinks[i].SetName("{" + lowerCaseCharacter + "}");
+                    }
+                }
+            }
         }
 
-		private static void RegisterExistingLetter(Link letter)
-		{
-			letter.WalkThroughReferersBySource(referer =>
-				{
-					if (referer.Linker == Net.Has)
-					{
-						Link target = referer.Target;
-						if (target.Source == Net.Code && target.Linker == Net.ThatIsRepresentedBy)
-						{
-							char charCode = (char) LinkConverter.ToNumber(target.Target);
+        private static void RegisterExistingLetter(Link letter)
+        {
+            letter.WalkThroughReferersBySource(referer =>
+                {
+                    if (referer.Linker == Net.Has)
+                    {
+                        Link target = referer.Target;
+                        if (target.Source == Net.Code && target.Linker == Net.ThatIsRepresentedBy)
+                        {
+                            char charCode = (char)LinkConverter.ToNumber(target.Target);
 
-							CharactersToLinks[charCode] = letter;
-							LinksToCharacters[letter] = charCode;
-						}
-					}
-				});
-		}
+                            CharactersToLinks[charCode] = letter;
+                            LinksToCharacters[letter] = charCode;
+                        }
+                    }
+                });
+        }
 
         private static void GenerateAlphabetBasis(ref Link alphabet, ref Link letterOfAlphabet, Link[] letters)
         {
@@ -164,7 +190,7 @@ namespace NetLibrary
             //z: letter of latin alphabet that is after y.
 
             int firstLetterIndex = 0;
-            
+
             for (int i = firstLetterIndex; i < letters.Length; i++)
             {
                 letters[i] = Net.CreateThing();
@@ -173,18 +199,18 @@ namespace NetLibrary
             int lastLetterIndex = letters.Length - 1;
 
             Link.Update(ref letters[firstLetterIndex], letterOfAlphabet, Net.ThatIsBefore, letters[firstLetterIndex + 1]);
-			Link.Update(ref letters[lastLetterIndex], letterOfAlphabet, Net.ThatIsAfter, letters[lastLetterIndex - 1]);
+            Link.Update(ref letters[lastLetterIndex], letterOfAlphabet, Net.ThatIsAfter, letters[lastLetterIndex - 1]);
 
             int secondLetterIndex = firstLetterIndex + 1;
             for (int i = secondLetterIndex; i < lastLetterIndex; i++)
             {
-				Link.Update(ref letters[i], letterOfAlphabet, Net.ThatIsBetween, letters[i - 1] & letters[i + 1]);
+                Link.Update(ref letters[i], letterOfAlphabet, Net.ThatIsBetween, letters[i - 1] & letters[i + 1]);
             }
 
-			Link.Update(ref alphabet, Net.Alphabet, Net.ThatConsistsOf, LinkConverter.FromList(letters));
+            Link.Update(ref alphabet, Net.Alphabet, Net.ThatConsistsOf, LinkConverter.FromList(letters));
         }
 
-        static private void SetLetterCodes(Link letter, char lowerCaseCharacter, out Link lowerCase, out Link upperCase)
+        private static void SetLetterCodes(Link letter, char lowerCaseCharacter, out Link lowerCase, out Link upperCase)
         {
             char upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
 
@@ -208,25 +234,25 @@ namespace NetLibrary
             }
         }
 
-        static private Link CreateSimpleCharacterLink(char character)
+        private static Link CreateSimpleCharacterLink(char character)
         {
             return Link.Create(Net.Character, Net.ThatHas, Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(character)));
         }
 
-        static private bool IsLetterOfLatinAlphabet(char character)
+        private static bool IsLetterOfLatinAlphabet(char character)
         {
             return (character >= FirstLowerСaseLatinLetter && character <= LastLowerСaseLatinLetter)
                 || (character >= FirstUpperСaseLatinLetter && character <= LastUpperСaseLatinLetter);
         }
 
-        static private bool IsLetterOfCyrillicAlphabet(char character)
+        private static bool IsLetterOfCyrillicAlphabet(char character)
         {
             return (character >= FirstLowerCaseCyrillicLetter && character <= LastLowerCaseCyrillicLetter)
                 || (character >= FirstUpperCaseCyrillicLetter && character <= LastUpperCaseCyrillicLetter)
                 || character == YoLowerCaseCyrillicLetter || character == YoUpperCaseCyrillicLetter;
         }
 
-        static public Link FromChar(char character)
+        public static Link FromChar(char character)
         {
             if (CharactersToLinks[character] == null)
             {
@@ -254,7 +280,7 @@ namespace NetLibrary
             }
         }
 
-        static public char ToChar(Link link)
+        public static char ToChar(Link link)
         {
             char c;
             if (!LinksToCharacters.TryGetValue(link, out c))
@@ -264,7 +290,7 @@ namespace NetLibrary
             return c;
         }
 
-        static public bool IsChar(Link link)
+        public static bool IsChar(Link link)
         {
             return link != null && LinksToCharacters.ContainsKey(link);
         }

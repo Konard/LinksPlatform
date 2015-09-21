@@ -12,8 +12,8 @@ namespace CoreTests
     unsigned_integer isAVisitorCounter;
     unsigned_integer linkVisitorCounter;
 
-	TEST_CLASS(LinkTests)
-	{
+    TEST_CLASS(LinkTests)
+    {
     public:
         static void ThingVisitor(link_index linkIndex)
         {
@@ -29,7 +29,7 @@ namespace CoreTests
         {
             linkVisitorCounter += linkIndex;
         }
-	
+
         TEST_METHOD(CreateDeleteLinkTest)
         {
             char* filename = "db.links";
@@ -129,5 +129,5 @@ namespace CoreTests
 
             remove(filename);
         }
-	};
+    };
 }

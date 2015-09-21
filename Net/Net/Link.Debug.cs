@@ -41,8 +41,8 @@ namespace NetLibrary
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         private Int я_FC { get { return this == null ? 0 : ReferersByTargetCount; } }
 
-		[DebuggerDisplay(null, Name = "Timestamp")]
-		private DateTime я_H { get { return this == null ? DateTime.MinValue : Timestamp; } }
+        [DebuggerDisplay(null, Name = "Timestamp")]
+        private DateTime я_H { get { return this == null ? DateTime.MinValue : Timestamp; } }
 
         // ReSharper restore UnusedMember.Local
         // ReSharper restore InconsistentNaming

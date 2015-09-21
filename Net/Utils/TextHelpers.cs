@@ -2,7 +2,7 @@
 {
     public class TextHelpers
     {
-        static public string CapitalizeFirstLetter(string str)
+        public static string CapitalizeFirstLetter(string str)
         {
             if (string.IsNullOrWhiteSpace(str))
                 return str;

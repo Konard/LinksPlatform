@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace NetLibrary
 {
-    static public class LinkConverter
+    public static class LinkConverter
     {
-        static public Link FromList(List<Link> links)
+        public static Link FromList(List<Link> links)
         {
             int i = links.Count - 1;
             Link element = links[i];
@@ -13,7 +13,7 @@ namespace NetLibrary
             return element;
         }
 
-        static public Link FromList(Link[] links)
+        public static Link FromList(Link[] links)
         {
             int i = links.Length - 1;
             Link element = links[i];
@@ -21,7 +21,7 @@ namespace NetLibrary
             return element;
         }
 
-        static public List<Link> ToList(Link link)
+        public static List<Link> ToList(Link link)
         {
             var list = new List<Link>();
             var walker = new SequenceWalker(link, list.Add);
@@ -29,98 +29,98 @@ namespace NetLibrary
             return list;
         }
 
-        static public Link FromNumber(long number)
+        public static Link FromNumber(long number)
         {
             return NumberHelpers.FromNumber(number);
         }
 
-        static public long ToNumber(Link number)
+        public static long ToNumber(Link number)
         {
             return NumberHelpers.ToNumber(number);
         }
 
-        static public Link FromChar(char c)
+        public static Link FromChar(char c)
         {
             return CharacterHelpers.FromChar(c);
         }
 
-        static public char ToChar(Link charLink)
+        public static char ToChar(Link charLink)
         {
             return CharacterHelpers.ToChar(charLink);
         }
 
-        static public Link FromChars(char[] chars)
+        public static Link FromChars(char[] chars)
         {
             return FromObjectsToSequence(chars, FromChar);
         }
 
-        static public Link FromChars(char[] chars, int takeFrom, int takeUntil)
+        public static Link FromChars(char[] chars, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(chars, takeFrom, takeUntil, FromChar);
         }
 
-        static public Link FromNumbers(long[] numbers)
+        public static Link FromNumbers(long[] numbers)
         {
             return FromObjectsToSequence(numbers, FromNumber);
         }
 
-        static public Link FromNumbers(long[] numbers, int takeFrom, int takeUntil)
+        public static Link FromNumbers(long[] numbers, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(numbers, takeFrom, takeUntil, FromNumber);
         }
 
-        static public Link FromNumbers(ushort[] numbers)
+        public static Link FromNumbers(ushort[] numbers)
         {
             return FromObjectsToSequence(numbers, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(ushort[] numbers, int takeFrom, int takeUntil)
+        public static Link FromNumbers(ushort[] numbers, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(uint[] numbers)
+        public static Link FromNumbers(uint[] numbers)
         {
             return FromObjectsToSequence(numbers, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(uint[] numbers, int takeFrom, int takeUntil)
+        public static Link FromNumbers(uint[] numbers, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(byte[] numbers)
+        public static Link FromNumbers(byte[] numbers)
         {
             return FromObjectsToSequence(numbers, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(byte[] numbers, int takeFrom, int takeUntil)
+        public static Link FromNumbers(byte[] numbers, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
         }
 
-        static public Link FromNumbers(bool[] numbers)
+        public static Link FromNumbers(bool[] numbers)
         {
             return FromObjectsToSequence(numbers, x => FromNumber(x ? 1 : 0));
         }
 
-        static public Link FromNumbers(bool[] numbers, int takeFrom, int takeUntil)
+        public static Link FromNumbers(bool[] numbers, int takeFrom, int takeUntil)
         {
             return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x ? 1 : 0));
         }
 
-        static public Link FromObjectsToSequence<T>(T[] objects, Func<T, Link> converter)
+        public static Link FromObjectsToSequence<T>(T[] objects, Func<T, Link> converter)
         {
             return FromObjectsToSequence(objects, 0, objects.Length, converter);
         }
 
-        static public Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
+        public static Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
         {
             int length = takeUntil - takeFrom;
-            
+
             if (length <= 0)
                 throw new ArgumentOutOfRangeException("length", "Нельзя преобразовать пустой список к связям.");
-            
+
             var copy = new Link[length];
 
             for (int i = takeFrom, j = 0; i < takeUntil; i++, j++)
@@ -129,7 +129,7 @@ namespace NetLibrary
             return FromList(copy);
         }
 
-        static public Link FromChars(string str)
+        public static Link FromChars(string str)
         {
             var copy = new Link[str.Length];
 
@@ -139,7 +139,7 @@ namespace NetLibrary
             return FromList(copy);
         }
 
-        static public Link FromString(string str)
+        public static Link FromString(string str)
         {
             var copy = new Link[str.Length];
 
@@ -150,7 +150,7 @@ namespace NetLibrary
             return strLink;
         }
 
-        static public string ToString(Link link)
+        public static string ToString(Link link)
         {
             if (link.IsString())
                 return ToString(ToList(link.Target));
@@ -158,7 +158,7 @@ namespace NetLibrary
             throw new ArgumentOutOfRangeException("link", "Specified link is not a string.");
         }
 
-        static public string ToString(List<Link> charLinks)
+        public static string ToString(List<Link> charLinks)
         {
             var chars = new char[charLinks.Count];
             for (int i = 0; i < charLinks.Count; i++)

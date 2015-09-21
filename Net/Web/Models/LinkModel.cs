@@ -19,7 +19,7 @@ namespace Web.Models
             ReferersModels = referersModels;
         }
 
-        static public LinkModel CreateLinkModel(Link link, int nestingLevel = 3)
+        public static LinkModel CreateLinkModel(Link link, int nestingLevel = 3)
         {
             //ThreadHelpers.SyncInvokeWithExtendedStack(() =>
             //{
@@ -31,7 +31,7 @@ namespace Web.Models
             return result;
         }
 
-        static private LinkModel CreateLinkModel(Link link, HashSet<Link> visitedLinks, int currentLevel, int maxLevel)
+        private static LinkModel CreateLinkModel(Link link, HashSet<Link> visitedLinks, int currentLevel, int maxLevel)
         {
             var model = new LinkModel(link);
 
