@@ -82,7 +82,7 @@
     <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>true</LinkIncremental>
+    <LinkIncremental>false</LinkIncremental>
     <LibraryPath>$(SolutionDir)$(Platform)\Configuration;$(LibraryPath)</LibraryPath>
     <IncludePath>$(SolutionDir)\Core;$(IncludePath)</IncludePath>
   </PropertyGroup>

@@ -196,7 +196,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>Always</RunPostBuildEvent>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -223,8 +223,8 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /y "$(SolutionDir)x64\Debug\Core.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)x64\Debug\Core.pdb" "$(TargetDir)"
+    <PreBuildEvent>xcopy /y "$(SolutionDir)x64\$(ConfigurationName)\Core.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)x64\$(ConfigurationName)\Core.pdb" "$(TargetDir)"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
