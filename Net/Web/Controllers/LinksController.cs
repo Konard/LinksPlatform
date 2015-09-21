@@ -12,7 +12,7 @@ namespace Web.Controllers
             if (id == 0) id = Net.Link;
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
-            return View(model);
+            return View("Infinite", model);
         }
     }
 }

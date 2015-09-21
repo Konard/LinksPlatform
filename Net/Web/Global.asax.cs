@@ -21,10 +21,8 @@ namespace Web
             Link.StartMemoryManager(Path.Combine(Server.MapPath("App_Data"), @"data.dat"));
         }
 
-        public override void Dispose()
+        public void Application_End()
         {
-            base.Dispose();
-
             Link.StopMemoryManager();
         }
     }
