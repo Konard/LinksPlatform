@@ -14,40 +14,40 @@ namespace ConsoleTester
 
             public override string ToString()
             {
-                return string.Format("Value = {0}, Size = {1}", this.Value, this.Size);
+                return string.Format("Value = {0}, Size = {1}", Value, Size);
             }
 
             public bool Validate()
             {
-                if (this == this.Left)
+                if (this == Left)
                 {
                     return false;
                 }
-                if (this == this.Right)
+                if (this == Right)
                 {
                     return false;
                 }
 
                 int estimatedSize = 1;
 
-                if (this.Left != null && this.Left.Size < this.Size)
+                if (Left != null && Left.Size < Size)
                 {
-                    estimatedSize += this.Left.Size;
+                    estimatedSize += Left.Size;
                 }
-                if (this.Right != null && this.Right.Size < this.Size)
+                if (Right != null && Right.Size < Size)
                 {
-                    estimatedSize += this.Right.Size;
+                    estimatedSize += Right.Size;
                 }
 
-                if (this.Size != estimatedSize)
+                if (Size != estimatedSize)
                 {
                     return false;
                 }
-                if (!IsLeftThreaded(this) && this.Left.Value > this.Value)
+                if (!IsLeftThreaded(this) && Left.Value > Value)
                 {
                     return false;
                 }
-                if (!IsRightThreaded(this) && this.Right.Value < this.Value)
+                if (!IsRightThreaded(this) && Right.Value < Value)
                 {
                     return false;
                 }
@@ -56,9 +56,9 @@ namespace ConsoleTester
 
             public bool TryCatchValue(int value)
             {
-                return this.Value == value
-                    || (this.Left != null && this.Left.Value == value)
-                    || (this.Right != null && this.Right.Value == value);
+                return Value == value
+                    || (Left != null && Left.Value == value)
+                    || (Right != null && Right.Value == value);
             }
         }
 

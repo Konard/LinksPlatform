@@ -25,7 +25,7 @@ namespace Gexf
 
         public void WriteXml(XmlWriter writer)
         {
-            WriteXml(writer, this.Id, this.Source, this.Target, this.Label);
+            WriteXml(writer, Id, Source, Target, Label);
         }
 
         static public void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label)

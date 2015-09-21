@@ -173,6 +173,21 @@ void public_calling_convention DeleteLink(link_index linkIndex)
     FreeLink(linkIndex);
 }
 
+link_index public_calling_convention GetFirstRefererBySourceIndex(link_index linkIndex)
+{
+    return GetLink(linkIndex)->BySourceRootIndex;
+}
+
+link_index public_calling_convention GetFirstRefererByLinkerIndex(link_index linkIndex)
+{
+    return GetLink(linkIndex)->ByLinkerRootIndex;
+}
+
+link_index public_calling_convention GetFirstRefererByTargetIndex(link_index linkIndex)
+{
+    return GetLink(linkIndex)->ByTargetRootIndex;
+}
+
 unsigned_integer public_calling_convention GetLinkNumberOfReferersBySource(link_index linkIndex) { return GetNumberOfReferersBySource(linkIndex); }
 unsigned_integer public_calling_convention GetLinkNumberOfReferersByLinker(link_index linkIndex) { return GetNumberOfReferersByLinker(linkIndex); }
 unsigned_integer public_calling_convention GetLinkNumberOfReferersByTarget(link_index linkIndex) { return GetNumberOfReferersByTarget(linkIndex); }

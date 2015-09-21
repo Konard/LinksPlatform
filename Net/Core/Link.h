@@ -50,6 +50,10 @@ extern "C" {
 
     PREFIX_DLL void DeleteLink(link_index linkIndex);
 
+    PREFIX_DLL link_index GetFirstRefererBySourceIndex(link_index linkIndex);
+    PREFIX_DLL link_index GetFirstRefererByLinkerIndex(link_index linkIndex);
+    PREFIX_DLL link_index GetFirstRefererByTargetIndex(link_index linkIndex);
+
     PREFIX_DLL unsigned_integer GetLinkNumberOfReferersBySource(link_index linkIndex);
     PREFIX_DLL unsigned_integer GetLinkNumberOfReferersByLinker(link_index linkIndex);
     PREFIX_DLL unsigned_integer GetLinkNumberOfReferersByTarget(link_index linkIndex);

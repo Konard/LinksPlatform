@@ -22,21 +22,21 @@ namespace Gexf
 
         public Gexf()
         {
-            this.Version = CurrentVersion;
-            this.Graph = new Graph();
+            Version = CurrentVersion;
+            Graph = new Graph();
         }
 
         public void WriteXml(XmlWriter writer)
         {
             Action writeGraph = () =>
             {
-                this.Graph.WriteXml(writer);
+                Graph.WriteXml(writer);
             };
 
-            WriteXml(writer, writeGraph, this.Version);
+            WriteXml(writer, writeGraph, Version);
         }
 
-        static public void WriteXml(XmlWriter writer, Action writeGraph, string version = Gexf.CurrentVersion)
+        static public void WriteXml(XmlWriter writer, Action writeGraph, string version = CurrentVersion)
         {
             writer.WriteStartDocument();
             writer.WriteStartElement(ElementName, Namespace);

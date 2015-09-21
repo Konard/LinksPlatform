@@ -54,7 +54,7 @@ Link*               pointerToUnusedMarker;              // Инициализи�
 __forceinline void PrintLinksDataBaseSize()
 {
 #ifdef DEBUG
-    printf("Links databse size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
+    printf("Links database size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
         (uint64_t)(*pointerToLinksSize),
         (uint64_t)(*pointerToLinksSize * sizeof(Link)),
         (uint64_t)serviceBlockSizeInBytes);
@@ -635,7 +635,7 @@ signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor)
     return true;
 }
 
-link_index GetMappingLink(signed_integer mappingIndex)
+link_index GetMappedLink(signed_integer mappingIndex)
 {
     if (mappingIndex >= 0 && mappingIndex < (signed_integer)*pointerToMappingLinksMaxSize)
         return pointerToPointerToMappingLinks[mappingIndex];
@@ -643,7 +643,7 @@ link_index GetMappingLink(signed_integer mappingIndex)
         return null;
 }
 
-void SetMappingLink(signed_integer mappingIndex, link_index linkIndex)
+void SetMappedLink(signed_integer mappingIndex, link_index linkIndex)
 {
     if (mappingIndex >= 0 && mappingIndex < (signed_integer)*pointerToMappingLinksMaxSize)
         pointerToPointerToMappingLinks[mappingIndex] = linkIndex;

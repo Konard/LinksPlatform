@@ -31,29 +31,29 @@ namespace Gexf
 
         public Graph()
         {
-            this.Nodes = new List<Node>();
-            this.Edges = new List<Edge>();
+            Nodes = new List<Node>();
+            Edges = new List<Edge>();
         }
 
         public void WriteXml(XmlWriter writer)
         {
             Action writeNodes = () =>
                 {
-                    for (int i = 0; i < this.Nodes.Count; i++)
+                    for (int i = 0; i < Nodes.Count; i++)
                     {
-                        this.Nodes[i].WriteXml(writer);
+                        Nodes[i].WriteXml(writer);
                     }
                 };
 
             Action writeEdges = () =>
                 {
-                    for (int i = 0; i < this.Edges.Count; i++)
+                    for (int i = 0; i < Edges.Count; i++)
                     {
-                        this.Edges[i].WriteXml(writer);
+                        Edges[i].WriteXml(writer);
                     }
                 };
 
-            WriteXml(writer, writeNodes, writeEdges, this.Mode, this.DefaultEdgeType);
+            WriteXml(writer, writeNodes, writeEdges, Mode, DefaultEdgeType);
         }
 
         static public void WriteXml(XmlWriter writer, Action writeNodes, Action writeEdges, GraphMode mode = GraphMode.Static, GraphDefaultEdgeType defaultEdgeType = GraphDefaultEdgeType.Directed)

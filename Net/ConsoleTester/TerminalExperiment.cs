@@ -34,7 +34,7 @@ namespace ConsoleTester
 
 		static public void LinkCreated(LinkDefinition createdLink)
 		{
-			Console.WriteLine("Link created: {0} {1} {2}", createdLink.Source.GetPointer(), createdLink.Linker.GetPointer(), createdLink.Target.GetPointer());
+			Console.WriteLine("Link created: {0} {1} {2}", createdLink.Source.ToIndex(), createdLink.Linker.ToIndex(), createdLink.Target.ToIndex());
 		}
 	}
 }

@@ -1,7 +1,0 @@
-﻿@model NetLibrary.Link
-
-<span class="link">
-    <span class="source">@Html.ActionLink(Model.Source.ToString(), "Index", "Links", new { Id = Model.Source.GetPointer().ToInt64() }, null)</span>
-    <span class="linker">@Html.ActionLink(Model.Linker.ToString(), "Index", "Links", new { Id = Model.Linker.GetPointer().ToInt64() }, null)</span>
-    <span class="target">@Html.ActionLink(Model.Target.ToString(), "Index", "Links", new { Id = Model.Target.GetPointer().ToInt64() }, null)</span>
-</span>

@@ -1,4 +1,4 @@
-#ifndef __LINKS_LINKLOWLEVEL_H__
+﻿#ifndef __LINKS_LINKLOWLEVEL_H__
 #define __LINKS_LINKLOWLEVEL_H__
 
 #define of(x) x

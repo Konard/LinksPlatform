@@ -1,0 +1,17 @@
+﻿@using Utils
+@model Web.Models.LinkModel
+
+@{
+    ViewBag.Title = TextHelpers.CapitalizeFirstLetter(Model.Link.ToString());
+}
+
+<div class="link-view">
+    <h2>@ViewBag.Title</h2>
+
+    <div class="link-description">
+        @Html.Partial("LinkDescription", Model.Link)
+    </div>
+    <div>
+        @Html.Partial("LinkReferersList", Model.ReferersModels)
+    </div>
+</div>

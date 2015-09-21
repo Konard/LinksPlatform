@@ -1,9 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 
+using Int = System.Int64;
+using UInt = System.UInt64;
+using LinkIndex = System.UInt64;
+
 namespace NetLibrary
 {
-    public unsafe partial struct Link
+    public partial struct Link
     {
         #region Properties
 
@@ -29,13 +33,13 @@ namespace NetLibrary
         private Link[] я_F { get { return this.GetArrayOfRererersByTarget(); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_DC { get { return this == null ? 0 : ReferersBySourceCount; } }
+        private Int я_DC { get { return this == null ? 0 : ReferersBySourceCount; } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_EC { get { return this == null ? 0 : ReferersByLinkerCount; } }
+        private Int я_EC { get { return this == null ? 0 : ReferersByLinkerCount; } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private long я_FC { get { return this == null ? 0 : ReferersByTargetCount; } }
+        private Int я_FC { get { return this == null ? 0 : ReferersByTargetCount; } }
 
 		[DebuggerDisplay(null, Name = "Timestamp")]
 		private DateTime я_H { get { return this == null ? DateTime.MinValue : Timestamp; } }

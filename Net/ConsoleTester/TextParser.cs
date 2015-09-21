@@ -53,7 +53,7 @@ namespace ConsoleTester
 
         public void Dispose()
         {
-            this._streamReader.Dispose();
+            _streamReader.Dispose();
         }
     }
 }

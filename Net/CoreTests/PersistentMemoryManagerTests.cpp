@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CppUnitTest.h"
 
 #include <PersistentMemoryManager.h>
@@ -114,6 +114,29 @@ namespace CoreTests
 
             FreeLink(link1); // Creates "hole" and forces "Attach" to be executed
             FreeLink(link2); // Removes both links, all "Attached" links forced to be "Detached" here
+
+            Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
+
+            Assert::IsTrue(succeeded(CloseStorageFile()));
+
+            remove(filename);
+        }
+
+        TEST_METHOD(GetSetMappedLinkTest)
+        {
+            char* filename = "db.links";
+
+            remove(filename);
+
+            InitPersistentMemoryManager();
+
+            Assert::IsTrue(succeeded(OpenStorageFile(filename)));
+
+            Assert::IsTrue(succeeded(SetStorageFileMemoryMapping()));
+
+            link_index mapped = GetMappedLink(0);
+
+            SetMappedLink(0, mapped);
 
             Assert::IsTrue(succeeded(ResetStorageFileMemoryMapping()));
 

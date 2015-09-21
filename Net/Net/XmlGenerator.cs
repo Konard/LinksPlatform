@@ -87,7 +87,7 @@ namespace NetLibrary
                         {
                             foreach (Link matchingLink in matchingLinks)
                             {
-                                Node.WriteXml(writer, matchingLink.GetPointer().ToInt64(), matchingLink.ToString());
+                                Node.WriteXml(writer, matchingLink.ToInt(), matchingLink.ToString());
                             }
                         },
                         () => // edges
@@ -96,15 +96,15 @@ namespace NetLibrary
                             {
                                 if (matchingLinks.Contains(matchingLink.Source))
                                 {
-                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Source.GetPointer().ToInt64(), SourceLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.ToInt(), matchingLink.Source.ToInt(), SourceLabel);
                                 }
                                 if (matchingLinks.Contains(matchingLink.Linker))
                                 {
-                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Linker.GetPointer().ToInt64(), LinkerLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.ToInt(), matchingLink.Linker.ToInt(), LinkerLabel);
                                 }
                                 if (matchingLinks.Contains(matchingLink.Target))
                                 {
-                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.GetPointer().ToInt64(), matchingLink.Target.GetPointer().ToInt64(), TargetLabel);
+                                    Edge.WriteXml(writer, edgesCounter++, matchingLink.ToInt(), matchingLink.Target.ToInt(), TargetLabel);
                                 }
                             }
                         }));

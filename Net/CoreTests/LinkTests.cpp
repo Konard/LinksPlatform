@@ -1,4 +1,4 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 #include "CppUnitTest.h"
 
 #include <PersistentMemoryManager.h>
@@ -74,11 +74,11 @@ namespace CoreTests
 
             Assert::IsTrue(GetTargetIndex(isA) == isA);
 
-            isA = UpdateLink(isA, isA, isA, link); // Произведено замыкание
+            isA = UpdateLink(isA, isA, isA, link); // РџСЂРѕРёР·РІРµРґРµРЅРѕ Р·Р°РјС‹РєР°РЅРёРµ
 
             Assert::IsTrue(GetTargetIndex(isA) == link);
 
-            DeleteLink(isA); // Одна эта операция удалит все 4 связи
+            DeleteLink(isA); // РћРґРЅР° СЌС‚Р° РѕРїРµСЂР°С†РёСЏ СѓРґР°Р»РёС‚ РІСЃРµ 4 СЃРІСЏР·Рё
 
             Assert::IsTrue(GetLinksCount() == 0);
 

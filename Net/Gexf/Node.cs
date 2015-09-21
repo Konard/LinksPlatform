@@ -17,7 +17,7 @@ namespace Gexf
 
         public void WriteXml(XmlWriter writer)
         {
-            WriteXml(writer, this.Id, this.Label);
+            WriteXml(writer, Id, Label);
         }
 
         static public void WriteXml(XmlWriter writer, long id, string label)

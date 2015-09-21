@@ -5,7 +5,7 @@ namespace NetLibrary
 {
     static public class CharacterHelpers
     {
-		public enum CharacterMapping
+		public enum CharacterMapping : long
 		{
 			LatinAlphabet = 100,
 			CyrillicAlphabet

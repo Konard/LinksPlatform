@@ -2,7 +2,7 @@
 
 namespace NetLibrary
 {
-	public enum NetMapping
+	public enum NetMapping : long
 	{
 		Link,
 		Thing,
