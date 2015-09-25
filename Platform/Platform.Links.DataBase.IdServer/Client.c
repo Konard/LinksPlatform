@@ -1,3 +1,4 @@
+#include "Common.h"
 
 // TCP/IP-client (Linux, Windows).
 
@@ -6,7 +7,7 @@ long long int requestsCount = 0;
 #define _DEBUG 0
 #define BUFSIZE 32
 
-#ifdef __linux__
+#ifdef LINUX
 
 #include <stdlib.h> // atoi(), exit()
 
@@ -38,7 +39,7 @@ int Func(int *clientSocket)
 	return 0;
 }
 
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 #define _WIN32_WINNT 0x0501
 
@@ -84,7 +85,7 @@ int Func(SOCKET *clientSocket) {
 
 int ClientInitialize(const char *hostname, const char *port)
 {
-#ifdef __linux__
+#ifdef LINUX
 
 	ClientSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (ClientSocket < 0)
@@ -127,7 +128,7 @@ int ClientInitialize(const char *hostname, const char *port)
 		if (_DEBUG) printf("connect(): Success\n");
 	}
 
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 	int winsockResult;
 	// Initialize Winsock2 system.
@@ -207,10 +208,10 @@ void FinalizeCallback(int signal)
 
 void ClientFinalize()
 {
-#ifdef __linux__
+#ifdef LINUX
 	shutdown(ClientSocket, 2);
 	close(ClientSocket);
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 	closesocket(ClientSocket);
 	WSACleanup();
 #endif
@@ -224,10 +225,10 @@ int main(int argumentsCount, char **arguments)
 	char *hostname = arguments[1];
 	char *port = arguments[2];
 
-#ifdef __linux__
+#ifdef LINUX
 	atexit((void(*)())ClientFinalize);
 	signal(SIGINT, FinalizeCallback);
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 #endif
 
 	ClientInitialize(hostname, port);

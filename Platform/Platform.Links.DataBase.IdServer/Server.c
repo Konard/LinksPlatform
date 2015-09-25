@@ -1,3 +1,4 @@
+#include "Common.h"
 
 // TCP/IP-server (Linux, Windows).
 
@@ -6,7 +7,7 @@ long long int requestsCount = 0;
 #define _DEBUG 1
 #define BUFSIZE 32
 
-#ifdef __linux__
+#ifdef LINUX
 
 #include <stdlib.h> // atoi(), exit()
 
@@ -86,7 +87,7 @@ int Func(void *p)
 #endif
 }
 
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 #define _WIN32_WINNT 0x0501
 
@@ -141,7 +142,7 @@ int Func(SOCKET *clientSocket)
 int ServerInitialize(char *hostname, char *port)
 {
 	// Only ListenSocket, not ClientSocket[s].
-#ifdef __linux__
+#ifdef LINUX
 
 	ListenSocket = socket(AF_INET, SOCK_STREAM, 0);
 	if (ListenSocket < 0)
@@ -186,7 +187,7 @@ int ServerInitialize(char *hostname, char *port)
 		if (_DEBUG) printf("listen(): Success\n");
 	}
 
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 	int winsockResult;
 	// Initialize Winsock
@@ -263,7 +264,7 @@ void FinalizeCallback(int signal)
 
 void ServerFinalize()
 {
-#ifdef __linux__
+#ifdef LINUX
 #if defined(SERVER_SELECT)
 	int socketIndex;
 	for (socketIndex = 0; socketIndex < FreeSocketIndex; socketIndex++) {
@@ -278,7 +279,7 @@ void ServerFinalize()
 	close(ListenSocket);
 	close(ClientSocket);
 #endif
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 #if defined(SERVER_SELECT)
 	int socketIndex;
 	for (socketIndex = 0; socketIndex < FreeSocketIndex; socketIndex++) {
@@ -302,10 +303,10 @@ int main(int argumentsCount, char **arguments)
 	char *hostname = arguments[1];
 	char *port = arguments[2];
 
-#ifdef __linux__
+#ifdef LINUX
 	atexit((void(*)())ServerFinalize);
 	signal(SIGINT, FinalizeCallback);
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 #endif
 
 	ServerInitialize(hostname, port);
@@ -324,7 +325,7 @@ int main(int argumentsCount, char **arguments)
 		ClientSocket = accept(ListenSocket, NULL, NULL); // Blocking accept().
 #endif
 
-#ifdef __linux__
+#ifdef LINUX
 		int yes = 1;
 
 #if defined(SERVER_SELECT)
@@ -336,7 +337,7 @@ int main(int argumentsCount, char **arguments)
 			if (_DEBUG) perror("setsockopt()");
 			return -EXIT_FAILURE; // -1
 		}
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 #if defined(SERVER_SELECT)
 		if (ClientSockets[FreeSocketIndex] == INVALID_SOCKET)
@@ -368,7 +369,7 @@ int main(int argumentsCount, char **arguments)
 
 		if (_DEBUG) printf("[accepted]\n");
 
-#ifdef __linux__
+#ifdef LINUX
 
 #if defined(SERVER_SELECT)
 		printf("%d\n", ClientSockets[FreeSocketIndex]);
@@ -378,7 +379,7 @@ int main(int argumentsCount, char **arguments)
 		Func(&ClientSocket);
 #endif
 
-#elif defined(__MINGW32__) || defined(__MINGW64__)
+#elif defined(WINDOWS)
 
 		HANDLE _thread;
 		DWORD _thread_id;
