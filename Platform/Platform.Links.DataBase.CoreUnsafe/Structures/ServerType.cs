@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.DataBase.Core.Structures
+﻿namespace Platform.Links.DataBase.CoreUnsafe.Structures
 {
     public enum ServerType
     {

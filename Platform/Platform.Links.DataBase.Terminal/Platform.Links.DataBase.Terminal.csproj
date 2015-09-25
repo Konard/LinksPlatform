@@ -52,9 +52,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Links.DataBase.Core\Platform.Links.DataBase.Core.csproj">
+    <ProjectReference Include="..\Platform.Links.DataBase.CoreUnsafe\Platform.Links.DataBase.CoreUnsafe.csproj">
       <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
-      <Name>Platform.Links.DataBase.Core</Name>
+      <Name>Platform.Links.DataBase.CoreUnsafe</Name>
     </ProjectReference>
     <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>

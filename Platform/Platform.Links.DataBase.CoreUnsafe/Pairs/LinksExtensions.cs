@@ -1,7 +1,7 @@
 ﻿using System;
 using Platform.Links.System.Helpers;
 
-namespace Platform.Links.DataBase.Core.Pairs
+namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 {
     public static class LinksExtensions
     {

@@ -25,7 +25,7 @@ namespace Platform.Links.DataBase.SlaveServer
                 LinksServerStoped = true;
             };
 
-            var links = new CoreNet.Links();
+            var links = new CoreNet.Pairs.Links();
 
             //InitUTF16(links);
 
@@ -63,7 +63,7 @@ namespace Platform.Links.DataBase.SlaveServer
         }
 
         // Устранить дублирование
-        private static void PrintContents(CoreNet.Links links)
+        private static void PrintContents(CoreNet.Pairs.Links links)
         {
             if (links.Total == char.MaxValue)
                 Console.WriteLine("Database is empty.");

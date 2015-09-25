@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.DataBase.Core.TreeMethods
+namespace Platform.Links.DataBase.CoreUnsafe.TreeMethods
 {
     /// <remarks>
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.

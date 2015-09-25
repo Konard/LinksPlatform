@@ -17,11 +17,11 @@ namespace Platform.Sandbox
         /// <param name="links">База данных связей, над которой будет выполняться запрос.</param>
         /// <param name="query">Запрос в виде Linq-выражения.</param>
         /// <returns>Результат запроса в виде перечисляемого объекта с элементами типа T.</returns>
-        public static IEnumerable<T> Execute<T>(this Links.DataBase.Core.Pairs.Links links,
-            Expression<Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>> query)
+        public static IEnumerable<T> Execute<T>(this Links.DataBase.CoreUnsafe.Pairs.Links links,
+            Expression<Func<Links.DataBase.CoreUnsafe.Pairs.Links, IEnumerable<T>>> query)
         {
             string queryId = query.ToString();
-            Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>> compiledQuery;
+            Func<Links.DataBase.CoreUnsafe.Pairs.Links, IEnumerable<T>> compiledQuery;
             if (!CompiledQueriesCache<T>.compiledQueries.TryGetValue(queryId, out compiledQuery))
             {
                 compiledQuery = query.Compile(); // Подумать как повлиять на процесс компиляции запроса
@@ -37,9 +37,9 @@ namespace Platform.Sandbox
 
         private static class CompiledQueriesCache<T>
         {
-            public static readonly ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>>
+            public static readonly ConcurrentDictionary<string, Func<Links.DataBase.CoreUnsafe.Pairs.Links, IEnumerable<T>>>
                 compiledQueries =
-                    new ConcurrentDictionary<string, Func<Links.DataBase.Core.Pairs.Links, IEnumerable<T>>>();
+                    new ConcurrentDictionary<string, Func<Links.DataBase.CoreUnsafe.Pairs.Links, IEnumerable<T>>>();
         }
     }
 }

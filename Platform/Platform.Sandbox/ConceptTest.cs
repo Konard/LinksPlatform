@@ -1,6 +1,6 @@
 ﻿using System;
-using Platform.Links.DataBase.Core.Pairs;
-using Platform.Links.DataBase.Core.Sequences;
+using Platform.Links.DataBase.CoreUnsafe.Pairs;
+using Platform.Links.DataBase.CoreUnsafe.Sequences;
 
 namespace Platform.Sandbox
 {
@@ -8,7 +8,7 @@ namespace Platform.Sandbox
     {
         public static void TestGexf(string filename)
         {
-            using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512*1024*1024))
+            using (var links = new Links.DataBase.CoreUnsafe.Pairs.Links(filename, 512*1024*1024))
             {
                 const int linksToCreate = 1024;
 
@@ -24,7 +24,7 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var links = new Links.DataBase.Core.Pairs.Links(filename, 512*1024*1024))
+                using (var links = new Links.DataBase.CoreUnsafe.Pairs.Links(filename, 512*1024*1024))
                 {
                     //links.EnterTransaction();
 
@@ -131,7 +131,7 @@ namespace Platform.Sandbox
             Console.ReadKey();
         }
 
-        private static void PrintLink(this Links.DataBase.Core.Pairs.Links links, ulong link)
+        private static void PrintLink(this Links.DataBase.CoreUnsafe.Pairs.Links links, ulong link)
         {
             Console.WriteLine(links.FormatLink(link));
         }

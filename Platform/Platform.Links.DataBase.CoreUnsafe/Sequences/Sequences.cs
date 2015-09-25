@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Links.DataBase.Core.Exceptions;
+using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Links.System.Helpers.Synchronization;
 
-namespace Platform.Links.DataBase.Core.Sequences
+namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 {
     /// <summary>
     /// Представляет коллекцию последовательностей связей.

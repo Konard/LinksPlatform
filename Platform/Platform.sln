@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Memor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Sandbox", "Platform.Sandbox\Platform.Sandbox.csproj", "{5C498D57-2625-434B-9D8B-862FD09B8B6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.Core", "Platform.Links.DataBase.Core\Platform.Links.DataBase.Core.csproj", "{BBCE20EF-EEC2-49DB-AC61-EBA5C69B52AE}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.CoreUnsafe", "Platform.Links.DataBase.CoreUnsafe\Platform.Links.DataBase.CoreUnsafe.csproj", "{BBCE20EF-EEC2-49DB-AC61-EBA5C69B52AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.Terminal", "Platform.Links.DataBase.Terminal\Platform.Links.DataBase.Terminal.csproj", "{11CAD7AD-8675-4826-B974-EFFAD027AC8C}"
 EndProject

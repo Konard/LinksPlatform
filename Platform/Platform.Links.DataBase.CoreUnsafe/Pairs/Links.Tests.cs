@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.Xml;
 
-namespace Platform.Links.DataBase.Core.Pairs
+namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 {
     unsafe partial class Links
     {

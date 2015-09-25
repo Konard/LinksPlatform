@@ -1,6 +1,6 @@
 ﻿//#define LinksTransactions
 
-namespace Platform.Links.DataBase.Core.Pairs
+namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 {
 #if LinksTransactions
 

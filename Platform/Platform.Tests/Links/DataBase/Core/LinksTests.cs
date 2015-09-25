@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Platform.Links.DataBase.Core.Pairs;
+using Platform.Links.DataBase.CoreUnsafe.Pairs;
 using Platform.Links.System.Helpers;
 
 namespace Platform.Tests.Links.DataBase.Core
@@ -14,7 +14,7 @@ namespace Platform.Tests.Links.DataBase.Core
     {
         private const long Iterations = 1*1024*1024;
 
-        private static readonly long DefaultLinksSize = (long) Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes*
+        private static readonly long DefaultLinksSize = (long) Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes*
                                                         1*1024*1024;
 
         private static readonly Random Rnd = new Random();
@@ -26,7 +26,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, 1024*1024))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, 1024*1024))
             {
                 links.TestBasicMemoryManagement();
             }
@@ -173,7 +173,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations.", Iterations);
 
@@ -209,7 +209,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations in parallel.", Iterations);
 
@@ -246,7 +246,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations.", Iterations);
 
@@ -279,7 +279,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations in parallel.", Iterations);
 
@@ -355,7 +355,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong counter = 0;
 
@@ -393,7 +393,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong counter = 0;
 
@@ -485,11 +485,11 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 
-                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links.", linksToCreate);
 
@@ -518,13 +518,13 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 
                 Stopwatch sw = Stopwatch.StartNew();
 
-                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links in parallel.", linksToCreate);
 
@@ -547,7 +547,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 

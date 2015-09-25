@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Threading;
-using Platform.Links.DataBase.Core.Sequences;
+using Platform.Links.DataBase.CoreUnsafe.Sequences;
 using Platform.Links.System.Helpers.Udp;
 
 namespace Platform.Links.DataBase.MasterServer
@@ -21,7 +21,7 @@ namespace Platform.Links.DataBase.MasterServer
                 LinksServerStoped = true;
             };
 
-            using (var links = new Core.Pairs.Links("db.links", 512*1024*1024))
+            using (var links = new CoreUnsafe.Pairs.Links("db.links", 512*1024*1024))
             {
                 InitUTF16(links);
 
@@ -61,7 +61,7 @@ namespace Platform.Links.DataBase.MasterServer
             }
         }
 
-        private static void PrintContents(Core.Pairs.Links links)
+        private static void PrintContents(CoreUnsafe.Pairs.Links links)
         {
             if (links.Total == char.MaxValue)
                 Console.WriteLine("Database is empty.");
@@ -83,7 +83,7 @@ namespace Platform.Links.DataBase.MasterServer
             }
         }
 
-        private static void InitUTF16(Core.Pairs.Links links)
+        private static void InitUTF16(CoreUnsafe.Pairs.Links links)
         {
             if (UTF16Initialized)
                 return;

@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.DataBase.Core.Elements
+﻿namespace Platform.Links.DataBase.CoreUnsafe.Elements
 {
     /// <summary>
     /// Инкапсулирует метод, читающий элемент.

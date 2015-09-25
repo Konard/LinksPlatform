@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Links.DataBase.Core.Exceptions;
+using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Links.System.Helpers.Disposal;
 using Platform.Links.System.Helpers.Synchronization;
 using Platform.Links.System.Memory;
@@ -8,7 +8,7 @@ using Platform.Links.System.Memory;
 #pragma warning disable 0649
 #pragma warning disable 169
 
-namespace Platform.Links.DataBase.Core.Pairs
+namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 {
     /// <summary>
     /// Представляет объект для работы с базой данных (файлом) в формате Links (массива взаимосвязей).

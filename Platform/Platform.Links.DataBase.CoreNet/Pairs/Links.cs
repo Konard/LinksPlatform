@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Platform.Links.DataBase.Core.Exceptions;
-using Platform.Links.DataBase.Core.Pairs;
-using Platform.Links.DataBase.Core.Structures;
+using Platform.Links.DataBase.CoreUnsafe.Exceptions;
+using Platform.Links.DataBase.CoreUnsafe.Pairs;
+using Platform.Links.DataBase.CoreUnsafe.Structures;
 
-namespace Platform.Links.DataBase.CoreNet
+namespace Platform.Links.DataBase.CoreNet.Pairs
 {
     public class Links : ILinks<ILink>
     {
@@ -103,9 +103,9 @@ namespace Platform.Links.DataBase.CoreNet
             return SearchCore(source, target);
         }
 
-        public Core.Structures.Link GetLink(ILink link)
+        public CoreUnsafe.Structures.Link GetLink(ILink link)
         {
-            return Core.Structures.Link.Create(link);
+            return CoreUnsafe.Structures.Link.Create(link);
         }
 
         public void Update(ref ILink link, ILink newSource, ILink newTarget)
@@ -193,7 +193,7 @@ namespace Platform.Links.DataBase.CoreNet
 
             public override string ToString()
             {
-                return Core.Structures.Link.ToString(this);
+                return CoreUnsafe.Structures.Link.ToString(this);
             }
 
             #endregion

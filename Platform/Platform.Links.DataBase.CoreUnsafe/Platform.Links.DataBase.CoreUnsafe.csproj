@@ -8,8 +8,8 @@
     <ProjectGuid>{BBCE20EF-EEC2-49DB-AC61-EBA5C69B52AE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.DataBase.Core</RootNamespace>
-    <AssemblyName>Platform.Links.DataBase.Core</AssemblyName>
+    <RootNamespace>Platform.Links.DataBase.CoreUnsafe</RootNamespace>
+    <AssemblyName>Platform.Links.DataBase.CoreUnsafe</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -79,6 +79,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Triggers\" />
+    <Folder Include="Triplets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

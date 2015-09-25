@@ -35,8 +35,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitString.cs" />
-    <Compile Include="Links.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="Pairs\Links.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SearchEngine.cs" />
     <Compile Include="Triggers\ICondition.cs" />
@@ -45,10 +45,13 @@
     <Compile Include="Triggers\ITriggers.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Links.DataBase.Core\Platform.Links.DataBase.Core.csproj">
+    <ProjectReference Include="..\Platform.Links.DataBase.CoreUnsafe\Platform.Links.DataBase.CoreUnsafe.csproj">
       <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
-      <Name>Platform.Links.DataBase.Core</Name>
+      <Name>Platform.Links.DataBase.CoreUnsafe</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Triplets\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
