@@ -4,14 +4,13 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</ProjectGuid>
+    <ProjectGuid>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.System.Helpers</RootNamespace>
-    <AssemblyName>Platform.Links.System.Helpers</AssemblyName>
+    <RootNamespace>Platform.Communication</RootNamespace>
+    <AssemblyName>Platform.Communication</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -33,28 +32,20 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitConverterExtensions.cs" />
-    <Compile Include="ConsoleExtensions.cs" />
-    <Compile Include="Disposal\DefaultDisposal.cs" />
-    <Compile Include="Disposal\DefaultDisposalUsageExample.cs" />
-    <Compile Include="Disposal\DisposalBase.cs" />
-    <Compile Include="Disposal\DisposalBaseUsageExample.cs" />
-    <Compile Include="Disposal\IDisposal.cs" />
-    <Compile Include="FileHelpers.cs" />
-    <Compile Include="Global.cs" />
-    <Compile Include="Logger.cs" />
-    <Compile Include="MemoryHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="RandomExtensions.cs" />
-    <Compile Include="Synchronization\ISyncronization.cs" />
-    <Compile Include="Synchronization\SafeSynchronization.cs" />
-    <Compile Include="Synchronization\UnsafeSynchronization.cs" />
-    <Compile Include="TextHelpers.cs" />
-    <Compile Include="ThreadHelpers.cs" />
-    <Compile Include="Udp\UdpReceiver.cs" />
-    <Compile Include="Udp\UdpSender.cs" />
+    <Compile Include="Protocol\Gexf\Edge.cs" />
+    <Compile Include="Protocol\Gexf\Enums.cs" />
+    <Compile Include="Protocol\Gexf\Gexf.cs" />
+    <Compile Include="Protocol\Gexf\Graph.cs" />
+    <Compile Include="Protocol\Gexf\Node.cs" />
+    <Compile Include="Protocol\Gexf\SerializationHelpers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

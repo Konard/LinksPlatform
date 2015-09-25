@@ -44,16 +44,34 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compilier.cs" />
+    <Compile Include="FileReadWriteTest.cs" />
+    <Compile Include="ILGeneratorExtensions.cs" />
+    <Compile Include="NetParser.cs" />
+    <Compile Include="NetParserTest.cs" />
+    <Compile Include="NewMemoryManagerExperiments.cs" />
+    <Compile Include="OperationsExperiments.cs" />
+    <Compile Include="OperationsExperimentsTrash.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ConceptTest.cs" />
     <Compile Include="QueryExecutorExtensions.cs" />
+    <Compile Include="TerminalExperiment.cs" />
+    <Compile Include="TextParser.cs" />
+    <Compile Include="TextSearchTest.cs" />
+    <Compile Include="Transactions.cs" />
+    <Compile Include="TreeStructureExperiments.cs" />
+    <Compile Include="TriggersEngine.cs" />
     <Compile Include="WebSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Platform.Links.DataBase.CoreNet\Platform.Links.DataBase.CoreNet.csproj">
+      <Project>{8bd910b1-e2b9-4ddd-9248-99e83ef8f401}</Project>
+      <Name>Platform.Links.DataBase.CoreNet</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
       <Project>{70af2122-82e4-43d1-9eeb-99c4e6fa5a49}</Project>
       <Name>Platform.Links.System.Helpers</Name>
@@ -64,6 +82,10 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>xcopy /y "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\Core.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\Core.pdb" "$(TargetDir)"</PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
