@@ -1,8 +1,8 @@
 ﻿using System.Web.Mvc;
-using NetLibrary;
-using Web.Models;
+using Platform.Links.DataBase.CoreNet.Triplets;
+using Platform.Links.DataBase.WebTerminal.Models;
 
-namespace Web.Controllers
+namespace Platform.Links.DataBase.WebTerminal.Controllers
 {
     public class LinksController : Controller
     {

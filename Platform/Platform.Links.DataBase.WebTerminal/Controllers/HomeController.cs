@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Web.Controllers
+namespace Platform.Links.DataBase.WebTerminal.Controllers
 {
     public class HomeController : Controller
     {

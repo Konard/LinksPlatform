@@ -186,12 +186,22 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Links.DataBase.CoreNet\Platform.Links.DataBase.CoreNet.csproj">
+      <Project>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</Project>
+      <Name>Platform.Links.DataBase.CoreNet</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+      <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
+      <Name>Platform.Links.System.Helpers</Name>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <PropertyGroup>
-    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+    <RunPostBuildEvent>Always</RunPostBuildEvent>
   </PropertyGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(VSToolsPath)\WebApplications\Microsoft.WebApplication.targets" Condition="'$(VSToolsPath)' != ''" />
@@ -218,8 +228,8 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /y "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\Core.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)$(PlatformName)\$(ConfigurationName)\Core.pdb" "$(TargetDir)"
+    <PreBuildEvent>xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Links.DataBase.Core.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Links.DataBase.Core.pdb" "$(TargetDir)"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.

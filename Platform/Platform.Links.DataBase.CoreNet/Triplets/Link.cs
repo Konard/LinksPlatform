@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
+using Int = System.Int64;
+using LinkIndex = System.UInt64;
+
 namespace Platform.Links.DataBase.CoreNet.Triplets
 {
     public struct LinkDefinition
@@ -40,105 +43,105 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
         #region Basic Operations
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetSourceIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetSourceIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetLinkerIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetLinkerIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetTargetIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetTargetIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetFirstRefererBySourceIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetFirstRefererBySourceIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetFirstRefererByLinkerIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetFirstRefererByLinkerIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetFirstRefererByTargetIndex(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetFirstRefererByTargetIndex(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int64 GetTime(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int GetTime(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 CreateLink(UInt64 source, UInt64 linker, UInt64 target);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex CreateLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 UpdateLink(UInt64 link, UInt64 newSource, UInt64 newLinker, UInt64 newTarget);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex UpdateLink(LinkIndex link, LinkIndex newSource, LinkIndex newLinker, LinkIndex newTarget);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void DeleteLink(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void DeleteLink(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 ReplaceLink(UInt64 link, UInt64 replacement);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex ReplaceLink(LinkIndex link, LinkIndex replacement);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 SearchLink(UInt64 source, UInt64 linker, UInt64 target);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex SearchLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetMappedLink(Int64 mappedIndex);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetMappedLink(Int mappedIndex);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void SetMappedLink(Int64 mappedIndex, UInt64 linkIndex);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void SetMappedLink(Int mappedIndex, LinkIndex linkIndex);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void InitPersistentMemoryManager();
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int64 OpenStorageFile(string filename);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int OpenStorageFile(string filename);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int64 CloseStorageFile();
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int CloseStorageFile();
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int64 SetStorageFileMemoryMapping();
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int SetStorageFileMemoryMapping();
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int64 ResetStorageFileMemoryMapping();
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int ResetStorageFileMemoryMapping();
 
         #endregion
 
         #region Referers Count Selectors
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetLinkNumberOfReferersBySource(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetLinkNumberOfReferersBySource(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetLinkNumberOfReferersByLinker(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetLinkNumberOfReferersByLinker(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern UInt64 GetLinkNumberOfReferersByTarget(UInt64 link);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern LinkIndex GetLinkNumberOfReferersByTarget(LinkIndex link);
 
         #endregion
 
         #region Referers Walkers
 
-        private delegate void Visitor(UInt64 link);
-        private delegate Int64 StopableVisitor(UInt64 link);
+        private delegate void Visitor(LinkIndex link);
+        private delegate Int StopableVisitor(LinkIndex link);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void WalkThroughAllReferersBySource(UInt64 root, Visitor action);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void WalkThroughAllReferersBySource(LinkIndex root, Visitor action);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersBySource(UInt64 root, StopableVisitor func);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int WalkThroughReferersBySource(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void WalkThroughAllReferersByLinker(UInt64 root, Visitor action);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void WalkThroughAllReferersByLinker(LinkIndex root, Visitor action);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersByLinker(UInt64 root, StopableVisitor func);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int WalkThroughReferersByLinker(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern void WalkThroughAllReferersByTarget(UInt64 root, Visitor action);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern void WalkThroughAllReferersByTarget(LinkIndex root, Visitor action);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersByTarget(UInt64 root, StopableVisitor func);
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        private static extern int WalkThroughReferersByTarget(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllLinks(Visitor action);
 
-        [DllImport("Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int WalkThroughLinks(StopableVisitor func);
 
         #endregion
@@ -164,7 +167,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
         #region Fields
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        private readonly UInt64 _link;
+        private readonly LinkIndex _link;
 
         #endregion
 
@@ -189,16 +192,16 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
         public Link FirstRefererByTarget { get { return GetFirstRefererByTargetIndex(_link); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Int64 ReferersBySourceCount { get { return (Int64)GetLinkNumberOfReferersBySource(_link); } }
+        public Int ReferersBySourceCount { get { return (Int)GetLinkNumberOfReferersBySource(_link); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Int64 ReferersByLinkerCount { get { return (Int64)GetLinkNumberOfReferersByLinker(_link); } }
+        public Int ReferersByLinkerCount { get { return (Int)GetLinkNumberOfReferersByLinker(_link); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Int64 ReferersByTargetCount { get { return (Int64)GetLinkNumberOfReferersByTarget(_link); } }
+        public Int ReferersByTargetCount { get { return (Int)GetLinkNumberOfReferersByTarget(_link); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
-        public Int64 TotalReferers { get { return (Int64)GetLinkNumberOfReferersBySource(_link) + (Int64)GetLinkNumberOfReferersByLinker(_link) + (Int64)GetLinkNumberOfReferersByTarget(_link); } }
+        public Int TotalReferers { get { return (Int)GetLinkNumberOfReferersBySource(_link) + (Int)GetLinkNumberOfReferersByLinker(_link) + (Int)GetLinkNumberOfReferersByTarget(_link); } }
 
         [DebuggerBrowsable(DebuggerBrowsableState.Never)]
         public DateTime Timestamp { get { return DateTime.FromFileTimeUtc(GetTime(_link)); } }
@@ -207,7 +210,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
         #region Infrastructure
 
-        public Link(UInt64 link)
+        public Link(LinkIndex link)
         {
             _link = link;
         }
@@ -247,32 +250,32 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             }
         }
 
-        public static implicit operator UInt64?(Link link)
+        public static implicit operator LinkIndex?(Link link)
         {
-            return link._link == 0 ? (UInt64?)null : link._link;
+            return link._link == 0 ? (LinkIndex?)null : link._link;
         }
 
-        public static implicit operator Link(UInt64? link)
+        public static implicit operator Link(LinkIndex? link)
         {
-            return new Link(link == null ? 0 : (UInt64)link);
+            return new Link(link == null ? 0 : (LinkIndex)link);
         }
 
-        public static implicit operator Int64(Link link)
+        public static implicit operator Int(Link link)
         {
-            return (Int64)link._link;
+            return (Int)link._link;
         }
 
-        public static implicit operator Link(Int64 link)
+        public static implicit operator Link(Int link)
         {
-            return new Link((UInt64)link);
+            return new Link((LinkIndex)link);
         }
 
-        public static implicit operator UInt64(Link link)
+        public static implicit operator LinkIndex(Link link)
         {
             return link._link;
         }
 
-        public static implicit operator Link(UInt64 link)
+        public static implicit operator Link(LinkIndex link)
         {
             return new Link(link);
         }
@@ -322,12 +325,12 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return base.GetHashCode();
         }
 
-        private static bool LinkDoesNotExist(UInt64 link)
+        private static bool LinkDoesNotExist(LinkIndex link)
         {
             return link == 0 || GetLinkerIndex(link) == 0;
         }
 
-        private static bool LinkWasDeleted(UInt64 link)
+        private static bool LinkWasDeleted(LinkIndex link)
         {
             return link != 0 && GetLinkerIndex(link) == 0;
         }
@@ -339,14 +342,14 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
                 && ((Target == this && target == null) || (Target == target));
         }
 
-        public UInt64 ToIndex()
+        public LinkIndex ToIndex()
         {
             return _link;
         }
 
-        public Int64 ToInt()
+        public Int ToInt()
         {
-            return (Int64)_link;
+            return (Int)_link;
         }
 
         #endregion
@@ -372,12 +375,12 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return link;
         }
 
-        public static Link Restore(Int64 index)
+        public static Link Restore(Int index)
         {
-            return Restore((UInt64)index);
+            return Restore((LinkIndex)index);
         }
 
-        public static Link Restore(UInt64 index)
+        public static Link Restore(LinkIndex index)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -403,7 +406,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return CreateMapped(source, linker, target, Convert.ToInt64(mappingIndex));
         }
 
-        public static Link CreateMapped(Link source, Link linker, Link target, Int64 mappingIndex)
+        public static Link CreateMapped(Link source, Link linker, Link target, Int mappingIndex)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -428,7 +431,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return mappedLink;
         }
 
-        public static bool TrySetMapped(Link link, Int64 mappingIndex, bool rewrite = false)
+        public static bool TrySetMapped(Link link, Int mappingIndex, bool rewrite = false)
         {
             Link mappedLink = GetMappedLink(mappingIndex);
 
@@ -455,7 +458,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return GetMapped(Convert.ToInt64(mappingIndex));
         }
 
-        public static Link GetMapped(Int64 mappingIndex)
+        public static Link GetMapped(Int mappingIndex)
         {
             Link mappedLink;
             if (!TryGetMapped(mappingIndex, out mappedLink))
@@ -468,7 +471,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return TryGetMapped(Convert.ToInt64(mappingIndex), out mappedLink);
         }
 
-        public static bool TryGetMapped(Int64 mappingIndex, out Link mappedLink)
+        public static bool TryGetMapped(Int mappingIndex, out Link mappedLink)
         {
             if (!MemoryManagerIsReady)
                 throw new Exception("Менеджер памяти ещё не готов.");
@@ -492,8 +495,8 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             if (LinkWasDeleted(newTarget))
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве нового значения.", "newTarget");
 
-            UInt64 previousLinkIndex = link;
-            Int64 mappingIndex;
+            LinkIndex previousLinkIndex = link;
+            Int mappingIndex;
             LinkToMappingIndex.TryGetValue(link, out mappingIndex);
             var previousDefinition = new LinkDefinition(link);
 
@@ -513,8 +516,8 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             if (LinkDoesNotExist(link))
                 return;
 
-            UInt64 previousLinkIndex = link;
-            Int64 mappingIndex;
+            LinkIndex previousLinkIndex = link;
+            Int mappingIndex;
             LinkToMappingIndex.TryGetValue(link, out mappingIndex);
             var previousDefinition = new LinkDefinition(link);
 

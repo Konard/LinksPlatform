@@ -1,6 +1,6 @@
 ﻿using System.Web.Http;
 
-namespace Web
+namespace Platform.Links.DataBase.WebTerminal.App_Start
 {
     public static class WebApiConfig
     {

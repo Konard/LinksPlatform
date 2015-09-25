@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using NetLibrary;
+using Platform.Links.DataBase.CoreNet.Triplets;
 
-namespace Web.Models
+namespace Platform.Links.DataBase.WebTerminal.Models
 {
     public class LinkModel
     {

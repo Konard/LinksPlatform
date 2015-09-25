@@ -1,6 +1,6 @@
 ﻿using System.Web.Optimization;
 
-namespace Web
+namespace Platform.Links.DataBase.WebTerminal.App_Start
 {
     public class BundleConfig
     {

@@ -1,6 +1,6 @@
 ﻿using System.Web.Mvc;
 
-namespace Web
+namespace Platform.Links.DataBase.WebTerminal.App_Start
 {
     public class FilterConfig
     {
