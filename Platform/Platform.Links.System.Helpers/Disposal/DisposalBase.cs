@@ -51,7 +51,7 @@ namespace Platform.Links.System.Helpers.Disposal
                 {
                     DisposeCore(manual);
                 }
-                    // TODO: Среагировать
+                // TODO: Среагировать
                 finally
                 {
                     _currentProcess.Exited -= OnProcessExit;

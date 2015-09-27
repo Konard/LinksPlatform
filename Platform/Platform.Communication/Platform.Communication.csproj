@@ -45,7 +45,6 @@
     <Compile Include="Protocol\Gexf\Gexf.cs" />
     <Compile Include="Protocol\Gexf\Graph.cs" />
     <Compile Include="Protocol\Gexf\Node.cs" />
-    <Compile Include="Protocol\Gexf\SerializationHelpers.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

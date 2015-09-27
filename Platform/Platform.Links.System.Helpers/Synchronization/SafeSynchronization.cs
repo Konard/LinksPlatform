@@ -15,6 +15,14 @@ namespace Platform.Links.System.Helpers.Synchronization
 
                 action();
             }
+#if DEBUG
+            catch (Exception ex)
+            {
+                // TODO: Log exception
+
+                throw ex;
+            }
+#endif
             finally
             {
                 _rwLock.ExitReadLock();
@@ -29,6 +37,14 @@ namespace Platform.Links.System.Helpers.Synchronization
 
                 return func();
             }
+#if DEBUG
+            catch (Exception ex)
+            {
+                // TODO: Log exception
+
+                throw ex;
+            }
+#endif
             finally
             {
                 _rwLock.ExitReadLock();
@@ -43,6 +59,14 @@ namespace Platform.Links.System.Helpers.Synchronization
 
                 action();
             }
+#if DEBUG
+            catch (Exception ex)
+            {
+                // TODO: Log exception
+
+                throw ex;
+            }
+#endif
             finally
             {
                 _rwLock.ExitWriteLock();
@@ -57,6 +81,14 @@ namespace Platform.Links.System.Helpers.Synchronization
 
                 return func();
             }
+#if DEBUG
+            catch (Exception ex)
+            {
+                // TODO: Log exception
+
+                throw ex;
+            }
+#endif
             finally
             {
                 _rwLock.ExitWriteLock();

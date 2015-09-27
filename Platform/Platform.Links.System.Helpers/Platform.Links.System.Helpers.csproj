@@ -33,6 +33,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitConverterExtensions.cs" />
@@ -48,6 +49,7 @@
     <Compile Include="MemoryHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomExtensions.cs" />
+    <Compile Include="SerializationHelpers.cs" />
     <Compile Include="Synchronization\ISyncronization.cs" />
     <Compile Include="Synchronization\SafeSynchronization.cs" />
     <Compile Include="Synchronization\UnsafeSynchronization.cs" />

@@ -51,7 +51,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public ulong Create(params ulong[] sequence)
         {
-            return Compact(sequence);
+            //return Compact(sequence);
+            return CreateBalancedVariant(sequence);
         }
 
         public ulong CreateAllVariants(params ulong[] sequence)
@@ -112,10 +113,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             if (sequence.Length == 2)
                 return _links.Create(sequence[0], sequence[1]);
 
-            var innerSequence = new ulong[sequence.Length/2 + sequence.Length%2];
+            var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
 
             for (var i = 0; i < sequence.Length; i += 2)
-                innerSequence[i/2] = i + 1 == sequence.Length ? sequence[i] : Create(sequence[i], sequence[i + 1]);
+                innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Create(sequence[i], sequence[i + 1]);
 
             return CreateBalancedVariantCore(innerSequence);
         }
@@ -138,17 +139,17 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
-        public List<ulong> Each(params ulong[] sequence)
+        public HashSet<ulong> Each(params ulong[] sequence)
         {
-            var results = new List<ulong>();
+            var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
 
-            Each(link =>
+            EachCore(link =>
             {
-                results.Add(link);
-                return Pairs.Links.Continue;
+                if (!visitedLinks.Contains(link)) visitedLinks.Add(link); // изучить почему случаются повторы
+                return true;
             }, sequence);
 
-            return results;
+            return visitedLinks;
         }
 
         public void Each(Func<ulong, bool> handler, params ulong[] sequence)
@@ -162,7 +163,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     visitedLinks.Add(link); // изучить почему случаются повторы
                     return handler(link);
                 }
-
                 return true;
             }, sequence);
         }
@@ -217,6 +217,89 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                         return Pairs.Links.Continue;
                     });
                 }
+            }
+        }
+
+        public HashSet<ulong> EachPart(params ulong[] sequence)
+        {
+            var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
+
+            EachPartCore(link =>
+            {
+                if (!visitedLinks.Contains(link)) visitedLinks.Add(link); // изучить почему случаются повторы
+                return true;
+            }, sequence);
+
+            return visitedLinks;
+        }
+
+        public void EachPart(Func<ulong, bool> handler, params ulong[] sequence)
+        {
+            var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
+
+            EachPartCore(link =>
+            {
+                if (!visitedLinks.Contains(link))
+                {
+                    visitedLinks.Add(link); // изучить почему случаются повторы
+                    return handler(link);
+                }
+
+                return true;
+            }, sequence);
+        }
+
+        private void EachPartCore(Func<ulong, bool> handler, params ulong[] sequence)
+        {
+            if (sequence == null || sequence.Length == 0)
+                return;
+
+            EnsureEachLinkIsAnyOrExists(_links, sequence);
+
+            if (sequence.Length == 1)
+            {
+                var link = sequence[0];
+
+                if (link > 0)
+                    handler(link);
+                else
+                    _links.Each(0, 0, handler);
+            }
+            else if (sequence.Length == 2)
+            {
+                //_links.Each(sequence[0], sequence[1], handler);
+
+                //  o_|      x_o ... 
+                // x_|        |___|
+
+                _links.Each(sequence[1], 0, pair =>
+                {
+                    var match = _links.Search(sequence[0], pair);
+                    if (match != 0)
+                        handler(match);
+                    return true;
+                });
+
+                // |_x      ... x_o
+                //  |_o      |___|
+
+                _links.Each(0, sequence[0], pair =>
+                {
+                    var match = _links.Search(pair, sequence[1]);
+                    if (match != 0)
+                        handler(match);
+                    return true;
+                });
+
+                //          ._x o_.
+                //           |___|
+
+
+            }
+            else
+            {
+                // TODO: Implement other variants
+                return;
             }
         }
 
@@ -279,7 +362,13 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public void Delete(params ulong[] sequence)
         {
-            _sync.ExecuteWriteOperation(() => Each(sequence).ForEach(x => _links.Delete(ref x)));
+            _sync.ExecuteWriteOperation(() => {
+                foreach (var linkToDelete in Each(sequence))
+                {
+                    var x = linkToDelete;
+                    _links.Delete(ref x);
+                }
+            });
         }
 
         private static void EnsureEachLinkExists(Pairs.Links links, params ulong[] sequence)
@@ -381,7 +470,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public static void TestSimplify()
         {
-            var sequence = new ulong[] {1, 1, 2, 3, 4, 1, 1, 1, 4, 1, 1, 1};
+            var sequence = new ulong[] { 1, 1, 2, 3, 4, 1, 1, 1, 4, 1, 1, 1 };
             const ulong zeroOrMany = 1UL;
 
             var simplifiedSequence = Simplify(zeroOrMany, sequence);

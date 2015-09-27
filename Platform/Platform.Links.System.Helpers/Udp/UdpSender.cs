@@ -29,7 +29,8 @@ namespace Platform.Links.System.Helpers.Udp
         public int Send(string message)
         {
             // Формирование оправляемого сообщения и его отправка.
-            return _udp.Send(Encoding.Default.GetBytes(message), message.Length, _ipendpoint);
+            var bytes = Encoding.Default.GetBytes(message);
+            return _udp.Send(bytes, bytes.Length, _ipendpoint);
         }
 
         protected override void DisposeCore(bool manual)

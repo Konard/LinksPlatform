@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -64,21 +65,24 @@ namespace Platform.Links.System.Helpers.Udp
         // и работающая в отдельном потоке.
         private void Receive()
         {
-            try
+            while (true)
             {
-                while (true)
+#if DEBUG
+                try
                 {
+#endif
                     IPEndPoint ipendpoint = null;
                     byte[] message = _udp.Receive(ref ipendpoint);
                     _messageHandler(Encoding.Default.GetString(message));
-
-                    // Если дана команда остановить поток, останавливаем бесконечный цикл.
-                    if (_stopReceive) break;
+#if DEBUG
                 }
-            }
-            catch
-            {
-                // Log Exception
+                catch (Exception ex)
+                {
+                    // TODO: Log Exception
+                }
+#endif
+                // Если дана команда остановить поток, останавливаем бесконечный цикл.
+                if (_stopReceive) break;
             }
         }
 

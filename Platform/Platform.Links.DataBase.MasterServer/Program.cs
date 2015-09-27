@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Platform.Links.DataBase.CoreUnsafe.Sequences;
 using Platform.Links.System.Helpers.Udp;
@@ -13,7 +13,7 @@ namespace Platform.Links.DataBase.MasterServer
         private static ulong UTF16LastCharLink;
         private static bool LinksServerStoped;
 
-        private static void Main(string[] args)
+        private static void Main()
         {
             Console.CancelKeyPress += (sender, eventArgs) =>
             {
@@ -21,7 +21,7 @@ namespace Platform.Links.DataBase.MasterServer
                 LinksServerStoped = true;
             };
 
-            using (var links = new CoreUnsafe.Pairs.Links("db.links", 512*1024*1024))
+            using (var links = new CoreUnsafe.Pairs.Links("db.links", 512 * 1024 * 1024))
             {
                 InitUTF16(links);
 
@@ -30,6 +30,7 @@ namespace Platform.Links.DataBase.MasterServer
                 var sequences = new Sequences(links);
 
                 Console.WriteLine("Links server started.");
+                Console.WriteLine("Press CTRL+C to stop server.");
 
                 using (var sender = new UdpSender(8888))
                 {
@@ -116,6 +117,7 @@ namespace Platform.Links.DataBase.MasterServer
 
         private static void Create(this Sequences sequences, UdpSender sender, string sequence)
         {
+            // char array to ulong array
             var linksSequence = new ulong[sequence.Length];
             for (int i = 0; i < sequence.Length; i++)
                 linksSequence[i] = sequence[i];
@@ -134,18 +136,37 @@ namespace Platform.Links.DataBase.MasterServer
                 else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            List<ulong> resultList = sequences.Each(linksSequenceQuery);
+            var resultList = sequences.Each(linksSequenceQuery);
 
             if (resultList.Count == 0)
-                sender.Send("No sequences found.");
+            {
+                sender.Send("No full sequences found.");
+            }
             else if (resultList.Count == 1)
-                sender.Send(string.Format("Sequence found - {0}.", resultList[0]));
+                sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
             else
             {
-                sender.Send(string.Format("Found {0} sequences:", resultList.Count));
+                sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
 
-                for (int i = 0; i < resultList.Count; i++)
-                    sender.Send(string.Format("\t{0}", resultList[i]));
+                foreach (var result in resultList)
+                    sender.Send(string.Format("\t{0}", result));
+            }
+
+            resultList = sequences.EachPart(linksSequenceQuery);
+
+            // Subsequences
+            if (resultList.Count == 0)
+            {
+                sender.Send("No partial sequences found.");
+            }
+            else if (resultList.Count == 1)
+                sender.Send(string.Format("Partial sequence found - {0}.", resultList.First()));
+            else
+            {
+                sender.Send(string.Format("Found {0} partial sequences:", resultList.Count));
+
+                foreach (var result in resultList)
+                    sender.Send(string.Format("\t{0}", result));
             }
         }
     }

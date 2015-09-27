@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Platform.Communication.Protocol.Gexf
+namespace Platform.Links.System.Helpers
 {
     static public class SerializationHelpers
     {
@@ -12,8 +12,8 @@ namespace Platform.Communication.Protocol.Gexf
 
         static public T DeserializeFromXml<T>(string xmlString)
         {
-            XmlSerializer serializer = GetXmlSerializer<T>();
-            using (StringReader reader = new StringReader(xmlString))
+            var serializer = GetXmlSerializer<T>();
+            using (var reader = new StringReader(xmlString))
             {
                 return (T)serializer.Deserialize(reader);
             }
@@ -21,7 +21,7 @@ namespace Platform.Communication.Protocol.Gexf
 
         static public void SerializeToFile<T>(string path, T obj)
         {
-            XmlSerializer serializer = GetXmlSerializer<T>();
+            var serializer = GetXmlSerializer<T>();
             using (var fileStream = File.Open(path, FileMode.Create))
             {
                 serializer.Serialize(fileStream, obj);
@@ -31,9 +31,9 @@ namespace Platform.Communication.Protocol.Gexf
 
         static public string SerializeAsXmlString<T>(T obj)
         {
-            XmlSerializer serializer = GetXmlSerializer<T>();
-            StringBuilder sb = new StringBuilder();
-            using (TextWriter writer = new StringWriter(sb))
+            var serializer = GetXmlSerializer<T>();
+            var sb = new StringBuilder();
+            using (var writer = new StringWriter(sb))
             {
                 serializer.Serialize(writer, obj);
                 writer.Flush();
@@ -44,7 +44,7 @@ namespace Platform.Communication.Protocol.Gexf
         static XmlSerializer GetXmlSerializer<T>()
         {
             XmlSerializer serializer;
-            Type type = typeof(T);
+            var type = typeof(T);
             if (!XmlSerializerCache.TryGetValue(type, out serializer))
             {
                 serializer = new XmlSerializer(type);

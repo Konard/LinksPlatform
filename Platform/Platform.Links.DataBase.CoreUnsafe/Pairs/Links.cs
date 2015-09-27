@@ -56,7 +56,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         /// Используется только во вне класса, не рекомедуется использовать внутри.
         /// Так как во вне не обязательно будет доступен unsafe С#.
         /// </remarks>
-        public static readonly int LinkSizeInBytes = sizeof (Link);
+        public static readonly int LinkSizeInBytes = sizeof(Link);
 
         #endregion
 
@@ -65,10 +65,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         private struct Link
         {
             public ulong Source;
+            public ulong Target;
             public ulong LeftAsSource;
             public ulong RightAsSource;
             public ulong SizeAsSource;
-            public ulong Target;
             public ulong LeftAsTarget;
             public ulong RightAsTarget;
             public ulong SizeAsTarget;
@@ -128,10 +128,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             UpdatePointers(_memory);
 
             // Гарантия корректности _memory.UsedCapacity относительно _header->AllocatedLinks
-            _memory.UsedCapacity = (long) _header->AllocatedLinks*sizeof (Link) + sizeof (LinksHeader);
+            _memory.UsedCapacity = (long)_header->AllocatedLinks * sizeof(Link) + sizeof(LinksHeader);
 
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
-            _header->ReservedLinks = (ulong) ((_memory.ReservedCapacity - sizeof (LinksHeader))/sizeof (Link));
+            _header->ReservedLinks = (ulong)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
         }
 
         /// <summary>
@@ -522,12 +522,12 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         /// <param name="memory">Объект для работы с файлом как виртуальным блоком памяти.</param>
         private void UpdatePointers(IMemory memory)
         {
-            _header = (LinksHeader*) memory.Pointer;
+            _header = (LinksHeader*)memory.Pointer;
 
             // Указатель this.links может быть в том же месте, 
             // так как 0-я связь не используется и имеет такой же размер как Header,
             // поэтому header размещается в том же месте, что и 0-я связь
-            _links = (Link*) memory.Pointer;
+            _links = (Link*)memory.Pointer;
 
             _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
@@ -600,11 +600,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 {
                     _memory.ReservedCapacity += _memoryReservationStep;
                     UpdatePointers(_memory);
-                    _header->ReservedLinks = (ulong) (_memory.ReservedCapacity/sizeof (Link));
+                    _header->ReservedLinks = (ulong)(_memory.ReservedCapacity / sizeof(Link));
                 }
 
                 _header->AllocatedLinks++;
-                _memory.UsedCapacity += sizeof (Link);
+                _memory.UsedCapacity += sizeof(Link);
                 freeLink = _header->AllocatedLinks;
             }
 
@@ -631,7 +631,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             if (link == _header->AllocatedLinks)
             {
                 _header->AllocatedLinks--;
-                _memory.UsedCapacity -= sizeof (Link);
+                _memory.UsedCapacity -= sizeof(Link);
 
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
@@ -640,7 +640,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                     DetachFromFreeLinkList(_header->AllocatedLinks);
 
                     _header->AllocatedLinks--;
-                    _memory.UsedCapacity -= sizeof (Link);
+                    _memory.UsedCapacity -= sizeof(Link);
                 }
             }
             else
