@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Links.System.Helpers.Synchronization;
 
@@ -102,23 +103,27 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 EnsureEachLinkExists(_links, sequence);
 
+                if (sequence.Length == 1)
+                    return sequence[0];
+
                 return CreateBalancedVariantCore(sequence);
             });
         }
 
         private ulong CreateBalancedVariantCore(params ulong[] sequence)
         {
-            if (sequence.Length == 1)
-                return sequence[0];
-            if (sequence.Length == 2)
-                return _links.Create(sequence[0], sequence[1]);
+            do
+            {
+                if (sequence.Length == 2)
+                    return _links.Create(sequence[0], sequence[1]);
 
-            var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
+                var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
 
-            for (var i = 0; i < sequence.Length; i += 2)
-                innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Create(sequence[i], sequence[i + 1]);
+                for (var i = 0; i < sequence.Length; i += 2)
+                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
 
-            return CreateBalancedVariantCore(innerSequence);
+                sequence = innerSequence;
+            } while (true);
         }
 
         /// <remarks>
@@ -294,13 +299,40 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 //          ._x o_.
                 //           |___|
 
-
+                StepRight(handler, sequence[0], sequence[1]);
             }
             else
             {
                 // TODO: Implement other variants
                 return;
             }
+        }
+
+        private void StepRight(Func<ulong, bool> handler, ulong left, ulong right)
+        {
+            _links.Each(0, left, pair =>
+            {
+                _links.Each(pair, 0, rightStep =>
+                {
+                    var upStep = rightStep;
+                    var firstSource = _links.GetTarget(rightStep);
+                    while (firstSource != right && firstSource != upStep)
+                    {
+                        upStep = firstSource;
+                        firstSource = _links.GetSource(upStep);
+                    }
+
+                    if (firstSource == right)
+                        handler(rightStep);
+
+                    return true;
+                });
+
+                if (left != pair)
+                    StepRight(handler, pair, right);
+
+                return true;
+            });
         }
 
         public ulong Update(ulong[] sequence, ulong[] newSequence)
@@ -362,7 +394,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public void Delete(params ulong[] sequence)
         {
-            _sync.ExecuteWriteOperation(() => {
+            _sync.ExecuteWriteOperation(() =>
+            {
                 foreach (var linkToDelete in Each(sequence))
                 {
                     var x = linkToDelete;

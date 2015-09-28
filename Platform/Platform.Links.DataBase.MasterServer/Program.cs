@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Platform.Links.DataBase.CoreUnsafe.Sequences;
@@ -8,6 +9,8 @@ namespace Platform.Links.DataBase.MasterServer
 {
     internal static class Program
     {
+        private const string DefaultDatabaseFilename = "db.links";
+
         private static bool UTF16Initialized;
         private static ulong UTF16FirstCharLink;
         private static ulong UTF16LastCharLink;
@@ -21,7 +24,9 @@ namespace Platform.Links.DataBase.MasterServer
                 LinksServerStoped = true;
             };
 
-            using (var links = new CoreUnsafe.Pairs.Links("db.links", 512 * 1024 * 1024))
+            File.Delete(DefaultDatabaseFilename);
+
+            using (var links = new CoreUnsafe.Pairs.Links(DefaultDatabaseFilename, 512 * 1024 * 1024))
             {
                 InitUTF16(links);
 
@@ -136,23 +141,23 @@ namespace Platform.Links.DataBase.MasterServer
                 else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            var resultList = sequences.Each(linksSequenceQuery);
+            //var resultList = sequences.Each(linksSequenceQuery);
 
-            if (resultList.Count == 0)
-            {
-                sender.Send("No full sequences found.");
-            }
-            else if (resultList.Count == 1)
-                sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
-            else
-            {
-                sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
+            //if (resultList.Count == 0)
+            //{
+            //    sender.Send("No full sequences found.");
+            //}
+            //else if (resultList.Count == 1)
+            //    sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
+            //else
+            //{
+            //    sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
 
-                foreach (var result in resultList)
-                    sender.Send(string.Format("\t{0}", result));
-            }
+            //    foreach (var result in resultList)
+            //        sender.Send(string.Format("\t{0}", result));
+            //}
 
-            resultList = sequences.EachPart(linksSequenceQuery);
+            var resultList = sequences.EachPart(linksSequenceQuery);
 
             // Subsequences
             if (resultList.Count == 0)
