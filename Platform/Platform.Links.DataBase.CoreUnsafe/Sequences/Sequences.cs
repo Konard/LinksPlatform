@@ -515,5 +515,226 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             //_links
             //sequences
         }
+
+        #region From Triplets
+
+        public const int MaxSequenceFormatSize = 20;
+
+        //public static void DeleteSequence(Link sequence)
+        //{
+        //}
+
+        //public static FormatSequence(Link sequence)
+        //{
+        //    int visitedElements = 0;
+
+        //    StringBuilder sb = new StringBuilder();
+
+        //    sb.Append('[');
+
+        //    StopableSequenceWalker walker = new StopableSequenceWalker(sequence, element =>
+        //    {
+        //        if (visitedElements > 0)
+        //            sb.Append(',');
+
+        //        sb.Append(element.ToString());
+
+        //        visitedElements++;
+
+        //        if (visitedElements < MaxSequenceFormatSize)
+        //        {
+        //            return true;
+        //        }
+        //        else
+        //        {
+        //            sb.Append(", ...");
+        //            return false;
+        //        }
+        //    });
+
+        //    walker.WalkFromLeftToRight();
+
+        //    sb.Append(']');
+
+        //    return sb.ToString();
+        //}
+
+        public List<ulong> CollectMatchingSequences(ulong[] links)
+        {
+            if (links.Length == 1)
+            {
+                throw new Exception("Подпоследовательности с одним элементом не поддерживаются.");
+            }
+
+            int leftBound = 0;
+            int rightBound = links.Length - 1;
+
+            ulong left = links[leftBound++];
+            ulong right = links[rightBound--];
+
+            var results = new List<ulong>();
+            CollectMatchingSequences(left, leftBound, links, right, rightBound, ref results);
+            return results;
+        }
+
+        private void CollectMatchingSequences(ulong leftLink, int leftBound, ulong[] middleLinks, ulong rightLink, int rightBound, ref List<ulong> results)
+        {
+            ulong leftLinkTotalReferers = _links.CalculateReferences(leftLink);
+            ulong rightLinkTotalReferers = _links.CalculateReferences(rightLink);
+
+            if (leftLinkTotalReferers <= rightLinkTotalReferers)
+            {
+                var nextLeftLink = middleLinks[leftBound];
+
+                ulong[] elements = GetRightElements(leftLink, nextLeftLink);
+                if (leftBound <= rightBound)
+                {
+                    for (int i = elements.Length - 1; i >= 0; i--)
+                    {
+                        var element = elements[i];
+                        if (element != 0)
+                        {
+                            CollectMatchingSequences(element, leftBound + 1, middleLinks, rightLink, rightBound, ref results);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = elements.Length - 1; i >= 0; i--)
+                    {
+                        var element = elements[i];
+                        if (element != 0)
+                        {
+                            results.Add(element);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                var nextRightLink = middleLinks[rightBound];
+
+                ulong[] elements = GetLeftElements(rightLink, nextRightLink);
+
+                if (leftBound <= rightBound)
+                {
+                    for (int i = elements.Length - 1; i >= 0; i--)
+                    {
+                        var element = elements[i];
+                        if (element != 0)
+                        {
+                            CollectMatchingSequences(leftLink, leftBound, middleLinks, elements[i], rightBound - 1, ref results);
+                        }
+                    }
+                }
+                else
+                {
+                    for (int i = elements.Length - 1; i >= 0; i--)
+                    {
+                        var element = elements[i];
+                        if (element != 0)
+                        {
+                            results.Add(element);
+                        }
+                    }
+                }
+            }
+        }
+
+        public ulong[] GetRightElements(ulong startLink, ulong rightLink)
+        {
+            var result = new ulong[4];
+
+            TryStepRight(startLink, rightLink, result, 0);
+
+            _links.Each(0, startLink, couple =>
+            {
+                if (couple != startLink)
+                    if (TryStepRight(couple, rightLink, result, 2))
+                        return false;
+
+                return true;
+            });
+
+            return result;
+        }
+
+        public bool TryStepRight(ulong startLink, ulong rightLink, ulong[] result, int offset)
+        {
+            int added = 0;
+
+            _links.Each(startLink, 0, couple =>
+            {
+                if (couple != startLink)
+                {
+                    var coupleTarget = _links.GetTarget(couple);
+                    if (coupleTarget == rightLink)
+                    {
+                        result[offset] = couple;
+                        if (++added == 2)
+                            return false;
+                    }
+                    else if (_links.GetSource(coupleTarget) == rightLink) // coupleTarget.Linker == Net.And &&
+                    {
+                        result[offset + 1] = couple;
+                        if (++added == 2)
+                            return false;
+                    }
+                }
+
+                return true;
+            });
+
+            return added > 0;
+        }
+
+        public ulong[] GetLeftElements(ulong startLink, ulong leftLink)
+        {
+            var result = new ulong[4];
+
+            TryStepLeft(startLink, leftLink, result, 0);
+
+            _links.Each(startLink, 0, couple =>
+            {
+                if (couple != startLink)
+                    if (TryStepLeft(couple, leftLink, result, 2))
+                        return false;
+
+                return true;
+            });
+
+            return result;
+        }
+
+        public bool TryStepLeft(ulong startLink, ulong leftLink, ulong[] result, int offset)
+        {
+            int added = 0;
+
+            _links.Each(0, startLink, couple =>
+            {
+                if (couple != startLink)
+                {
+                    var coupleSource =_links.GetSource(couple);
+                    if (coupleSource == leftLink)
+                    {
+                        result[offset] = couple;
+                        if (++added == 2)
+                            return false;
+                    }
+                    else if (_links.GetTarget(coupleSource) == leftLink) // coupleSource.Linker == Net.And &&
+                    {
+                        result[offset + 1] = couple;
+                        if (++added == 2)
+                            return false;
+                    }
+                }
+
+                return true;
+            });
+
+            return added > 0;
+        }
+
+        #endregion
     }
 }

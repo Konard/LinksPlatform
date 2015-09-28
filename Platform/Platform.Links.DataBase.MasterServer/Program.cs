@@ -141,36 +141,36 @@ namespace Platform.Links.DataBase.MasterServer
                 else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            //var resultList = sequences.Each(linksSequenceQuery);
+            var resultList = sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
 
-            //if (resultList.Count == 0)
-            //{
-            //    sender.Send("No full sequences found.");
-            //}
-            //else if (resultList.Count == 1)
-            //    sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
-            //else
-            //{
-            //    sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
+            if (resultList.Count == 0)
+            {
+                sender.Send("No full sequences found.");
+            }
+            else if (resultList.Count == 1)
+                sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
+            else
+            {
+                sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
 
-            //    foreach (var result in resultList)
-            //        sender.Send(string.Format("\t{0}", result));
-            //}
+                foreach (var result in resultList)
+                    sender.Send(string.Format("\t{0}", result));
+            }
 
-            var resultList = sequences.EachPart(linksSequenceQuery);
+            var resultHash = sequences.EachPart(linksSequenceQuery);
 
             // Subsequences
-            if (resultList.Count == 0)
+            if (resultHash.Count == 0)
             {
                 sender.Send("No partial sequences found.");
             }
-            else if (resultList.Count == 1)
-                sender.Send(string.Format("Partial sequence found - {0}.", resultList.First()));
+            else if (resultHash.Count == 1)
+                sender.Send(string.Format("Partial sequence found - {0}.", resultHash.First()));
             else
             {
-                sender.Send(string.Format("Found {0} partial sequences:", resultList.Count));
+                sender.Send(string.Format("Found {0} partial sequences:", resultHash.Count));
 
-                foreach (var result in resultList)
+                foreach (var result in resultHash)
                     sender.Send(string.Format("\t{0}", result));
             }
         }

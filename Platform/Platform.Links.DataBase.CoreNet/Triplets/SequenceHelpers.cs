@@ -47,15 +47,15 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return sb.ToString();
         }
 
-        public static List<Link> CollectMatchingSequences(List<Link> links)
+        public static List<Link> CollectMatchingSequences(Link[] links)
         {
-            if (links.Count == 1)
+            if (links.Length == 1)
             {
                 throw new Exception("Подпоследовательности с одним элементом не поддерживаются.");
             }
 
             int leftBound = 0;
-            int rightBound = links.Count - 1;
+            int rightBound = links.Length - 1;
 
             Link left = links[leftBound++];
             Link right = links[rightBound--];
@@ -65,7 +65,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
             return results;
         }
 
-        private static void CollectMatchingSequences(Link leftLink, int leftBound, List<Link> middleLinks, Link rightLink, int rightBound, ref List<Link> results)
+        private static void CollectMatchingSequences(Link leftLink, int leftBound, Link[] middleLinks, Link rightLink, int rightBound, ref List<Link> results)
         {
             long leftLinkTotalReferers = leftLink.ReferersBySourceCount + leftLink.ReferersByTargetCount;
             long rightLinkTotalReferers = rightLink.ReferersBySourceCount + rightLink.ReferersByTargetCount;
