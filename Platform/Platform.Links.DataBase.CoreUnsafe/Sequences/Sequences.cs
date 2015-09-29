@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
+using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Links.System.Helpers.Synchronization;
 
@@ -53,7 +55,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
         public ulong Create(params ulong[] sequence)
         {
             //return Compact(sequence);
-            return CreateBalancedVariant(sequence);
+            //return CreateBalancedVariant(sequence);
+            return CreateAllVariants(sequence);
         }
 
         public ulong CreateAllVariants(params ulong[] sequence)
@@ -67,31 +70,36 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 if (sequence.Length == 1)
                     return sequence[0];
-                if (sequence.Length == 2)
-                    return _links.Create(sequence[0], sequence[1]);
 
-                var innerSequenceLength = sequence.Length - 1;
-                var innerSequence = new ulong[innerSequenceLength];
-                var innerSequenceLink = Pairs.Links.Null;
-
-                for (var li = 0; li < innerSequenceLength; li++)
-                {
-                    var link = Create(sequence[li], sequence[li + 1]);
-
-                    for (var isi = 0; isi < innerSequence.Length; isi++)
-                    {
-                        if (isi < li) innerSequence[isi] = sequence[isi];
-                        if (isi == li) innerSequence[isi] = link;
-                        if (isi > li) innerSequence[isi] = sequence[isi + 1];
-                    }
-
-                    innerSequenceLink = Create(innerSequence);
-                    if (innerSequenceLink == Pairs.Links.Null)
-                        throw new NotImplementedException("Creation cancellation is not implemented.");
-                }
-
-                return innerSequenceLink;
+                return CreateAllVariantsCore(sequence);
             });
+        }
+
+        private ulong CreateAllVariantsCore(ulong[] sequence)
+        {
+            if (sequence.Length == 2)
+                return _links.Create(sequence[0], sequence[1]);
+
+            var innerSequenceLength = sequence.Length - 1;
+            var innerSequence = new ulong[innerSequenceLength];
+            var innerSequenceLink = Pairs.Links.Null;
+
+            for (var li = 0; li < innerSequenceLength; li++)
+            {
+                var link = _links.Create(sequence[li], sequence[li + 1]);
+
+                for (var isi = 0; isi < li; isi++)
+                    innerSequence[isi] = sequence[isi];
+                innerSequence[li] = link;
+                for (var isi = li + 1; isi < innerSequenceLength; isi++)
+                    innerSequence[isi] = sequence[isi + 1];
+
+                innerSequenceLink = CreateAllVariantsCore(innerSequence);
+                if (innerSequenceLink == Pairs.Links.Null)
+                    throw new NotImplementedException("Creation cancellation is not implemented.");
+            }
+
+            return innerSequenceLink;
         }
 
         public ulong CreateBalancedVariant(params ulong[] sequence)
@@ -159,21 +167,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public void Each(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
-
-            EachCore(link =>
-            {
-                if (!visitedLinks.Contains(link))
-                {
-                    visitedLinks.Add(link); // изучить почему случаются повторы
-                    return handler(link);
-                }
-                return true;
-            }, sequence);
-        }
-
-        private void EachCore(Func<ulong, bool> handler, params ulong[] sequence)
-        {
             if (sequence == null || sequence.Length == 0)
                 return;
 
@@ -188,15 +181,30 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 else
                     _links.Each(0, 0, handler);
             }
-            else if (sequence.Length == 2)
+            else
+            {
+                var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
+                EachCore(link =>
+                {
+                    if (!visitedLinks.Contains(link))
+                    {
+                        visitedLinks.Add(link); // изучить почему случаются повторы
+                        return handler(link);
+                    }
+                    return true;
+                }, sequence);
+            }
+        }
+
+        private void EachCore(Func<ulong, bool> handler, params ulong[] sequence)
+        {
+            if (sequence.Length == 2)
             {
                 _links.Each(sequence[0], sequence[1], handler);
             }
             else
             {
                 var innerSequenceLength = sequence.Length - 1;
-                var innerSequence = new ulong[innerSequenceLength];
-
                 for (var li = 0; li < innerSequenceLength; li++)
                 {
                     var left = sequence[li];
@@ -205,16 +213,22 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     if (left == 0 && right == 0)
                         continue;
 
-                    for (var isi = 0; isi < innerSequence.Length; isi++)
-                    {
-                        if (isi < li) innerSequence[isi] = sequence[isi];
-                        if (isi > li) innerSequence[isi] = sequence[isi + 1];
-                    }
-
                     var linkIndex = li;
+                    ulong[] innerSequence = null;
 
                     _links.Each(left, right, pair =>
                     {
+                        if (innerSequence == null)
+                        {
+                            innerSequence = new ulong[innerSequenceLength];
+
+                            for (var isi = 0; isi < linkIndex; isi++)
+                                innerSequence[isi] = sequence[isi];
+
+                            for (var isi = linkIndex + 1; isi < innerSequenceLength; isi++)
+                                innerSequence[isi] = sequence[isi + 1];
+                        }
+
                         innerSequence[linkIndex] = pair;
 
                         EachCore(handler, innerSequence);
@@ -714,7 +728,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             {
                 if (couple != startLink)
                 {
-                    var coupleSource =_links.GetSource(couple);
+                    var coupleSource = _links.GetSource(couple);
                     if (coupleSource == leftLink)
                     {
                         result[offset] = couple;
