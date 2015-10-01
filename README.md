@@ -1,5 +1,7 @@
 #LinksPlatform
 
+[![Join the chat at https://gitter.im/Konard/LinksPlatform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Konard/LinksPlatform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Inspired by work of Simon Williams (The Associative Model of Data, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
 
 Вдохновлено работой Симона Вильямса (Ассоциативная модель данных, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
