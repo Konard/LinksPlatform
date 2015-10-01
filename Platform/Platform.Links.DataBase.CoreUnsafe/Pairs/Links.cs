@@ -51,6 +51,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         /// <remarks>Возможно нужно зарезервировать отдельное значение, тогда можно будет создавать все варианты последовательностей в функции Create.</remarks>
         public const ulong Any = 0;
 
+        /// <summary>Возвращает значение ulong, обозначающее связь-ссылку на саму связь.</summary>
+        public const ulong Itself = 0;
+
         /// <summary>Возвращает размер одной связи в байтах.</summary>
         /// <remarks>
         /// Используется только во вне класса, не рекомедуется использовать внутри.
@@ -347,8 +350,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
                     return linkIndex;
                 }
-
-                throw new Exception("Невозможно");
             });
         }
 
@@ -467,7 +468,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
-        public void Delete(ref ulong link)
+        public void Delete(ulong link)
         {
             var linkCopy = link;
 
@@ -476,9 +477,13 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 if (linkCopy != Null && Exists(linkCopy))
                     DeleteCore(linkCopy);
             });
-
-            link = 0;
         }
+
+        // TODO: Возможно есть очень простой способ это сделать.
+        //public void DeleteAll()
+        //{
+        //    _header->AllocatedLinks
+        //}
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>

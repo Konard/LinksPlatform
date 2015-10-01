@@ -43,7 +43,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             {
                 var link = Rnd.NextUInt64(min, links.Total);
                 result += link;
-                links.Delete(ref link);
+                links.Delete(link);
                 if (links.Total < min)
                     break;
             }
@@ -54,8 +54,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         {
             for (ulong i = links.Total; i > 0; i--)
             {
-                ulong link = i;
-                links.Delete(ref link);
+                links.Delete(i);
                 if (links.Total != i - 1)
                     i = links.Total;
             }

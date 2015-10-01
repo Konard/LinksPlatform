@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Metadata.W3cXsd2001;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
+using Platform.Links.System.Helpers;
 using Platform.Links.System.Helpers.Synchronization;
 
 namespace Platform.Links.DataBase.CoreUnsafe.Sequences
@@ -56,7 +54,62 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
         {
             //return Compact(sequence);
             //return CreateBalancedVariant(sequence);
-            return CreateAllVariants(sequence);
+            //return CreateAllVariants(sequence);
+            return CreateAllVariants2(sequence)[0];
+        }
+
+        /// <remarks>
+        /// Number of links that is needed to generate all variants for
+        /// sequence of length N corresponds to https://oeis.org/A014143/list sequence.
+        /// </remarks>
+        public ulong[] CreateAllVariants2(ulong[] sequence)
+        {
+            return _sync.ExecuteWriteOperation(() =>
+            {
+                if (sequence == null || sequence.Length == 0)
+                    return new ulong[0];
+
+                EnsureEachLinkExists(_links, sequence);
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                return CreateAllVariants2Core(sequence, 0, sequence.Length - 1);
+            });
+        }
+
+        private ulong[] CreateAllVariants2Core(ulong[] sequence, long startAt, long stopAt)
+        {
+#if DEBUG
+            if ((stopAt - startAt) < 0)
+                throw new ArgumentOutOfRangeException("startAt", "startAt должен быть меньше или равен stopAt");
+#endif
+            if ((stopAt - startAt) == 0)
+                return new[] { sequence[startAt] };
+            if ((stopAt - startAt) == 1)
+                return new[] { _links.Create(sequence[startAt], sequence[stopAt]) };
+
+            var variants = new ulong[(ulong)MathHelpers.Catalan(stopAt - startAt)];
+            var last = 0;
+
+            for (var splitter = startAt; splitter < stopAt; splitter++)
+            {
+                var left = CreateAllVariants2Core(sequence, startAt, splitter);
+                var right = CreateAllVariants2Core(sequence, splitter + 1, stopAt);
+
+                for (var i = 0; i < left.Length; i++)
+                {
+                    for (var j = 0; j < right.Length; j++)
+                    {
+                        var variant = _links.Create(left[i], right[j]);
+                        if (variant == Pairs.Links.Null)
+                            throw new NotImplementedException("Creation cancellation is not implemented.");
+                        variants[last++] = variant;
+                    }
+                }
+            }
+
+            return variants;
         }
 
         public ulong CreateAllVariants(params ulong[] sequence)
@@ -392,7 +445,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             if (_links.CalculateReferences(left) == 0)
             {
-                _links.Delete(ref left);
+                _links.Delete(left);
                 ClearGarbage(leftSource, leftTarget);
             }
 
@@ -401,7 +454,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             if (_links.CalculateReferences(right) == 0)
             {
-                _links.Delete(ref right);
+                _links.Delete(right);
                 ClearGarbage(rightSource, rightTarget);
             }
         }
@@ -412,8 +465,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             {
                 foreach (var linkToDelete in Each(sequence))
                 {
-                    var x = linkToDelete;
-                    _links.Delete(ref x);
+                    _links.Delete(linkToDelete);
                 }
             });
         }

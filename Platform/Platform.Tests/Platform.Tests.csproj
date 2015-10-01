@@ -52,6 +52,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Links\DataBase\Core\LinksTests.cs" />
+    <Compile Include="Links\DataBase\Core\SequencesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

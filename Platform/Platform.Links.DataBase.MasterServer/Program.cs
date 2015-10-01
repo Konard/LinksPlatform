@@ -102,7 +102,7 @@ namespace Platform.Links.DataBase.MasterServer
 
             if (firstLink != UTF16FirstCharLink)
             {
-                links.Delete(ref firstLink);
+                links.Delete(firstLink);
                 Console.WriteLine("Assume UTF16 table already created.");
             }
             else

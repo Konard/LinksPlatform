@@ -194,7 +194,7 @@ namespace Platform.Tests.Links.DataBase.Core
                 double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
 
                 // Удаляем связь, из которой производилось считывание
-                links.Delete(ref firstLink);
+                links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
@@ -231,7 +231,7 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
 
-                links.Delete(ref firstLink);
+                links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
@@ -264,7 +264,7 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
 
-                links.Delete(ref firstLink);
+                links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",
@@ -300,7 +300,7 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
 
-                links.Delete(ref firstLink);
+                links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",

@@ -27,7 +27,7 @@ namespace Platform.Links.DataBase.CoreNet.Pairs
             return link;
         }
 
-        public void Delete(ref ILink link)
+        public void Delete(ILink link)
         {
             if (!_links.Contains(link))
                 throw new ArgumentException("Связь не находится в этом хранилище.");
@@ -108,13 +108,13 @@ namespace Platform.Links.DataBase.CoreNet.Pairs
             return CoreUnsafe.Structures.Link.Create(link);
         }
 
-        public void Update(ref ILink link, ILink newSource, ILink newTarget)
+        public ILink Update(ILink link, ILink newSource, ILink newTarget)
         {
             if (!_links.Contains(link))
                 throw new ArgumentException("Связь не находится в этом хранилище.");
 
-            Delete(ref link);
-            link = Create(newSource, newTarget);
+            Delete(link);
+            return Create(newSource, newTarget);
         }
 
         private ILink SearchCore(ILink source, ILink target)

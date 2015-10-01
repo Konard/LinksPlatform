@@ -78,7 +78,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
-        void Delete(ref TLink link);
+        void Delete(TLink link);
 
         #endregion
     }
