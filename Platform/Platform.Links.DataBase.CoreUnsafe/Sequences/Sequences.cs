@@ -374,7 +374,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 //          ._x o_.
                 //           |___|
 
-                StepRight(handler, sequence[0], sequence[1]);
+                PartialStepRight(handler, sequence[0], sequence[1]);
             }
             else
             {
@@ -383,7 +383,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             }
         }
 
-        private void StepRight(Func<ulong, bool> handler, ulong left, ulong right)
+        public void PartialStepRight(Func<ulong, bool> handler, ulong left, ulong right)
         {
             _links.Each(0, left, pair =>
             {
@@ -404,10 +404,72 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 });
 
                 if (left != pair)
-                    StepRight(handler, pair, right);
+                    PartialStepRight(handler, pair, right);
 
                 return true;
             });
+        }
+
+        public void StepRight(Func<ulong, bool> handler, ulong left, ulong right)
+        {
+            _links.Each(left, 0, rightStep =>
+            {
+                var upStep = rightStep;
+                var firstSource = _links.GetTarget(rightStep);
+                while (firstSource != right && firstSource != upStep)
+                {
+                    upStep = firstSource;
+                    firstSource = _links.GetSource(upStep);
+                }
+
+                if (firstSource == right)
+                    handler(rightStep);
+
+                return true;
+            });
+        }
+
+        public void StepLeft(Func<ulong, bool> handler, ulong left, ulong right)
+        {
+            _links.Each(0, right, leftStep =>
+            {
+                var upStep = leftStep;
+                var firstTarget = _links.GetSource(leftStep);
+                while (firstTarget != right && firstTarget != upStep)
+                {
+                    upStep = firstTarget;
+                    firstTarget = _links.GetTarget(upStep);
+                }
+
+                if (firstTarget == left)
+                    handler(leftStep);
+
+                return true;
+            });
+        }
+
+        public bool StartsWith(ulong sequence, ulong link)
+        {
+            var upStep = sequence;
+            var firstSource = _links.GetSource(upStep);
+            while (firstSource != link && firstSource != upStep)
+            {
+                upStep = firstSource;
+                firstSource = _links.GetSource(upStep);
+            }
+            return firstSource == link;
+        }
+
+        public bool EndsWith(ulong sequence, ulong link)
+        {
+            var upStep = sequence;
+            var lastTarget = _links.GetTarget(upStep);
+            while (lastTarget != link && lastTarget != upStep)
+            {
+                upStep = lastTarget;
+                lastTarget = _links.GetTarget(upStep);
+            }
+            return lastTarget == link;
         }
 
         public ulong Update(ulong[] sequence, ulong[] newSequence)
@@ -426,6 +488,51 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 return UpdateCore(sequence, newSequence);
             });
+        }
+
+        public List<ulong> GetAllMatchingSequences(params ulong[] sequence)
+        {
+            var results = new List<ulong>();
+
+            if (sequence.Length > 0)
+            {
+                EnsureEachLinkExists(_links, sequence);
+
+                var firstElement = sequence[0];
+
+                if (sequence.Length == 1)
+                {
+                    results.Add(firstElement);
+                    return results;
+                }
+                if (sequence.Length == 2)
+                {
+                    var pair = _links.Search(firstElement, sequence[1]);
+                    if (pair != Pairs.Links.Null)
+                        results.Add(pair);
+                    return results;
+                }
+
+                var lastElement = sequence[sequence.Length - 1];
+
+                Func<ulong, bool> handler = x =>
+                {
+                    if (StartsWith(x, firstElement) && EndsWith(x, lastElement)) results.Add(x);
+                    return true;
+                };
+
+                if (sequence.Length >= 2)
+                    StepRight(handler, sequence[0], sequence[1]);
+
+                var last = sequence.Length - 2;
+                for (var i = 1; i < last; i++)
+                    PartialStepRight(handler, sequence[i], sequence[i + 1]);
+
+                if (sequence.Length >= 3)
+                    StepLeft(handler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+            }
+
+            return results;
         }
 
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
@@ -717,7 +824,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public ulong[] GetRightElements(ulong startLink, ulong rightLink)
         {
-            var result = new ulong[4];
+            var result = new ulong[5];
 
             TryStepRight(startLink, rightLink, result, 0);
 
@@ -729,6 +836,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 return true;
             });
+
+            if (_links.GetTarget(_links.GetTarget(startLink)) == rightLink)
+                result[4] = startLink;
 
             return result;
         }
@@ -764,7 +874,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public ulong[] GetLeftElements(ulong startLink, ulong leftLink)
         {
-            var result = new ulong[4];
+            var result = new ulong[5];
 
             TryStepLeft(startLink, leftLink, result, 0);
 
@@ -776,6 +886,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 return true;
             });
+
+            if (_links.GetSource(_links.GetSource(leftLink)) == startLink)
+                result[4] = leftLink;
 
             return result;
         }
