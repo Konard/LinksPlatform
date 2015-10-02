@@ -11,7 +11,7 @@ extern "C" {
 #endif
 
     PREFIX_DLL void InitPersistentMemoryManager();
-    
+
     PREFIX_DLL signed_integer OpenStorageFile(char* filename);
     PREFIX_DLL signed_integer CloseStorageFile();
     PREFIX_DLL signed_integer EnlargeStorageFile();
@@ -25,9 +25,9 @@ extern "C" {
     PREFIX_DLL void WalkThroughAllLinks(visitor visitor);
     PREFIX_DLL signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor);
 
-	PREFIX_DLL unsigned_integer GetLinksCount();
+    PREFIX_DLL unsigned_integer GetLinksCount();
 
-	// Exported only for Tests, Unsafe to use directly (use Create/Update/Delete instead)
+    // Exported only for Tests, Unsafe to use directly (use Create/Update/Delete instead)
     PREFIX_DLL link_index AllocateLink();
     PREFIX_DLL void FreeLink(link_index link);
 
