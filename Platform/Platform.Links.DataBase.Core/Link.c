@@ -122,7 +122,7 @@ link_index public_calling_convention ReplaceLink(link_index linkIndex, link_inde
             firstRefererByTargetIndex = link->ByTargetRootIndex;
         }
 
-        FreeLink(linkIndex);
+		DeleteLink(linkIndex);
 
         replacement->Timestamp = GetTimestamp();
     }
@@ -169,8 +169,18 @@ link_index public_calling_convention UpdateLink(link_index linkIndex, link_index
 
 void public_calling_convention DeleteLink(link_index linkIndex)
 {
-    GetLink(linkIndex)->Timestamp = 0;
-    FreeLink(linkIndex);
+	if (linkIndex == null) return;
+
+	DetachLink(linkIndex);
+
+	Link *link = GetLink(linkIndex);
+	link->Timestamp = 0;
+
+	while (link->BySourceRootIndex != null) DeleteLink(link->BySourceRootIndex);
+	while (link->ByLinkerRootIndex != null) DeleteLink(link->ByLinkerRootIndex);
+	while (link->ByTargetRootIndex != null) DeleteLink(link->ByTargetRootIndex);
+
+	FreeLink(linkIndex);
 }
 
 link_index public_calling_convention GetFirstRefererBySourceIndex(link_index linkIndex)

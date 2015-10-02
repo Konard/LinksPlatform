@@ -25,10 +25,11 @@ extern "C" {
     PREFIX_DLL void WalkThroughAllLinks(visitor visitor);
     PREFIX_DLL signed_integer WalkThroughLinks(stoppable_visitor stoppableVisitor);
 
+	PREFIX_DLL unsigned_integer GetLinksCount();
+
+	// Exported only for Tests, Unsafe to use directly (use Create/Update/Delete instead)
     PREFIX_DLL link_index AllocateLink();
     PREFIX_DLL void FreeLink(link_index link);
-
-    PREFIX_DLL unsigned_integer GetLinksCount();
 
     __forceinline Link* GetLink(link_index linkIndex);
     __forceinline link_index GetLinkIndex(Link* link);

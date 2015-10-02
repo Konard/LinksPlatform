@@ -53,10 +53,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
         public ulong Create(params ulong[] sequence)
         {
             //return Compact(sequence);
-            //return CreateBalancedVariant(sequence);
-            //return CreateAllVariants(sequence);
-            return CreateAllVariants2(sequence)[0];
+            return CreateBalancedVariant(sequence);
         }
+
+        #region Create All Variants (Not Practical)
 
         /// <remarks>
         /// Number of links that is needed to generate all variants for
@@ -112,34 +112,42 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             return variants;
         }
 
-        public ulong CreateAllVariants(params ulong[] sequence)
+        public List<ulong> CreateAllVariants1(params ulong[] sequence)
         {
             return _sync.ExecuteWriteOperation(() =>
             {
                 if (sequence == null || sequence.Length == 0)
-                    return Pairs.Links.Null;
+                    return new List<ulong>();
 
                 EnsureEachLinkExists(_links, sequence);
 
                 if (sequence.Length == 1)
-                    return sequence[0];
+                    return new List<ulong>() { sequence[0] };
 
-                return CreateAllVariantsCore(sequence);
+                var results = new List<ulong>((int)MathHelpers.Catalan(sequence.Length));
+                return CreateAllVariants1Core(sequence, results);
             });
         }
 
-        private ulong CreateAllVariantsCore(ulong[] sequence)
+        private List<ulong> CreateAllVariants1Core(ulong[] sequence, List<ulong> results)
         {
             if (sequence.Length == 2)
-                return _links.Create(sequence[0], sequence[1]);
+            {
+                var link = _links.Create(sequence[0], sequence[1]);
+                if (link == Pairs.Links.Null)
+                    throw new NotImplementedException("Creation cancellation is not implemented.");
+                results.Add(link);
+                return results;
+            }
 
             var innerSequenceLength = sequence.Length - 1;
             var innerSequence = new ulong[innerSequenceLength];
-            var innerSequenceLink = Pairs.Links.Null;
 
             for (var li = 0; li < innerSequenceLength; li++)
             {
                 var link = _links.Create(sequence[li], sequence[li + 1]);
+                if (link == Pairs.Links.Null)
+                    throw new NotImplementedException("Creation cancellation is not implemented.");
 
                 for (var isi = 0; isi < li; isi++)
                     innerSequence[isi] = sequence[isi];
@@ -147,13 +155,13 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 for (var isi = li + 1; isi < innerSequenceLength; isi++)
                     innerSequence[isi] = sequence[isi + 1];
 
-                innerSequenceLink = CreateAllVariantsCore(innerSequence);
-                if (innerSequenceLink == Pairs.Links.Null)
-                    throw new NotImplementedException("Creation cancellation is not implemented.");
+                CreateAllVariants1Core(innerSequence, results);
             }
 
-            return innerSequenceLink;
+            return results;
         }
+
+        #endregion
 
         public ulong CreateBalancedVariant(params ulong[] sequence)
         {

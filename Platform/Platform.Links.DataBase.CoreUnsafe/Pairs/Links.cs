@@ -470,12 +470,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         /// <param name="link">Индекс удаляемой связи.</param>
         public void Delete(ulong link)
         {
-            var linkCopy = link;
-
             _sync.ExecuteWriteOperation(() =>
             {
-                if (linkCopy != Null && Exists(linkCopy))
-                    DeleteCore(linkCopy);
+                if (link != Null && Exists(link))
+                    DeleteCore(link);
             });
         }
 
@@ -495,6 +493,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 _sourcesTreeMethods.RemoveUnsafe(link, &_header->FirstAsSource);
                 _targetsTreeMethods.RemoveUnsafe(link, &_header->FirstAsTarget);
 
+                _links[link].Source = 0;
+                _links[link].Target = 0;
+
                 var references = new List<ulong>();
 
                 _sourcesTreeMethods.EachReference(link, x =>
@@ -509,9 +510,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 });
 
                 references.ForEach(DeleteCore);
-
-                _links[link].Source = 0;
-                _links[link].Target = 0;
 
                 FreeLink(link);
             }
@@ -624,7 +622,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         private bool IsUnusedLink(ulong link)
         {
             return _header->FirstFreeLink == link
-                   || (_links[link].SizeAsSource == Null && (_links[link].Source != Null));
+                   || (_links[link].SizeAsSource == Null && _links[link].Source != Null);
         }
 
         /// <summary>
@@ -633,7 +631,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         /// <param name="link">Индекс высвобождаемой связи.</param>
         private void FreeLink(ulong link)
         {
-            if (link == _header->AllocatedLinks)
+            if (link < _header->AllocatedLinks)
+            {
+                AttachToFreeLinkList(link);
+            }
+            else if (link == _header->AllocatedLinks)
             {
                 _header->AllocatedLinks--;
                 _memory.UsedCapacity -= sizeof(Link);
@@ -647,10 +649,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                     _header->AllocatedLinks--;
                     _memory.UsedCapacity -= sizeof(Link);
                 }
-            }
-            else
-            {
-                AttachToFreeLinkList(link);
             }
         }
 

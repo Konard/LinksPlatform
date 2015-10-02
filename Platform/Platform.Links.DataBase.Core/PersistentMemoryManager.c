@@ -575,35 +575,24 @@ link_index AllocateLink()
 
 void FreeLink(link_index linkIndex)
 {
-    if (linkIndex == null) return;
-
-    DetachLink(linkIndex);
-
     Link *link = GetLink(linkIndex);
+    Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
 
-    while (link->BySourceRootIndex != null) FreeLink(link->BySourceRootIndex);
-    while (link->ByLinkerRootIndex != null) FreeLink(link->ByLinkerRootIndex);
-    while (link->ByTargetRootIndex != null) FreeLink(link->ByTargetRootIndex);
-
+    if (link < lastUsedLink)
     {
-        Link* lastUsedLink = pointerToLinks + *pointerToLinksSize - 1;
+        AttachLinkToUnusedMarker(linkIndex);
+    }
+    else if (link == lastUsedLink)
+    {
+        --*pointerToLinksSize;
 
-        if (link < lastUsedLink)
+        while ((--lastUsedLink)->LinkerIndex == null && pointerToLinks != lastUsedLink) // Не существует и не является 0-й связью
         {
-            AttachLinkToUnusedMarker(linkIndex);
-        }
-        else if (link == lastUsedLink)
-        {
+            DetachLinkFromUnusedMarker(GetLinkIndex(lastUsedLink));
             --*pointerToLinksSize;
-
-            while ((--lastUsedLink)->LinkerIndex == null && pointerToLinks != lastUsedLink) // Не существует и не является 0-й связью
-            {
-                DetachLinkFromUnusedMarker(GetLinkIndex(lastUsedLink));
-                --*pointerToLinksSize;
-            }
-
-            ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
         }
+
+        ShrinkStorageFile(); // Размер будет уменьшен, только если допустимо
     }
 }
 
