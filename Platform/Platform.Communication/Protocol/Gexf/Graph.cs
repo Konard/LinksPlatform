@@ -39,18 +39,14 @@ namespace Platform.Communication.Protocol.Gexf
         {
             Action writeNodes = () =>
                 {
-                    for (int i = 0; i < Nodes.Count; i++)
-                    {
+                    for (var i = 0; i < Nodes.Count; i++)
                         Nodes[i].WriteXml(writer);
-                    }
                 };
 
             Action writeEdges = () =>
                 {
-                    for (int i = 0; i < Edges.Count; i++)
-                    {
+                    for (var i = 0; i < Edges.Count; i++)
                         Edges[i].WriteXml(writer);
-                    }
                 };
 
             WriteXml(writer, writeNodes, writeEdges, Mode, DefaultEdgeType);

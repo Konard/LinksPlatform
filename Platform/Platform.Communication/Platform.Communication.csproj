@@ -32,10 +32,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
@@ -45,6 +41,14 @@
     <Compile Include="Protocol\Gexf\Gexf.cs" />
     <Compile Include="Protocol\Gexf\Graph.cs" />
     <Compile Include="Protocol\Gexf\Node.cs" />
+    <Compile Include="Udp\UdpReceiver.cs" />
+    <Compile Include="Udp\UdpSender.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+      <Project>{70af2122-82e4-43d1-9eeb-99c4e6fa5a49}</Project>
+      <Name>Platform.Links.System.Helpers</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

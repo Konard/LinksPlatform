@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Links.System.Helpers.Udp;
+using Platform.Communication.Udp;
 
 namespace Platform.Links.DataBase.Terminal
 {
@@ -20,7 +20,6 @@ namespace Platform.Links.DataBase.Terminal
                         sender.Send(line);
 
                     Console.WriteLine("Empty request. Press any key to terminate process.");
-                    Console.ReadKey();
                 }
 
                 receiver.Stop();

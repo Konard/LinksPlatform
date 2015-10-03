@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Text;
 using Platform.Links.System.Helpers.Disposal;
 
-namespace Platform.Links.System.Helpers.Udp
+namespace Platform.Communication.Udp
 {
     /// <summary>
     /// Представляет вспомогательную сущность для отправки сообщений по протоколу UDP.

@@ -56,8 +56,6 @@
     <Compile Include="Synchronization\UnsafeSynchronization.cs" />
     <Compile Include="TextHelpers.cs" />
     <Compile Include="ThreadHelpers.cs" />
-    <Compile Include="Udp\UdpReceiver.cs" />
-    <Compile Include="Udp\UdpSender.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

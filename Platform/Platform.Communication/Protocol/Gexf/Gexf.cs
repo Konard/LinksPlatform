@@ -28,10 +28,7 @@ namespace Platform.Communication.Protocol.Gexf
 
         public void WriteXml(XmlWriter writer)
         {
-            Action writeGraph = () =>
-            {
-                Graph.WriteXml(writer);
-            };
+            Action writeGraph = () => Graph.WriteXml(writer);
 
             WriteXml(writer, writeGraph, Version);
         }

@@ -38,11 +38,6 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -52,6 +47,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
+      <Project>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</Project>
+      <Name>Platform.Communication</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Platform.Links.DataBase.CoreUnsafe\Platform.Links.DataBase.CoreUnsafe.csproj">
       <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
       <Name>Platform.Links.DataBase.CoreUnsafe</Name>
@@ -59,10 +58,6 @@
     <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
       <Project>{70af2122-82e4-43d1-9eeb-99c4e6fa5a49}</Project>
       <Name>Platform.Links.System.Helpers</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Platform.Links.System.Memory\Platform.Links.System.Memory.csproj">
-      <Project>{da0c0d80-9821-48ca-a498-c3bcf8a3db0e}</Project>
-      <Name>Platform.Links.System.Memory</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
