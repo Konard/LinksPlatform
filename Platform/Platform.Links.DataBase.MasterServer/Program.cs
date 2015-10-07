@@ -159,8 +159,8 @@ namespace Platform.Links.DataBase.MasterServer
                     sender.Send(string.Format("\t{0}", result));
             }
 
-            /*
-            var resultHash = sequences.EachPart(linksSequenceQuery);
+
+            var resultHash = sequences.GetAllPartiallyMatchingSequences0(linksSequenceQuery);
 
             // Subsequences
             if (resultHash.Count == 0)
@@ -176,7 +176,6 @@ namespace Platform.Links.DataBase.MasterServer
                 foreach (var result in resultHash)
                     sender.Send(string.Format("\t{0}", result));
             }
-            */
         }
     }
 }

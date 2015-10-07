@@ -530,10 +530,46 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                     var lastElement = sequence[sequence.Length - 1];
 
-                    Action<ulong> handler = x =>
+                    var linksInSequence = new HashSet<ulong>(sequence);
+
+                    Action<ulong> handler = result =>
                     {
-                        if (StartsWith(x, firstElement) && EndsWith(x, lastElement)) // TODO: Check lenght/contents (use Walker)
-                            results.Add(x);
+                        // Проверку на первый и последний элемент можно делать только в том случае, если в исходной последовательности
+                        // нет повторяющихся символов
+                        //if (StartsWith(x, firstElement) && EndsWith(x, lastElement))
+                        
+                        // Check lenght/contents (use Walker) done:
+
+                        var filterPosition = 0;
+
+                        var walker = new StopableSequenceWalker<LinkIndex>(result, _links.GetSourceCore, _links.GetTargetCore,
+                            x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, x =>
+                            {
+                                if (filterPosition == sequence.Length)
+                                {
+                                    filterPosition = -2; // Длиннее чем нужно
+                                    return false;
+                                }
+
+                                if (x != sequence[filterPosition])
+                                {
+                                    filterPosition = -1;
+                                    return false; // Начинается иначе
+                                }
+
+                                filterPosition++;
+
+                                //File.AppendAllText(tempFilename, string.Format("Sequence: {0}, position: {1}, element: {2}", result, filterPosition, x));
+                                //Console.WriteLine();
+
+                                return true;
+                            });
+                        walker.WalkFromLeftToRight();
+
+                        if (filterPosition == sequence.Length)
+                        {
+                            results.Add(result);
+                        }
                     };
 
                     if (sequence.Length >= 2)
@@ -643,8 +679,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                                 return true;
                             });
-
-
                         walker.WalkFromLeftToRight();
 
                         if (filterPosition == (sequence.Length - 1))
