@@ -45,6 +45,8 @@
     <Compile Include="Disposal\IDisposal.cs" />
     <Compile Include="FileHelpers.cs" />
     <Compile Include="Global.cs" />
+    <Compile Include="HashSetExtensions.cs" />
+    <Compile Include="ListExtensions.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MathHelpers.cs" />
     <Compile Include="MemoryHelpers.cs" />

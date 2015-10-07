@@ -59,6 +59,8 @@
     <Compile Include="Pairs\LinksExtensions.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sequences\Sequences.cs" />
+    <Compile Include="Sequences\SequenceWalker.cs" />
+    <Compile Include="Sequences\StopableSequenceWalker.cs" />
     <Compile Include="Structures\ILink.cs" />
     <Compile Include="Structures\Link.cs" />
     <Compile Include="Structures\ServerType.cs" />

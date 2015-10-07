@@ -1,7 +1,11 @@
 ﻿@model Link
 
 <span class="link">
+    <sub>@Model.ToIndex()</sub>
     <span class="source">@Model.Source.ToString()</span>
+    <sup class="source">@Model.Source.ToIndex()</sup>
     <span class="linker">@Model.Linker.ToString()</span>
+    <sup class="linker">@Model.Linker.ToIndex()</sup>
     <span class="target">@Model.Target.ToString()</span>
+    <sup class="target">@Model.Target.ToIndex()</sup>
 </span>

@@ -1,104 +1,115 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 {
     /// <remarks>
     /// Реализованный внутри алгоритм наглядно показывает,
     /// что совершенно не обязательна рекурсивная реализация (с вложенным вызовом функцией самой себя),
     /// так как стэк можно использовать намного эффективнее при ручном управлении.
+    /// 
+    /// При оптимизации можно использовать встроенную поддержку стеков в процессор.
+    /// 
+    /// Решить объединять ли логику в одну функцию, или оставить 4 отдельных реализации?
+    /// Решить встраивать ли защиту от зацикливания.
     /// </remarks>
-    public class StopableSequenceWalker
+    public class StopableSequenceWalker<TLink>
     {
-        private readonly Link _root;
-        private readonly Func<Link, bool> _visit;
-        private readonly Stack<Link> _stack;
+        private readonly TLink _root;
+        private readonly Func<TLink, TLink> _getSource;
+        private readonly Func<TLink, TLink> _getTarget;
+        private readonly Func<TLink, bool> _isElement;
+        private readonly Func<TLink, bool> _visit;
+        private readonly Stack<TLink> _stack;
 
-        public StopableSequenceWalker(Link sequence, Func<Link, bool> visit)
+        public StopableSequenceWalker(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
             _root = sequence;
+            _getSource = getSource;
+            _getTarget = getTarget;
+            _isElement = isElement;
             _visit = visit;
-            _stack = new Stack<Link>();
+            _stack = new Stack<TLink>();
         }
 
-        public static bool WalkRight(Link sequence, Func<Link, bool> visit)
+        public static bool WalkRight(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
-            return (new StopableSequenceWalker(sequence, visit)).WalkFromLeftToRight();
+            return (new StopableSequenceWalker<TLink>(sequence, getSource, getTarget, isElement, visit)).WalkFromLeftToRight();
         }
 
         public bool WalkFromLeftToRight()
         {
-            Link element = _root;
+            var element = _root;
 
-            if (element.Linker != Net.And)
+            if (_isElement(element))
                 return _visit(element);
 
             while (true)
             {
-                if (element.Linker == Net.And)
-                {
-                    _stack.Push(element);
-
-                    element = element.Source;
-                }
-                else
+                if (_isElement(element))
                 {
                     if (_stack.Count == 0)
                         return true;
 
                     element = _stack.Pop();
 
-                    Link source = element.Source;
-                    Link target = element.Target;
+                    var source = _getSource(element);
+                    var target = _getTarget(element);
 
                     // Обработка элемента
-                    if (source.Linker != Net.And && !_visit(source))
+                    if (_isElement(source) && !_visit(source))
                         return false;
-                    if (target.Linker != Net.And && !_visit(target))
+                    if (_isElement(target) && !_visit(target))
                         return false;
 
                     element = target;
                 }
+                else
+                {
+                    _stack.Push(element);
+
+                    element = _getSource(element);
+                }
             }
         }
 
-        public static bool WalkLeft(Link sequence, Func<Link, bool> visit)
+        public static bool WalkLeft(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
-            return (new StopableSequenceWalker(sequence, visit)).WalkFromRightToLeft();
+            return (new StopableSequenceWalker<TLink>(sequence, getSource, getTarget, isElement, visit)).WalkFromRightToLeft();
         }
 
         public bool WalkFromRightToLeft()
         {
-            Link element = _root;
+            var element = _root;
 
-            if (element.Linker != Net.And)
+            if (_isElement(element))
                 return _visit(element);
 
             while (true)
             {
-                if (element.Linker == Net.And)
-                {
-                    _stack.Push(element);
-
-                    element = element.Target;
-                }
-                else
+                if (_isElement(element))
                 {
                     if (_stack.Count == 0)
                         return true;
 
                     element = _stack.Pop();
 
-                    Link target = element.Target;
-                    Link source = element.Source;
+                    var source = _getSource(element);
+                    var target = _getTarget(element);
 
                     // Обработка элемента
-                    if (target.Linker != Net.And && !_visit(target))
+                    if (_isElement(target) && !_visit(target))
                         return false;
-                    if (source.Linker != Net.And && !_visit(source))
+                    if (_isElement(source) && !_visit(source))
                         return false;
 
                     element = source;
+                }
+                else
+                {
+                    _stack.Push(element);
+
+                    element = _getTarget(element);
                 }
             }
         }

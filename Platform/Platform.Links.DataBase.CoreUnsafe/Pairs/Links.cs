@@ -153,7 +153,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             });
         }
 
-        private ulong GetSourceCore(ulong link)
+        /// <remarks>
+        /// Использовать напрямую небезопасно, рекомендуется GetSource.
+        /// </remarks>
+        public ulong GetSourceCore(ulong link)
         {
             // Связь "точка" не имеет начала и конца
             //if (_links[link].Target == Null)
@@ -178,6 +181,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             });
         }
 
+        /// <remarks>
+        /// Использовать напрямую небезопасно, рекомендуется GetTarget.
+        /// </remarks>
         public ulong GetTargetCore(ulong link)
         {
             return _links[link].Target;

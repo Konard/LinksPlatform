@@ -19,7 +19,11 @@ namespace Platform.Links.DataBase.WebTerminal
             RouteConfig.RegisterRoutes(RouteTable.Routes);
             BundleConfig.RegisterBundles(BundleTable.Bundles);
 
-            Link.StartMemoryManager(Path.Combine(Server.MapPath("App_Data"), @"data.dat"));
+            var databaseFile = Path.Combine(Server.MapPath("App_Data"), @"data.dat");
+
+            File.Delete(databaseFile);
+
+            Link.StartMemoryManager(databaseFile);
         }
 
         public void Application_End()

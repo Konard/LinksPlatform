@@ -56,8 +56,6 @@
     <Compile Include="Triplets\Net.cs" />
     <Compile Include="Triplets\NumberHelpers.cs" />
     <Compile Include="Triplets\SequenceHelpers.cs" />
-    <Compile Include="Triplets\SequenceWalker.cs" />
-    <Compile Include="Triplets\StopableSequenceWalker.cs" />
     <Compile Include="Triplets\XmlGenerator.cs" />
   </ItemGroup>
   <ItemGroup>

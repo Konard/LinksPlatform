@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Platform.Links.DataBase.CoreUnsafe.Sequences;
 
 namespace Platform.Links.DataBase.CoreNet.Triplets
 {
@@ -20,7 +21,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
             sb.Append('[');
 
-            StopableSequenceWalker walker = new StopableSequenceWalker(sequence, element =>
+            var walker = new StopableSequenceWalker<Link>(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
             {
                 if (visitedElements > 0)
                     sb.Append(',');

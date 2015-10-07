@@ -79,6 +79,8 @@ namespace Platform.Links.DataBase.MasterServer
 
                 var printFormatBase = new String('0', linksTotalLength);
 
+                // Выделить код по печати одной связи в Extensions
+
                 string printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} ({{3}})", printFormatBase);
 
                 for (ulong link = UTF16LastCharLink + 1; link <= links.Total; link++)
@@ -136,12 +138,12 @@ namespace Platform.Links.DataBase.MasterServer
         {
             var linksSequenceQuery = new ulong[sequenceQuery.Length];
             for (int i = 0; i < sequenceQuery.Length; i++)
-                if (sequenceQuery[i] == '_')
-                    linksSequenceQuery[i] = 0;
-                else
+                //if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
+                //    linksSequenceQuery[i] = 0;
+                //else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            var resultList = sequences.Each(linksSequenceQuery); //sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
+            var resultList = sequences.GetAllMatchingSequences(linksSequenceQuery); //sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
 
             if (resultList.Count == 0)
             {

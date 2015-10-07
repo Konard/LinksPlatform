@@ -19,7 +19,7 @@ namespace Platform.Links.DataBase.WebTerminal.Models
             ReferersModels = referersModels;
         }
 
-        public static LinkModel CreateLinkModel(Link link, int nestingLevel = 3)
+        public static LinkModel CreateLinkModel(Link link, int nestingLevel = 5)
         {
             //ThreadHelpers.SyncInvokeWithExtendedStack(() =>
             //{

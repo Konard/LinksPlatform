@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Platform.Links.DataBase.CoreUnsafe.Sequences;
 
 namespace Platform.Links.DataBase.CoreNet.Triplets
 {
@@ -193,7 +194,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
         public static void WalkThroughSequence(this Link link, Action<Link> action)
         {
-            var walker = new SequenceWalker(link, action);
+            var walker = new SequenceWalker<Link>(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, action);
             walker.WalkFromLeftToRight();
         }
     }

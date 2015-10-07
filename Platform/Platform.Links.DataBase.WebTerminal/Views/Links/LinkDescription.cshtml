@@ -1,7 +1,11 @@
 ﻿@model Link
 
 <span class="link" title="@Model.ToString()">
+    <sub>@Model.ToIndex()</sub>
     <span class="source">@Html.ActionLink(Model.Source.ToString(), "Index", "Links", new { Id = Model.Source.ToInt() }, null)</span>
+    <sup class="source">@Model.Source.ToIndex()</sup>
     <span class="linker">@Html.ActionLink(Model.Linker.ToString(), "Index", "Links", new { Id = Model.Linker.ToInt() }, null)</span>
+    <sup class="linker">@Model.Linker.ToIndex()</sup>
     <span class="target">@Html.ActionLink(Model.Target.ToString(), "Index", "Links", new { Id = Model.Target.ToInt() }, null)</span>
+    <sup class="target">@Model.Target.ToIndex()</sup>
 </span>

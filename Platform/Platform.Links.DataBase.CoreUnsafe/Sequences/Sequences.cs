@@ -1,8 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Links.System.Helpers;
 using Platform.Links.System.Helpers.Synchronization;
+
+using LinkIndex = System.UInt64;
 
 namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 {
@@ -374,7 +379,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 //          ._x o_.
                 //           |___|
 
-                PartialStepRight(handler, sequence[0], sequence[1]);
+                PartialStepRight(x => handler(x), sequence[0], sequence[1]);
             }
             else
             {
@@ -383,25 +388,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             }
         }
 
-        public void PartialStepRight(Func<ulong, bool> handler, ulong left, ulong right)
+        private void PartialStepRight(Action<ulong> handler, ulong left, ulong right)
         {
             _links.Each(0, left, pair =>
             {
-                _links.Each(pair, 0, rightStep =>
-                {
-                    var upStep = rightStep;
-                    var firstSource = _links.GetTarget(rightStep);
-                    while (firstSource != right && firstSource != upStep)
-                    {
-                        upStep = firstSource;
-                        firstSource = _links.GetSource(upStep);
-                    }
-
-                    if (firstSource == right)
-                        handler(rightStep);
-
-                    return true;
-                });
+                StepRight(handler, pair, right);
 
                 if (left != pair)
                     PartialStepRight(handler, pair, right);
@@ -410,45 +401,67 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
-        public void StepRight(Func<ulong, bool> handler, ulong left, ulong right)
+        private void StepRight(Action<ulong> handler, ulong left, ulong right)
         {
             _links.Each(left, 0, rightStep =>
             {
-                var upStep = rightStep;
-                var firstSource = _links.GetTarget(rightStep);
-                while (firstSource != right && firstSource != upStep)
-                {
-                    upStep = firstSource;
-                    firstSource = _links.GetSource(upStep);
-                }
+                TryStepRightUp(handler, right, rightStep);
+                return true;
+            });
+        }
 
-                if (firstSource == right)
-                    handler(rightStep);
+        private void TryStepRightUp(Action<ulong> handler, ulong right, ulong stepFrom)
+        {
+            var upStep = stepFrom;
+            var firstSource = _links.GetTarget(upStep);
+            while (firstSource != right && firstSource != upStep)
+            {
+                upStep = firstSource;
+                firstSource = _links.GetSource(upStep);
+            }
+
+            if (firstSource == right)
+                handler(stepFrom);
+        }
+
+        // TODO: Test
+        private void PartialStepLeft(Action<ulong> handler, ulong left, ulong right)
+        {
+            _links.Each(right, 0, pair =>
+            {
+                StepLeft(handler, left, pair);
+
+                if (right != pair)
+                    PartialStepLeft(handler, left, pair);
 
                 return true;
             });
         }
 
-        public void StepLeft(Func<ulong, bool> handler, ulong left, ulong right)
+        private void StepLeft(Action<ulong> handler, ulong left, ulong right)
         {
             _links.Each(0, right, leftStep =>
             {
-                var upStep = leftStep;
-                var firstTarget = _links.GetSource(leftStep);
-                while (firstTarget != right && firstTarget != upStep)
-                {
-                    upStep = firstTarget;
-                    firstTarget = _links.GetTarget(upStep);
-                }
-
-                if (firstTarget == left)
-                    handler(leftStep);
-
+                TryStepLeftUp(handler, left, leftStep);
                 return true;
             });
         }
 
-        public bool StartsWith(ulong sequence, ulong link)
+        private void TryStepLeftUp(Action<ulong> handler, ulong left, ulong stepFrom)
+        {
+            var upStep = stepFrom;
+            var firstTarget = _links.GetSource(upStep);
+            while (firstTarget != left && firstTarget != upStep)
+            {
+                upStep = firstTarget;
+                firstTarget = _links.GetTarget(upStep);
+            }
+
+            if (firstTarget == left)
+                handler(stepFrom);
+        }
+
+        private bool StartsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
             var firstSource = _links.GetSource(upStep);
@@ -460,7 +473,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             return firstSource == link;
         }
 
-        public bool EndsWith(ulong sequence, ulong link)
+        private bool EndsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
             var lastTarget = _links.GetTarget(upStep);
@@ -492,47 +505,355 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public List<ulong> GetAllMatchingSequences(params ulong[] sequence)
         {
-            var results = new List<ulong>();
-
-            if (sequence.Length > 0)
+            return _sync.ExecuteReadOperation(() =>
             {
-                EnsureEachLinkExists(_links, sequence);
+                var results = new List<ulong>();
 
-                var firstElement = sequence[0];
-
-                if (sequence.Length == 1)
+                if (sequence.Length > 0)
                 {
-                    results.Add(firstElement);
-                    return results;
+                    EnsureEachLinkExists(_links, sequence);
+
+                    var firstElement = sequence[0];
+
+                    if (sequence.Length == 1)
+                    {
+                        results.Add(firstElement);
+                        return results;
+                    }
+                    if (sequence.Length == 2)
+                    {
+                        var pair = _links.Search(firstElement, sequence[1]);
+                        if (pair != Pairs.Links.Null)
+                            results.Add(pair);
+                        return results;
+                    }
+
+                    var lastElement = sequence[sequence.Length - 1];
+
+                    Action<ulong> handler = x =>
+                    {
+                        if (StartsWith(x, firstElement) && EndsWith(x, lastElement)) // TODO: Check lenght/contents (use Walker)
+                            results.Add(x);
+                    };
+
+                    if (sequence.Length >= 2)
+                        StepRight(handler, sequence[0], sequence[1]);
+
+                    var last = sequence.Length - 2;
+                    for (var i = 1; i < last; i++)
+                        PartialStepRight(handler, sequence[i], sequence[i + 1]);
+
+                    if (sequence.Length >= 3)
+                        StepLeft(handler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
                 }
-                if (sequence.Length == 2)
-                {
-                    var pair = _links.Search(firstElement, sequence[1]);
-                    if (pair != Pairs.Links.Null)
-                        results.Add(pair);
-                    return results;
-                }
 
-                var lastElement = sequence[sequence.Length - 1];
+                return results;
+            });
+        }
 
-                Func<ulong, bool> handler = x =>
+        public string FormatSequence(LinkIndex sequenceLink, params LinkIndex[] knownElements)
+        {
+            int visitedElements = 0;
+
+            var linksInSequence = new HashSet<ulong>(knownElements);
+
+            var sb = new StringBuilder();
+
+            sb.Append('[');
+
+            var walker = new StopableSequenceWalker<LinkIndex>(sequenceLink, _links.GetSourceCore, _links.GetTargetCore,
+                            x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, element =>
+            {
+                if (visitedElements > 0)
+                    sb.Append(',');
+
+                sb.Append(element.ToString());
+
+                visitedElements++;
+
+                if (visitedElements < MaxSequenceFormatSize)
                 {
-                    if (StartsWith(x, firstElement) && EndsWith(x, lastElement)) results.Add(x);
                     return true;
-                };
+                }
+                else
+                {
+                    sb.Append(", ...");
+                    return false;
+                }
+            });
 
-                if (sequence.Length >= 2)
-                    StepRight(handler, sequence[0], sequence[1]);
+            walker.WalkFromLeftToRight();
 
-                var last = sequence.Length - 2;
-                for (var i = 1; i < last; i++)
-                    PartialStepRight(handler, sequence[i], sequence[i + 1]);
+            sb.Append(']');
 
-                if (sequence.Length >= 3)
-                    StepLeft(handler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+            return sb.ToString();
+        }
+
+        public List<ulong> GetAllPartiallyMatchingSequences0(params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                //var tempFilename = Path.GetTempFileName();
+
+                if (sequence.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, sequence);
+
+                    var results = new HashSet<ulong>();
+
+                    for (int i = 0; i < sequence.Length; i++)
+                    {
+                        var before = results.Count;
+                        AllUsagesCore(sequence[i], results);
+                        var after = results.Count - before;
+                        if (before == after)
+                            return new List<ulong>();
+                    }
+
+                    var filteredResults = new List<ulong>();
+
+                    var linksInSequence = new HashSet<ulong>(sequence);
+
+                    foreach (var result in results)
+                    {
+                        var filterPosition = -1;
+
+                        var walker = new StopableSequenceWalker<LinkIndex>(result, _links.GetSourceCore, _links.GetTargetCore,
+                            x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, x =>
+                            {
+                                if (filterPosition == (sequence.Length - 1))
+                                    return false;
+
+                                if (filterPosition >= 0)
+                                {
+                                    if (x == sequence[filterPosition + 1])
+                                        filterPosition++;
+                                    else
+                                        return false;
+                                }
+
+                                if (filterPosition < 0)
+                                {
+                                    if (x == sequence[0])
+                                        filterPosition = 0;
+                                }
+
+                                //File.AppendAllText(tempFilename, string.Format("Sequence: {0}, position: {1}, element: {2}", result, filterPosition, x));
+                                //Console.WriteLine();
+
+                                return true;
+                            });
+
+
+                        walker.WalkFromLeftToRight();
+
+                        if (filterPosition == (sequence.Length - 1))
+                        {
+                            filteredResults.Add(result);
+                        }
+                    }
+
+                    return filteredResults;
+                }
+
+                return new List<ulong>();
+            });
+        }
+
+        public List<ulong> GetAllPartiallyMatchingSequences(params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                if (sequence.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, sequence);
+
+                    //var firstElement = sequence[0];
+
+                    //if (sequence.Length == 1)
+                    //{
+                    //    //results.Add(firstElement);
+                    //    return results;
+                    //}
+                    //if (sequence.Length == 2)
+                    //{
+                    //    //var pair = _links.Search(firstElement, sequence[1]);
+                    //    //if (pair != Pairs.Links.Null)
+                    //    //    results.Add(pair);
+                    //    return results;
+                    //}
+
+                    //var lastElement = sequence[sequence.Length - 1];
+
+                    //Func<ulong, bool> handler = x =>
+                    //{
+                    //    if (StartsWith(x, firstElement) && EndsWith(x, lastElement)) results.Add(x);
+                    //    return true;
+                    //};
+
+                    //if (sequence.Length >= 2)
+                    //    StepRight(handler, sequence[0], sequence[1]);
+
+                    //var last = sequence.Length - 2;
+                    //for (var i = 1; i < last; i++)
+                    //    PartialStepRight(handler, sequence[i], sequence[i + 1]);
+
+                    //if (sequence.Length >= 3)
+                    //    StepLeft(handler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+
+                    //////if (sequence.Length == 1)
+                    //////{
+                    //////    throw new NotImplementedException(); // all sequences, containing this element?
+                    //////}
+                    //////if (sequence.Length == 2)
+                    //////{
+                    //////    var results = new List<ulong>();
+                    //////    PartialStepRight(results.Add, sequence[0], sequence[1]);
+                    //////    return results;
+                    //////}
+
+                    //////var matches = new List<List<ulong>>();
+
+                    //////var last = sequence.Length - 1;
+                    //////for (var i = 0; i < last; i++)
+                    //////{
+                    //////    var results = new List<ulong>();
+                    //////    //StepRight(results.Add, sequence[i], sequence[i + 1]);
+                    //////    PartialStepRight(results.Add, sequence[i], sequence[i + 1]);
+
+                    //////    if (results.Count > 0)
+                    //////        matches.Add(results);
+                    //////    else
+                    //////        return results;
+
+                    //////    if (matches.Count == 2)
+                    //////    {
+                    //////        var merged = new List<ulong>();
+
+                    //////        for (var j = 0; j < matches[0].Count; j++)
+                    //////            for (var k = 0; k < matches[1].Count; k++)
+                    //////                CloseInnerConnections(merged.Add, matches[0][j], matches[1][k]);
+
+                    //////        if (merged.Count > 0)
+                    //////            matches = new List<List<ulong>> { merged };
+                    //////        else
+                    //////            return new List<ulong>();
+                    //////    }
+                    //////}
+
+                    //////if (matches.Count > 0)
+                    //////{
+                    //////    var usages = new HashSet<ulong>();
+
+                    //////    for (int i = 0; i < sequence.Length; i++)
+                    //////    {
+                    //////        AllUsagesCore(sequence[i], usages);
+                    //////    }
+
+                    //////    //for (int i = 0; i < matches[0].Count; i++)
+                    //////    //    AllUsagesCore(matches[0][i], usages);
+
+                    //////    //usages.UnionWith(matches[0]);
+
+                    //////    return usages.ToList();
+                    //////}
+
+                    var firstLinkUsages = new HashSet<ulong>();
+                    AllUsagesCore(sequence[0], firstLinkUsages);
+                    firstLinkUsages.Add(sequence[0]);
+                    //var previousMatchings = firstLinkUsages.ToList(); //new List<ulong>() { sequence[0] }; // or all sequences, containing this element?
+                    //return GetAllPartiallyMatchingSequencesCore(sequence, firstLinkUsages, 1).ToList();
+
+                    var results = new HashSet<ulong>();
+                    foreach (var match in GetAllPartiallyMatchingSequencesCore(sequence, firstLinkUsages, 1))
+                        AllUsagesCore(match, results);
+                    return results.ToList();
+                }
+
+                return new List<ulong>();
+            });
+        }
+
+        public HashSet<ulong> AllUsages(ulong link)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var usages = new HashSet<ulong>();
+                AllUsagesCore(link, usages);
+                return usages;
+            });
+        }
+
+        private void AllUsagesCore(ulong link, HashSet<ulong> usages)
+        {
+            Func<ulong, bool> handler = pair =>
+            {
+                if (usages.Add(pair)) AllUsagesCore(pair, usages);
+                return true;
+            };
+            _links.Each(link, 0, handler);
+            _links.Each(0, link, handler);
+        }
+
+        private void CloseInnerConnections(Action<ulong> handler, ulong left, ulong right)
+        {
+            TryStepLeftUp(handler, left, right);
+            TryStepRightUp(handler, right, left);
+        }
+
+        private void AllCloseConnections(Action<ulong> handler, ulong left, ulong right)
+        {
+            // Direct
+
+            if (left == right)
+                handler(left);
+            var pair = _links.Search(left, right);
+            if (pair != Pairs.Links.Null)
+                handler(pair);
+
+            // Inner
+
+            CloseInnerConnections(handler, left, right);
+
+            // Outer
+
+            StepLeft(handler, left, right);
+            StepRight(handler, left, right);
+
+            PartialStepRight(handler, left, right);
+            PartialStepLeft(handler, left, right);
+        }
+
+        private HashSet<ulong> GetAllPartiallyMatchingSequencesCore(ulong[] sequence, HashSet<ulong> previousMatchings, long startAt)
+        {
+            if (startAt >= sequence.Length) // ?
+                return previousMatchings;
+
+            var secondLinkUsages = new HashSet<ulong>();
+            AllUsagesCore(sequence[startAt], secondLinkUsages);
+            secondLinkUsages.Add(sequence[startAt]);
+
+            var matchings = new HashSet<ulong>();
+
+            //for (var i = 0; i < previousMatchings.Count; i++)
+
+            foreach (var secondLinkUsage in secondLinkUsages)
+            {
+                foreach (var previousMatching in previousMatchings)
+                {
+                    //AllCloseConnections(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
+
+                    StepRight(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
+                    TryStepRightUp(matchings.AddAndReturnVoid, secondLinkUsage, previousMatching);
+                    //PartialStepRight(matchings.AddAndReturnVoid, secondLinkUsage, sequence[startAt]); // почему-то эта ошибочная запись приводит к желаемым результам.
+                    PartialStepRight(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
+                }
             }
 
-            return results;
+            if (matchings.Count == 0)
+                return matchings;
+
+            return GetAllPartiallyMatchingSequencesCore(sequence, matchings, startAt + 1); // ??
         }
 
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
@@ -920,6 +1241,50 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
 
             return added > 0;
+        }
+
+        #endregion
+
+
+        #region Walkers
+
+        public class Walker
+        {
+            private readonly Sequences _sequences;
+            private readonly Pairs.Links _links;
+            private readonly ISyncronization _sync = new SafeSynchronization();
+
+            public Walker(Sequences sequences)
+            {
+                _sequences = sequences;
+                _links = _sequences._links;
+                _sync = _sequences._sync;
+            }
+
+            protected virtual bool IsElement(LinkIndex link)
+            {
+                return _links.GetTargetCore(link) == link;
+            }
+
+            public void WalkRight(LinkIndex sequence, Action<LinkIndex> visit)
+            {
+                _sequences._sync.ExecuteReadOperation(() => (new SequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromLeftToRight());
+            }
+
+            public void WalkLeft(LinkIndex sequence, Action<LinkIndex> visit)
+            {
+                _sync.ExecuteReadOperation(() => (new SequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromRightToLeft());
+            }
+
+            public bool WalkRight(LinkIndex sequence, Func<LinkIndex, bool> visit)
+            {
+                return _sync.ExecuteReadOperation(() => (new StopableSequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromLeftToRight());
+            }
+
+            public bool WalkLeft(LinkIndex sequence, Func<LinkIndex, bool> visit)
+            {
+                return _sync.ExecuteReadOperation(() => (new StopableSequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromRightToLeft());
+            }
         }
 
         #endregion

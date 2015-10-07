@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Platform.Links.DataBase.CoreUnsafe.Sequences;
 
 namespace Platform.Links.DataBase.CoreNet.Triplets
 {
@@ -24,7 +25,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
         public static List<Link> ToList(Link link)
         {
             var list = new List<Link>();
-            var walker = new SequenceWalker(link, list.Add);
+            var walker = new SequenceWalker<Link>(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, list.Add);
             walker.WalkFromLeftToRight();
             return list;
         }
