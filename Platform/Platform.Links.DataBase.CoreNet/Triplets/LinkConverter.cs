@@ -25,8 +25,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
         public static List<Link> ToList(Link link)
         {
             var list = new List<Link>();
-            var walker = new SequenceWalker<Link>(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, list.Add);
-            walker.WalkFromLeftToRight();
+            SequenceWalker.WalkRight(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, list.Add);
             return list;
         }
 

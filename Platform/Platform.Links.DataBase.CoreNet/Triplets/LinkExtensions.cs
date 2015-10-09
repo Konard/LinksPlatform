@@ -194,8 +194,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
         public static void WalkThroughSequence(this Link link, Action<Link> action)
         {
-            var walker = new SequenceWalker<Link>(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, action);
-            walker.WalkFromLeftToRight();
+            SequenceWalker.WalkRight(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, action);
         }
     }
 }

@@ -21,7 +21,7 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
             sb.Append('[');
 
-            var walker = new StopableSequenceWalker<Link>(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
+            var walker = StopableSequenceWalker.WalkRight(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
             {
                 if (visitedElements > 0)
                     sb.Append(',');
@@ -40,8 +40,6 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
                     return false;
                 }
             });
-
-            walker.WalkFromLeftToRight();
 
             sb.Append(']');
 

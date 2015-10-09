@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Text;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
@@ -180,11 +179,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 if (sequence.Length == 1)
                     return sequence[0];
 
-                return CreateBalancedVariantCore(sequence);
+                return CreateBalancedVariantCore1(sequence);
             });
         }
 
-        private ulong CreateBalancedVariantCore(params ulong[] sequence)
+        private ulong CreateBalancedVariantCore0(params ulong[] sequence)
         {
             do
             {
@@ -198,6 +197,34 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                 sequence = innerSequence;
             } while (true);
+        }
+
+        private ulong CreateBalancedVariantCore1(params ulong[] sequence)
+        {
+            var length = sequence.Length;
+
+            // Needed only if we not allowed to change sequence itself (so it makes copy)
+            // Нужно только если исходный массив последовательности изменять нельзя (тогда делается его копия)
+            if (length > 2)
+            {
+                var innerSequence = new ulong[length / 2 + length % 2];
+
+                for (var i = 0; i < length; i += 2)
+                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
+
+                sequence = innerSequence;
+                length = innerSequence.Length;
+            }
+
+            while (length > 2)
+            {
+                for (var i = 0; i < length; i += 2)
+                    sequence[i / 2] = i + 1 == length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
+
+                length = length / 2 + length % 2;
+            }
+
+            return _links.Create(sequence[0], sequence[1]);
         }
 
         /// <remarks>
@@ -503,7 +530,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
-        public List<ulong> GetAllMatchingSequences(params ulong[] sequence)
+        public List<ulong> GetAllMatchingSequences0(params ulong[] sequence)
         {
             return _sync.ExecuteReadOperation(() =>
             {
@@ -528,21 +555,13 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                         return results;
                     }
 
-                    var lastElement = sequence[sequence.Length - 1];
-
                     var linksInSequence = new HashSet<ulong>(sequence);
 
                     Action<ulong> handler = result =>
                     {
-                        // Проверку на первый и последний элемент можно делать только в том случае, если в исходной последовательности
-                        // нет повторяющихся символов
-                        //if (StartsWith(x, firstElement) && EndsWith(x, lastElement))
-                        
-                        // Check lenght/contents (use Walker) done:
-
                         var filterPosition = 0;
 
-                        var walker = new StopableSequenceWalker<LinkIndex>(result, _links.GetSourceCore, _links.GetTargetCore,
+                        StopableSequenceWalker.WalkRight(result, _links.GetSourceCore, _links.GetTargetCore,
                             x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, x =>
                             {
                                 if (filterPosition == sequence.Length)
@@ -559,12 +578,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                                 filterPosition++;
 
-                                //File.AppendAllText(tempFilename, string.Format("Sequence: {0}, position: {1}, element: {2}", result, filterPosition, x));
-                                //Console.WriteLine();
-
                                 return true;
                             });
-                        walker.WalkFromLeftToRight();
 
                         if (filterPosition == sequence.Length)
                         {
@@ -587,6 +602,48 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
+        public List<ulong> GetAllMatchingSequences1(params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var results = new List<ulong>();
+
+                if (sequence.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, sequence);
+
+                    var firstElement = sequence[0];
+
+                    if (sequence.Length == 1)
+                    {
+                        results.Add(firstElement);
+                        return results;
+                    }
+                    if (sequence.Length == 2)
+                    {
+                        var pair = _links.Search(firstElement, sequence[1]);
+                        if (pair != Pairs.Links.Null)
+                            results.Add(pair);
+                        return results;
+                    }
+
+                    var matcher = new Matcher(this, sequence, results);
+
+                    if (sequence.Length >= 2)
+                        StepRight(matcher.AddFullMatchedToResults, sequence[0], sequence[1]);
+
+                    var last = sequence.Length - 2;
+                    for (var i = 1; i < last; i++)
+                        PartialStepRight(matcher.AddFullMatchedToResults, sequence[i], sequence[i + 1]);
+
+                    if (sequence.Length >= 3)
+                        StepLeft(matcher.AddFullMatchedToResults, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+                }
+
+                return results;
+            });
+        }
+
         public string FormatSequence(LinkIndex sequenceLink, params LinkIndex[] knownElements)
         {
             int visitedElements = 0;
@@ -597,28 +654,26 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             sb.Append('[');
 
-            var walker = new StopableSequenceWalker<LinkIndex>(sequenceLink, _links.GetSourceCore, _links.GetTargetCore,
-                            x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, element =>
-            {
-                if (visitedElements > 0)
-                    sb.Append(',');
-
-                sb.Append(element.ToString());
-
-                visitedElements++;
-
-                if (visitedElements < MaxSequenceFormatSize)
+            StopableSequenceWalker.WalkRight(sequenceLink, _links.GetSourceCore, _links.GetTargetCore,
+                x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, element =>
                 {
-                    return true;
-                }
-                else
-                {
-                    sb.Append(", ...");
-                    return false;
-                }
-            });
+                    if (visitedElements > 0)
+                        sb.Append(',');
 
-            walker.WalkFromLeftToRight();
+                    sb.Append(element.ToString());
+
+                    visitedElements++;
+
+                    if (visitedElements < MaxSequenceFormatSize)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        sb.Append(", ...");
+                        return false;
+                    }
+                });
 
             sb.Append(']');
 
@@ -638,13 +693,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     var results = new HashSet<ulong>();
 
                     for (int i = 0; i < sequence.Length; i++)
-                    {
-                        var before = results.Count;
                         AllUsagesCore(sequence[i], results);
-                        var after = results.Count - before;
-                        if (before == after)
-                            return new List<ulong>();
-                    }
 
                     var filteredResults = new List<ulong>();
 
@@ -654,7 +703,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     {
                         var filterPosition = -1;
 
-                        var walker = new StopableSequenceWalker<LinkIndex>(result, _links.GetSourceCore, _links.GetTargetCore,
+                        StopableSequenceWalker.WalkRight(result, _links.GetSourceCore, _links.GetTargetCore,
                             x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, x =>
                             {
                                 if (filterPosition == (sequence.Length - 1))
@@ -679,7 +728,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
                                 return true;
                             });
-                        walker.WalkFromLeftToRight();
 
                         if (filterPosition == (sequence.Length - 1))
                         {
@@ -688,6 +736,64 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     }
 
                     return filteredResults;
+                }
+
+                return new List<ulong>();
+            });
+        }
+
+        public List<ulong> GetAllPartiallyMatchingSequences1(params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                //var tempFilename = Path.GetTempFileName();
+
+                if (sequence.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, sequence);
+
+                    var results = new HashSet<ulong>();
+
+                    for (int i = 0; i < sequence.Length; i++)
+                    {
+                        AllUsagesCore(sequence[i], results);
+                    }
+
+                    var filteredResults = new List<ulong>();
+
+                    var matcher = new Matcher(this, sequence, filteredResults);
+
+                    foreach (var result in results)
+                        matcher.AddPartialMatchedToResults(result);
+
+                    return filteredResults;
+                }
+
+                return new List<ulong>();
+            });
+        }
+
+        // Могут быть проблемы, если с теми же элементами есть по разному упорядоченные последовательности
+        public List<ulong> GetAllPartiallyMatchingSequences2(params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                if (sequence.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, sequence);
+
+                    var results = new HashSet<ulong>();
+                    AllUsagesCore(sequence[0], results);
+
+                    for (int i = 1; i < sequence.Length; i++)
+                    {
+                        var next = new HashSet<ulong>();
+                        AllUsagesCore(sequence[i], next);
+
+                        results.IntersectWith(next);
+                    }
+
+                    return results.ToList();
                 }
 
                 return new List<ulong>();
@@ -818,6 +924,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
+        // При сборе всех использований (последовательностей) можно сохранять обратный путь к той связи с которой начинался поиск (STTTSSSTT),
+        // причём достаточно одного бита для хранения перехода влево или вправо
         private void AllUsagesCore(ulong link, HashSet<ulong> usages)
         {
             Func<ulong, bool> handler = pair =>
@@ -892,7 +1000,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
         {
-            var bestVariant = CreateBalancedVariantCore(newSequence);
+            var bestVariant = CreateBalancedVariantCore0(newSequence);
 
             foreach (var variant in Each(sequence))
                 if (variant != bestVariant)
@@ -1284,15 +1392,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public class Walker
         {
-            private readonly Sequences _sequences;
-            private readonly Pairs.Links _links;
-            private readonly ISyncronization _sync = new SafeSynchronization();
+            protected readonly Pairs.Links _links;
 
             public Walker(Sequences sequences)
             {
-                _sequences = sequences;
-                _links = _sequences._links;
-                _sync = _sequences._sync;
+                _links = sequences._links;
             }
 
             protected virtual bool IsElement(LinkIndex link)
@@ -1302,22 +1406,114 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             public void WalkRight(LinkIndex sequence, Action<LinkIndex> visit)
             {
-                _sequences._sync.ExecuteReadOperation(() => (new SequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromLeftToRight());
+                SequenceWalker.WalkRight(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
             }
 
             public void WalkLeft(LinkIndex sequence, Action<LinkIndex> visit)
             {
-                _sync.ExecuteReadOperation(() => (new SequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromRightToLeft());
+                SequenceWalker.WalkLeft(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
             }
 
             public bool WalkRight(LinkIndex sequence, Func<LinkIndex, bool> visit)
             {
-                return _sync.ExecuteReadOperation(() => (new StopableSequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromLeftToRight());
+                return StopableSequenceWalker.WalkRight(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
             }
 
             public bool WalkLeft(LinkIndex sequence, Func<LinkIndex, bool> visit)
             {
-                return _sync.ExecuteReadOperation(() => (new StopableSequenceWalker<LinkIndex>(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit)).WalkFromRightToLeft());
+                return StopableSequenceWalker.WalkLeft(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
+            }
+        }
+
+        public class Matcher : Walker
+        {
+            private readonly ulong[] _patternSequence;
+            private readonly HashSet<LinkIndex> _linksInSequence;
+            private readonly List<LinkIndex> _results;
+            private long _filterPosition;
+
+            public Matcher(Sequences sequences, LinkIndex[] patternSequence, List<LinkIndex> results)
+                : base(sequences)
+            {
+                _patternSequence = patternSequence;
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence);
+                _results = results;
+            }
+
+            protected override bool IsElement(ulong link)
+            {
+                return _linksInSequence.Contains(link) || _links.GetTargetCore(link) == link;
+            }
+
+            public bool FullMatch(LinkIndex sequenceToMatch)
+            {
+                _filterPosition = 0;
+
+                WalkRight(sequenceToMatch, (Func<ulong, bool>)FullMatchCore);
+
+                return _filterPosition == _patternSequence.Length;
+            }
+
+            private bool FullMatchCore(LinkIndex element)
+            {
+                if (_filterPosition == _patternSequence.Length)
+                {
+                    _filterPosition = -2; // Длиннее чем нужно
+                    return false;
+                }
+
+                if (element != _patternSequence[_filterPosition])
+                {
+                    _filterPosition = -1;
+                    return false; // Начинается иначе
+                }
+
+                _filterPosition++;
+
+                return true;
+            }
+
+            public void AddFullMatchedToResults(ulong sequenceToMatch)
+            {
+                if (FullMatch(sequenceToMatch))
+                    _results.Add(sequenceToMatch);
+            }
+
+            public bool PartialMatch(LinkIndex sequenceToMatch)
+            {
+                _filterPosition = -1;
+
+                WalkRight(sequenceToMatch, (Func<ulong, bool>)PartialMatchCore);
+
+                return _filterPosition == _patternSequence.Length - 1;
+            }
+
+            private bool PartialMatchCore(LinkIndex element)
+            {
+                if (_filterPosition == (_patternSequence.Length - 1))
+                    return false;
+
+                if (_filterPosition >= 0)
+                {
+                    if (element == _patternSequence[_filterPosition + 1])
+                        _filterPosition++;
+                    else
+                        return false;
+                }
+
+                if (_filterPosition < 0)
+                {
+                    if (element == _patternSequence[0])
+                        _filterPosition = 0;
+                }
+
+                return true;
+            }
+
+            public void AddPartialMatchedToResults(ulong sequenceToMatch)
+            {
+                if (PartialMatch(sequenceToMatch))
+                    _results.Add(sequenceToMatch);
             }
         }
 

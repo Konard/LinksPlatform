@@ -143,7 +143,7 @@ namespace Platform.Links.DataBase.MasterServer
                 //else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            var resultList = sequences.GetAllMatchingSequences(linksSequenceQuery); //sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
+            var resultList = sequences.GetAllMatchingSequences1(linksSequenceQuery); //sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
 
             if (resultList.Count == 0)
             {
@@ -160,7 +160,7 @@ namespace Platform.Links.DataBase.MasterServer
             }
 
 
-            var resultHash = sequences.GetAllPartiallyMatchingSequences0(linksSequenceQuery);
+            var resultHash = sequences.GetAllPartiallyMatchingSequences1(linksSequenceQuery);
 
             // Subsequences
             if (resultHash.Count == 0)
