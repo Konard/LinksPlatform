@@ -10,6 +10,8 @@
 ![white link, black directed link](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/8.png "white link, black directed link")
 ![white regular & directed links, black typed link](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/9.png "white regular & directed links, black typed link")
 ![white regular & directed links with recursive inner structure, black typed link with recursive inner structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/10.png "white regular & directed links with recursive inner structure, black typed link with recursive inner structure")
+![white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/11.png "white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure")
+![white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/12.png "white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure")
 
 Inspired by work of Simon Williams (The Associative Model of Data, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
 

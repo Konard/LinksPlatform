@@ -12,7 +12,7 @@ namespace Platform.Tests.Links.DataBase.Core
     [TestClass]
     public class LinksTests
     {
-        private const long Iterations = 1*1024*1024;
+        private const long Iterations = 10*1024;
 
         private static readonly long DefaultLinksSize = (long) Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes*
                                                         1*1024*1024;

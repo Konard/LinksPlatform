@@ -46,6 +46,12 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
     /// </remarks>
     public sealed partial class Sequences // IList<string>, IList<ulong[]> (после завершения реализации Sequences)
     {
+        /// <summary>Возвращает значение ulong, обозначающее любую одну связь.</summary>
+        public const ulong Any = Pairs.Links.Any;
+
+        /// <summary>Возвращает значение ulong, обозначающее любое количество связей.</summary>
+        public const ulong ZeroOrMany = ulong.MaxValue;
+
         private readonly Pairs.Links _links;
         private readonly ISyncronization _sync = new SafeSynchronization();
 
@@ -602,11 +608,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
-        public List<ulong> GetAllMatchingSequences1(params ulong[] sequence)
+        public HashSet<ulong> GetAllMatchingSequences1(params ulong[] sequence)
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                var results = new List<ulong>();
+                var results = new HashSet<ulong>();
 
                 if (sequence.Length > 0)
                 {
@@ -644,7 +650,14 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
+        public const int MaxSequenceFormatSize = 200;
+
         public string FormatSequence(LinkIndex sequenceLink, params LinkIndex[] knownElements)
+        {
+            return FormatSequence(sequenceLink, x => x.ToString(), true, knownElements);
+        }
+
+        public string FormatSequence(LinkIndex sequenceLink, Func<LinkIndex, string> elementToString, bool insertComma, params LinkIndex[] knownElements)
         {
             int visitedElements = 0;
 
@@ -654,26 +667,29 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             sb.Append('[');
 
-            StopableSequenceWalker.WalkRight(sequenceLink, _links.GetSourceCore, _links.GetTargetCore,
-                x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, element =>
-                {
-                    if (visitedElements > 0)
-                        sb.Append(',');
-
-                    sb.Append(element.ToString());
-
-                    visitedElements++;
-
-                    if (visitedElements < MaxSequenceFormatSize)
+            if (_links.Exists(sequenceLink))
+            {
+                StopableSequenceWalker.WalkRight(sequenceLink, _links.GetSourceCore, _links.GetTargetCore,
+                    x => linksInSequence.Contains(x) || _links.GetTargetCore(x) == x, element =>
                     {
-                        return true;
-                    }
-                    else
-                    {
-                        sb.Append(", ...");
-                        return false;
-                    }
-                });
+                        if (insertComma && visitedElements > 0)
+                            sb.Append(',');
+
+                        sb.Append(elementToString(element));
+
+                        visitedElements++;
+
+                        if (visitedElements < MaxSequenceFormatSize)
+                        {
+                            return true;
+                        }
+                        else
+                        {
+                            sb.Append(insertComma ? ", ..." : "...");
+                            return false;
+                        }
+                    });
+            }
 
             sb.Append(']');
 
@@ -684,8 +700,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                //var tempFilename = Path.GetTempFileName();
-
                 if (sequence.Length > 0)
                 {
                     EnsureEachLinkExists(_links, sequence);
@@ -723,9 +737,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                                         filterPosition = 0;
                                 }
 
-                                //File.AppendAllText(tempFilename, string.Format("Sequence: {0}, position: {1}, element: {2}", result, filterPosition, x));
-                                //Console.WriteLine();
-
                                 return true;
                             });
 
@@ -742,61 +753,25 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             });
         }
 
-        public List<ulong> GetAllPartiallyMatchingSequences1(params ulong[] sequence)
+        public HashSet<ulong> GetAllPartiallyMatchingSequences1(params ulong[] sequence)
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                //var tempFilename = Path.GetTempFileName();
-
                 if (sequence.Length > 0)
                 {
                     EnsureEachLinkExists(_links, sequence);
 
                     var results = new HashSet<ulong>();
-
                     for (int i = 0; i < sequence.Length; i++)
-                    {
                         AllUsagesCore(sequence[i], results);
-                    }
 
-                    var filteredResults = new List<ulong>();
-
+                    var filteredResults = new HashSet<ulong>();
                     var matcher = new Matcher(this, sequence, filteredResults);
-
-                    foreach (var result in results)
-                        matcher.AddPartialMatchedToResults(result);
-
+                    matcher.AddAllPartialMatchedToResults(results);
                     return filteredResults;
                 }
 
-                return new List<ulong>();
-            });
-        }
-
-        // Могут быть проблемы, если с теми же элементами есть по разному упорядоченные последовательности
-        public List<ulong> GetAllPartiallyMatchingSequences2(params ulong[] sequence)
-        {
-            return _sync.ExecuteReadOperation(() =>
-            {
-                if (sequence.Length > 0)
-                {
-                    EnsureEachLinkExists(_links, sequence);
-
-                    var results = new HashSet<ulong>();
-                    AllUsagesCore(sequence[0], results);
-
-                    for (int i = 1; i < sequence.Length; i++)
-                    {
-                        var next = new HashSet<ulong>();
-                        AllUsagesCore(sequence[i], next);
-
-                        results.IntersectWith(next);
-                    }
-
-                    return results.ToList();
-                }
-
-                return new List<ulong>();
+                return new HashSet<ulong>();
             });
         }
 
@@ -937,6 +912,57 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             _links.Each(0, link, handler);
         }
 
+        private class AllUsagesCollector
+        {
+            private readonly Pairs.Links _links;
+            private readonly HashSet<ulong> _usages;
+
+            public AllUsagesCollector(Pairs.Links links, HashSet<ulong> usages)
+            {
+                _links = links;
+                _usages = usages;
+            }
+
+            public bool Collect(ulong link)
+            {
+                if (_usages.Add(link))
+                {
+                    _links.Each(link, 0, Collect);
+                    _links.Each(0, link, Collect);
+                }
+                return true;
+            }
+        }
+
+        private class AllUsagesIntersectingCollector
+        {
+            private readonly Pairs.Links _links;
+            private readonly HashSet<ulong> _intersectWith;
+            private readonly HashSet<ulong> _usages;
+            private readonly HashSet<ulong> _enter; 
+
+            public AllUsagesIntersectingCollector(Pairs.Links links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
+            {
+                _links = links;
+                _intersectWith = intersectWith;
+                _usages = usages;
+                _enter = new HashSet<ulong>(); // защита от зацикливания
+            }
+
+            public bool Collect(ulong link)
+            {
+                if (_enter.Add(link))
+                {
+                    if (_intersectWith.Contains(link))
+                        _usages.Add(link);
+
+                    _links.Each(link, 0, Collect);
+                    _links.Each(0, link, Collect);
+                }
+                return true;
+            }
+        }
+
         private void CloseInnerConnections(Action<ulong> handler, ulong left, ulong right)
         {
             TryStepLeftUp(handler, left, right);
@@ -1070,28 +1096,146 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                         string.Format("patternSequence[{0}]", i));
         }
 
+        private static void EnsureEachLinkIsAnyOrZeroOrManyOrExists(Pairs.Links links, params ulong[] sequence)
+        {
+            if (sequence == null)
+                return;
+
+            for (var i = 0; i < sequence.Length; i++)
+                if (sequence[i] != Pairs.Links.Null && sequence[i] != ZeroOrMany && !links.Exists(sequence[i]))
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
+                        string.Format("patternSequence[{0}]", i));
+        }
+
         // Pattern Matching -> Key To Triggers
-        // Добавлять ли oneOrMany, anyone?
-        public void MatchPattern(ulong zeroOrMany, params ulong[] patternSequence)
+        public HashSet<ulong> MatchPattern(params ulong[] patternSequence)
         {
-            patternSequence = Simplify(zeroOrMany, patternSequence);
+            return _sync.ExecuteReadOperation(() =>
+            {
+                patternSequence = Simplify(patternSequence);
+
+                if (patternSequence.Length > 0)
+                {
+                    EnsureEachLinkIsAnyOrZeroOrManyOrExists(_links, patternSequence);
+
+                    var uniqueSequenceElements = new HashSet<ulong>();
+                    for (var i = 0; i < patternSequence.Length; i++)
+                        if (patternSequence[i] != Pairs.Links.Null && patternSequence[i] != ZeroOrMany)
+                            uniqueSequenceElements.Add(patternSequence[i]);
+
+                    var results = new HashSet<ulong>();
+
+                    foreach (var uniqueSequenceElement in uniqueSequenceElements)
+                        AllUsagesCore(uniqueSequenceElement, results);
+
+                    var filteredResults = new HashSet<ulong>();
+                    var matcher = new PatternMatcher(this, patternSequence, filteredResults);
+                    matcher.AddAllPatternMatchedToResults(results);
+                    return filteredResults;
+                }
+
+                return new HashSet<ulong>();
+            });
         }
 
-        // Найти все возможные связи между указанным списком связей
-        // Нужно находить связи между всеми указанными связями в любом порядке?
-        // Или можно взять произвольные множества связей из исходного множества и найти для каждого из них все возможные связи?
-        public void FindAllConnections(params ulong[] linksToConnect)
+        // Найти все возможные связи между указанным списком связей.
+        // Находит связи между всеми указанными связями в любом порядке.
+        // TODO: решить что делать с повторами (когда одни и те же элементы встречаются несколько раз в последовательности)
+        public HashSet<ulong> GetAllConnections(params ulong[] linksToConnect)
         {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var results = new HashSet<ulong>();
+
+                if (linksToConnect.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, linksToConnect);
+
+                    AllUsagesCore(linksToConnect[0], results);
+
+                    for (int i = 1; i < linksToConnect.Length; i++)
+                    {
+                        var next = new HashSet<ulong>();
+                        AllUsagesCore(linksToConnect[i], next);
+
+                        results.IntersectWith(next);
+                    }
+                }
+
+                return results;
+            });
         }
 
-        private static ulong[] Simplify(ulong zeroOrMany, ulong[] sequence)
+        public HashSet<ulong> GetAllConnections1(params ulong[] linksToConnect)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var results = new HashSet<ulong>();
+
+                if (linksToConnect.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, linksToConnect);
+
+                    var collector1 = new AllUsagesCollector(_links, results);
+                    collector1.Collect(linksToConnect[0]);
+
+                    for (int i = 1; i < linksToConnect.Length; i++)
+                    {
+                        var next = new HashSet<ulong>();
+                        var collector = new AllUsagesCollector(_links, next);
+                        collector.Collect(linksToConnect[i]);
+
+                        results.IntersectWith(next);
+                    }
+                }
+
+                
+
+                return results;
+            });
+        }
+
+        public HashSet<ulong> GetAllConnections2(params ulong[] linksToConnect)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var results = new HashSet<ulong>();
+
+                if (linksToConnect.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, linksToConnect);
+
+                    var collector1 = new AllUsagesCollector(_links, results);
+                    collector1.Collect(linksToConnect[0]);
+
+                    //AllUsagesCore(linksToConnect[0], results);
+
+                    for (int i = 1; i < linksToConnect.Length; i++)
+                    {
+                        var next = new HashSet<ulong>();
+                        var collector = new AllUsagesIntersectingCollector(_links, results, next);
+                        collector.Collect(linksToConnect[i]);
+
+                        //AllUsagesCore(linksToConnect[i], next);
+
+                        //results.IntersectWith(next);
+
+                        results = next;
+                    }
+                }
+
+                return results;
+            });
+        }
+
+        private static ulong[] Simplify(ulong[] sequence)
         {
             // Считаем новый размер последовательности
             long newLength = 0;
             bool zeroOrManyStepped = false;
             for (int i = 0; i < sequence.Length; i++)
             {
-                if (sequence[i] == zeroOrMany)
+                if (sequence[i] == ZeroOrMany)
                 {
                     if (zeroOrManyStepped)
                         continue;
@@ -1125,7 +1269,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                 //zeroOrManyStepped = newZeroOrManyStepped;
 
 
-                if (sequence[i] == zeroOrMany)
+                if (sequence[i] == ZeroOrMany)
                 {
                     if (zeroOrManyStepped)
                         continue;
@@ -1147,12 +1291,16 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public static void TestSimplify()
         {
-            var sequence = new ulong[] { 1, 1, 2, 3, 4, 1, 1, 1, 4, 1, 1, 1 };
+            var sequence = new ulong[] { ZeroOrMany, ZeroOrMany, 2, 3, 4, ZeroOrMany, ZeroOrMany, ZeroOrMany, 4, ZeroOrMany, ZeroOrMany, ZeroOrMany };
             const ulong zeroOrMany = 1UL;
 
-            var simplifiedSequence = Simplify(zeroOrMany, sequence);
+            var simplifiedSequence = Simplify(sequence);
         }
 
+        public List<ulong> GetSimilarSequences()
+        {
+            return new List<ulong>();
+        }
 
         public void Prediction()
         {
@@ -1162,45 +1310,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         #region From Triplets
 
-        public const int MaxSequenceFormatSize = 20;
-
         //public static void DeleteSequence(Link sequence)
         //{
-        //}
-
-        //public static FormatSequence(Link sequence)
-        //{
-        //    int visitedElements = 0;
-
-        //    StringBuilder sb = new StringBuilder();
-
-        //    sb.Append('[');
-
-        //    StopableSequenceWalker walker = new StopableSequenceWalker(sequence, element =>
-        //    {
-        //        if (visitedElements > 0)
-        //            sb.Append(',');
-
-        //        sb.Append(element.ToString());
-
-        //        visitedElements++;
-
-        //        if (visitedElements < MaxSequenceFormatSize)
-        //        {
-        //            return true;
-        //        }
-        //        else
-        //        {
-        //            sb.Append(", ...");
-        //            return false;
-        //        }
-        //    });
-
-        //    walker.WalkFromLeftToRight();
-
-        //    sb.Append(']');
-
-        //    return sb.ToString();
         //}
 
         public List<ulong> CollectMatchingSequences(ulong[] links)
@@ -1429,14 +1540,14 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
         {
             private readonly ulong[] _patternSequence;
             private readonly HashSet<LinkIndex> _linksInSequence;
-            private readonly List<LinkIndex> _results;
+            private readonly HashSet<LinkIndex> _results;
             private long _filterPosition;
 
-            public Matcher(Sequences sequences, LinkIndex[] patternSequence, List<LinkIndex> results)
+            public Matcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results)
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence);
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Pairs.Links.Null && x != ZeroOrMany));
                 _results = results;
             }
 
@@ -1514,6 +1625,332 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             {
                 if (PartialMatch(sequenceToMatch))
                     _results.Add(sequenceToMatch);
+            }
+
+            public void AddAllPartialMatchedToResults(IEnumerable<ulong> sequencesToMatch)
+            {
+                foreach (var sequenceToMatch in sequencesToMatch)
+                    if (PartialMatch(sequenceToMatch))
+                        _results.Add(sequenceToMatch);
+            }
+        }
+
+        public class PatternMatcher : Walker
+        {
+            private readonly ulong[] _patternSequence;
+            private readonly HashSet<LinkIndex> _linksInSequence;
+            private readonly HashSet<LinkIndex> _results;
+
+            #region Pattern Match
+
+            enum PatternBlockType
+            {
+                Undefined,
+                Gap,
+                Elements
+            }
+
+            struct PatternBlock
+            {
+                public PatternBlockType Type;
+                public long Start;
+                public long Stop;
+            }
+
+            private List<PatternBlock> _pattern;
+            private int _patternPosition;
+            private long _sequencePosition;
+
+            #endregion
+
+            public PatternMatcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results)
+                : base(sequences)
+            {
+                _patternSequence = patternSequence;
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Pairs.Links.Null && x != ZeroOrMany));
+                _results = results;
+
+                // TODO: Переместить в PatternMatcher
+                _pattern = CreateDetailedPattern();
+            }
+
+            protected override bool IsElement(ulong link)
+            {
+                return _linksInSequence.Contains(link) || _links.GetTargetCore(link) == link;
+            }
+
+            public bool PatternMatch(LinkIndex sequenceToMatch)
+            {
+                _patternPosition = 0;
+                _sequencePosition = 0;
+
+                WalkRight(sequenceToMatch, (Func<ulong, bool>)PatternMatchCore);
+
+                return _patternPosition == _pattern.Count || (_patternPosition == _pattern.Count - 1 && _pattern[_patternPosition].Start == 0);
+            }
+
+            private List<PatternBlock> CreateDetailedPattern()
+            {
+                var pattern = new List<PatternBlock>();
+
+                var patternBlock = new PatternBlock();
+
+                for (var i = 0; i < _patternSequence.Length; i++)
+                {
+                    if (patternBlock.Type == PatternBlockType.Undefined)
+                    {
+                        if (_patternSequence[i] == Any)
+                        {
+                            patternBlock.Type = PatternBlockType.Gap;
+                            patternBlock.Start = 1;
+                            patternBlock.Stop = 1;
+                        }
+                        else if (_patternSequence[i] == ZeroOrMany)
+                        {
+                            patternBlock.Type = PatternBlockType.Gap;
+                            patternBlock.Start = 0;
+                            patternBlock.Stop = long.MaxValue;
+                        }
+                        else
+                        {
+                            patternBlock.Type = PatternBlockType.Elements;
+                            patternBlock.Start = i;
+                            patternBlock.Stop = i;
+                        }
+                    }
+                    else if (patternBlock.Type == PatternBlockType.Elements)
+                    {
+                        if (_patternSequence[i] == Any)
+                        {
+                            pattern.Add(patternBlock);
+
+                            patternBlock = new PatternBlock
+                            {
+                                Type = PatternBlockType.Gap,
+                                Start = 1,
+                                Stop = 1
+                            };
+                        }
+                        else if (_patternSequence[i] == ZeroOrMany)
+                        {
+                            pattern.Add(patternBlock);
+
+                            patternBlock = new PatternBlock
+                            {
+                                Type = PatternBlockType.Gap,
+                                Start = 0,
+                                Stop = long.MaxValue
+                            };
+                        }
+                        else
+                        {
+                            patternBlock.Stop = i;
+                        }
+                    }
+                    else // patternBlock.Type == PatternBlockType.Gap
+                    {
+                        if (_patternSequence[i] == Any)
+                        {
+                            patternBlock.Start++;
+
+                            if (patternBlock.Stop < patternBlock.Start)
+                                patternBlock.Stop = patternBlock.Start;
+                        }
+                        else if (_patternSequence[i] == ZeroOrMany)
+                        {
+                            patternBlock.Stop = long.MaxValue;
+                        }
+                        else
+                        {
+                            pattern.Add(patternBlock);
+
+                            patternBlock = new PatternBlock
+                            {
+                                Type = PatternBlockType.Elements,
+                                Start = i,
+                                Stop = i
+                            };
+                        }
+                    }
+                }
+
+                if (patternBlock.Type != PatternBlockType.Undefined)
+                    pattern.Add(patternBlock);
+
+                return pattern;
+            }
+
+            ///* match: search for regexp anywhere in text */
+            //int match(char* regexp, char* text)
+            //{
+            //    do
+            //    {   
+            //    } while (*text++ != '\0');
+            //    return 0;
+            //}
+
+            ///* matchhere: search for regexp at beginning of text */
+            //int matchhere(char* regexp, char* text)
+            //{
+            //    if (regexp[0] == '\0')
+            //        return 1;
+            //    if (regexp[1] == '*')
+            //        return matchstar(regexp[0], regexp + 2, text);
+            //    if (regexp[0] == '$' && regexp[1] == '\0')
+            //        return *text == '\0';
+            //    if (*text != '\0' && (regexp[0] == '.' || regexp[0] == *text))
+            //        return matchhere(regexp + 1, text + 1);
+            //    return 0;
+            //}
+
+            ///* matchstar: search for c*regexp at beginning of text */
+            //int matchstar(int c, char* regexp, char* text)
+            //{
+            //    do
+            //    {    /* a * matches zero or more instances */
+            //        if (matchhere(regexp, text))
+            //            return 1;
+            //    } while (*text != '\0' && (*text++ == c || c == '.'));
+            //    return 0;
+            //}
+
+            //private void GetNextPatternElement(out LinkIndex element, out long mininumGap, out long maximumGap)
+            //{
+            //    mininumGap = 0;
+            //    maximumGap = 0;
+            //    element = 0;
+            //    for (; _patternPosition < _patternSequence.Length; _patternPosition++)
+            //    {
+            //        if (_patternSequence[_patternPosition] == Pairs.Links.Null)
+            //            mininumGap++;
+            //        else if (_patternSequence[_patternPosition] == ZeroOrMany)
+            //            maximumGap = long.MaxValue;
+            //        else
+            //            break;
+            //    }
+
+            //    if (maximumGap < mininumGap)
+            //        maximumGap = mininumGap;
+            //}
+
+            private bool PatternMatchCore(LinkIndex element)
+            {
+                if (_patternPosition >= _pattern.Count)
+                {
+                    _patternPosition = -2;
+                    return false;
+                }
+
+                var currentPatternBlock = _pattern[_patternPosition];
+
+                if (currentPatternBlock.Type == PatternBlockType.Gap)
+                {
+                    //var currentMatchingBlockLength = (_sequencePosition - _lastMatchedBlockPosition);
+
+                    if (_sequencePosition < currentPatternBlock.Start)
+                    {
+                        _sequencePosition++;
+                        return true; // Двигаемся дальше
+                    }
+
+                    // Это последний блок
+                    if (_pattern.Count == _patternPosition + 1)
+                    {
+                        _patternPosition++;
+                        _sequencePosition = 0;
+                        return false; // Полное соответствие
+                    }
+                    else
+                    {
+                        if (_sequencePosition > currentPatternBlock.Stop)
+                            return false; // Соответствие невозможно
+
+                        var nextPatternBlock = _pattern[_patternPosition + 1];
+
+                        if (_patternSequence[nextPatternBlock.Start] == element)
+                        {
+                            if (nextPatternBlock.Start < nextPatternBlock.Stop)
+                            {
+                                _patternPosition++;
+                                _sequencePosition = 1;
+                            }
+                            else
+                            {
+                                _patternPosition += 2;
+                                _sequencePosition = 0;
+                            }
+                        }
+                    }
+                }
+                else // currentPatternBlock.Type == PatternBlockType.Elements
+                {
+                    var patternElementPosition = currentPatternBlock.Start + _sequencePosition;
+
+                    if (_patternSequence[patternElementPosition] != element)
+                        return false; // Соответствие невозможно
+
+                    if (patternElementPosition == currentPatternBlock.Stop)
+                    {
+                        _patternPosition++;
+                        _sequencePosition = 0;
+                    }
+                    else
+                    {
+                        _sequencePosition++;
+                    }
+                }
+
+                return true;
+
+                //if (_patternSequence[_patternPosition] != element)
+                //    return false;
+                //else
+                //{
+                //    _sequencePosition++;
+                //    _patternPosition++;
+
+                //    return true;
+                //}
+
+                ////////
+
+                //if (_filterPosition == _patternSequence.Length)
+                //{
+                //    _filterPosition = -2; // Длиннее чем нужно
+                //    return false;
+                //}
+
+                //if (element != _patternSequence[_filterPosition])
+                //{
+                //    _filterPosition = -1;
+                //    return false; // Начинается иначе
+                //}
+
+                //_filterPosition++;
+
+                //if (_filterPosition == (_patternSequence.Length - 1))
+                //    return false;
+
+                //if (_filterPosition >= 0)
+                //{
+                //    if (element == _patternSequence[_filterPosition + 1])
+                //        _filterPosition++;
+                //    else
+                //        return false;
+                //}
+
+                //if (_filterPosition < 0)
+                //{
+                //    if (element == _patternSequence[0])
+                //        _filterPosition = 0;
+                //}
+            }
+
+            public void AddAllPatternMatchedToResults(IEnumerable<ulong> sequencesToMatch)
+            {
+                foreach (var sequenceToMatch in sequencesToMatch)
+                    if (PatternMatch(sequenceToMatch))
+                        _results.Add(sequenceToMatch);
             }
         }
 

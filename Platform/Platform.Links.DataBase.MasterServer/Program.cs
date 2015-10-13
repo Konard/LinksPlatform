@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -134,47 +135,52 @@ namespace Platform.Links.DataBase.MasterServer
             sender.Send(string.Format("Sequence with balanced variant at {0} created.", resultLink));
         }
 
+        private static string FromLinkToString(ulong link)
+        {
+            if (char.MaxValue >= link)
+                return ((char) link).ToString(CultureInfo.InvariantCulture);
+            else
+                return link.ToString(CultureInfo.InvariantCulture);
+        }
+
         private static void Search(this Sequences sequences, UdpSender sender, string sequenceQuery)
         {
             var linksSequenceQuery = new ulong[sequenceQuery.Length];
             for (int i = 0; i < sequenceQuery.Length; i++)
-                //if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
-                //    linksSequenceQuery[i] = 0;
-                //else
+                if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
+                    linksSequenceQuery[i] = Sequences.Any;
+                else if(sequenceQuery[i] == '*')
+                    linksSequenceQuery[i] = Sequences.ZeroOrMany;
+                else
                     linksSequenceQuery[i] = sequenceQuery[i];
 
-            var resultList = sequences.GetAllMatchingSequences1(linksSequenceQuery); //sequences.CollectMatchingSequences(linksSequenceQuery); //sequences.Each(linksSequenceQuery);
-
-            if (resultList.Count == 0)
+            if (linksSequenceQuery.Contains(Sequences.Any) || linksSequenceQuery.Contains(Sequences.ZeroOrMany))
             {
-                sender.Send("No full sequences found.");
+                var patternMatched = sequences.MatchPattern(linksSequenceQuery);
+
+                sender.Send(string.Format("{0} sequences matched pattern.", patternMatched.Count));
+                foreach (var result in patternMatched)
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
             }
-            else if (resultList.Count == 1)
-                sender.Send(string.Format("Full sequence found - {0}.", resultList.First()));
             else
             {
-                sender.Send(string.Format("Found {0} full sequences:", resultList.Count));
+                var fullyMatched = sequences.GetAllMatchingSequences1(linksSequenceQuery);
 
-                foreach (var result in resultList)
-                    sender.Send(string.Format("\t{0}", result));
-            }
+                sender.Send(string.Format("{0} sequences matched fully.", fullyMatched.Count));
+                foreach (var result in fullyMatched)
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
 
+                var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(linksSequenceQuery);
 
-            var resultHash = sequences.GetAllPartiallyMatchingSequences1(linksSequenceQuery);
+                sender.Send(string.Format("{0} sequences matched partially.", partiallyMatched.Count));
+                foreach (var result in partiallyMatched)
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
 
-            // Subsequences
-            if (resultHash.Count == 0)
-            {
-                sender.Send("No partial sequences found.");
-            }
-            else if (resultHash.Count == 1)
-                sender.Send(string.Format("Partial sequence found - {0}.", resultHash.First()));
-            else
-            {
-                sender.Send(string.Format("Found {0} partial sequences:", resultHash.Count));
+                var allConnections = sequences.GetAllConnections(linksSequenceQuery);
 
-                foreach (var result in resultHash)
-                    sender.Send(string.Format("\t{0}", result));
+                sender.Send(string.Format("{0} sequences connects query elements.", allConnections.Count));
+                foreach (var result in allConnections)
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
             }
         }
     }
