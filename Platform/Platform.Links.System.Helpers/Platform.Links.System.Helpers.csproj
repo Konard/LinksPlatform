@@ -36,6 +36,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BinaryReader.cs" />
     <Compile Include="BitConverterExtensions.cs" />
     <Compile Include="ConsoleExtensions.cs" />
     <Compile Include="Disposal\DefaultDisposal.cs" />
@@ -47,7 +48,7 @@
     <Compile Include="Global.cs" />
     <Compile Include="HashSetExtensions.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="Logger.cs" />
+    <Compile Include="BinaryLogger.cs" />
     <Compile Include="MathHelpers.cs" />
     <Compile Include="MemoryHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

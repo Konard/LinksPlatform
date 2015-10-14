@@ -11,7 +11,7 @@ namespace Platform.Links.System.Helpers.Disposal
     /// </remarks>
     public abstract class DisposalBase : IDisposal
     {
-        private bool _disposed;
+        protected bool _disposed;
         private readonly Process _currentProcess;
         private readonly AppDomain _currentDomain;
 

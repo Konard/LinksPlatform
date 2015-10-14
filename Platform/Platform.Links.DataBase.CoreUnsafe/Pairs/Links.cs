@@ -325,9 +325,11 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 if (target != Null && !ExistsCore(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
+                ulong linkIndex;
+
                 if (source != Null && target != Null)
                 {
-                    var linkIndex = _sourcesTreeMethods.Search(source, target);
+                    linkIndex = _sourcesTreeMethods.Search(source, target);
 
                     if (linkIndex == Null)
                     {
@@ -340,12 +342,10 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                         _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
                         _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
                     }
-
-                    return linkIndex;
                 }
                 else
                 {
-                    var linkIndex = AllocateLink();
+                    linkIndex = AllocateLink();
                     var link = &_links[linkIndex];
 
                     link->Source = source == Null ? linkIndex : source;
@@ -353,15 +353,21 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
                     _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
                     _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
-
-                    return linkIndex;
                 }
+
+                CommitCreation(GetLinkCore(linkIndex));
+                return linkIndex;
             });
         }
 
         public ulong Update(ulong prevLink, ulong newLink)
         {
             return Update(GetSource(prevLink), GetTarget(prevLink), GetSource(newLink), GetTarget(newLink));
+        }
+
+        public ulong Update(ulong prevLink, ulong newSource, ulong newTarget)
+        {
+            return Update(GetSource(prevLink), GetTarget(prevLink), newSource, newTarget);
         }
 
         /// <summary>
@@ -381,81 +387,76 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
                 if (!ExistsCore(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-                if (!ExistsCore(newSource))
+                if (source != Null && !ExistsCore(newSource))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(newSource, "newSource");
-                if (!ExistsCore(newTarget))
+                if (source != Null && !ExistsCore(newTarget))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(newTarget, "newTarget");
 
                 var linkIndex = SearchCore(source, target);
-
                 if (linkIndex == Null)
-                {
-                    var x = Create(newSource, newTarget);
-                    return x;
-                }
-                //throw new Exception(string.Format("Link with source {0} and target {1} is not exists.", source, target));
-
-                if (newSource != newTarget &&
-                    (newSource == Null || newSource == linkIndex || newTarget == Null || newTarget == linkIndex))
-                    throw new Exception("Not passible.");
-
+                    return Create(newSource, newTarget);
                 if (newSource == source && newTarget == target)
                     return linkIndex;
 
-                var newLink = SearchCore(newSource, newTarget);
+                return UpdateCore(linkIndex, newSource, newTarget);
+            });
+        }
 
-                if (newLink == Null)
+        private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
+        {
+            var before = GetLinkCore(linkIndex);
+            
+            var newLink = SearchCore(newSource, newTarget);
+            if (newLink == Null)
+            {
+                _sourcesTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsSource);
+                _targetsTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsTarget);
+
+                var link = &_links[linkIndex];
+
+                link->Source = newSource == Null ? linkIndex : newSource;
+                link->Target = newTarget == Null ? linkIndex : newTarget;
+
+                _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
+                _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
+
+                CommitUpdate(before, GetLinkCore(linkIndex));
+
+                return linkIndex;
+            }
+            else
+            {
+                var referencesAsSource = new List<ulong>();
+                var referencesAsTarget = new List<ulong>();
+
+                _sourcesTreeMethods.EachReference(linkIndex, x =>
                 {
-                    _sourcesTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsSource);
-                    _targetsTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsTarget);
-
-                    _links[linkIndex].Source = newSource;
-                    _links[linkIndex].Target = newTarget;
-
-                    _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
-                    _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
-                }
-                else
+                    referencesAsSource.Add(x);
+                    return true;
+                });
+                _targetsTreeMethods.EachReference(linkIndex, x =>
                 {
-                    var referencesAsSource = new List<ulong>();
-                    var referencesAsTarget = new List<ulong>();
+                    referencesAsTarget.Add(x);
+                    return true;
+                });
 
-                    _sourcesTreeMethods.EachReference(linkIndex, x =>
-                    {
-                        referencesAsSource.Add(x);
-                        return true;
-                    });
-                    _targetsTreeMethods.EachReference(linkIndex, x =>
-                    {
-                        referencesAsTarget.Add(x);
-                        return true;
-                    });
-
-                    for (var i = 0; i < referencesAsSource.Count; i++)
-                    {
-                        var reference = referencesAsSource[i];
-                        var referenceSource = _links[reference].Source;
-                        var referenceTarget = _links[reference].Target;
-
-                        // TODO: Заменить на UpdateCore
-                        Update(referenceSource, referenceTarget, newLink, referenceTarget);
-                    }
-
-                    for (var i = 0; i < referencesAsTarget.Count; i++)
-                    {
-                        var reference = referencesAsTarget[i];
-                        var referenceSource = _links[reference].Source;
-                        var referenceTarget = _links[reference].Target;
-
-                        // TODO: Заменить на UpdateCore
-                        Update(referenceSource, referenceTarget, referenceSource, newLink);
-                    }
-
-                    DeleteCore(linkIndex);
+                for (var i = 0; i < referencesAsSource.Count; i++)
+                {
+                    var reference = referencesAsSource[i];
+                    UpdateCore(reference, newLink, GetTargetCore(reference));
                 }
+                for (var i = 0; i < referencesAsTarget.Count; i++)
+                {
+                    var reference = referencesAsTarget[i];
+                    UpdateCore(reference, GetSourceCore(reference), newLink);
+                }
+
+                DeleteCore(linkIndex);
+
+                CommitUpdate(before, GetLinkCore(newLink));
 
                 return newLink;
-            });
+            }
         }
 
         /// <summary>Удаляет связь с указанными началом (Source) и концом (Target).</summary>
@@ -483,7 +484,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             });
         }
 
-        // TODO: Возможно есть очень простой способ это сделать.
+        // TODO: Возможно есть очень простой способ это сделать. (Например просто удалить файл, или изменить его размер таким образом, чтобы удалился весь контент)
         //public void DeleteAll()
         //{
         //    _header->AllocatedLinks
@@ -496,6 +497,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         {
             if (ExistsCore(link))
             {
+                var before = GetLinkCore(link);
+
                 _sourcesTreeMethods.RemoveUnsafe(link, &_header->FirstAsSource);
                 _targetsTreeMethods.RemoveUnsafe(link, &_header->FirstAsTarget);
 
@@ -518,6 +521,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 references.ForEach(DeleteCore);
 
                 FreeLink(link);
+
+                CommitDeletion(before);
             }
         }
 
@@ -664,6 +669,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
         protected override void DisposeCore(bool manual)
         {
+            DisposeTransitions();
             _links = null;
             _memory.Dispose();
         }

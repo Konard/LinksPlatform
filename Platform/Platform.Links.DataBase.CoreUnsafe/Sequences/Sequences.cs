@@ -1189,8 +1189,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
                     }
                 }
 
-                
-
                 return results;
             });
         }

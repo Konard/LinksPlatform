@@ -6,6 +6,11 @@ namespace Platform.Sandbox
 {
     public static class ILGeneratorExtensions
     {
+        public static void EmitJumpTo(this ILGenerator il, Label label)
+        {
+            il.Emit(OpCodes.Br_S, label);
+        }
+
         public static void EmitCall(this ILGenerator il, MethodInfo method)
         {
             if (method.IsFinal || !method.IsVirtual)
@@ -60,17 +65,9 @@ namespace Platform.Sandbox
                 il.Emit(OpCodes.Ldc_I4, value);
         }
 
-        public static void EmitJumpTo(this ILGenerator il, Label label)
-        {
-            il.Emit(OpCodes.Br_S, label);
-        }
-
         public static void EmitLiteralLoad(this ILGenerator il, bool value)
         {
-            if (value)
-                il.Emit(OpCodes.Ldc_I4_1);
-            else
-                il.Emit(OpCodes.Ldc_I4_0);
+            il.Emit(value ? OpCodes.Ldc_I4_1 : OpCodes.Ldc_I4_0);
         }
 
         public static void EmitLiteralLoad(this ILGenerator il, long value)
@@ -95,9 +92,9 @@ namespace Platform.Sandbox
 
         public static void EmitLiteralLoad(this ILGenerator il, IntPtr value)
         {
-            if (IntPtr.Size == 4)
+            if (IntPtr.Size == sizeof(Int32))
                 il.Emit(OpCodes.Ldc_I4, value.ToInt32());
-            else if (IntPtr.Size == 8)
+            else if (IntPtr.Size == sizeof(Int64))
                 il.Emit(OpCodes.Ldc_I8, value.ToInt64());
         }
     }

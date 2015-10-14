@@ -2,6 +2,12 @@
 
 namespace Platform.Links.System.Helpers
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// TODO: Возможно fixed более производительное решение чем Marshal (найти то место откуда был взят пример и сообщить там о результатах)
+    /// </remarks>
     public static class BitConverterExtensions
     {
         public static byte[] GetBytes<T>(T obj)

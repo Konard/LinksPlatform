@@ -6,11 +6,11 @@ namespace Platform.Links.System.Helpers
     /// <summary>
     /// Представляет логгер (объект, который занимается записью в лог).
     /// </summary>
-    public class Logger : DisposalBase
+    public class BinaryLogger : DisposalBase
     {
         private readonly FileStream _file;
 
-        public Logger(string filename)
+        public BinaryLogger(string filename)
         {
             _file = File.Open(filename, FileMode.Append, FileAccess.Write);
         }

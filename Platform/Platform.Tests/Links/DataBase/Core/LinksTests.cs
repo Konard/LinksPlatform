@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -24,7 +25,7 @@ namespace Platform.Tests.Links.DataBase.Core
         [TestMethod]
         public void BasicMemoryTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, 1024*1024))
             {
@@ -32,6 +33,32 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             File.Delete(tempFilename);
+        }
+
+        [TestMethod]
+        public void BasicTransactionLogTest()
+        {
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            {
+                var l1 = links.Create(itself, itself);
+                var l2 = links.Create(itself, itself);
+
+                l2 = links.Update(l2, l2, l1, l2);
+
+                links.Delete(l1);
+            }
+
+            var transitions =
+                Platform.Links.System.Helpers.BinaryReader
+                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            File.Delete(tempDatabaseFilename);
+            File.Delete(tempTransactionLogFilename);
         }
 
         #endregion
