@@ -9,7 +9,7 @@ namespace Platform.Links.System.Memory
 
         public SyncedFileMemory(string filename)
         {
-            _file = File.Open(filename, FileMode.Append, FileAccess.Write);
+            _file = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
 
         public void* Read(long size)
@@ -24,7 +24,7 @@ namespace Platform.Links.System.Memory
         /*public void Push<T>(T value)
             where T : struct
         {
-            var bytes = BitConverterExtensions.GetBytes(value);
+            var bytes = BitConverterHelpers.GetBytes(value);
             _file.Write(bytes, 0, bytes.Length);
         }*/
 

@@ -2,6 +2,7 @@
 
 using System;
 using System.Collections.Concurrent;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Platform.Links.System.Helpers;
@@ -27,14 +28,14 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
         private static readonly TimeSpan DefaultPushDelay = TimeSpan.FromSeconds(0.5);
 
-        private readonly BinaryLogger _binaryLogger;
+        private readonly FileStream _binaryLogger;
         private readonly ConcurrentQueue<Transition> _transitions;
         private Task _transitionsPusher;
 
         public Links(string address, string logAddress, long size)
             : this(address, size)
         {
-            _binaryLogger = new BinaryLogger(logAddress);
+            _binaryLogger = FileHelpers.Append(logAddress);
             _transitions = new ConcurrentQueue<Transition>();
             _transitionsPusher = new Task(TransitionsPusher);
             _transitionsPusher.Start();
@@ -74,7 +75,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 Transition transition;
                 if (!_transitions.TryDequeue(out transition))
                     return;
-                _binaryLogger.Push(transition);
+                _binaryLogger.Write(transition);
             }
         }
 

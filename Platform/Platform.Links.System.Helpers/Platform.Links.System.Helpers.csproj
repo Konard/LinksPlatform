@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -36,8 +37,8 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BinaryReader.cs" />
-    <Compile Include="BitConverterExtensions.cs" />
+    <Compile Include="BitConverterHelpers.cs" />
+    <Compile Include="StreamExtensions.cs" />
     <Compile Include="ConsoleExtensions.cs" />
     <Compile Include="Disposal\DefaultDisposal.cs" />
     <Compile Include="Disposal\DefaultDisposalUsageExample.cs" />
@@ -48,7 +49,6 @@
     <Compile Include="Global.cs" />
     <Compile Include="HashSetExtensions.cs" />
     <Compile Include="ListExtensions.cs" />
-    <Compile Include="BinaryLogger.cs" />
     <Compile Include="MathHelpers.cs" />
     <Compile Include="MemoryHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

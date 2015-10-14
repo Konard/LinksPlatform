@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Threading;
@@ -53,8 +52,7 @@ namespace Platform.Tests.Links.DataBase.Core
                 links.Delete(l1);
             }
 
-            var transitions =
-                Platform.Links.System.Helpers.BinaryReader
+            var transitions = FileHelpers
                 .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             File.Delete(tempDatabaseFilename);

@@ -8,5 +8,17 @@ namespace Platform.Links.System.Helpers
         {
             return File.ReadAllText(path).ToCharArray();
         }
+
+        public static T[] ReadAll<T>(string path)
+            where T : struct
+        {
+            using (var reader = File.OpenRead(path))
+                return reader.ReadAll<T>();
+        }
+
+        public static FileStream Append(string path)
+        {
+            return File.Open(path, FileMode.Append, FileAccess.Write);
+        }
     }
 }
