@@ -41,6 +41,11 @@ Links Platform is a system, that combine simple database (Links) and execution e
 
 Платформа Связей это система, которая комбинирует простую базу данных (Связи) и движок выполнения операций (Триггеры). Таким образом предоставляется возможность программирования этой системы любым способом (в том числе динамически), благодаря тому факту, что все алгоритмы являются данными внутри этой базы данных. Идея, которая стоит за Платформой Связей это модель ассоциативной памяти человека. В итоге копируются большинство преимуществ и недостатков такой модели.
 
+## Road Map
+> ![Road Map Status](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/RoadMap-status.png "Road Map Status")
+
+## Contacts
+
 https://vk.com/linksplatform
 
 [![Join the chat at https://gitter.im/Konard/LinksPlatform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Konard/LinksPlatform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
