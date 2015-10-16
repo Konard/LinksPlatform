@@ -13,9 +13,10 @@
 ![white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/11.png "white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure")
 ![white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/12.png "white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure")
 
-Inspired by work of Simon Williams (The Associative Model of Data, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
 
-Вдохновлено работой Симона Вильямса (Ассоциативная модель данных, http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527).
+Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf).
+
+Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [книга](http://www.sentences.com/docs/other_docs/AMD.pdf).
 
 This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams.
 
@@ -44,7 +45,12 @@ Links Platform is a system, that combine simple database (Links) and execution e
 ## Road Map
 ![Road Map Status](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/RoadMap-status.png "Road Map Status")
 
-https://github.com/Konard/LinksPlatform/milestones
+[Project status | Текущее состояние разработки](https://github.com/Konard/LinksPlatform/milestones)
+
+## Swagger Connector
+
+[Links (pairs) API swagger connector.](https://gist.github.com/Konard/c76f9948bb25a0d7aff1)
+[Links (triples, micro RDF) API swagger connector.](https://gist.github.com/Konard/e6a0bff583bbca4d452b)
 
 ## Contacts
 
