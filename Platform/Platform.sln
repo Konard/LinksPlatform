@@ -30,7 +30,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.WindowsAPI", "Plat
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Tests", "Platform.Tests\Platform.Tests.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform.Links.DataBase.IdServer", "Platform.Links.DataBase.IdServer\Platform.Links.DataBase.IdServer.vcxproj", "{2E89282D-FCE8-4C09-855F-B13D6CF556DF}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform.Data.IdServer", "Platform.Data.IdServer\Platform.Data.IdServer.vcxproj", "{2E89282D-FCE8-4C09-855F-B13D6CF556DF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Communication", "Platform.Communication\Platform.Communication.csproj", "{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}"
 EndProject
