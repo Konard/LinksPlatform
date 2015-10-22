@@ -53,9 +53,9 @@
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
       <Name>Platform.Links.System.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Platform.System.Windows\Platform.System.Windows.csproj">
+    <ProjectReference Include="..\Platform.WindowsAPI\Platform.WindowsAPI.csproj">
       <Project>{B35BCC7D-3D44-404C-8252-14BDC5C5B36A}</Project>
-      <Name>Platform.System.Windows</Name>
+      <Name>Platform.WindowsAPI</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

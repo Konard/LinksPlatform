@@ -2,7 +2,7 @@
 using System.IO;
 using Platform.Links.System.Helpers;
 using Platform.Links.System.Helpers.Disposal;
-using Platform.System.Windows;
+using Platform.WindowsAPI;
 
 namespace Platform.Links.System.Memory
 {

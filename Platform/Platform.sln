@@ -26,7 +26,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Core"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.System.IO.Core", "Platform.System.IO.Core\Platform.System.IO.Core.csproj", "{94B596BA-E9F7-4E02-AEF3-8AAAA0294D33}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.System.Windows", "Platform.System.Windows\Platform.System.Windows.csproj", "{B35BCC7D-3D44-404C-8252-14BDC5C5B36A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.WindowsAPI", "Platform.WindowsAPI\Platform.WindowsAPI.csproj", "{B35BCC7D-3D44-404C-8252-14BDC5C5B36A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Tests", "Platform.Tests\Platform.Tests.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
 EndProject

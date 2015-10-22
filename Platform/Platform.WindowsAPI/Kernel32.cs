@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Platform.System.Windows
+namespace Platform.WindowsAPI
 {
     public static class Kernel32
     {

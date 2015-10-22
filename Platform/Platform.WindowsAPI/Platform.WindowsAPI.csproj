@@ -7,8 +7,8 @@
     <ProjectGuid>{B35BCC7D-3D44-404C-8252-14BDC5C5B36A}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.System.Windows</RootNamespace>
-    <AssemblyName>Platform.System.Windows</AssemblyName>
+    <RootNamespace>Platform.WindowsAPI</RootNamespace>
+    <AssemblyName>Platform.WindowsAPI</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
