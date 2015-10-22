@@ -6,7 +6,7 @@ using System.Threading;
 using Platform.Communication.Udp;
 using Platform.Links.DataBase.CoreUnsafe.Sequences;
 
-namespace Platform.Links.DataBase.MasterServer
+namespace Platform.Data.MasterServer
 {
     internal static class Program
     {
