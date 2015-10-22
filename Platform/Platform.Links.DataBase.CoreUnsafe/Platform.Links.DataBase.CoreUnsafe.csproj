@@ -71,9 +71,9 @@
     <Compile Include="TreeMethods\SizeBalancedTreeMethods2.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
-      <Name>Platform.Links.System.Helpers</Name>
+      <Name>Platform.Helpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Platform.Links.System.Memory\Platform.Links.System.Memory.csproj">
       <Project>{da0c0d80-9821-48ca-a498-c3bcf8a3db0e}</Project>

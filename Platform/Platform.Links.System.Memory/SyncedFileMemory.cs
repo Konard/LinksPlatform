@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Platform.Links.System.Helpers.Disposal;
+using Platform.Helpers.Disposal;
 
 namespace Platform.Links.System.Memory
 {

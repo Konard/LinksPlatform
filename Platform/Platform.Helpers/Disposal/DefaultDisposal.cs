@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.System.Helpers.Disposal
+﻿namespace Platform.Helpers.Disposal
 {
     public delegate void DisposedDelegate(bool manual);
 

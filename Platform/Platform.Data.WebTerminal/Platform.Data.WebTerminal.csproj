@@ -191,9 +191,9 @@
       <Project>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</Project>
       <Name>Platform.Links.DataBase.CoreNet</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
-      <Name>Platform.Links.System.Helpers</Name>
+      <Name>Platform.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup>

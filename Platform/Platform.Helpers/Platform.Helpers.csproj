@@ -7,8 +7,8 @@
     <ProjectGuid>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.System.Helpers</RootNamespace>
-    <AssemblyName>Platform.Links.System.Helpers</AssemblyName>
+    <RootNamespace>Platform.Helpers</RootNamespace>
+    <AssemblyName>Platform.Helpers</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.InteropServices;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     public static class BitConverterHelpers
     {

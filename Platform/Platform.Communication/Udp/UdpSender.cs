@@ -1,7 +1,7 @@
 ﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using Platform.Links.System.Helpers.Disposal;
+using Platform.Helpers.Disposal;
 
 namespace Platform.Communication.Udp
 {

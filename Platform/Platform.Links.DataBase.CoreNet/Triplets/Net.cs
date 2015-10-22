@@ -1,4 +1,4 @@
-﻿using Platform.Links.System.Helpers;
+﻿using Platform.Helpers;
 
 namespace Platform.Links.DataBase.CoreNet.Triplets
 {

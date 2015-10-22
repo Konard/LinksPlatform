@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.System.Helpers
+﻿namespace Platform.Helpers
 {
     /// <summary>
     /// 

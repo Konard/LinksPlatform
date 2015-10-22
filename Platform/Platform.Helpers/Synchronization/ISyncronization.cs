@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.System.Helpers.Synchronization
+namespace Platform.Helpers.Synchronization
 {
     public interface ISyncronization
     {

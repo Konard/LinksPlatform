@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
-using Platform.Links.System.Helpers;
-using Platform.Links.System.Helpers.Synchronization;
+using Platform.Helpers;
+using Platform.Helpers.Synchronization;
 
 using LinkIndex = System.UInt64;
 

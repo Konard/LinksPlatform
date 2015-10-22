@@ -45,9 +45,9 @@
     <Compile Include="Udp\UdpSender.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70af2122-82e4-43d1-9eeb-99c4e6fa5a49}</Project>
-      <Name>Platform.Links.System.Helpers</Name>
+      <Name>Platform.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

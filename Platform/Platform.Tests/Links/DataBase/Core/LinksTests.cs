@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Links.DataBase.CoreUnsafe.Pairs;
 using Platform.Links.DataBase.CoreUnsafe.Structures;
-using Platform.Links.System.Helpers;
+using Platform.Helpers;
 
 namespace Platform.Tests.Links.DataBase.Core
 {

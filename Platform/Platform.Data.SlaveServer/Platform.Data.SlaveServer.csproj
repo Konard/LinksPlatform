@@ -53,9 +53,9 @@
       <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
       <Name>Platform.Links.DataBase.CoreUnsafe</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj">
+    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70af2122-82e4-43d1-9eeb-99c4e6fa5a49}</Project>
-      <Name>Platform.Links.System.Helpers</Name>
+      <Name>Platform.Helpers</Name>
     </ProjectReference>
     <ProjectReference Include="..\Platform.Links.DataBase.CoreNet\Platform.Links.DataBase.CoreNet.csproj">
       <Project>{8bd910b1-e2b9-4ddd-9248-99e83ef8f401}</Project>

@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Reflection.Emit;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     public static class ILGeneratorExtensions
     {

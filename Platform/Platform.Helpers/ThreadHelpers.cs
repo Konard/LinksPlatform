@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     public static class ThreadHelpers
     {

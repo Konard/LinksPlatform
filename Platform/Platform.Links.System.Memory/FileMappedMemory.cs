@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using Platform.Links.System.Helpers;
-using Platform.Links.System.Helpers.Disposal;
+using Platform.Helpers;
+using Platform.Helpers.Disposal;
 
 namespace Platform.Links.System.Memory
 {

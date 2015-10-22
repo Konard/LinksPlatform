@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using Platform.Links.System.Helpers;
-using Platform.Links.System.Helpers.Disposal;
+using Platform.Helpers;
+using Platform.Helpers.Disposal;
 using Platform.WindowsAPI;
 
 namespace Platform.Links.System.Memory

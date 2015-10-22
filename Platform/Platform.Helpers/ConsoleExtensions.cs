@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     /// <summary>
     /// Представляет класс-контейнер методов-расширений для класса System.Console.

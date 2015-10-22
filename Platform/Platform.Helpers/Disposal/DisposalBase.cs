@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Platform.Links.System.Helpers.Disposal
+namespace Platform.Helpers.Disposal
 {
     /// <summary>
     /// Представляет базовый класс реализующий основную логику необходимую для повышения вероятности корректного высвобождения памяти.

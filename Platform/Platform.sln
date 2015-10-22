@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.MasterServer"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.SlaveServer", "Platform.Data.SlaveServer\Platform.Data.SlaveServer.csproj", "{FA3829E4-D805-4EC4-9A81-0B55E3994907}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Helpers", "Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Helpers", "Platform.Helpers\Platform.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Memory", "Platform.Links.System.Memory\Platform.Links.System.Memory.csproj", "{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}"
 EndProject

@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.System.Helpers.Disposal
+namespace Platform.Helpers.Disposal
 {
     partial class DefaultDisposalUsageExample : IDisposable
     {

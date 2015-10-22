@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
-using Platform.Links.System.Helpers.Disposal;
-using Platform.Links.System.Helpers.Synchronization;
+using Platform.Helpers.Disposal;
+using Platform.Helpers.Synchronization;
 using Platform.Links.System.Memory;
 
 #pragma warning disable 0649

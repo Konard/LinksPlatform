@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     public class PerformanceHelpers
     {

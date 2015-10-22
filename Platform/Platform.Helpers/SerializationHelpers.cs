@@ -4,7 +4,7 @@ using System.IO;
 using System.Text;
 using System.Xml.Serialization;
 
-namespace Platform.Links.System.Helpers
+namespace Platform.Helpers
 {
     static public class SerializationHelpers
     {
