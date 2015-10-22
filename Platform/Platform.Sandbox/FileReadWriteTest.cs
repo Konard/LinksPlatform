@@ -2,7 +2,7 @@
 using System.Globalization;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using Platform.Links.DataBase.CoreNet.Triplets;
+using Platform.Data.Core.Triplets;
 using Platform.Helpers;
 
 namespace Platform.Sandbox

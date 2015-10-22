@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using Platform.Links.DataBase.CoreUnsafe.Exceptions;
+using Platform.Data.Core.Exceptions;
 using Platform.Helpers;
 using Platform.Helpers.Synchronization;
 
 using LinkIndex = System.UInt64;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Sequences
+namespace Platform.Data.Core.Sequences
 {
     /// <summary>
     /// Представляет коллекцию последовательностей связей.

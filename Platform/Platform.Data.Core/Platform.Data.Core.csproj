@@ -1,15 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
+	<ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{BBCE20EF-EEC2-49DB-AC61-EBA5C69B52AE}</ProjectGuid>
+    <ProjectGuid>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.DataBase.CoreUnsafe</RootNamespace>
-    <AssemblyName>Platform.Links.DataBase.CoreUnsafe</AssemblyName>
+    <RootNamespace>Platform.Data.Core</RootNamespace>
+    <AssemblyName>Platform.Data.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
@@ -44,11 +45,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BitString.cs" />
+    <Compile Include="Node.cs" />
     <Compile Include="Elements\DefaultElements.cs" />
     <Compile Include="Elements\IElements.RW.cs" />
     <Compile Include="Elements\IElements.Helpers.cs" />
     <Compile Include="Elements\IElements.CRUD.cs" />
     <Compile Include="Exceptions\ArgumentLinkDoesNotExistsException.cs" />
+    <Compile Include="Pairs\Links2.cs" />
     <Compile Include="Pairs\ILinks.cs" />
     <Compile Include="Pairs\Links.cs" />
     <Compile Include="Pairs\Links.IList.cs" />
@@ -67,10 +71,34 @@
     <Compile Include="Structures\ServerType.cs" />
     <Compile Include="Structures\ServerUnique.cs" />
     <Compile Include="Structures\Unique.cs" />
+    <Compile Include="SearchEngine.cs" />
+    <Compile Include="Triggers\ICondition.cs" />
+    <Compile Include="Triggers\IContext.cs" />
+    <Compile Include="Triggers\ITrigger.cs" />
+    <Compile Include="Triggers\ITriggers.cs" />
+    <Compile Include="Triplets\CharacterHelpers.cs" />
+    <Compile Include="Triplets\CompressionExperiments.cs" />
+    <Compile Include="Triplets\ILink.cs" />
+    <Compile Include="Triplets\Link.cs" />
+    <Compile Include="Triplets\Link.Debug.cs" />
+    <Compile Include="Triplets\LinkConverter.cs" />
+    <Compile Include="Triplets\LinkExtensions.cs" />
+    <Compile Include="Triplets\Net.cs" />
+    <Compile Include="Triplets\NumberHelpers.cs" />
+    <Compile Include="Triplets\SequenceHelpers.cs" />
+    <Compile Include="Triplets\XmlGenerator.cs" />
     <Compile Include="TreeMethods\SizeBalancedTreeMethods.cs" />
     <Compile Include="TreeMethods\SizeBalancedTreeMethods2.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
+      <Project>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</Project>
+      <Name>Platform.Communication</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj">
+      <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
+      <Name>Platform.Data.Core</Name>
+    </ProjectReference>
     <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
       <Name>Platform.Helpers</Name>
@@ -80,10 +108,7 @@
       <Name>Platform.Memory</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Triggers\" />
-    <Folder Include="Triplets\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

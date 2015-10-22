@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Structures
+namespace Platform.Data.Core.Structures
 {
     public static class ServerUnique
     {

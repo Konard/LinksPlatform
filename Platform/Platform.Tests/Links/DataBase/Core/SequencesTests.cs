@@ -3,8 +3,8 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Platform.Links.DataBase.CoreUnsafe.Sequences;
-using Pairs = Platform.Links.DataBase.CoreUnsafe.Pairs;
+using Platform.Data.Core.Sequences;
+using Pairs = Platform.Data.Core.Pairs;
 
 namespace Platform.Tests.Links.DataBase.Core
 {

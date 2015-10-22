@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.DataBase.CoreNet.Triggers
+namespace Platform.Data.Core.Triggers
 {
     public interface ITrigger
     {

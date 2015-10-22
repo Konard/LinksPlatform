@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Platform.Links.DataBase.CoreNet.Triplets;
+using Platform.Data.Core.Triplets;
 
 namespace Platform.Data.WebTerminal.Models
 {

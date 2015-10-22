@@ -4,8 +4,8 @@ using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Platform.Links.DataBase.CoreUnsafe.Pairs;
-using Platform.Links.DataBase.CoreUnsafe.Structures;
+using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Structures;
 using Platform.Helpers;
 
 namespace Platform.Tests.Links.DataBase.Core
@@ -15,7 +15,7 @@ namespace Platform.Tests.Links.DataBase.Core
     {
         private const long Iterations = 10 * 1024;
 
-        private static readonly long DefaultLinksSize = (long)Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes *
+        private static readonly long DefaultLinksSize = (long)Platform.Data.Core.Pairs.Links.LinkSizeInBytes *
                                                         1 * 1024 * 1024;
 
         private static readonly Random Rnd = new Random();
@@ -27,7 +27,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, 1024 * 1024))
             {
                 links.TestBasicMemoryManagement();
             }
@@ -41,9 +41,9 @@ namespace Platform.Tests.Links.DataBase.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+            const ulong itself = Platform.Data.Core.Pairs.Links.Itself;
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+            using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename,
                     tempTransactionLogFilename, 1024 * 1024))
             {
                 var l1 = links.Create(itself, itself);
@@ -62,7 +62,7 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             File.Delete(tempDatabaseFilename);
             File.Delete(tempTransactionLogFilename);
@@ -74,9 +74,9 @@ namespace Platform.Tests.Links.DataBase.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+            const ulong itself = Platform.Data.Core.Pairs.Links.Itself;
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
             {
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
@@ -87,7 +87,7 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             File.Delete(tempDatabaseFilename);
             File.Delete(tempTransactionLogFilename);
@@ -99,10 +99,10 @@ namespace Platform.Tests.Links.DataBase.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+            const ulong itself = Platform.Data.Core.Pairs.Links.Itself;
 
             // Auto Reverted (Because no commit at transaction)
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+            using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename,
                     tempTransactionLogFilename, 1024 * 1024))
             {
                 using (var transaction = links.BeginTransaction())
@@ -121,12 +121,12 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             // User Code Error (Autoreverted)
             try
             {
-                using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename,
                     tempTransactionLogFilename, 1024 * 1024))
                 {
                     using (var transaction = links.BeginTransaction())
@@ -154,11 +154,11 @@ namespace Platform.Tests.Links.DataBase.Core
             catch
             {
                 Global.Trash = FileHelpers
-                    .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                    .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
             }
 
             // Commit
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+            using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename,
                     tempTransactionLogFilename, 1024 * 1024))
             {
                 using (var transaction = links.BeginTransaction())
@@ -177,18 +177,18 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             // Damage database
 
             FileHelpers
-                .WriteFirst(tempTransactionLogFilename, new Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition { TransactionId = 555 });
+                .WriteFirst(tempTransactionLogFilename, new Platform.Data.Core.Pairs.Links.Transition { TransactionId = 555 });
 
             // Try load damaged database
             try
             {
                 // TODO: Fix
-                using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename,
                         tempTransactionLogFilename, 1024 * 1024))
                 {
                     Global.Trash = links.Total;
@@ -200,7 +200,7 @@ namespace Platform.Tests.Links.DataBase.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<Platform.Data.Core.Pairs.Links.Transition>(tempTransactionLogFilename);
 
             File.Delete(tempDatabaseFilename);
             File.Delete(tempTransactionLogFilename);
@@ -217,11 +217,11 @@ namespace Platform.Tests.Links.DataBase.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
-            const Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement source = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement.Source;
-            const Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement target = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement.Target;
+            const ulong itself = Platform.Data.Core.Pairs.Links.Itself;
+            const Platform.Data.Core.Pairs.Links.PathElement source = Platform.Data.Core.Pairs.Links.PathElement.Source;
+            const Platform.Data.Core.Pairs.Links.PathElement target = Platform.Data.Core.Pairs.Links.PathElement.Target;
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
             {
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
@@ -373,7 +373,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations.", Iterations);
 
@@ -409,7 +409,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations in parallel.", Iterations);
 
@@ -446,7 +446,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations.", Iterations);
 
@@ -479,7 +479,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations in parallel.", Iterations);
 
@@ -555,7 +555,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong counter = 0;
 
@@ -593,7 +593,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong counter = 0;
 
@@ -685,11 +685,11 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 
-                long linksToCreate = 64 * 1024 * 1024 / Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / Platform.Data.Core.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links.", linksToCreate);
 
@@ -718,13 +718,13 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 
                 Stopwatch sw = Stopwatch.StartNew();
 
-                long linksToCreate = 64 * 1024 * 1024 / Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / Platform.Data.Core.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links in parallel.", linksToCreate);
 
@@ -747,7 +747,7 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Data.Core.Pairs.Links(tempFilename, DefaultLinksSize))
             {
                 ulong linksBeforeTest = links.Total;
 

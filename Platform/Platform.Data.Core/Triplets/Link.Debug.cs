@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public partial struct Link
     {

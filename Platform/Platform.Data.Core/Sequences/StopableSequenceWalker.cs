@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Sequences
+namespace Platform.Data.Core.Sequences
 {
     /// <remarks>
     /// Реализованный внутри алгоритм наглядно показывает,

@@ -1,7 +1,7 @@
 ﻿using System;
-using Platform.Links.DataBase.CoreUnsafe.TreeMethods;
+using Platform.Data.Core.TreeMethods;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Pairs
+namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
     /// Устранить дублирование логики.

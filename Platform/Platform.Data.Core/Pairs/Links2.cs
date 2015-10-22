@@ -1,11 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using Platform.Links.DataBase.CoreUnsafe.Exceptions;
-using Platform.Links.DataBase.CoreUnsafe.Pairs;
-using Platform.Links.DataBase.CoreUnsafe.Structures;
+using Platform.Data.Core.Exceptions;
+using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Structures;
 
-namespace Platform.Links.DataBase.CoreNet.Pairs
+namespace Platform.Data.Core.Pairs
 {
     public class Links : ILinks<ILink>
     {

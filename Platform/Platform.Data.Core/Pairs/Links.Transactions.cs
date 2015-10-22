@@ -12,7 +12,7 @@ using Platform.Helpers.Disposal;
 
 #if LinksTransactions
 
-namespace Platform.Links.DataBase.CoreUnsafe.Pairs
+namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {

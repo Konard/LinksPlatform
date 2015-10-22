@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Exceptions
+namespace Platform.Data.Core.Exceptions
 {
     public class ArgumentLinkDoesNotExistsException<TLink> : ArgumentException
     {

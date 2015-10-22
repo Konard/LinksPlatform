@@ -187,9 +187,9 @@
     <None Include="Project_Readme.html" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Links.DataBase.CoreNet\Platform.Links.DataBase.CoreNet.csproj">
+    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj">
       <Project>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</Project>
-      <Name>Platform.Links.DataBase.CoreNet</Name>
+      <Name>Platform.Data.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>

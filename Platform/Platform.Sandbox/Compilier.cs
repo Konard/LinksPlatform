@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
 using System.Runtime.CompilerServices;
-using Platform.Links.DataBase.CoreNet.Triplets;
+using Platform.Data.Core.Triplets;
 
 namespace Platform.Sandbox
 {

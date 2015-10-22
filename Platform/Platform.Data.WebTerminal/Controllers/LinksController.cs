@@ -1,5 +1,5 @@
 ﻿using System.Web.Mvc;
-using Platform.Links.DataBase.CoreNet.Triplets;
+using Platform.Data.Core.Triplets;
 using Platform.Data.WebTerminal.Models;
 
 namespace Platform.Data.WebTerminal.Controllers

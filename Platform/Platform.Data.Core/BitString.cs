@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Platform.Links.DataBase.CoreNet
+namespace Platform.Data.Core
 {
     /// <remarks>
     ///     А что если хранить карту значений, где каждый бит будет означать присутствует ли блок в 64 бит в массиве значений.

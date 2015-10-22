@@ -1,6 +1,6 @@
 ﻿using System;
-using Platform.Links.DataBase.CoreUnsafe.Pairs;
-using Platform.Links.DataBase.CoreUnsafe.Sequences;
+using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Sequences;
 
 namespace Platform.Sandbox
 {

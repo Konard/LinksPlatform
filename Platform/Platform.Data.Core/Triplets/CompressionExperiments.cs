@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public class CompressionExperiments
     {

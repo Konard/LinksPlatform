@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Links.DataBase.CoreUnsafe.Sequences;
+using Platform.Data.Core.Sequences;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public static class LinkConverter
     {

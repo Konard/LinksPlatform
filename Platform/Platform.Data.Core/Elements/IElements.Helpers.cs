@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.DataBase.CoreUnsafe.Elements
+﻿namespace Platform.Data.Core.Elements
 {
     /// <summary>
     /// Представляет интерфейс для работы с базой данных (хранилищем)

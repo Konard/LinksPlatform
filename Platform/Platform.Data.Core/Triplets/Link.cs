@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 using Int = System.Int64;
 using LinkIndex = System.UInt64;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public struct LinkDefinition
     {

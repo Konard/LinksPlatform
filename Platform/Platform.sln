@@ -13,14 +13,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Memory", "Platform
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Sandbox", "Platform.Sandbox\Platform.Sandbox.csproj", "{5C498D57-2625-434B-9D8B-862FD09B8B6D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.CoreUnsafe", "Platform.Links.DataBase.CoreUnsafe\Platform.Links.DataBase.CoreUnsafe.csproj", "{BBCE20EF-EEC2-49DB-AC61-EBA5C69B52AE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.ConsoleTerminal", "Platform.Data.ConsoleTerminal\Platform.Data.ConsoleTerminal.csproj", "{11CAD7AD-8675-4826-B974-EFFAD027AC8C}"
 	ProjectSection(ProjectDependencies) = postProject
 		{F717D689-5FC1-4A46-BED4-C16864820D7B} = {F717D689-5FC1-4A46-BED4-C16864820D7B}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.CoreNet", "Platform.Links.DataBase.CoreNet\Platform.Links.DataBase.CoreNet.csproj", "{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.Core", "Platform.Data.Core\Platform.Data.Core.csproj", "{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.System.Core", "Platform.System.Core\Platform.System.Core.csproj", "{A2BAFDD2-958E-45BB-A4CE-1708681A37B3}"
 EndProject

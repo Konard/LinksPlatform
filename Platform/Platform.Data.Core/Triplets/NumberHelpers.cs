@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public static class NumberHelpers
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Links.DataBase.CoreNet
+namespace Platform.Data.Core
 {
     // Concept:
     // var value = Node[43][12]["32423"].Value;

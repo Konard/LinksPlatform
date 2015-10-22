@@ -1,7 +1,7 @@
 ﻿using System;
 using Platform.Helpers;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Structures
+namespace Platform.Data.Core.Structures
 {
     /// <summary>
     /// Структура описывающая уникальную пространственно-временную зависимость.

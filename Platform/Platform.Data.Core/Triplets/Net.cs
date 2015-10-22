@@ -1,6 +1,6 @@
 ﻿using Platform.Helpers;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public enum NetMapping : long
     {

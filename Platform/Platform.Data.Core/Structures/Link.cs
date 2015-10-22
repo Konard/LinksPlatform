@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Structures
+namespace Platform.Data.Core.Structures
 {
     /// <summary>
     /// Структура описывающая уникальную связь.

@@ -4,7 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Platform.Communication.Udp;
-using Platform.Links.DataBase.CoreUnsafe.Sequences;
+using Platform.Data.Core.Sequences;
 
 namespace Platform.Data.MasterServer
 {

@@ -367,7 +367,3 @@
 //        #endregion
 //    }
 //}
-
-namespace Platform.Links.DataBase.CoreUnsafe.Pairs
-{
-}

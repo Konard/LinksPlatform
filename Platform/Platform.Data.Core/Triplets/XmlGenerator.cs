@@ -4,7 +4,7 @@ using System.Text;
 using System.Xml;
 using Platform.Communication.Protocol.Gexf;
 
-namespace Platform.Links.DataBase.CoreNet.Triplets
+namespace Platform.Data.Core.Triplets
 {
     public static class XmlGenerator
     {

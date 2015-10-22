@@ -1,4 +1,4 @@
-﻿namespace Platform.Links.DataBase.CoreUnsafe.Pairs
+﻿namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
     /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.

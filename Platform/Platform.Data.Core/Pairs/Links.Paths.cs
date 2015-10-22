@@ -1,7 +1,7 @@
 ﻿using System;
-using Platform.Links.DataBase.CoreUnsafe.Exceptions;
+using Platform.Data.Core.Exceptions;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Pairs
+namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {

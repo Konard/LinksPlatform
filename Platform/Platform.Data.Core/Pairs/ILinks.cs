@@ -1,7 +1,7 @@
 ﻿using System;
-using Platform.Links.DataBase.CoreUnsafe.Structures;
+using Platform.Data.Core.Structures;
 
-namespace Platform.Links.DataBase.CoreUnsafe.Pairs
+namespace Platform.Data.Core.Pairs
 {
     /// <summary>
     /// Представляет интерфейс для работы с базой данных в формате Links (хранилища взаимосвязей).
