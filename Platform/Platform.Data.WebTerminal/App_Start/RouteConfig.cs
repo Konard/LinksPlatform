@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc;
 using System.Web.Routing;
 
-namespace Platform.Links.DataBase.WebTerminal.App_Start
+namespace Platform.Data.WebTerminal.App_Start
 {
     public class RouteConfig
     {

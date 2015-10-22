@@ -34,7 +34,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform.Data.IdServer", "P
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Communication", "Platform.Communication\Platform.Communication.csproj", "{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.WebTerminal", "Platform.Links.DataBase.WebTerminal\Platform.Links.DataBase.WebTerminal.csproj", "{E7EDA085-2B2A-4B15-89CE-C2384D88A4F7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.WebTerminal", "Platform.Data.WebTerminal\Platform.Data.WebTerminal.csproj", "{E7EDA085-2B2A-4B15-89CE-C2384D88A4F7}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Platform.Links.DataBase.Core", "Platform.Links.DataBase.Core\Platform.Links.DataBase.Core.vcxproj", "{6B34F379-3D89-4EC7-BA47-C1A1A7B4421C}"
 EndProject

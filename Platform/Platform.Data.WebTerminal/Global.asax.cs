@@ -5,9 +5,9 @@ using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
 using Platform.Links.DataBase.CoreNet.Triplets;
-using Platform.Links.DataBase.WebTerminal.App_Start;
+using Platform.Data.WebTerminal.App_Start;
 
-namespace Platform.Links.DataBase.WebTerminal
+namespace Platform.Data.WebTerminal
 {
     public class MvcApplication : HttpApplication
     {
