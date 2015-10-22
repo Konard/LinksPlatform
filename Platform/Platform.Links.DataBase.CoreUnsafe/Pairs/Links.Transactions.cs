@@ -23,7 +23,6 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             public ulong TransactionId;
             public Structures.Link Before;
             public Structures.Link After;
-            // TODO: Добавить отметку времени
             public UniqueTimestamp Timestamp;
 
             public override string ToString()
