@@ -6,31 +6,31 @@ namespace Platform.Sandbox
 {
     public class NewMemoryManagerExperiments
     {
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void InitPersistentMemoryManager();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong OpenStorageFile(string filename);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong CloseStorageFile();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong EnlargeStorageFile();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong ShrinkStorageFile();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong SetStorageFileMemoryMapping();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern ulong ResetStorageFileMemoryMapping();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void ReadTest();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WriteTest();
 
         public static void RunExperiment2()

@@ -43,74 +43,74 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
 
         #region Basic Operations
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetSourceIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetLinkerIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetTargetIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetFirstRefererBySourceIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetFirstRefererByLinkerIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetFirstRefererByTargetIndex(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern Int GetTime(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex CreateLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex UpdateLink(LinkIndex link, LinkIndex newSource, LinkIndex newLinker, LinkIndex newTarget);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void DeleteLink(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex ReplaceLink(LinkIndex link, LinkIndex replacement);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex SearchLink(LinkIndex source, LinkIndex linker, LinkIndex target);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetMappedLink(Int mappedIndex);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void SetMappedLink(Int mappedIndex, LinkIndex linkIndex);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void InitPersistentMemoryManager();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern Int OpenStorageFile(string filename);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern Int CloseStorageFile();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern Int SetStorageFileMemoryMapping();
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern Int ResetStorageFileMemoryMapping();
 
         #endregion
 
         #region Referers Count Selectors
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetLinkNumberOfReferersBySource(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetLinkNumberOfReferersByLinker(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern LinkIndex GetLinkNumberOfReferersByTarget(LinkIndex link);
 
         #endregion
@@ -120,28 +120,28 @@ namespace Platform.Links.DataBase.CoreNet.Triplets
         private delegate void Visitor(LinkIndex link);
         private delegate Int StopableVisitor(LinkIndex link);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllReferersBySource(LinkIndex root, Visitor action);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int WalkThroughReferersBySource(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllReferersByLinker(LinkIndex root, Visitor action);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int WalkThroughReferersByLinker(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllReferersByTarget(LinkIndex root, Visitor action);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int WalkThroughReferersByTarget(LinkIndex root, StopableVisitor func);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllLinks(Visitor action);
 
-        [DllImport("Platform.Links.DataBase.Core.dll", CallingConvention = CallingConvention.Cdecl)]
+        [DllImport("Platform.Data.Kernel.dll", CallingConvention = CallingConvention.Cdecl)]
         private static extern int WalkThroughLinks(StopableVisitor func);
 
         #endregion

@@ -228,8 +228,8 @@
     </VisualStudio>
   </ProjectExtensions>
   <PropertyGroup>
-    <PreBuildEvent>xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Links.DataBase.Core.dll" "$(TargetDir)"
-xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Links.DataBase.Core.pdb" "$(TargetDir)"
+    <PreBuildEvent>xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Data.Kernel.dll" "$(TargetDir)"
+xcopy /y "$(SolutionDir)$(ConfigurationName)\Platform.Data.Kernel.pdb" "$(TargetDir)"
 </PreBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it.
