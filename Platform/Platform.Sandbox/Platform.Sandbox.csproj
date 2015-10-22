@@ -48,7 +48,6 @@
   <ItemGroup>
     <Compile Include="Compilier.cs" />
     <Compile Include="FileReadWriteTest.cs" />
-    <Compile Include="ILGeneratorExtensions.cs" />
     <Compile Include="NetParser.cs" />
     <Compile Include="NetParserTest.cs" />
     <Compile Include="NewMemoryManagerExperiments.cs" />

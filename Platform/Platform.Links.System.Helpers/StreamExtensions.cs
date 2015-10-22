@@ -1,10 +1,9 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Platform.Links.System.Helpers
 {
-    public unsafe static class StreamExtensions
+    public static class StreamExtensions
     {
         public static void Write<T>(this Stream stream, T value)
             where T : struct
@@ -13,7 +12,7 @@ namespace Platform.Links.System.Helpers
             stream.Write(bytes, 0, bytes.Length);
         }
 
-        public static T Read<T>(this Stream stream)
+        public static T ReadOrDefault<T>(this Stream stream)
             where T : struct
         {
             var size = Marshal.SizeOf(typeof(T));

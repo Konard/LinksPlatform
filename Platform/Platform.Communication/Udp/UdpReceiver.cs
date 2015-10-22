@@ -10,7 +10,7 @@ namespace Platform.Communication.Udp
     public delegate void MessageHandlerCallback(string message);
 
     /// <summary>
-    /// Представляет вспомогательную сущность для получения сообщений по протоколу UDP.
+    /// Представляет получателя сообщений по протоколу UDP.
     /// </summary>
     /// <remarks>
     /// TODO: Попробовать ThreadPool / Tasks

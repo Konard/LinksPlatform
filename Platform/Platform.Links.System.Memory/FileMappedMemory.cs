@@ -25,7 +25,7 @@ namespace Platform.Links.System.Memory
         private MemoryMappedViewAccessor _accessor;
 
         private byte* _pointer;
-            // Может хранить как ссылку на MemoryMappedFile, так и на блок, выделенный в куче операционной системы.
+        // Может хранить как ссылку на MemoryMappedFile, так и на блок, выделенный в куче операционной системы.
 
         private long _reservedCapacity;
         private long _usedCapacity;
@@ -146,7 +146,8 @@ namespace Platform.Links.System.Memory
         }
 
         /// <remarks>Проверить насколько корректно будет работать данный случай.</remarks>
-        public FileMappedMemory(string address) : this(address, 0)
+        public FileMappedMemory(string address)
+            : this(address, 0)
         {
         }
 

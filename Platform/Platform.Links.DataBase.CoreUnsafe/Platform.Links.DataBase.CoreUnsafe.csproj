@@ -52,6 +52,7 @@
     <Compile Include="Pairs\ILinks.cs" />
     <Compile Include="Pairs\Links.cs" />
     <Compile Include="Pairs\Links.IList.cs" />
+    <Compile Include="Pairs\Links.Paths.cs" />
     <Compile Include="Pairs\Links.Points.cs" />
     <Compile Include="Pairs\Links.Tests.cs" />
     <Compile Include="Pairs\Links.Transactions.cs" />

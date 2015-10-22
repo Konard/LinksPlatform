@@ -13,6 +13,7 @@ namespace Platform.Links.DataBase.CoreNet
     /// </remarks>
     public sealed class BitString : ICloneable
     {
+        // TODO: Replace List<byte> with byte[]
         private static readonly Dictionary<int, List<byte>> BitSetsIn16Bits;
         private long[] _array;
         private int _length;

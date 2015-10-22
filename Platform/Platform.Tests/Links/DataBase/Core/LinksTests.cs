@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Links.DataBase.CoreUnsafe.Pairs;
+using Platform.Links.DataBase.CoreUnsafe.Structures;
 using Platform.Links.System.Helpers;
 
 namespace Platform.Tests.Links.DataBase.Core
@@ -12,10 +13,10 @@ namespace Platform.Tests.Links.DataBase.Core
     [TestClass]
     public class LinksTests
     {
-        private const long Iterations = 10*1024;
+        private const long Iterations = 10 * 1024;
 
-        private static readonly long DefaultLinksSize = (long) Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes*
-                                                        1*1024*1024;
+        private static readonly long DefaultLinksSize = (long)Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes *
+                                                        1 * 1024 * 1024;
 
         private static readonly Random Rnd = new Random();
 
@@ -26,12 +27,45 @@ namespace Platform.Tests.Links.DataBase.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, 1024*1024))
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempFilename, 1024 * 1024))
             {
                 links.TestBasicMemoryManagement();
             }
 
             File.Delete(tempFilename);
+        }
+
+        [TestMethod]
+        public void CascadeUpdateTest()
+        {
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024 * 1024))
+            {
+                var l1 = links.Create(itself, itself);
+                var l2 = links.Create(itself, itself);
+
+                l2 = links.Update(l2, l2, l1, l2);
+
+                links.Create(l2, itself);
+                links.Create(l2, itself);
+
+                l2 = links.Update(l2, l1);
+
+                links.Delete(l2);
+
+                Global.Trash = links.Total;
+            }
+
+            Global.Trash = FileHelpers
+                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            File.Delete(tempDatabaseFilename);
+            File.Delete(tempTransactionLogFilename);
         }
 
         [TestMethod]
@@ -47,13 +81,154 @@ namespace Platform.Tests.Links.DataBase.Core
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
 
-                l2 = links.Update(l2, l2, l1, l2);
+                Global.Trash = links.Update(l2, l2, l1, l2);
 
                 links.Delete(l1);
             }
 
-            var transitions = FileHelpers
+            Global.Trash = FileHelpers
                 .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            File.Delete(tempDatabaseFilename);
+            File.Delete(tempTransactionLogFilename);
+        }
+
+        [TestMethod]
+        public void TransactionsTest()
+        {
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+
+            // Auto Reverted (Because no commit at transaction)
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024 * 1024))
+            {
+                using (var transaction = links.BeginTransaction())
+                {
+                    var l1 = links.Create(itself, itself);
+                    var l2 = links.Create(itself, itself);
+
+                    Global.Trash = links.Update(l2, l2, l1, l2);
+
+                    links.Delete(l1);
+
+                    Global.Trash = transaction;
+                }
+
+                Global.Trash = links.Total;
+            }
+
+            Global.Trash = FileHelpers
+                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            // User Code Error (Autoreverted)
+            try
+            {
+                using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024 * 1024))
+                {
+                    using (var transaction = links.BeginTransaction())
+                    {
+                        var l1 = links.Create(itself, itself);
+                        var l2 = links.Create(itself, itself);
+
+                        l2 = links.Update(l2, l2, l1, l2);
+
+                        links.Create(l2, itself);
+                        links.Create(l2, itself);
+
+                        ExceptionThrower();
+
+                        l2 = links.Update(l2, l1); // TODO: Fix CascadeUpdateTest and move ExceptionThrower() before transaction.Commit()
+
+                        links.Delete(l2);
+
+                        transaction.Commit();
+                    }
+
+                    Global.Trash = links.Total;
+                }
+            }
+            catch
+            {
+                Global.Trash = FileHelpers
+                    .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+            }
+
+            // Commit
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024 * 1024))
+            {
+                using (var transaction = links.BeginTransaction())
+                {
+                    var l1 = links.Create(itself, itself);
+                    var l2 = links.Create(itself, itself);
+
+                    Global.Trash = links.Update(l2, l2, l1, l2);
+
+                    links.Delete(l1);
+
+                    transaction.Commit();
+                }
+
+                Global.Trash = links.Total;
+            }
+
+            Global.Trash = FileHelpers
+                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            // Damage database
+
+            FileHelpers
+                .WriteFirst(tempTransactionLogFilename, new Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition { TransactionId = 555 });
+
+            // Try load damaged database
+            try
+            {
+                // TODO: Fix
+                using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename,
+                        tempTransactionLogFilename, 1024 * 1024))
+                {
+                    Global.Trash = links.Total;
+                }
+            }
+            catch (NotSupportedException ex)
+            {
+                Assert.IsTrue(ex.Message == "Database is damaged, autorecovery is not supported yet.");
+            }
+
+            Global.Trash = FileHelpers
+                .ReadAll<Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Transition>(tempTransactionLogFilename);
+
+            File.Delete(tempDatabaseFilename);
+            File.Delete(tempTransactionLogFilename);
+        }
+
+        public void ExceptionThrower()
+        {
+            throw new Exception();
+        }
+
+        [TestMethod]
+        public void PathsTest()
+        {
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            const ulong itself = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.Itself;
+            const Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement source = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement.Source;
+            const Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement target = Platform.Links.DataBase.CoreUnsafe.Pairs.Links.PathElement.Target;
+
+            using (var links = new Platform.Links.DataBase.CoreUnsafe.Pairs.Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            {
+                var l1 = links.Create(itself, itself);
+                var l2 = links.Create(itself, itself);
+
+                var r1 = links.Get(l1, source, target, source);
+                var r2 = links.Get(l2, l2, l2, l2);
+            }
 
             File.Delete(tempDatabaseFilename);
             File.Delete(tempTransactionLogFilename);
@@ -216,14 +391,14 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
+                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 // Удаляем связь, из которой производилось считывание
                 links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
-                    Iterations, elapsedTime, (long) iterationsPerSecond, counter);
+                    Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
 
             File.Delete(tempFilename);
@@ -248,19 +423,19 @@ namespace Platform.Tests.Links.DataBase.Core
                 // Тестируем саму функцию
                 Parallel.For(0, Iterations, x =>
                 {
-                    Interlocked.Add(ref counter, (long) links.GetSource(firstLink));
+                    Interlocked.Add(ref counter, (long)links.GetSource(firstLink));
                     //Interlocked.Increment(ref counter);
                 });
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
+                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
-                    Iterations, elapsedTime, (long) iterationsPerSecond, counter);
+                    Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
 
             File.Delete(tempFilename);
@@ -287,13 +462,13 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
+                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",
-                    Iterations, elapsedTime, (long) iterationsPerSecond, counter);
+                    Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
 
             File.Delete(tempFilename);
@@ -317,19 +492,19 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 Parallel.For(0, Iterations, x =>
                 {
-                    Interlocked.Add(ref counter, (long) links.GetTarget(firstLink));
+                    Interlocked.Add(ref counter, (long)links.GetTarget(firstLink));
                     //Interlocked.Increment(ref counter);
                 });
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations/elapsedTime.TotalSeconds;
+                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
                 Console.WriteLine(
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",
-                    Iterations, elapsedTime, (long) iterationsPerSecond, counter);
+                    Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
 
             File.Delete(tempFilename);
@@ -388,7 +563,7 @@ namespace Platform.Tests.Links.DataBase.Core
                 ulong maxLink = links.Total;
 
                 ulong iterations = links.Total;
-                var rnd = new Random((int) DateTime.UtcNow.Ticks);
+                var rnd = new Random((int)DateTime.UtcNow.Ticks);
 
                 Console.WriteLine("Testing Random Search with {0} Iterations.", links.Total);
 
@@ -404,10 +579,10 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = iterations/elapsedTime.TotalSeconds;
+                double iterationsPerSecond = iterations / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} Iterations of Random Search done in {1} ({2} Iterations per second), c: {3}",
-                    iterations, elapsedTime, (long) iterationsPerSecond, counter);
+                    iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
 
             File.Delete(tempFilename);
@@ -435,10 +610,10 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 TimeSpan elapsedTime = sw.Elapsed;
 
-                double linksPerSecond = counter/elapsedTime.TotalSeconds;
+                double linksPerSecond = counter / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} Iterations of Each's handler function done in {1} ({2} links per second)",
-                    counter, elapsedTime, (long) linksPerSecond);
+                    counter, elapsedTime, (long)linksPerSecond);
             }
 
             File.Delete(tempFilename);
@@ -514,11 +689,11 @@ namespace Platform.Tests.Links.DataBase.Core
             {
                 ulong linksBeforeTest = links.Total;
 
-                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links.", linksToCreate);
 
-                TimeSpan elapsedTime = Measure(() =>
+                TimeSpan elapsedTime = PerformanceHelpers.Measure(() =>
                 {
                     for (long i = 0; i < linksToCreate; i++)
                     {
@@ -527,12 +702,12 @@ namespace Platform.Tests.Links.DataBase.Core
                 });
 
                 ulong linksCreated = links.Total - linksBeforeTest;
-                double linksPerSecond = linksCreated/elapsedTime.TotalSeconds;
+                double linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("Current links count: {0}.", links.Total);
 
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
-                    (long) linksPerSecond);
+                    (long)linksPerSecond);
             }
 
             File.Delete(tempFilename);
@@ -549,7 +724,7 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 Stopwatch sw = Stopwatch.StartNew();
 
-                long linksToCreate = 64*1024*1024/Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / Platform.Links.DataBase.CoreUnsafe.Pairs.Links.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links in parallel.", linksToCreate);
 
@@ -558,10 +733,10 @@ namespace Platform.Tests.Links.DataBase.Core
                 TimeSpan elapsedTime = sw.Elapsed;
 
                 ulong linksCreated = links.Total - linksBeforeTest;
-                double linksPerSecond = linksCreated/elapsedTime.TotalSeconds;
+                double linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
-                    (long) linksPerSecond);
+                    (long)linksPerSecond);
             }
 
             File.Delete(tempFilename);
@@ -578,26 +753,16 @@ namespace Platform.Tests.Links.DataBase.Core
 
                 Console.WriteLine("Deleting all links");
 
-                TimeSpan elapsedTime = Measure(links.DeleteAllLinks);
+                TimeSpan elapsedTime = PerformanceHelpers.Measure(links.DeleteAllLinks);
 
                 ulong linksDeleted = linksBeforeTest - links.Total;
-                double linksPerSecond = linksDeleted/elapsedTime.TotalSeconds;
+                double linksPerSecond = linksDeleted / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links deleted in {1} ({2} links per second)", linksDeleted, elapsedTime,
-                    (long) linksPerSecond);
+                    (long)linksPerSecond);
             }
 
             File.Delete(tempFilename);
-        }
-
-        public static TimeSpan Measure(Action action)
-        {
-            Stopwatch sw = Stopwatch.StartNew();
-
-            action();
-
-            sw.Stop();
-            return sw.Elapsed;
         }
 
         #endregion

@@ -6,7 +6,7 @@ using Platform.Links.System.Helpers.Disposal;
 namespace Platform.Communication.Udp
 {
     /// <summary>
-    /// Представляет вспомогательную сущность для отправки сообщений по протоколу UDP.
+    /// Представляет отправителя сообщений по протоколу UDP.
     /// </summary>
     public class UdpSender : DisposalBase
     {

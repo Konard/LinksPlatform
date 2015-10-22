@@ -38,6 +38,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitConverterHelpers.cs" />
+    <Compile Include="ILGeneratorExtensions.cs" />
+    <Compile Include="PerformanceHelpers.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="ConsoleExtensions.cs" />
     <Compile Include="Disposal\DefaultDisposal.cs" />

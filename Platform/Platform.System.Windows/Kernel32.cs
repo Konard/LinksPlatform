@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace Platform.System.Windows
 {
-    public static class Kernel
+    public static class Kernel32
     {
         #region Virtual Memory
 

@@ -405,7 +405,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
         {
             var before = GetLinkCore(linkIndex);
-            
+
             var newLink = SearchCore(newSource, newTarget);
             if (newLink == Null)
             {
@@ -453,6 +453,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
 
                 DeleteCore(linkIndex);
 
+                // TODO: Определиться с порядком действий, чтобы можно было успешно выполнять откат операций
                 CommitUpdate(before, GetLinkCore(newLink));
 
                 return newLink;
@@ -671,7 +672,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         {
             DisposeTransitions();
             _links = null;
-            _memory.Dispose();
+            if (_memory != null)
+                _memory.Dispose();
         }
 
         #endregion

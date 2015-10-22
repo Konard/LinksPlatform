@@ -939,7 +939,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
             private readonly Pairs.Links _links;
             private readonly HashSet<ulong> _intersectWith;
             private readonly HashSet<ulong> _usages;
-            private readonly HashSet<ulong> _enter; 
+            private readonly HashSet<ulong> _enter;
 
             public AllUsagesIntersectingCollector(Pairs.Links links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
             {
@@ -1501,36 +1501,36 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
         public class Walker
         {
-            protected readonly Pairs.Links _links;
+            protected readonly Pairs.Links Links;
 
             public Walker(Sequences sequences)
             {
-                _links = sequences._links;
+                Links = sequences._links;
             }
 
             protected virtual bool IsElement(LinkIndex link)
             {
-                return _links.GetTargetCore(link) == link;
+                return Links.GetTargetCore(link) == link || Links.GetSourceCore(link) == link;
             }
 
             public void WalkRight(LinkIndex sequence, Action<LinkIndex> visit)
             {
-                SequenceWalker.WalkRight(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
+                SequenceWalker.WalkRight(sequence, Links.GetSourceCore, Links.GetTargetCore, IsElement, visit);
             }
 
             public void WalkLeft(LinkIndex sequence, Action<LinkIndex> visit)
             {
-                SequenceWalker.WalkLeft(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
+                SequenceWalker.WalkLeft(sequence, Links.GetSourceCore, Links.GetTargetCore, IsElement, visit);
             }
 
             public bool WalkRight(LinkIndex sequence, Func<LinkIndex, bool> visit)
             {
-                return StopableSequenceWalker.WalkRight(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
+                return StopableSequenceWalker.WalkRight(sequence, Links.GetSourceCore, Links.GetTargetCore, IsElement, visit);
             }
 
             public bool WalkLeft(LinkIndex sequence, Func<LinkIndex, bool> visit)
             {
-                return StopableSequenceWalker.WalkLeft(sequence, _links.GetSourceCore, _links.GetTargetCore, IsElement, visit);
+                return StopableSequenceWalker.WalkLeft(sequence, Links.GetSourceCore, Links.GetTargetCore, IsElement, visit);
             }
         }
 
@@ -1551,7 +1551,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             protected override bool IsElement(ulong link)
             {
-                return _linksInSequence.Contains(link) || _links.GetTargetCore(link) == link;
+                return _linksInSequence.Contains(link) || Links.GetTargetCore(link) == link || Links.GetSourceCore(link) == link;
             }
 
             public bool FullMatch(LinkIndex sequenceToMatch)
@@ -1674,7 +1674,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Sequences
 
             protected override bool IsElement(ulong link)
             {
-                return _linksInSequence.Contains(link) || _links.GetTargetCore(link) == link;
+                return _linksInSequence.Contains(link) || Links.GetTargetCore(link) == link || Links.GetSourceCore(link) == link;
             }
 
             public bool PatternMatch(LinkIndex sequenceToMatch)

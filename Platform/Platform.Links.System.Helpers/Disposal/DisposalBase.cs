@@ -11,9 +11,11 @@ namespace Platform.Links.System.Helpers.Disposal
     /// </remarks>
     public abstract class DisposalBase : IDisposal
     {
-        protected bool _disposed;
         private readonly Process _currentProcess;
         private readonly AppDomain _currentDomain;
+        private bool _disposed;
+
+        public bool Disposed { get { return _disposed; } }
 
         protected DisposalBase()
         {
@@ -51,7 +53,11 @@ namespace Platform.Links.System.Helpers.Disposal
                 {
                     DisposeCore(manual);
                 }
-                // TODO: Среагировать
+                catch 
+                {
+                    if (manual) throw;
+                    // else TODO: Log exception
+                }
                 finally
                 {
                     _currentProcess.Exited -= OnProcessExit;

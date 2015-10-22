@@ -14,7 +14,7 @@ namespace Platform.Links.System.Memory
     /// </remarks>
     public unsafe class HeapMemory : DisposalBase, IMemory
     {
-        private static readonly IntPtr CurrentProcessHeapHandle = Kernel.GetProcessHeap();
+        private static readonly IntPtr CurrentProcessHeapHandle = Kernel32.GetProcessHeap();
 
         #region Structure
 
@@ -231,7 +231,7 @@ namespace Platform.Links.System.Memory
         public static void* Alloc(int size)
         {
             void* result =
-                Kernel.HeapAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new UIntPtr((uint) size))
+                Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr((uint) size))
                     .ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
@@ -241,7 +241,7 @@ namespace Platform.Links.System.Memory
         // blocks are permitted to overlap.
         public static void Copy(void* src, void* dst, int count)
         {
-            Kernel.CopyMemory(new IntPtr(dst), new IntPtr(src), new UIntPtr((uint) count));
+            Kernel32.CopyMemory(new IntPtr(dst), new IntPtr(src), new UIntPtr((uint) count));
 
             /*
             byte* ps = (byte*)src;
@@ -259,7 +259,7 @@ namespace Platform.Links.System.Memory
         // Frees a memory block.
         public static void Free(void* block)
         {
-            if (!Kernel.HeapFree(CurrentProcessHeapHandle, 0, new IntPtr(block)))
+            if (!Kernel32.HeapFree(CurrentProcessHeapHandle, 0, new IntPtr(block)))
                 throw new InvalidOperationException();
         }
 
@@ -269,7 +269,7 @@ namespace Platform.Links.System.Memory
         public static void* ReAlloc(void* block, int size)
         {
             void* result =
-                Kernel.HeapReAlloc(CurrentProcessHeapHandle, Kernel.HeapFlags.ZeroMemory, new IntPtr(block),
+                Kernel32.HeapReAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new IntPtr(block),
                     new UIntPtr((uint) size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
@@ -278,7 +278,7 @@ namespace Platform.Links.System.Memory
         // Returns the size of a memory block.
         public static int SizeOf(void* block)
         {
-            int result = (int) Kernel.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
+            int result = (int) Kernel32.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
             if (result == -1) throw new InvalidOperationException();
             return result;
         }
