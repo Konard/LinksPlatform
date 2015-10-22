@@ -51,7 +51,7 @@ Link*               pointerToLinks;                     // Указатель н
 
 Link*               pointerToUnusedMarker;              // Инициализируется в SetStorageFileMemoryMapping()
 
-__forceinline void PrintLinksDataBaseSize()
+__forceinline void PrintLinksDatabaseSize()
 {
 #ifdef DEBUG
     printf("Links database size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
@@ -420,7 +420,7 @@ signed_integer SetStorageFileMemoryMapping()
 
     DebugInfo("Memory mapping of storage file is set.");
 
-    PrintLinksDataBaseSize();
+    PrintLinksDatabaseSize();
 
     return SUCCESS_RESULT;
 }
@@ -482,7 +482,7 @@ signed_integer ResetStorageFileMemoryMapping()
         {
             DebugInfo("Resetting memory mapping of storage file...");
 
-            PrintLinksDataBaseSize();
+            PrintLinksDatabaseSize();
 
             if (*pointerToDataSeal != LINKS_DATA_SEAL_64BIT)
             {

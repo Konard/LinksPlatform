@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Data.Core.Exceptions;
-using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Structures;
 
 namespace Platform.Data.Core.Pairs
 {
-    public class Links : ILinks<ILink>
+    public class Links2 : ILinks<ILink>
     {
-        public Links()
+        public Links2()
         {
             _links = new HashSet<ILink>();
             _linksBySource = new Dictionary<ILink, HashSet<ILink>>();
@@ -103,9 +102,9 @@ namespace Platform.Data.Core.Pairs
             return SearchCore(source, target);
         }
 
-        public CoreUnsafe.Structures.Link GetLink(ILink link)
+        public Structures.Link GetLink(ILink link)
         {
-            return CoreUnsafe.Structures.Link.Create(link);
+            return Structures.Link.Create(link);
         }
 
         public ILink Update(ILink link, ILink newSource, ILink newTarget)
@@ -139,7 +138,7 @@ namespace Platform.Data.Core.Pairs
         {
             #region Structure
 
-            private readonly Links _links;
+            private readonly Links2 _links;
             private readonly ILink _source;
             private readonly ILink _target;
 
@@ -147,14 +146,14 @@ namespace Platform.Data.Core.Pairs
 
             #region Contructors
 
-            public Link(Links links)
+            public Link(Links2 links)
             {
                 _links = links;
                 _source = this;
                 _target = this;
             }
 
-            public Link(Links links, ILink source, ILink target)
+            public Link(Links2 links, ILink source, ILink target)
             {
                 _links = links;
                 _source = source;
@@ -193,7 +192,7 @@ namespace Platform.Data.Core.Pairs
 
             public override string ToString()
             {
-                return CoreUnsafe.Structures.Link.ToString(this);
+                return Structures.Link.ToString(this);
             }
 
             #endregion

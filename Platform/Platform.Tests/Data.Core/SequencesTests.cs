@@ -6,7 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Sequences;
 using Pairs = Platform.Data.Core.Pairs;
 
-namespace Platform.Tests.Links.DataBase.Core
+namespace Platform.Tests.Data.Core
 {
     [TestClass]
     public class SequencesTests

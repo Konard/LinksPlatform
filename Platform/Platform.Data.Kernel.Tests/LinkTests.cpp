@@ -6,7 +6,7 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace CoreTests
+namespace PlatformDataKernelTests
 {
     unsigned_integer thingVisitorCounter;
     unsigned_integer isAVisitorCounter;

@@ -4,7 +4,7 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-	<ProductVersion>8.0.30703</ProductVersion>
+    <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</ProjectGuid>
     <OutputType>Library</OutputType>
@@ -94,10 +94,6 @@
     <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
       <Project>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</Project>
       <Name>Platform.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj">
-      <Project>{bbce20ef-eec2-49db-ac61-eba5c69b52ae}</Project>
-      <Name>Platform.Data.Core</Name>
     </ProjectReference>
     <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>

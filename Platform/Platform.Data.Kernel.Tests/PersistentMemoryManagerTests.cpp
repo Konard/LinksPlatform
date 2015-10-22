@@ -5,7 +5,7 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace CoreTests
+namespace PlatformDataKernelTests
 {
     TEST_CLASS(PersistentMemoryManagerTests)
     {

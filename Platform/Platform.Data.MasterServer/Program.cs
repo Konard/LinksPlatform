@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using Platform.Communication.Udp;
+using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 
 namespace Platform.Data.MasterServer
@@ -27,7 +28,7 @@ namespace Platform.Data.MasterServer
 
             File.Delete(DefaultDatabaseFilename);
 
-            using (var links = new CoreUnsafe.Pairs.Links(DefaultDatabaseFilename, 512 * 1024 * 1024))
+            using (var links = new Links(DefaultDatabaseFilename, 512 * 1024 * 1024))
             {
                 InitUTF16(links);
 
@@ -68,7 +69,7 @@ namespace Platform.Data.MasterServer
             }
         }
 
-        private static void PrintContents(CoreUnsafe.Pairs.Links links)
+        private static void PrintContents(Links links)
         {
             if (links.Total == char.MaxValue)
                 Console.WriteLine("Database is empty.");
@@ -92,7 +93,7 @@ namespace Platform.Data.MasterServer
             }
         }
 
-        private static void InitUTF16(CoreUnsafe.Pairs.Links links)
+        private static void InitUTF16(Links links)
         {
             if (UTF16Initialized)
                 return;

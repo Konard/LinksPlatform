@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Platform.Communication.Udp;
+using Platform.Data.Core.Pairs;
 
 namespace Platform.Data.SlaveServer
 {
@@ -16,7 +17,7 @@ namespace Platform.Data.SlaveServer
                 LinksServerStoped = true;
             };
 
-            var links = new CoreNet.Pairs.Links();
+            var links = new Links2();
 
             //var sequences = new Sequences(links);
 

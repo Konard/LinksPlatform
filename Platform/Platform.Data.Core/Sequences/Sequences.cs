@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Platform.Data.Core.Exceptions;
+using Platform.Data.Core.Pairs;
 using Platform.Helpers;
 using Platform.Helpers.Synchronization;
 
@@ -47,15 +48,15 @@ namespace Platform.Data.Core.Sequences
     public sealed partial class Sequences // IList<string>, IList<ulong[]> (после завершения реализации Sequences)
     {
         /// <summary>Возвращает значение ulong, обозначающее любую одну связь.</summary>
-        public const ulong Any = Pairs.Links.Any;
+        public const ulong Any = Links.Any;
 
         /// <summary>Возвращает значение ulong, обозначающее любое количество связей.</summary>
         public const ulong ZeroOrMany = ulong.MaxValue;
 
-        private readonly Pairs.Links _links;
+        private readonly Links _links;
         private readonly ISyncronization _sync = new SafeSynchronization();
 
-        public Sequences(Pairs.Links links)
+        public Sequences(Links links)
         {
             _links = links;
         }
@@ -112,7 +113,7 @@ namespace Platform.Data.Core.Sequences
                     for (var j = 0; j < right.Length; j++)
                     {
                         var variant = _links.Create(left[i], right[j]);
-                        if (variant == Pairs.Links.Null)
+                        if (variant == Links.Null)
                             throw new NotImplementedException("Creation cancellation is not implemented.");
                         variants[last++] = variant;
                     }
@@ -144,7 +145,7 @@ namespace Platform.Data.Core.Sequences
             if (sequence.Length == 2)
             {
                 var link = _links.Create(sequence[0], sequence[1]);
-                if (link == Pairs.Links.Null)
+                if (link == Links.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
                 results.Add(link);
                 return results;
@@ -156,7 +157,7 @@ namespace Platform.Data.Core.Sequences
             for (var li = 0; li < innerSequenceLength; li++)
             {
                 var link = _links.Create(sequence[li], sequence[li + 1]);
-                if (link == Pairs.Links.Null)
+                if (link == Links.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
 
                 for (var isi = 0; isi < li; isi++)
@@ -178,7 +179,7 @@ namespace Platform.Data.Core.Sequences
             return _sync.ExecuteWriteOperation(() =>
             {
                 if (sequence == null || sequence.Length == 0)
-                    return Pairs.Links.Null;
+                    return Links.Null;
 
                 EnsureEachLinkExists(_links, sequence);
 
@@ -243,7 +244,7 @@ namespace Platform.Data.Core.Sequences
             return _sync.ExecuteWriteOperation(() =>
             {
                 if (sequence == null || sequence.Length == 0)
-                    return Pairs.Links.Null;
+                    return Links.Null;
 
                 EnsureEachLinkIsAnyOrExists(_links, sequence);
 
@@ -332,7 +333,7 @@ namespace Platform.Data.Core.Sequences
 
                         EachCore(handler, innerSequence);
 
-                        return Pairs.Links.Continue;
+                        return Links.Continue;
                     });
                 }
             }
@@ -556,7 +557,7 @@ namespace Platform.Data.Core.Sequences
                     if (sequence.Length == 2)
                     {
                         var pair = _links.Search(firstElement, sequence[1]);
-                        if (pair != Pairs.Links.Null)
+                        if (pair != Links.Null)
                             results.Add(pair);
                         return results;
                     }
@@ -628,7 +629,7 @@ namespace Platform.Data.Core.Sequences
                     if (sequence.Length == 2)
                     {
                         var pair = _links.Search(firstElement, sequence[1]);
-                        if (pair != Pairs.Links.Null)
+                        if (pair != Links.Null)
                             results.Add(pair);
                         return results;
                     }
@@ -914,10 +915,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCollector
         {
-            private readonly Pairs.Links _links;
+            private readonly Links _links;
             private readonly HashSet<ulong> _usages;
 
-            public AllUsagesCollector(Pairs.Links links, HashSet<ulong> usages)
+            public AllUsagesCollector(Links links, HashSet<ulong> usages)
             {
                 _links = links;
                 _usages = usages;
@@ -936,12 +937,12 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesIntersectingCollector
         {
-            private readonly Pairs.Links _links;
+            private readonly Links _links;
             private readonly HashSet<ulong> _intersectWith;
             private readonly HashSet<ulong> _usages;
             private readonly HashSet<ulong> _enter;
 
-            public AllUsagesIntersectingCollector(Pairs.Links links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
+            public AllUsagesIntersectingCollector(Links links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
             {
                 _links = links;
                 _intersectWith = intersectWith;
@@ -976,7 +977,7 @@ namespace Platform.Data.Core.Sequences
             if (left == right)
                 handler(left);
             var pair = _links.Search(left, right);
-            if (pair != Pairs.Links.Null)
+            if (pair != Links.Null)
                 handler(pair);
 
             // Inner
@@ -1074,7 +1075,7 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
-        private static void EnsureEachLinkExists(Pairs.Links links, params ulong[] sequence)
+        private static void EnsureEachLinkExists(Links links, params ulong[] sequence)
         {
             if (sequence == null)
                 return;
@@ -1085,24 +1086,24 @@ namespace Platform.Data.Core.Sequences
                         string.Format("patternSequence[{0}]", i));
         }
 
-        private static void EnsureEachLinkIsAnyOrExists(Pairs.Links links, params ulong[] sequence)
+        private static void EnsureEachLinkIsAnyOrExists(Links links, params ulong[] sequence)
         {
             if (sequence == null)
                 return;
 
             for (var i = 0; i < sequence.Length; i++)
-                if (sequence[i] != Pairs.Links.Null && !links.Exists(sequence[i]))
+                if (sequence[i] != Links.Null && !links.Exists(sequence[i]))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
                         string.Format("patternSequence[{0}]", i));
         }
 
-        private static void EnsureEachLinkIsAnyOrZeroOrManyOrExists(Pairs.Links links, params ulong[] sequence)
+        private static void EnsureEachLinkIsAnyOrZeroOrManyOrExists(Links links, params ulong[] sequence)
         {
             if (sequence == null)
                 return;
 
             for (var i = 0; i < sequence.Length; i++)
-                if (sequence[i] != Pairs.Links.Null && sequence[i] != ZeroOrMany && !links.Exists(sequence[i]))
+                if (sequence[i] != Links.Null && sequence[i] != ZeroOrMany && !links.Exists(sequence[i]))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
                         string.Format("patternSequence[{0}]", i));
         }
@@ -1120,7 +1121,7 @@ namespace Platform.Data.Core.Sequences
 
                     var uniqueSequenceElements = new HashSet<ulong>();
                     for (var i = 0; i < patternSequence.Length; i++)
-                        if (patternSequence[i] != Pairs.Links.Null && patternSequence[i] != ZeroOrMany)
+                        if (patternSequence[i] != Links.Null && patternSequence[i] != ZeroOrMany)
                             uniqueSequenceElements.Add(patternSequence[i]);
 
                     var results = new HashSet<ulong>();
@@ -1501,7 +1502,7 @@ namespace Platform.Data.Core.Sequences
 
         public class Walker
         {
-            protected readonly Pairs.Links Links;
+            protected readonly Links Links;
 
             public Walker(Sequences sequences)
             {
@@ -1545,7 +1546,7 @@ namespace Platform.Data.Core.Sequences
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Pairs.Links.Null && x != ZeroOrMany));
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Links.Null && x != ZeroOrMany));
                 _results = results;
             }
 
@@ -1665,7 +1666,7 @@ namespace Platform.Data.Core.Sequences
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Pairs.Links.Null && x != ZeroOrMany));
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Links.Null && x != ZeroOrMany));
                 _results = results;
 
                 // TODO: Переместить в PatternMatcher

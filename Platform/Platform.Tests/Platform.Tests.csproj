@@ -51,8 +51,8 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="Links\DataBase\Core\LinksTests.cs" />
-    <Compile Include="Links\DataBase\Core\SequencesTests.cs" />
+    <Compile Include="Data.Core\LinksTests.cs" />
+    <Compile Include="Data.Core\SequencesTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -65,6 +65,7 @@
       <Name>Platform.Helpers</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Choose>
     <When Condition="'$(VisualStudioVersion)' == '10.0' And '$(IsCodedUITest)' == 'True'">
       <ItemGroup>

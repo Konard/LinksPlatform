@@ -1,6 +1,6 @@
 ﻿//using System;
 
-//namespace Platform.Links.DataBase.Core.Elements
+//namespace Platform.Data.Elements
 //{
 //    /// <summary>
 //    /// Инкапсулирует метод, обрабатывающий элемент.

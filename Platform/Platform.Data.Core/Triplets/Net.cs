@@ -104,143 +104,143 @@ namespace Platform.Data.Core.Triplets
 
         public static Link CreateThing()
         {
-            return Link.Create(Link.Itself, Net.IsA, Net.Thing);
+            return Link.Create(Link.Itself, IsA, Thing);
         }
 
         public static Link CreateMappedThing(object mapping)
         {
-            return Link.CreateMapped(Link.Itself, Net.IsA, Net.Thing, mapping);
+            return Link.CreateMapped(Link.Itself, IsA, Thing, mapping);
         }
 
         public static Link CreateLink()
         {
-            return Link.Create(Link.Itself, Net.IsA, Net.Link);
+            return Link.Create(Link.Itself, IsA, Link);
         }
 
         public static Link CreateMappedLink(object mapping)
         {
-            return Link.CreateMapped(Link.Itself, Net.IsA, Net.Link, mapping);
+            return Link.CreateMapped(Link.Itself, IsA, Link, mapping);
         }
 
         public static Link CreateSet()
         {
-            return Link.Create(Link.Itself, Net.IsA, Net.Set);
+            return Link.Create(Link.Itself, IsA, Set);
         }
 
         private static void Create()
         {
             #region Core
 
-            if (!Link.TryGetMapped(NetMapping.IsA, out Net.IsA)
-             || !Link.TryGetMapped(NetMapping.IsNotA, out Net.IsNotA)
-             || !Link.TryGetMapped(NetMapping.Link, out Net.Link)
-             || !Link.TryGetMapped(NetMapping.Thing, out Net.Thing))
+            if (!Link.TryGetMapped(NetMapping.IsA, out IsA)
+             || !Link.TryGetMapped(NetMapping.IsNotA, out IsNotA)
+             || !Link.TryGetMapped(NetMapping.Link, out Link)
+             || !Link.TryGetMapped(NetMapping.Thing, out Thing))
             {
                 // Наивная инициализация (Не является корректным объяснением).
-                Net.IsA = Link.CreateMapped(Link.Itself, Link.Itself, Link.Itself, NetMapping.IsA); // Стоит переделать в "[x] is a member|instance|element of the class [y]"
-                Net.IsNotA = Link.CreateMapped(Link.Itself, Link.Itself, Net.IsA, NetMapping.IsNotA);
-                Net.Link = Link.CreateMapped(Link.Itself, Net.IsA, Link.Itself, NetMapping.Link);
-                Net.Thing = Link.CreateMapped(Link.Itself, Net.IsNotA, Net.Link, NetMapping.Thing);
+                IsA = Link.CreateMapped(Link.Itself, Link.Itself, Link.Itself, NetMapping.IsA); // Стоит переделать в "[x] is a member|instance|element of the class [y]"
+                IsNotA = Link.CreateMapped(Link.Itself, Link.Itself, IsA, NetMapping.IsNotA);
+                Link = Link.CreateMapped(Link.Itself, IsA, Link.Itself, NetMapping.Link);
+                Thing = Link.CreateMapped(Link.Itself, IsNotA, Link, NetMapping.Thing);
 
-                Link.Update(ref Net.IsA, Net.IsA, Net.IsA, Net.Link); // Исключение, позволяющие завершить систему
+                Link.Update(ref IsA, IsA, IsA, Link); // Исключение, позволяющие завершить систему
             }
 
             #endregion
 
-            Net.Of = CreateMappedLink(NetMapping.Of);
-            Net.And = CreateMappedLink(NetMapping.And);
-            Net.ThatConsistsOf = CreateMappedLink(NetMapping.ThatConsistsOf);
-            Net.Has = CreateMappedLink(NetMapping.Has);
-            Net.Contains = CreateMappedLink(NetMapping.Contains);
-            Net.ContainedBy = CreateMappedLink(NetMapping.ContainedBy);
+            Of = CreateMappedLink(NetMapping.Of);
+            And = CreateMappedLink(NetMapping.And);
+            ThatConsistsOf = CreateMappedLink(NetMapping.ThatConsistsOf);
+            Has = CreateMappedLink(NetMapping.Has);
+            Contains = CreateMappedLink(NetMapping.Contains);
+            ContainedBy = CreateMappedLink(NetMapping.ContainedBy);
 
-            Net.One = CreateMappedThing(NetMapping.One);
-            Net.Zero = CreateMappedThing(NetMapping.Zero);
+            One = CreateMappedThing(NetMapping.One);
+            Zero = CreateMappedThing(NetMapping.Zero);
 
-            Net.Sum = CreateMappedThing(NetMapping.Sum);
-            Net.Character = CreateMappedThing(NetMapping.Character);
-            Net.String = CreateMappedThing(NetMapping.String);
-            Net.Name = Link.CreateMapped(Link.Itself, Net.IsA, Net.String, NetMapping.Name);
+            Sum = CreateMappedThing(NetMapping.Sum);
+            Character = CreateMappedThing(NetMapping.Character);
+            String = CreateMappedThing(NetMapping.String);
+            Name = Link.CreateMapped(Link.Itself, IsA, String, NetMapping.Name);
 
-            Net.Set = CreateMappedThing(NetMapping.Set);
-            Net.Group = CreateMappedThing(NetMapping.Group);
+            Set = CreateMappedThing(NetMapping.Set);
+            Group = CreateMappedThing(NetMapping.Group);
 
-            Net.ParsedFrom = CreateMappedLink(NetMapping.ParsedFrom);
-            Net.ThatIs = CreateMappedLink(NetMapping.ThatIs);
-            Net.ThatIsBefore = CreateMappedLink(NetMapping.ThatIsBefore);
-            Net.ThatIsAfter = CreateMappedLink(NetMapping.ThatIsAfter);
-            Net.ThatIsBetween = CreateMappedLink(NetMapping.ThatIsBetween);
-            Net.ThatIsRepresentedBy = CreateMappedLink(NetMapping.ThatIsRepresentedBy);
-            Net.ThatHas = CreateMappedLink(NetMapping.ThatHas);
+            ParsedFrom = CreateMappedLink(NetMapping.ParsedFrom);
+            ThatIs = CreateMappedLink(NetMapping.ThatIs);
+            ThatIsBefore = CreateMappedLink(NetMapping.ThatIsBefore);
+            ThatIsAfter = CreateMappedLink(NetMapping.ThatIsAfter);
+            ThatIsBetween = CreateMappedLink(NetMapping.ThatIsBetween);
+            ThatIsRepresentedBy = CreateMappedLink(NetMapping.ThatIsRepresentedBy);
+            ThatHas = CreateMappedLink(NetMapping.ThatHas);
 
-            Net.Text = CreateMappedThing(NetMapping.Text);
-            Net.Path = CreateMappedThing(NetMapping.Path);
-            Net.Content = CreateMappedThing(NetMapping.Content);
-            Net.Empty = CreateMappedThing(NetMapping.Empty);
-            Net.EmptyContent = Link.CreateMapped(Net.Content, Net.ThatIs, Net.Empty, NetMapping.EmptyContent);
-            Net.Alphabet = CreateMappedThing(NetMapping.Alphabet);
-            Net.Letter = Link.CreateMapped(Link.Itself, Net.IsA, Net.Character, NetMapping.Letter);
-            Net.Case = CreateMappedThing(NetMapping.Case);
-            Net.Upper = CreateMappedThing(NetMapping.Upper);
-            Net.UpperCase = Link.CreateMapped(Net.Case, Net.ThatIs, Net.Upper, NetMapping.UpperCase);
-            Net.Lower = CreateMappedThing(NetMapping.Lower);
-            Net.LowerCase = Link.CreateMapped(Net.Case, Net.ThatIs, Net.Lower, NetMapping.LowerCase);
-            Net.Code = CreateMappedThing(NetMapping.Code);
+            Text = CreateMappedThing(NetMapping.Text);
+            Path = CreateMappedThing(NetMapping.Path);
+            Content = CreateMappedThing(NetMapping.Content);
+            Empty = CreateMappedThing(NetMapping.Empty);
+            EmptyContent = Link.CreateMapped(Content, ThatIs, Empty, NetMapping.EmptyContent);
+            Alphabet = CreateMappedThing(NetMapping.Alphabet);
+            Letter = Link.CreateMapped(Link.Itself, IsA, Character, NetMapping.Letter);
+            Case = CreateMappedThing(NetMapping.Case);
+            Upper = CreateMappedThing(NetMapping.Upper);
+            UpperCase = Link.CreateMapped(Case, ThatIs, Upper, NetMapping.UpperCase);
+            Lower = CreateMappedThing(NetMapping.Lower);
+            LowerCase = Link.CreateMapped(Case, ThatIs, Lower, NetMapping.LowerCase);
+            Code = CreateMappedThing(NetMapping.Code);
 
             SetNames();
         }
 
         public static void Recreate()
         {
-            ThreadHelpers.SyncInvokeWithExtendedStack(() => Link.Delete(ref Net.IsA));
+            ThreadHelpers.SyncInvokeWithExtendedStack(() => Link.Delete(ref IsA));
             CharacterHelpers.Recreate();
             Create();
         }
 
         private static void SetNames()
         {
-            Net.Thing.SetName("thing");
-            Net.Link.SetName("link");
-            Net.IsA.SetName("is a");
-            Net.IsNotA.SetName("is not a");
+            Thing.SetName("thing");
+            Link.SetName("link");
+            IsA.SetName("is a");
+            IsNotA.SetName("is not a");
 
-            Net.Of.SetName("of");
-            Net.And.SetName("and");
-            Net.ThatConsistsOf.SetName("that consists of");
-            Net.Has.SetName("has");
-            Net.Contains.SetName("contains");
-            Net.ContainedBy.SetName("contained by");
+            Of.SetName("of");
+            And.SetName("and");
+            ThatConsistsOf.SetName("that consists of");
+            Has.SetName("has");
+            Contains.SetName("contains");
+            ContainedBy.SetName("contained by");
 
-            Net.One.SetName("one");
-            Net.Zero.SetName("zero");
+            One.SetName("one");
+            Zero.SetName("zero");
 
-            Net.Character.SetName("character");
-            Net.Sum.SetName("sum");
-            Net.String.SetName("string");
-            Net.Name.SetName("name");
+            Character.SetName("character");
+            Sum.SetName("sum");
+            String.SetName("string");
+            Name.SetName("name");
 
-            Net.Set.SetName("set");
-            Net.Group.SetName("group");
+            Set.SetName("set");
+            Group.SetName("group");
 
-            Net.ParsedFrom.SetName("parsed from");
-            Net.ThatIs.SetName("that is");
-            Net.ThatIsBefore.SetName("that is before");
-            Net.ThatIsAfter.SetName("that is after");
-            Net.ThatIsBetween.SetName("that is between");
-            Net.ThatIsRepresentedBy.SetName("that is represented by");
-            Net.ThatHas.SetName("that has");
+            ParsedFrom.SetName("parsed from");
+            ThatIs.SetName("that is");
+            ThatIsBefore.SetName("that is before");
+            ThatIsAfter.SetName("that is after");
+            ThatIsBetween.SetName("that is between");
+            ThatIsRepresentedBy.SetName("that is represented by");
+            ThatHas.SetName("that has");
 
-            Net.Text.SetName("text");
-            Net.Path.SetName("path");
-            Net.Content.SetName("content");
-            Net.Empty.SetName("empty");
-            Net.EmptyContent.SetName("empty content");
-            Net.Alphabet.SetName("alphabet");
-            Net.Letter.SetName("letter");
-            Net.Case.SetName("case");
-            Net.Upper.SetName("upper");
-            Net.Lower.SetName("lower");
-            Net.Code.SetName("code");
+            Text.SetName("text");
+            Path.SetName("path");
+            Content.SetName("content");
+            Empty.SetName("empty");
+            EmptyContent.SetName("empty content");
+            Alphabet.SetName("alphabet");
+            Letter.SetName("letter");
+            Case.SetName("case");
+            Upper.SetName("upper");
+            Lower.SetName("lower");
+            Code.SetName("code");
         }
     }
 }
