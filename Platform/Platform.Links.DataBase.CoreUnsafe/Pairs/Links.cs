@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Links.DataBase.CoreUnsafe.Exceptions;
 using Platform.Helpers.Disposal;
 using Platform.Helpers.Synchronization;
-using Platform.Links.System.Memory;
+using Platform.Memory;
 
 #pragma warning disable 0649
 #pragma warning disable 169

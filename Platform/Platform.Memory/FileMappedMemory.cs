@@ -4,7 +4,7 @@ using System.IO.MemoryMappedFiles;
 using Platform.Helpers;
 using Platform.Helpers.Disposal;
 
-namespace Platform.Links.System.Memory
+namespace Platform.Memory
 {
     /// <summary>
     /// Представляет блок памяти.

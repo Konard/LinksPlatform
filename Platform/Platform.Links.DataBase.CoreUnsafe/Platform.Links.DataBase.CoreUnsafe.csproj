@@ -75,9 +75,9 @@
       <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
       <Name>Platform.Helpers</Name>
     </ProjectReference>
-    <ProjectReference Include="..\Platform.Links.System.Memory\Platform.Links.System.Memory.csproj">
+    <ProjectReference Include="..\Platform.Memory\Platform.Memory.csproj">
       <Project>{da0c0d80-9821-48ca-a498-c3bcf8a3db0e}</Project>
-      <Name>Platform.Links.System.Memory</Name>
+      <Name>Platform.Memory</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

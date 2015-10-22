@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Links.System.Memory
+namespace Platform.Memory
 {
     /// <summary>
     /// Представляет интерфейс блока памяти.

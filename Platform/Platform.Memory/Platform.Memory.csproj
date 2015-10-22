@@ -8,8 +8,8 @@
     <ProjectGuid>{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.System.Memory</RootNamespace>
-    <AssemblyName>Platform.Links.System.Memory</AssemblyName>
+    <RootNamespace>Platform.Memory</RootNamespace>
+    <AssemblyName>Platform.Memory</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

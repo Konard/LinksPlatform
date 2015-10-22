@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.SlaveServer",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Helpers", "Platform.Helpers\Platform.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Memory", "Platform.Links.System.Memory\Platform.Links.System.Memory.csproj", "{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Memory", "Platform.Memory\Platform.Memory.csproj", "{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Sandbox", "Platform.Sandbox\Platform.Sandbox.csproj", "{5C498D57-2625-434B-9D8B-862FD09B8B6D}"
 EndProject

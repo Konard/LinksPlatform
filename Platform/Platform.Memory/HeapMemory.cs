@@ -4,7 +4,7 @@ using Platform.Helpers;
 using Platform.Helpers.Disposal;
 using Platform.WindowsAPI;
 
-namespace Platform.Links.System.Memory
+namespace Platform.Memory
 {
     /// <summary>
     /// Представляет блок неуправляемой куче памяти предоставляемой операционной системой Windows.

@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Platform.Helpers.Disposal;
 
-namespace Platform.Links.System.Memory
+namespace Platform.Memory
 {
     public unsafe class SyncedFileMemory : DisposalBase
     {
