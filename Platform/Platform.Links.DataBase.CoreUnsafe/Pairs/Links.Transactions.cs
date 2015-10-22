@@ -23,10 +23,12 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
             public ulong TransactionId;
             public Structures.Link Before;
             public Structures.Link After;
+            // TODO: Добавить отметку времени
+            public UniqueTimestamp Timestamp;
 
             public override string ToString()
             {
-                return string.Format("{0}: {1} => {2}", TransactionId, Before, After);
+                return string.Format("{0} {1}: {2} => {3}", Timestamp, TransactionId, Before, After);
             }
         }
 
@@ -139,6 +141,7 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
         private readonly string _logAddress;
         private readonly FileStream _binaryLogger;
         private readonly ConcurrentQueue<Transition> _transitions;
+        private readonly UniqueTimestampFactory _uniqueTimestampFactory;
         private Task _transitionsPusher;
         private Transition _lastCommitedTransition;
         private ulong _currentTransactionId;
@@ -165,6 +168,8 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
 
             _lastCommitedTransition = lastCommitedTransition;
+
+            _uniqueTimestampFactory = new UniqueTimestampFactory();
 
             _logAddress = logAddress;
             _binaryLogger = FileHelpers.Append(logAddress);
@@ -267,6 +272,9 @@ namespace Platform.Links.DataBase.CoreUnsafe.Pairs
                 Transition transition;
                 if (!_transitions.TryDequeue(out transition))
                     return;
+
+                transition.Timestamp = _uniqueTimestampFactory.Create();
+
                 _binaryLogger.Write(transition);
                 _lastCommitedTransition = transition;
             }
