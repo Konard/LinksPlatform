@@ -7,8 +7,8 @@
     <ProjectGuid>{11CAD7AD-8675-4826-B974-EFFAD027AC8C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.DataBase.Terminal</RootNamespace>
-    <AssemblyName>Platform.Links.DataBase.Terminal</AssemblyName>
+    <RootNamespace>Platform.Data.ConsoleTerminal</RootNamespace>
+    <AssemblyName>Platform.Data.ConsoleTerminal</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

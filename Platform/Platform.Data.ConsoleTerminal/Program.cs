@@ -1,7 +1,7 @@
 ﻿using System;
 using Platform.Communication.Udp;
 
-namespace Platform.Links.DataBase.Terminal
+namespace Platform.Data.ConsoleTerminal
 {
     internal static class Program
     {
