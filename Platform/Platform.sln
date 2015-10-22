@@ -24,7 +24,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.Cor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Core", "Platform.Links.System.Core\Platform.Links.System.Core.csproj", "{A2BAFDD2-958E-45BB-A4CE-1708681A37B3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.FileSystem.Core", "Platform.Links.FileSystem.Core\Platform.Links.FileSystem.Core.csproj", "{94B596BA-E9F7-4E02-AEF3-8AAAA0294D33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.System.IO.Core", "Platform.System.IO.Core\Platform.System.IO.Core.csproj", "{94B596BA-E9F7-4E02-AEF3-8AAAA0294D33}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.System.Windows", "Platform.System.Windows\Platform.System.Windows.csproj", "{B35BCC7D-3D44-404C-8252-14BDC5C5B36A}"
 EndProject

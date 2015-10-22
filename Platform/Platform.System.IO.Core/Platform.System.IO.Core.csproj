@@ -7,8 +7,8 @@
     <ProjectGuid>{94B596BA-E9F7-4E02-AEF3-8AAAA0294D33}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.FileSystem.Core</RootNamespace>
-    <AssemblyName>Platform.Links.FileSystem.Core</AssemblyName>
+    <RootNamespace>Platform.System.IO.Core</RootNamespace>
+    <AssemblyName>Platform.System.IO.Core</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
