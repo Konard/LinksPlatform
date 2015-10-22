@@ -2,7 +2,7 @@
 using System.Threading;
 using Platform.Communication.Udp;
 
-namespace Platform.Links.DataBase.SlaveServer
+namespace Platform.Data.SlaveServer
 {
     internal class Program
     {

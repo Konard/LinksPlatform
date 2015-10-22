@@ -7,8 +7,8 @@
     <ProjectGuid>{FA3829E4-D805-4EC4-9A81-0B55E3994907}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Platform.Links.DataBase.SlaveServer</RootNamespace>
-    <AssemblyName>Platform.Links.DataBase.SlaveServer</AssemblyName>
+    <RootNamespace>Platform.Data.SlaveServer</RootNamespace>
+    <AssemblyName>Platform.Data.SlaveServer</AssemblyName>
     <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />

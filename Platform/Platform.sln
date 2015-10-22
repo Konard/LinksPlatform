@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.MasterServer", "Platform.Data.MasterServer\Platform.Data.MasterServer.csproj", "{F717D689-5FC1-4A46-BED4-C16864820D7B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.DataBase.SlaveServer", "Platform.Links.DataBase.SlaveServer\Platform.Links.DataBase.SlaveServer.csproj", "{FA3829E4-D805-4EC4-9A81-0B55E3994907}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Data.SlaveServer", "Platform.Data.SlaveServer\Platform.Data.SlaveServer.csproj", "{FA3829E4-D805-4EC4-9A81-0B55E3994907}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Platform.Links.System.Helpers", "Platform.Links.System.Helpers\Platform.Links.System.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
 EndProject
