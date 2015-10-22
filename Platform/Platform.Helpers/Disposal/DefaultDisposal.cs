@@ -4,17 +4,17 @@
 
     public class DefaultDisposal : DisposalBase
     {
-        public event DisposedDelegate Disposed = m => { };
+        public event DisposedDelegate OnDispose = m => { };
 
         public DefaultDisposal(DisposedDelegate disposed)
         {
-            Disposed += disposed;
+            OnDispose += disposed;
         }
 
         protected override void DisposeCore(bool manual)
         {
-            Disposed(manual);
-            foreach (DisposedDelegate item in Disposed.GetInvocationList()) Disposed -= item;
+            OnDispose(manual);
+            foreach (DisposedDelegate item in OnDispose.GetInvocationList()) OnDispose -= item;
         }
     }
 }

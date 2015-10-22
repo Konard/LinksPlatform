@@ -1291,8 +1291,6 @@ namespace Platform.Data.Core.Sequences
         public static void TestSimplify()
         {
             var sequence = new ulong[] { ZeroOrMany, ZeroOrMany, 2, 3, 4, ZeroOrMany, ZeroOrMany, ZeroOrMany, 4, ZeroOrMany, ZeroOrMany, ZeroOrMany };
-            const ulong zeroOrMany = 1UL;
-
             var simplifiedSequence = Simplify(sequence);
         }
 
