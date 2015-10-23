@@ -16,6 +16,70 @@ namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {
+        /// <remarks>
+        /// Альтернативные варианты хранения трансформации (элемента транзакции):
+        /// 
+        /// private enum TransitionType
+        /// {
+        ///     Creation,
+        ///     UpdateOf,
+        ///     UpdateTo,
+        ///     Deletion
+        /// }
+        /// 
+        /// private struct Transition
+        /// {
+        ///     public ulong TransactionId;
+        ///     public UniqueTimestamp Timestamp;
+        ///     public TransactionItemType Type;
+        ///     public Link Source;
+        ///     public Link Linker;
+        ///     public Link Target;
+        /// }
+        /// 
+        /// Или
+        /// 
+        /// public struct TransitionHeader
+        /// {
+        ///     public ulong TransactionIdCombined;
+        ///     public ulong TimestampCombined;
+        /// 
+        ///     public ulong TransactionId
+        ///     {
+        ///         get
+        ///         {
+        ///             return (ulong) mask & TransactionIdCombined;
+        ///         }
+        ///     }
+        /// 
+        ///     public UniqueTimestamp Timestamp
+        ///     {
+        ///         get
+        ///         {
+        ///             return (UniqueTimestamp)mask & TransactionIdCombined;
+        ///         }
+        ///     }
+        /// 
+        ///     public TransactionItemType Type
+        ///     {
+        ///         get
+        ///         {
+        ///             // Использовать по одному биту из TransactionId и Timestamp,
+        ///             // для значения в 2 бита, которое представляет тип операции
+        ///             throw new NotImplementedException();
+        ///         }
+        ///     }
+        /// }
+        /// 
+        /// private struct Transition
+        /// {
+        ///     public TransitionHeader Header;
+        ///     public Link Source;
+        ///     public Link Linker;
+        ///     public Link Target;
+        /// }
+        /// 
+        /// </remarks>
         public struct Transition
         {
             public static readonly long Size = Marshal.SizeOf(typeof(Transition));
