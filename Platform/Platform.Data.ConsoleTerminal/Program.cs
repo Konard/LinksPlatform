@@ -13,8 +13,6 @@ namespace Platform.Data.ConsoleTerminal
             {
                 eventArgs.Cancel = true;
                 TerminalRunning = false;
-
-                Console.WriteLine("Press enter to stop terminal.");
             };
 
             using (new UdpReceiver(8888, m =>
@@ -25,13 +23,15 @@ namespace Platform.Data.ConsoleTerminal
                 using (var sender = new UdpSender(7777))
                 {
                     Console.WriteLine("Welcome to sequences terminal.");
-                    Console.WriteLine("Press CTRL+C to stop terminal.");
+                    Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
 
                     while (TerminalRunning)
                     {
                         var line = Console.ReadLine();
                         if (!string.IsNullOrWhiteSpace(line))
                             sender.Send(line);
+                        else
+                            TerminalRunning = false;
                     }
                 }
             }

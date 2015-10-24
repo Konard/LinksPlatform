@@ -39,7 +39,7 @@ namespace Platform.Data.MasterServer
                 PrintContents(links, sequences);
 
                 Console.WriteLine("Links server started.");
-                Console.WriteLine("Press CTRL+C to stop server.");
+                Console.WriteLine("Press CTRL+C or ESC to stop server.");
 
                 using (var sender = new UdpSender(8888))
                 {
@@ -59,7 +59,17 @@ namespace Platform.Data.MasterServer
                         }
                     }))
                     {
-                        while (LinksServerRunning) Thread.Sleep(1);
+                        while (LinksServerRunning)
+                        {
+                            Thread.Sleep(1);
+
+                            if (Console.KeyAvailable)
+                            {
+                                var info = Console.ReadKey(true);
+                                if (info.Key == ConsoleKey.Escape)
+                                    LinksServerRunning = false;
+                            }
+                        }
                     }
                 }
 
