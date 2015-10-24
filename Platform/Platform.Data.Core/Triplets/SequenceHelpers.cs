@@ -19,7 +19,7 @@ namespace Platform.Data.Core.Triplets
 
             StringBuilder sb = new StringBuilder();
 
-            sb.Append('[');
+            sb.Append('{');
 
             var walker = StopableSequenceWalker.WalkRight(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
             {
@@ -41,7 +41,7 @@ namespace Platform.Data.Core.Triplets
                 }
             });
 
-            sb.Append(']');
+            sb.Append('}');
 
             return sb.ToString();
         }

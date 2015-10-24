@@ -5,28 +5,36 @@ namespace Platform.Data.ConsoleTerminal
 {
     internal static class Program
     {
+        private static bool TerminalRunning = true;
+
         private static void Main()
         {
-            using (var receiver = new UdpReceiver(8888, m => Console.WriteLine("R.M.: {0}", m)))
+            Console.CancelKeyPress += (sender, eventArgs) =>
             {
-                receiver.Start();
+                eventArgs.Cancel = true;
+                TerminalRunning = false;
 
+                Console.WriteLine("Press enter to stop terminal.");
+            };
+
+            using (new UdpReceiver(8888, m =>
+            {
+                if (!string.IsNullOrWhiteSpace(m)) Console.WriteLine("R.M.: {0}", m);
+            }))
+            {
                 using (var sender = new UdpSender(7777))
                 {
                     Console.WriteLine("Welcome to sequences terminal.");
+                    Console.WriteLine("Press CTRL+C to stop terminal.");
 
-                    string line;
-                    while (!string.IsNullOrWhiteSpace(line = Console.ReadLine()))
-                        sender.Send(line);
-
-                    Console.WriteLine("Empty request. Press any key to terminate process.");
+                    while (TerminalRunning)
+                    {
+                        var line = Console.ReadLine();
+                        if (!string.IsNullOrWhiteSpace(line))
+                            sender.Send(line);
+                    }
                 }
-
-                receiver.Stop();
             }
-
-            Console.WriteLine();
-            Console.ReadKey();
         }
     }
 }

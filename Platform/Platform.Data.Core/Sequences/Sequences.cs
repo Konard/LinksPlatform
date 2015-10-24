@@ -666,7 +666,7 @@ namespace Platform.Data.Core.Sequences
 
             var sb = new StringBuilder();
 
-            sb.Append('[');
+            sb.Append('{');
 
             if (_links.Exists(sequenceLink))
             {
@@ -692,7 +692,7 @@ namespace Platform.Data.Core.Sequences
                     });
             }
 
-            sb.Append(']');
+            sb.Append('}');
 
             return sb.ToString();
         }

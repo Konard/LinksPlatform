@@ -25,12 +25,12 @@ namespace Platform.Data.SlaveServer
 
             using (var sender = new UdpSender(8888))
             {
-                using (var receiver = new UdpReceiver(7777, m =>
+                using (new UdpReceiver(7777, m =>
                 {
-                    Console.WriteLine("R.M.: {0}", m);
-
                     if (!string.IsNullOrWhiteSpace(m))
                     {
+                        Console.WriteLine("R.M.: {0}", m);
+
                         if (m.EndsWith("?"))
                         {
                             m = m.Remove(m.Length - 1);
@@ -39,11 +39,7 @@ namespace Platform.Data.SlaveServer
                     }
                 }))
                 {
-                    receiver.Start();
-
                     while (!LinksServerStoped) Thread.Sleep(1);
-
-                    receiver.Stop();
                 }
             }
 
