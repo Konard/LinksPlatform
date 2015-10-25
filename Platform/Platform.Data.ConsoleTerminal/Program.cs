@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Net.Sockets;
+using System.Threading;
 using Platform.Communication.Udp;
 
 namespace Platform.Data.ConsoleTerminal
@@ -9,16 +11,9 @@ namespace Platform.Data.ConsoleTerminal
 
         private static void Main()
         {
-            Console.CancelKeyPress += (sender, eventArgs) =>
-            {
-                eventArgs.Cancel = true;
-                TerminalRunning = false;
-            };
+            Console.CancelKeyPress += OnCancelKeyPressed;
 
-            using (new UdpReceiver(8888, m =>
-            {
-                if (!string.IsNullOrWhiteSpace(m)) Console.WriteLine("R.M.: {0}", m);
-            }))
+            using (var receiver = new UdpClient(8888))
             {
                 using (var sender = new UdpSender(7777))
                 {
@@ -27,14 +22,36 @@ namespace Platform.Data.ConsoleTerminal
 
                     while (TerminalRunning)
                     {
-                        var line = Console.ReadLine();
-                        if (!string.IsNullOrWhiteSpace(line))
-                            sender.Send(line);
-                        else
-                            TerminalRunning = false;
+                        while (Console.KeyAvailable)
+                        {
+                            var line = Console.ReadLine();
+                            if (!string.IsNullOrWhiteSpace(line))
+                                sender.Send(line);
+                            else
+                                TerminalRunning = false;
+                        }
+
+                        while (receiver.Available > 0)
+                        {
+                            var message = receiver.ReceiveString();
+                            if (!string.IsNullOrWhiteSpace(message))
+                                Console.WriteLine("R.M.: {0}", message);
+                        }
+
+                        Thread.Sleep(1);
                     }
+
+                    Console.WriteLine("Terminal stopped.");
                 }
             }
+
+            Console.CancelKeyPress -= OnCancelKeyPressed;
+        }
+
+        private static void OnCancelKeyPressed(object sender, ConsoleCancelEventArgs e)
+        {
+            e.Cancel = true;
+            TerminalRunning = false;
         }
     }
 }

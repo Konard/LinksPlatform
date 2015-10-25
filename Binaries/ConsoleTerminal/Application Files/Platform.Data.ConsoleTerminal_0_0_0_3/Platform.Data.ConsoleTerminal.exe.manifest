@@ -42,14 +42,14 @@
     </dependentAssembly>
   </dependency>
   <dependency>
-    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Platform.Communication.dll" size="12288">
+    <dependentAssembly dependencyType="install" allowDelayedBinding="true" codebase="Platform.Communication.dll" size="12800">
       <assemblyIdentity name="Platform.Communication" version="1.0.0.0" language="neutral" processorArchitecture="msil" />
       <hash>
         <dsig:Transforms>
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>FEAm6k3dYnZlqJSQtQ7E8j7Pp8WMmDjbMZHyN1gMRoc=</dsig:DigestValue>
+        <dsig:DigestValue>4D8Erk9zK+F+vW5BCKDeK7FDFRyR94+Xr1UkcQPSqpA=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>
@@ -61,7 +61,7 @@
           <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
         </dsig:Transforms>
         <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-        <dsig:DigestValue>TrcpeWgTnn2XsXn7yvvy5RLWaGmc5KHiV535gsnH9Oc=</dsig:DigestValue>
+        <dsig:DigestValue>tMUpOF2uEG3KJCObkYVj8R/ynvR3pxtcNaiijISF73o=</dsig:DigestValue>
       </hash>
     </dependentAssembly>
   </dependency>

@@ -1,6 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Runtime.CompilerServices;
 using Platform.Helpers.Disposal;
 
 namespace Platform.Communication.Udp
@@ -10,27 +10,34 @@ namespace Platform.Communication.Udp
     /// </summary>
     public class UdpSender : DisposalBase
     {
-        private const string DefaultHostname = "127.0.0.1";
-
         private readonly UdpClient _udp;
         private readonly IPEndPoint _ipendpoint;
 
-        public UdpSender(string hostname, int port)
+        public UdpSender(IPEndPoint ipendpoint)
         {
             _udp = new UdpClient();
-            _ipendpoint = new IPEndPoint(IPAddress.Parse(hostname), port);
+            _ipendpoint = ipendpoint;
+        }
+
+        public UdpSender(IPAddress address, int port)
+            : this(new IPEndPoint(address, port))
+        {
+        }
+
+        public UdpSender(string hostname, int port)
+            : this(IPAddress.Parse(hostname), port)
+        {
         }
 
         public UdpSender(int port)
-            : this(DefaultHostname, port)
+            : this(IPAddress.Loopback, port)
         {
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Send(string message)
         {
-            // Формирование оправляемого сообщения и его отправка.
-            var bytes = Encoding.Default.GetBytes(message);
-            return _udp.Send(bytes, bytes.Length, _ipendpoint);
+            return _udp.SendString(_ipendpoint, message);
         }
 
         protected override void DisposeCore(bool manual)

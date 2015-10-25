@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net;
 using System.Net.Sockets;
-using System.Text;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using Platform.Helpers.Disposal;
 
@@ -19,95 +19,93 @@ namespace Platform.Communication.Udp
     {
         private const int DefaultPort = 15000;
 
-        private bool _stopReceive;
-        private Thread _worker;
+        private bool _receiverRunning;
+        private Thread _thread;
         private readonly int _listenPort;
         private readonly UdpClient _udp;
         private readonly MessageHandlerCallback _messageHandler;
 
-        public UdpReceiver(Thread worker, int listenPort, bool autoStart, MessageHandlerCallback messageHandler)
+        public bool Available { get { return _udp.Available > 0; } }
+
+        public UdpReceiver(int listenPort, bool autoStart, MessageHandlerCallback messageHandler)
         {
-            _worker = worker;
-            _listenPort = listenPort;
             _udp = new UdpClient(listenPort);
-            _stopReceive = true;
+            _listenPort = listenPort;
             _messageHandler = messageHandler;
 
             if (autoStart) Start();
         }
 
         public UdpReceiver(int listenPort, MessageHandlerCallback messageHandler)
-            : this(null, listenPort, true, messageHandler)
+            : this(listenPort, true, messageHandler)
         {
         }
 
         public UdpReceiver(MessageHandlerCallback messageHandler)
-            : this(null, DefaultPort, true, messageHandler)
+            : this(DefaultPort, true, messageHandler)
         {
         }
 
         public UdpReceiver()
-            : this(null, DefaultPort, true, message => { })
+            : this(DefaultPort, true, message => { })
         {
         }
 
         public void Start()
         {
-            if (_stopReceive)
+            if (!_receiverRunning && _thread == null)
             {
-                _stopReceive = false;
-                _worker = new Thread(Receive);
-                _worker.Start();
+                _receiverRunning = true;
+                _thread = new Thread(Receiver);
+                _thread.Start();
             }
         }
 
         public void Stop()
         {
-            if (!_stopReceive)
+            if (_receiverRunning && _thread != null)
             {
-                _stopReceive = true;
+                _receiverRunning = false;
 
                 // Send Packet to itself to switch Receiver from Receiving.
                 _udp.Connect(IPAddress.Loopback, _listenPort);
                 _udp.Send(new byte[0], 0);
 
-                if (_worker != null) _worker.Join();
-                if (_udp != null) _udp.Close();
+                _thread.Join();
+                _thread = null;
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public string Receive()
+        {
+            return _udp.ReceiveString();
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void ReceiveAndHandle()
+        {
+            _messageHandler(Receive());
         }
 
         // Функция извлекающая пришедшие сообщения
         // и работающая в отдельном потоке.
-        private void Receive()
+        private void Receiver()
         {
-            while (true)
+            while (_receiverRunning)
             {
-                try
-                {
-                    IPEndPoint ipendpoint = null;
-                    byte[] message = _udp.Receive(ref ipendpoint);
-                    _messageHandler(Encoding.Default.GetString(message));
-                }
+                try { ReceiveAndHandle(); }
                 catch (Exception ex)
                 {
                     // TODO: Log Exception
                 }
-
-                // Если дана команда остановить поток, останавливаем бесконечный цикл.
-                if (_stopReceive) break;
             }
         }
 
         protected override void DisposeCore(bool manual)
         {
-            try
-            {
-                Stop();
-            }
-            finally
-            {
-                _worker = null;
-            }
+            Stop();
+            _udp.Close();
         }
     }
 }

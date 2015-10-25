@@ -1,7 +1,8 @@
 ﻿using System;
-using System.Globalization;
 using System.Linq;
+using System.Net.Sockets;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using Platform.Communication.Udp;
 using Platform.Data.Core.Pairs;
@@ -20,11 +21,7 @@ namespace Platform.Data.MasterServer
 
         private static void Main()
         {
-            Console.CancelKeyPress += (sender, eventArgs) =>
-            {
-                eventArgs.Cancel = true;
-                LinksServerRunning = false;
-            };
+            Console.CancelKeyPress += OnCancelKeyPressed;
 
 #if DEBUG
             File.Delete(DefaultDatabaseFilename);
@@ -41,40 +38,52 @@ namespace Platform.Data.MasterServer
                 Console.WriteLine("Links server started.");
                 Console.WriteLine("Press CTRL+C or ESC to stop server.");
 
+
                 using (var sender = new UdpSender(8888))
                 {
-                    using (new UdpReceiver(7777, m =>
+                    MessageHandlerCallback handleMessage = (message) =>
                     {
-                        if (!string.IsNullOrWhiteSpace(m))
+                        if (!string.IsNullOrWhiteSpace(message))
                         {
-                            Console.WriteLine("R.M.: {0}", m);
+                            Console.WriteLine("R.M.: {0}", message);
 
-                            if (m.EndsWith("?"))
-                            {
-                                m = m.Remove(m.Length - 1);
-                                sequences.Search(sender, m);
-                            }
+                            if (message.EndsWith("?"))
+                                sequences.Search(sender, message);
                             else
-                                sequences.Create(sender, m);
+                                sequences.Create(sender, message);
                         }
-                    }))
+                    };
+
+                    //using (var receiver = new UdpReceiver(7777, handleMessage))
+                    using (var receiver = new UdpClient(7777))
                     {
                         while (LinksServerRunning)
                         {
-                            Thread.Sleep(1);
+                            while (receiver.Available > 0)
+                                handleMessage(receiver.ReceiveString());
 
-                            if (Console.KeyAvailable)
+                            while (Console.KeyAvailable)
                             {
                                 var info = Console.ReadKey(true);
                                 if (info.Key == ConsoleKey.Escape)
                                     LinksServerRunning = false;
                             }
+
+                            Thread.Sleep(1);
                         }
+
+                        Console.WriteLine("Links server stopped.");
                     }
                 }
-
-                Console.WriteLine("Links server stopped.");
             }
+
+            Console.CancelKeyPress -= OnCancelKeyPressed;
+        }
+
+        private static void OnCancelKeyPressed(object sender, ConsoleCancelEventArgs e)
+        {
+            e.Cancel = true;
+            LinksServerRunning = false;
         }
 
         private static void PrintContents(Links links, Sequences sequences)
@@ -96,7 +105,7 @@ namespace Platform.Data.MasterServer
                 for (var link = UTF16LastCharLink + 1; link <= links.Total; link++)
                 {
                     Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link),
-                        sequences.FormatSequence(link, FromLinkToString, true));
+                        sequences.FormatSequence(link, AppendLinkToString, true));
                 }
             }
         }
@@ -166,18 +175,19 @@ namespace Platform.Data.MasterServer
             return linksSequence;
         }
 
-        private static string FromLinkToString(ulong link)
+        private static void AppendLinkToString(StringBuilder sb, ulong link)
         {
             if (link <= (char.MaxValue + 1))
-                return FromLinkToChar(link).ToString(CultureInfo.InvariantCulture);
-
-            return string.Format("({0})", link);
+                sb.Append(FromLinkToChar(link));
+            else
+                sb.AppendFormat("({0})", link);
         }
 
         private static void Search(this Sequences sequences, UdpSender sender, string sequenceQuery)
         {
-            var linksSequenceQuery = new ulong[sequenceQuery.Length];
-            for (var i = 0; i < sequenceQuery.Length; i++)
+            var actualLength = sequenceQuery.Length - 1;
+            var linksSequenceQuery = new ulong[actualLength];
+            for (var i = 0; i < actualLength; i++)
                 if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
                     linksSequenceQuery[i] = Sequences.Any;
                 else if (sequenceQuery[i] == '*')
@@ -191,7 +201,7 @@ namespace Platform.Data.MasterServer
 
                 sender.Send(string.Format("{0} sequences matched pattern.", patternMatched.Count));
                 foreach (var result in patternMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
             }
             else
             {
@@ -199,19 +209,19 @@ namespace Platform.Data.MasterServer
 
                 sender.Send(string.Format("{0} sequences matched fully.", fullyMatched.Count));
                 foreach (var result in fullyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
 
                 var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(linksSequenceQuery);
 
                 sender.Send(string.Format("{0} sequences matched partially.", partiallyMatched.Count));
                 foreach (var result in partiallyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
 
                 var allConnections = sequences.GetAllConnections(linksSequenceQuery);
 
                 sender.Send(string.Format("{0} sequences connects query elements.", allConnections.Count));
                 foreach (var result in allConnections)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, FromLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
             }
         }
     }

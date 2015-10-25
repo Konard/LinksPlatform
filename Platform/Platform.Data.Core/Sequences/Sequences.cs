@@ -655,10 +655,10 @@ namespace Platform.Data.Core.Sequences
 
         public string FormatSequence(LinkIndex sequenceLink, params LinkIndex[] knownElements)
         {
-            return FormatSequence(sequenceLink, x => x.ToString(), true, knownElements);
+            return FormatSequence(sequenceLink, (sb, x) => sb.Append(x), true, knownElements);
         }
 
-        public string FormatSequence(LinkIndex sequenceLink, Func<LinkIndex, string> elementToString, bool insertComma, params LinkIndex[] knownElements)
+        public string FormatSequence(LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
         {
             int visitedElements = 0;
 
@@ -676,7 +676,7 @@ namespace Platform.Data.Core.Sequences
                         if (insertComma && visitedElements > 0)
                             sb.Append(',');
 
-                        sb.Append(elementToString(element));
+                        elementToString(sb, element);
 
                         visitedElements++;
 

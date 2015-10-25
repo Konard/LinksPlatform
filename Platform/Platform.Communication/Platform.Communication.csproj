@@ -41,6 +41,7 @@
     <Compile Include="Protocol\Gexf\Gexf.cs" />
     <Compile Include="Protocol\Gexf\Graph.cs" />
     <Compile Include="Protocol\Gexf\Node.cs" />
+    <Compile Include="Udp\UdpClientExtensions.cs" />
     <Compile Include="Udp\UdpReceiver.cs" />
     <Compile Include="Udp\UdpSender.cs" />
   </ItemGroup>
