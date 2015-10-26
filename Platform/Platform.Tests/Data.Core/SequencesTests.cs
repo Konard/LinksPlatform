@@ -3,14 +3,18 @@ using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Platform.Data.Core;
+using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
-using Pairs = Platform.Data.Core.Pairs;
+using Platform.Helpers;
 
 namespace Platform.Tests.Data.Core
 {
     [TestClass]
     public class SequencesTests
     {
+        public const long LinksSizeStep = 4 * 1024 * 1024;
+
         [TestMethod]
         public void CreateAllVariantsTest()
         {
@@ -18,9 +22,9 @@ namespace Platform.Tests.Data.Core
 
             const long sequenceLength = 8;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -51,9 +55,9 @@ namespace Platform.Tests.Data.Core
 
             const long sequenceLength = 8;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -100,9 +104,9 @@ namespace Platform.Tests.Data.Core
 
             const long sequenceLength = 200;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -143,9 +147,9 @@ namespace Platform.Tests.Data.Core
 
             const long sequenceLength = 8;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -196,9 +200,9 @@ namespace Platform.Tests.Data.Core
 
             const long sequenceLength = 200;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -234,16 +238,16 @@ namespace Platform.Tests.Data.Core
         {
             string tempFilename = Path.GetTempFileName();
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
             const ulong one = Sequences.Any;
             const ulong zeroOrMany = Sequences.ZeroOrMany;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var e1 = links.Create(itself, itself);
                 var e2 = links.Create(itself, itself);
 
-                var sequence = new ulong[]
+                var sequence = new[]
                 {
                     e1, e2, e1, e2 // mama / papa
                 };
@@ -283,16 +287,23 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempFilename);
         }
 
+        private static void InitBitString()
+        {
+            Global.Trash = new BitString(1);
+        }
+
         [TestMethod]
         public void AllPossibleConnectionsTest()
         {
+            InitBitString();
+
             string tempFilename = Path.GetTempFileName();
 
-            const long sequenceLength = 9;
+            const long sequenceLength = 5;
 
-            const ulong itself = Pairs.Links.Itself;
+            const ulong itself = Links.Itself;
 
-            using (var links = new Pairs.Links(tempFilename, 1024 * 1024))
+            using (var links = new Links(tempFilename, LinksSizeStep))
             {
                 var sequence = new ulong[sequenceLength];
                 for (int i = 0; i < sequenceLength; i++)
@@ -304,24 +315,39 @@ namespace Platform.Tests.Data.Core
 
                 var reverseResults = sequences.CreateAllVariants2(sequence.Reverse().ToArray());
 
-                var sw1 = Stopwatch.StartNew();
-                var searchResults1 = sequences.GetAllConnections(sequence); sw1.Stop();
+                for (var i = 0; i < 5; i++)
+                {
+                    var sw1 = Stopwatch.StartNew();
+                    var searchResults1 = sequences.GetAllConnections(sequence); sw1.Stop();
 
-                var sw2 = Stopwatch.StartNew();
-                var searchResults2 = sequences.GetAllConnections1(sequence); sw2.Stop();
+                    var sw2 = Stopwatch.StartNew();
+                    var searchResults2 = sequences.GetAllConnections1(sequence); sw2.Stop();
 
-                var sw3 = Stopwatch.StartNew();
-                var searchResults3 = sequences.GetAllConnections2(sequence); sw3.Stop();
+                    var sw3 = Stopwatch.StartNew();
+                    var searchResults3 = sequences.GetAllConnections2(sequence); sw3.Stop();
 
+                    var sw4 = Stopwatch.StartNew();
+                    var searchResults4 = sequences.GetAllConnections3(sequence); sw4.Stop();
 
-                var intersection0 = searchResults1.Intersect(searchResults2).ToList();
-                Assert.IsTrue(intersection0.Count == searchResults2.Count);
+                    Global.Trash = searchResults3;
+                    Global.Trash = searchResults4;
 
-                var intersection1 = createResults.Intersect(searchResults1).ToList();
-                Assert.IsTrue(intersection1.Count == createResults.Length);
+                    var intersection1 = createResults.Intersect(searchResults1).ToList();
+                    Assert.IsTrue(intersection1.Count == createResults.Length);
 
-                var intersection2 = reverseResults.Intersect(searchResults1).ToList();
-                Assert.IsTrue(intersection2.Count == reverseResults.Length);
+                    var intersection2 = reverseResults.Intersect(searchResults1).ToList();
+                    Assert.IsTrue(intersection2.Count == reverseResults.Length);
+
+                    var intersection0 = searchResults1.Intersect(searchResults2).ToList();
+                    Assert.IsTrue(intersection0.Count == searchResults2.Count);
+
+                    var intersection3 = searchResults2.Intersect(searchResults3).ToList();
+                    Assert.IsTrue(intersection3.Count == searchResults3.Count);
+
+                    var intersection4 = searchResults3.Intersect(searchResults4).ToList();
+                    Assert.IsTrue(intersection4.Count == searchResults4.Count);
+                }
+
 
                 for (int i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);

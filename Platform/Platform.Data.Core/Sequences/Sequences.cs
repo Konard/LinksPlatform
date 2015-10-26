@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -424,7 +425,7 @@ namespace Platform.Data.Core.Sequences
 
         private void PartialStepRight(Action<ulong> handler, ulong left, ulong right)
         {
-            _links.Each(0, left, pair =>
+            _links.EachCore(0, left, pair =>
             {
                 StepRight(handler, pair, right);
 
@@ -437,7 +438,7 @@ namespace Platform.Data.Core.Sequences
 
         private void StepRight(Action<ulong> handler, ulong left, ulong right)
         {
-            _links.Each(left, 0, rightStep =>
+            _links.EachCore(left, 0, rightStep =>
             {
                 TryStepRightUp(handler, right, rightStep);
                 return true;
@@ -461,7 +462,7 @@ namespace Platform.Data.Core.Sequences
         // TODO: Test
         private void PartialStepLeft(Action<ulong> handler, ulong left, ulong right)
         {
-            _links.Each(right, 0, pair =>
+            _links.EachCore(right, 0, pair =>
             {
                 StepLeft(handler, left, pair);
 
@@ -474,7 +475,7 @@ namespace Platform.Data.Core.Sequences
 
         private void StepLeft(Action<ulong> handler, ulong left, ulong right)
         {
-            _links.Each(0, right, leftStep =>
+            _links.EachCore(0, right, leftStep =>
             {
                 TryStepLeftUp(handler, left, leftStep);
                 return true;
@@ -909,8 +910,8 @@ namespace Platform.Data.Core.Sequences
                 if (usages.Add(pair)) AllUsagesCore(pair, usages);
                 return true;
             };
-            _links.Each(link, 0, handler);
-            _links.Each(0, link, handler);
+            _links.EachCore(link, 0, handler);
+            _links.EachCore(0, link, handler);
         }
 
         private class AllUsagesCollector
@@ -928,8 +929,32 @@ namespace Platform.Data.Core.Sequences
             {
                 if (_usages.Add(link))
                 {
-                    _links.Each(link, 0, Collect);
-                    _links.Each(0, link, Collect);
+                    _links.EachCore(link, 0, Collect);
+                    _links.EachCore(0, link, Collect);
+                }
+                return true;
+            }
+        }
+
+        private class AllUsagesCollector2
+        {
+            private readonly Links _links;
+            private readonly BitString _usages;
+
+            public AllUsagesCollector2(Links links, BitString usages)
+            {
+                _links = links;
+                _usages = usages;
+            }
+
+            public bool Collect(ulong link)
+            {
+                if (!_usages.GetCore((long)link))
+                {
+                    _usages.SetCore((long)link);
+
+                    _links.EachCore(link, 0, Collect);
+                    _links.EachCore(0, link, Collect);
                 }
                 return true;
             }
@@ -957,8 +982,8 @@ namespace Platform.Data.Core.Sequences
                     if (_intersectWith.Contains(link))
                         _usages.Add(link);
 
-                    _links.Each(link, 0, Collect);
-                    _links.Each(0, link, Collect);
+                    _links.EachCore(link, 0, Collect);
+                    _links.EachCore(0, link, Collect);
                 }
                 return true;
             }
@@ -1224,6 +1249,33 @@ namespace Platform.Data.Core.Sequences
                 }
 
                 return results;
+            });
+        }
+
+        public List<ulong> GetAllConnections3(params ulong[] linksToConnect)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                var results = new BitString((long)_links.Total + 1); // new BitArray((int)_links.Total + 1);
+
+                if (linksToConnect.Length > 0)
+                {
+                    EnsureEachLinkExists(_links, linksToConnect);
+
+                    var collector1 = new AllUsagesCollector2(_links, results);
+                    collector1.Collect(linksToConnect[0]);
+
+                    for (int i = 1; i < linksToConnect.Length; i++)
+                    {
+                        var next = new BitString((long)_links.Total + 1); //new BitArray((int)_links.Total + 1);
+                        var collector = new AllUsagesCollector2(_links, next);
+                        collector.Collect(linksToConnect[i]);
+
+                        results = results.And(next);
+                    }
+                }
+
+                return results.GetSetUInt64Indices();
             });
         }
 

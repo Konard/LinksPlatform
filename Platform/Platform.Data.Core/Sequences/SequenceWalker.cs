@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -16,6 +17,7 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public class SequenceWalker
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WalkRight<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Action<TLink> visit)
         {
             var stack = new Stack<TLink>();
@@ -51,6 +53,7 @@ namespace Platform.Data.Core.Sequences
                 }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void WalkLeft<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Action<TLink> visit)
         {
             var stack = new Stack<TLink>();

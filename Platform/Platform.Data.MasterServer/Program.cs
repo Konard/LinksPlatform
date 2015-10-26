@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
@@ -7,6 +8,7 @@ using System.Threading;
 using Platform.Communication.Udp;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers;
 
 namespace Platform.Data.MasterServer
 {
@@ -23,58 +25,65 @@ namespace Platform.Data.MasterServer
         {
             Console.CancelKeyPress += OnCancelKeyPressed;
 
+            try
+            {
 #if DEBUG
-            File.Delete(DefaultDatabaseFilename);
+                File.Delete(DefaultDatabaseFilename);
 #endif
 
-            using (var links = new Links(DefaultDatabaseFilename, 8 * 1024 * 1024))
-            {
-                InitUTF16(links);
-
-                var sequences = new Sequences(links);
-
-                PrintContents(links, sequences);
-
-                Console.WriteLine("Links server started.");
-                Console.WriteLine("Press CTRL+C or ESC to stop server.");
-
-
-                using (var sender = new UdpSender(8888))
+                using (var links = new Links(DefaultDatabaseFilename, 8*1024*1024))
                 {
-                    MessageHandlerCallback handleMessage = (message) =>
+                    InitUTF16(links);
+
+                    var sequences = new Sequences(links);
+
+                    PrintContents(links, sequences);
+
+                    Console.WriteLine("Links server started.");
+                    Console.WriteLine("Press CTRL+C or ESC to stop server.");
+
+
+                    using (var sender = new UdpSender(8888))
                     {
-                        if (!string.IsNullOrWhiteSpace(message))
+                        MessageHandlerCallback handleMessage = message =>
                         {
-                            Console.WriteLine("R.M.: {0}", message);
-
-                            if (message.EndsWith("?"))
-                                sequences.Search(sender, message);
-                            else
-                                sequences.Create(sender, message);
-                        }
-                    };
-
-                    //using (var receiver = new UdpReceiver(7777, handleMessage))
-                    using (var receiver = new UdpClient(7777))
-                    {
-                        while (LinksServerRunning)
-                        {
-                            while (receiver.Available > 0)
-                                handleMessage(receiver.ReceiveString());
-
-                            while (Console.KeyAvailable)
+                            if (!string.IsNullOrWhiteSpace(message))
                             {
-                                var info = Console.ReadKey(true);
-                                if (info.Key == ConsoleKey.Escape)
-                                    LinksServerRunning = false;
+                                Console.WriteLine("R.M.: {0}", message);
+
+                                if (message.EndsWith("?"))
+                                    sequences.Search(sender, message);
+                                else
+                                    sequences.Create(sender, message);
+                            }
+                        };
+
+                        //using (var receiver = new UdpReceiver(7777, handleMessage))
+                        using (var receiver = new UdpClient(7777))
+                        {
+                            while (LinksServerRunning)
+                            {
+                                while (receiver.Available > 0)
+                                    handleMessage(receiver.ReceiveString());
+
+                                while (Console.KeyAvailable)
+                                {
+                                    var info = Console.ReadKey(true);
+                                    if (info.Key == ConsoleKey.Escape)
+                                        LinksServerRunning = false;
+                                }
+
+                                Thread.Sleep(1);
                             }
 
-                            Thread.Sleep(1);
+                            Console.WriteLine("Links server stopped.");
                         }
-
-                        Console.WriteLine("Links server stopped.");
                     }
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.WriteToConsole();
             }
 
             Console.CancelKeyPress -= OnCancelKeyPressed;

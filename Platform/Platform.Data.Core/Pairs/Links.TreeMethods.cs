@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 using Platform.Data.Core.TreeMethods;
 
 namespace Platform.Data.Core.Pairs
@@ -21,31 +22,37 @@ namespace Platform.Data.Core.Pairs
                 _header = header;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetLeft(ulong node)
             {
                 return &_links[node].LeftAsSource;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetRight(ulong node)
             {
                 return &_links[node].RightAsSource;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong GetSize(ulong node)
             {
                 return _links[node].SizeAsSource;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetLeft(ulong node, ulong left)
             {
                 _links[node].LeftAsSource = left;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetRight(ulong node, ulong right)
             {
                 _links[node].RightAsSource = right;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetSize(ulong node, ulong size)
             {
                 _links[node].SizeAsSource = size;
@@ -123,6 +130,7 @@ namespace Platform.Data.Core.Pairs
             /// </summary>
             /// <param name="source">Индекс связи-начала.</param>
             /// <param name="handler">Функция-обработчик, выполняющая необходимое действие над каждой связью-ссылкой.</param>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool EachReference(ulong source, Func<ulong, bool> handler)
             {
                 return EachReferenceCore(source, _header->FirstAsSource, handler);
@@ -133,7 +141,7 @@ namespace Platform.Data.Core.Pairs
                 if (link == 0)
                     return true;
 
-                var linkSource = _db.GetSource(link);
+                var linkSource = _db.GetSourceCore(link);
 
                 if (linkSource > source)
                 {
@@ -173,31 +181,37 @@ namespace Platform.Data.Core.Pairs
                 _header = header;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetLeft(ulong node)
             {
                 return &_links[node].LeftAsTarget;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetRight(ulong node)
             {
                 return &_links[node].RightAsTarget;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong GetSize(ulong node)
             {
                 return _links[node].SizeAsTarget;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetLeft(ulong node, ulong left)
             {
                 _links[node].LeftAsTarget = left;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetRight(ulong node, ulong right)
             {
                 _links[node].RightAsTarget = right;
             }
 
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetSize(ulong node, ulong size)
             {
                 _links[node].SizeAsTarget = size;
@@ -236,6 +250,7 @@ namespace Platform.Data.Core.Pairs
             /// </summary>
             /// <param name="target">Индекс связи-конца.</param>
             /// <param name="handler">Функция-обработчик, выполняющая необходимое действие над каждой связью-ссылкой.</param>
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool EachReference(ulong target, Func<ulong, bool> handler)
             {
                 return EachReferenceCore(target, _header->FirstAsTarget, handler);
@@ -246,7 +261,7 @@ namespace Platform.Data.Core.Pairs
                 if (link == 0)
                     return true;
 
-                var linkTarget = _db.GetTarget(link);
+                var linkTarget = _db.GetTargetCore(link);
 
                 if (linkTarget > target)
                 {

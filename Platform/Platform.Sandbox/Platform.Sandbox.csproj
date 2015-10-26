@@ -70,7 +70,6 @@
     <Compile Include="FileReadWriteTest.cs" />
     <Compile Include="NetParser.cs" />
     <Compile Include="NetParserTest.cs" />
-    <Compile Include="NewMemoryManagerExperiments.cs" />
     <Compile Include="OperationsExperiments.cs" />
     <Compile Include="OperationsExperimentsTrash.cs" />
     <Compile Include="Program.cs" />
@@ -82,7 +81,6 @@
     <Compile Include="TextSearchTest.cs" />
     <Compile Include="Transactions.cs" />
     <Compile Include="TreeStructureExperiments.cs" />
-    <Compile Include="TriggersEngine.cs" />
     <Compile Include="WebSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>

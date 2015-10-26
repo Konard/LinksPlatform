@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
 using Platform.Helpers.Disposal;
 using Platform.Helpers.Synchronization;
@@ -156,6 +157,7 @@ namespace Platform.Data.Core.Pairs
         /// <remarks>
         /// Использовать напрямую небезопасно, рекомендуется GetSource.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetSourceCore(ulong link)
         {
             // Связь "точка" не имеет начала и конца
@@ -184,6 +186,7 @@ namespace Platform.Data.Core.Pairs
         /// <remarks>
         /// Использовать напрямую небезопасно, рекомендуется GetTarget.
         /// </remarks>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetTargetCore(ulong link)
         {
             return _links[link].Target;
@@ -220,6 +223,7 @@ namespace Platform.Data.Core.Pairs
             return _sync.ExecuteReadOperation(() => ExistsCore(link));
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool ExistsCore(ulong link)
         {
             return link != Null && !IsUnusedLink(link) && link <= _header->AllocatedLinks;
@@ -281,33 +285,39 @@ namespace Platform.Data.Core.Pairs
                 if (target != Null && !ExistsCore(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
-                if (source == Null && target == Null)
-                {
-                    // Этот блок используется в GetEnumerator, CopyTo, Clear
-                    for (ulong link = 1; link <= _header->AllocatedLinks; link++)
-                        if (ExistsCore(link))
-                            if (handler(link) == Break)
-                                return false;
-                }
-                else if (source == Null)
-                {
-                    _targetsTreeMethods.EachReference(target, handler);
-                }
-                else if (target == Null)
-                {
-                    _sourcesTreeMethods.EachReference(source, handler);
-                }
-                else //if(source != Null && target != Null)
-                {
-                    var link = _sourcesTreeMethods.Search(source, target);
+                return EachCore(source, target, handler);
+            });
+        }
 
-                    if (link != Null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool EachCore(ulong source, ulong target, Func<ulong, bool> handler)
+        {
+            if (source == Null && target == Null)
+            {
+                // Этот блок используется в GetEnumerator, CopyTo, Clear
+                for (ulong link = 1; link <= _header->AllocatedLinks; link++)
+                    if (ExistsCore(link))
                         if (handler(link) == Break)
                             return false;
-                }
+            }
+            else if (source == Null)
+            {
+                return _targetsTreeMethods.EachReference(target, handler);
+            }
+            else if (target == Null)
+            {
+                return _sourcesTreeMethods.EachReference(source, handler);
+            }
+            else //if(source != Null && target != Null)
+            {
+                var link = _sourcesTreeMethods.Search(source, target);
 
-                return true;
-            });
+                if (link != Null)
+                    if (handler(link) == Break)
+                        return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -631,6 +641,7 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс проверяемой связи.</param>
         /// <returns>Значение, определяющие включена ли связь в список свободных связей.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsUnusedLink(ulong link)
         {
             return _header->FirstFreeLink == link

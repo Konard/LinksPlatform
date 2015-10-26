@@ -2,6 +2,7 @@
 using System.Net.Sockets;
 using System.Threading;
 using Platform.Communication.Udp;
+using Platform.Helpers;
 
 namespace Platform.Data.ConsoleTerminal
 {
@@ -13,36 +14,43 @@ namespace Platform.Data.ConsoleTerminal
         {
             Console.CancelKeyPress += OnCancelKeyPressed;
 
-            using (var receiver = new UdpClient(8888))
+            try
             {
-                using (var sender = new UdpSender(7777))
+                using (var receiver = new UdpClient(8888))
                 {
-                    Console.WriteLine("Welcome to sequences terminal.");
-                    Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
-
-                    while (TerminalRunning)
+                    using (var sender = new UdpSender(7777))
                     {
-                        while (Console.KeyAvailable)
+                        Console.WriteLine("Welcome to sequences terminal.");
+                        Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
+
+                        while (TerminalRunning)
                         {
-                            var line = Console.ReadLine();
-                            if (!string.IsNullOrWhiteSpace(line))
-                                sender.Send(line);
-                            else
-                                TerminalRunning = false;
+                            while (Console.KeyAvailable)
+                            {
+                                var line = Console.ReadLine();
+                                if (!string.IsNullOrWhiteSpace(line))
+                                    sender.Send(line);
+                                else
+                                    TerminalRunning = false;
+                            }
+
+                            while (receiver.Available > 0)
+                            {
+                                var message = receiver.ReceiveString();
+                                if (!string.IsNullOrWhiteSpace(message))
+                                    Console.WriteLine("R.M.: {0}", message);
+                            }
+
+                            Thread.Sleep(1);
                         }
 
-                        while (receiver.Available > 0)
-                        {
-                            var message = receiver.ReceiveString();
-                            if (!string.IsNullOrWhiteSpace(message))
-                                Console.WriteLine("R.M.: {0}", message);
-                        }
-
-                        Thread.Sleep(1);
+                        Console.WriteLine("Terminal stopped.");
                     }
-
-                    Console.WriteLine("Terminal stopped.");
                 }
+            }
+            catch (Exception ex)
+            {
+                ex.WriteToConsole();
             }
 
             Console.CancelKeyPress -= OnCancelKeyPressed;

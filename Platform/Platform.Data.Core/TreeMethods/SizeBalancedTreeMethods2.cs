@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Data.Core.TreeMethods
 {
@@ -8,25 +9,34 @@ namespace Platform.Data.Core.TreeMethods
     /// </remarks>
     public abstract unsafe class SizeBalancedTreeMethods2
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract ulong* GetLeft(ulong node);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract ulong* GetRight(ulong node);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract ulong GetSize(ulong node);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void SetLeft(ulong node, ulong left);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void SetRight(ulong node, ulong right);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void SetSize(ulong node, ulong size);
         protected abstract bool FirstIsToTheLeftOfSecond(ulong first, ulong second);
         protected abstract bool FirstIsToTheRightOfSecond(ulong first, ulong second);
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void IncrementSize(ulong node)
         {
             SetSize(node, GetSize(node) + 1);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void DecrementSize(ulong node)
         {
             SetSize(node, GetSize(node) - 1);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ulong GetSizeOrZero(ulong node)
         {
             return node == 0 ? 0 : GetSize(node);

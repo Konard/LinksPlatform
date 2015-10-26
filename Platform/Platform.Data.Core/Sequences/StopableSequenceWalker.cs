@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -16,6 +17,7 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public class StopableSequenceWalker
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool WalkRight<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
             var stack = new Stack<TLink>();
@@ -53,6 +55,7 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool WalkLeft<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
             var stack = new Stack<TLink>();
