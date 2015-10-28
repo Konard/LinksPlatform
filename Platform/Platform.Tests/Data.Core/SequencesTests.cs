@@ -315,7 +315,7 @@ namespace Platform.Tests.Data.Core
 
                 var reverseResults = sequences.CreateAllVariants2(sequence.Reverse().ToArray());
 
-                for (var i = 0; i < 5; i++)
+                for (var i = 0; i < 1; i++)
                 {
                     var sw1 = Stopwatch.StartNew();
                     var searchResults1 = sequences.GetAllConnections(sequence); sw1.Stop();
@@ -348,6 +348,49 @@ namespace Platform.Tests.Data.Core
                     Assert.IsTrue(intersection4.Count == searchResults4.Count);
                 }
 
+                for (int i = 0; i < sequenceLength; i++)
+                    links.Delete(sequence[i]);
+            }
+
+            File.Delete(tempFilename);
+        }
+
+        [TestMethod]
+        public void CalculateAllUsagesTest()
+        {
+            InitBitString();
+
+            string tempFilename = Path.GetTempFileName();
+
+            const long sequenceLength = 3;
+
+            const ulong itself = Links.Itself;
+
+            using (var links = new Links(tempFilename, LinksSizeStep))
+            {
+                var sequence = new ulong[sequenceLength];
+                for (int i = 0; i < sequenceLength; i++)
+                    sequence[i] = links.Create(itself, itself);
+
+                var sequences = new Sequences(links);
+
+                var createResults = sequences.CreateAllVariants2(sequence);
+
+                //var reverseResults = sequences.CreateAllVariants2(sequence.Reverse().ToArray());
+
+                for (var i = 0; i < 1; i++)
+                {
+                    var linksTotalUsages1 = new ulong[links.Total + 1];
+
+                    sequences.CalculateAllUsages(linksTotalUsages1);
+
+                    var linksTotalUsages2 = new ulong[links.Total + 1];
+
+                    sequences.CalculateAllUsages2(linksTotalUsages2);
+
+                    var intersection1 = linksTotalUsages1.Intersect(linksTotalUsages2).ToList();
+                    Assert.IsTrue(intersection1.Count == linksTotalUsages2.Length);
+                }
 
                 for (int i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);

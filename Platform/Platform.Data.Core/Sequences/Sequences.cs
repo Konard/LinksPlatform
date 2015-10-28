@@ -914,6 +914,142 @@ namespace Platform.Data.Core.Sequences
             _links.EachCore(0, link, handler);
         }
 
+        public void CalculateAllUsages(ulong[] totals)
+        {
+            var calculator = new AllUsagesCalculator(_links, totals);
+            calculator.Calculate();
+        }
+
+        public void CalculateAllUsages2(ulong[] totals)
+        {
+            var calculator = new AllUsagesCalculator2(_links, totals);
+            calculator.Calculate();
+        }
+
+        private class AllUsagesCalculator
+        {
+            private readonly Links _links;
+            private readonly ulong[] _totals;
+
+            public AllUsagesCalculator(Links links, ulong[] totals)
+            {
+                _links = links;
+                _totals = totals;
+            }
+
+            public void Calculate()
+            {
+                _links.Each(0, 0, CalculateCore);
+            }
+
+            private bool CalculateCore(ulong link)
+            {
+                if (_totals[link] == 0)
+                {
+                    var total = 1UL;
+                    _totals[link] = total;
+
+                    var visitedChildren = new HashSet<ulong>();
+
+                    Func<ulong, bool> linkCalculator = child =>
+                    {
+                        if (link != child && visitedChildren.Add(child))
+                            total += _totals[child] == 0 ? 1 : _totals[child];
+                        return true;
+                    };
+
+                    _links.EachCore(link, 0, linkCalculator);
+                    _links.EachCore(0, link, linkCalculator);
+
+                    _totals[link] = total;
+                }
+                return true;
+            }
+        }
+
+        private class AllUsagesCalculator2
+        {
+            private readonly Links _links;
+            private readonly ulong[] _totals;
+
+            public AllUsagesCalculator2(Links links, ulong[] totals)
+            {
+                _links = links;
+                _totals = totals;
+            }
+
+            public void Calculate()
+            {
+                _links.Each(0, 0, CalculateCore);
+            }
+
+            private bool IsElement(ulong link)
+            {
+                //_linksInSequence.Contains(link) || 
+
+                return _links.GetTargetCore(link) == link || _links.GetSourceCore(link) == link;
+            }
+
+            private bool CalculateCore(ulong link)
+            {
+                // TODO: Проработать защиту от зацикливания
+
+                // Основано на SequenceWalker.WalkLeft
+
+                Func<ulong, ulong> getSource = _links.GetSourceCore;
+                Func<ulong, ulong> getTarget = _links.GetTargetCore;
+                Func<ulong, bool> isElement = IsElement;
+                Action<ulong> visitLeaf = (parent) =>
+                {
+                    if (link != parent)
+                        _totals[parent]++;
+                };
+                Action<ulong> visitNode = (parent) =>
+                {
+                    if (link != parent)
+                        _totals[parent]++;
+                };
+
+                var stack = new Stack<ulong>();
+                var element = link;
+
+                if (isElement(element))
+                    visitLeaf(element);
+                else
+                    while (true)
+                    {
+                        if (isElement(element))
+                        {
+                            if (stack.Count == 0)
+                                break;
+
+                            element = stack.Pop();
+
+                            var source = getSource(element);
+                            var target = getTarget(element);
+
+                            // Обработка элемента
+                            if (isElement(target)) visitLeaf(target);
+                            if (isElement(source)) visitLeaf(source);
+
+                            element = source;
+                        }
+                        else
+                        {
+                            stack.Push(element);
+
+                            visitNode(element);
+
+                            element = getTarget(element);
+                        }
+                    }
+
+                _totals[link]++;
+
+                return true;
+            }
+        }
+
         private class AllUsagesCollector
         {
             private readonly Links _links;
