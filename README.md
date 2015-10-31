@@ -55,6 +55,8 @@ Links Platform is a system, that combine simple database (Links) and execution e
 
 [Links (triples, micro RDF) API swagger connector.](https://gist.github.com/Konard/e6a0bff583bbca4d452b)
 
+## [Frequently asked questions](https://github.com/Konard/LinksPlatform/wiki/FAQ) | [Часто задаваемые вопросы](https://github.com/Konard/LinksPlatform/wiki/%D0%A7%D0%90%D0%92%D0%9E)
+
 ## Contacts
 
 https://vk.com/linksplatform
