@@ -1,18 +1,6 @@
 #LinksPlatform
 
-![blackspace, whitespace](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/1.png "blackspace, whitespace")
-![blackspace, black dot](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/2.png "blackspace, black dot")
-![white dot, black dot](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/3.png "white dot, black dot")
-![two white dots, black vertical line](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/4.png "two white dots, black vertical line")
-![white vertical line, black circle](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/5.png "white vertical line, black circle")
-![white circle, black horizontal line](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/6.png "white circle, black horizontal line")
-![white horizontal line, black horizontal arrow](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/7.png "white horizontal line, black horizontal arrow")
-![white link, black directed link](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/8.png "white link, black directed link")
-![white regular & directed links, black typed link](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/9.png "white regular & directed links, black typed link")
-![white regular & directed links with recursive inner structure, black typed link with recursive inner structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/10.png "white regular & directed links with recursive inner structure, black typed link with recursive inner structure")
-![white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/11.png "white regular & directed links with double recursive inner structure, black typed link with double recursive inner structure")
-![white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/12.png "white regular & directed links with coloured 8 elements sequence structure, black typed link with coloured 8 elements sequence structure")
-
+![Intro animation](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif "Intro animation")
 
 Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf).
 

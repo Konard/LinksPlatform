@@ -14,8 +14,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="ЗначениеСмысл0.80.svg"
-   inkscape:export-filename="C:\Users\Константин\Desktop\Avalast Collaboration\Avalast\Avalast\~LinksDocs\ЗначениеСмысл0.8.png"
+   sodipodi:docname="4.svg"
+   inkscape:export-filename="C:\Users\Константин\Desktop\LinksPlatform\doc\Intro\4.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -36,11 +36,11 @@
      showborder="true"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="979"
-     inkscape:window-height="607"
-     inkscape:window-x="449"
-     inkscape:window-y="100"
-     inkscape:window-maximized="0" />
+     inkscape:window-width="1920"
+     inkscape:window-height="1017"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
   <metadata
      id="metadata7">
     <rdf:RDF>
@@ -63,8 +63,8 @@
        id="rect2987"
        width="914"
        height="1130"
-       x="-2.4446499"
-       y="-76.302933" />
+       x="0"
+       y="-77.637848" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none"
        id="rect2987-1"
@@ -80,7 +80,7 @@
        transform="translate(0,-77.637847)" />
     <g
        id="g2994"
-       transform="translate(-916.35715,0.91102726)"
+       transform="translate(-913.9125,-0.423887)"
        style="stroke:#ffffff">
       <path
          inkscape:connector-curvature="0"

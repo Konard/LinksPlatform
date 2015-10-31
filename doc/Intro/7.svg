@@ -14,8 +14,8 @@
    id="svg2"
    version="1.1"
    inkscape:version="0.48.4 r9939"
-   sodipodi:docname="ЗначениеСмысл4.svg"
-   inkscape:export-filename="C:\Users\Константин\Desktop\Avalast Collaboration\Avalast\Avalast\~LinksDocs\ЗначениеСмысл4.png"
+   sodipodi:docname="7.svg"
+   inkscape:export-filename="C:\Users\Константин\Desktop\LinksPlatform\doc\Intro\7.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -77,8 +77,8 @@
        id="rect2987"
        width="914"
        height="1130"
-       x="-2.4446499"
-       y="-76.302933" />
+       x="0"
+       y="-77.637848" />
     <rect
        style="fill:#ffffff;fill-opacity:1;stroke:none"
        id="rect2987-1"
@@ -88,7 +88,7 @@
        y="-77.637848" />
     <path
        style="fill:#ffffff;stroke:#ffffff;stroke-width:10;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;marker-start:none"
-       d="m 785.88535,488.69707 -662.66,0"
+       d="m 788.33,487.36216 -662.66,0"
        id="path3802"
        inkscape:connector-curvature="0" />
     <path
