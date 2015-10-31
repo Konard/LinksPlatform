@@ -414,11 +414,11 @@ namespace Platform.Data.Core.Pairs
 
         private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
         {
-            var before = GetLinkCore(linkIndex);
-
             var newLink = SearchCore(newSource, newTarget);
-            if (newLink == Null)
+            if (newLink == Null) // Actual update
             {
+                var before = GetLinkCore(linkIndex);
+
                 _sourcesTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsSource);
                 _targetsTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsTarget);
 
@@ -434,7 +434,7 @@ namespace Platform.Data.Core.Pairs
 
                 return linkIndex;
             }
-            else
+            else // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
             {
                 var referencesAsSource = new List<ulong>();
                 var referencesAsTarget = new List<ulong>();
@@ -453,19 +453,18 @@ namespace Platform.Data.Core.Pairs
                 for (var i = 0; i < referencesAsSource.Count; i++)
                 {
                     var reference = referencesAsSource[i];
+                    if (reference == linkIndex) continue;
                     UpdateCore(reference, newLink, GetTargetCore(reference));
                 }
                 for (var i = 0; i < referencesAsTarget.Count; i++)
                 {
                     var reference = referencesAsTarget[i];
+                    if(reference == linkIndex) continue;
                     UpdateCore(reference, GetSourceCore(reference), newLink);
                 }
 
                 DeleteCore(linkIndex);
-
-                // TODO: Определиться с порядком действий, чтобы можно было успешно выполнять откат операций
-                CommitUpdate(before, GetLinkCore(newLink));
-
+                
                 return newLink;
             }
         }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -37,8 +38,6 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void CascadeUpdateTest()
         {
-            throw new StackOverflowException();
-
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
@@ -124,7 +123,7 @@ namespace Platform.Tests.Data.Core
             Global.Trash = FileHelpers
                 .ReadAll<Links.Transition>(tempTransactionLogFilename);
 
-            // User Code Error (Autoreverted)
+            // User Code Error (Autoreverted), no data saved
             try
             {
                 using (var links = new Links(tempDatabaseFilename,
@@ -140,11 +139,58 @@ namespace Platform.Tests.Data.Core
                         links.Create(l2, itself);
                         links.Create(l2, itself);
 
-                        ExceptionThrower();
+                        Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
 
-                        l2 = links.Update(l2, l1); // TODO: Fix CascadeUpdateTest and move ExceptionThrower() before transaction.Commit()
+                        l2 = links.Update(l2, l1);
 
                         links.Delete(l2);
+
+                        ExceptionThrower();
+
+                        transaction.Commit();
+                    }
+
+                    Global.Trash = links.Total;
+                }
+            }
+            catch
+            {
+                var transitions = FileHelpers
+                    .ReadAll<Links.Transition>(tempTransactionLogFilename);
+
+                Assert.IsTrue(transitions.Length == 1 && transitions[0].Before.IsNull() && transitions[0].After.IsNull());
+            }
+
+            // User Code Error (Autoreverted), some data saved
+            try
+            {
+                ulong l1;
+                ulong l2;
+
+                using (var links = new Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024*1024))
+                {
+                    l1 = links.Create(itself, itself);
+                    l2 = links.Create(itself, itself);
+
+                    l2 = links.Update(l2, l2, l1, l2);
+
+                    links.Create(l2, itself);
+                    links.Create(l2, itself);
+                }
+
+                Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
+
+                using (var links = new Links(tempDatabaseFilename,
+                    tempTransactionLogFilename, 1024 * 1024))
+                {
+                    using (var transaction = links.BeginTransaction())
+                    {
+                        l2 = links.Update(l2, l1);
+
+                        links.Delete(l2);
+
+                        ExceptionThrower();
 
                         transaction.Commit();
                     }
