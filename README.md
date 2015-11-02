@@ -6,9 +6,9 @@ Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wi
 
 Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [книга](http://www.sentences.com/docs/other_docs/AMD.pdf).
 
-This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams.
+This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams. So the Item or Point is a specific case of link, which references itself.
 
-Эта платформа использует объединённый тип данных - связь, который является комбинацией Элемента и Связи из оригинальной работы Симона Вильямса.
+Эта платформа использует объединённый тип данных - связь, который является комбинацией Элемента и Связи из оригинальной работы Симона Вильямса. Таким образом Элемент или Точка являются частным случаем связи, которая ссылается сама на себя.
 
 There also at least two variants of Link structure:
 
@@ -17,14 +17,14 @@ There also at least two variants of Link structure:
 > ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png "Source-Target link, untyped")
 > ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png "Source-Target link, untyped")
 
-- Untyped, the simplest yet, each link contains only Source (Beginning) and Target (Ending).
-- Нетипизированная, простейшая (пока ещё), каждая связь содержит только Source (Начало) и Target (Конец).
+- Untyped, the simplest yet, each link contains only Source (Beginning, Subject) and Target (Ending, Predicate, Object).
+- Нетипизированная, простейшая (пока ещё), каждая связь содержит только Source (Начало, Подлежащее) и Target (Конец, Сказуемое, Дополнение).
 
 > ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png "Source-Linker-Target link, typed")
 > ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png "Source-Linker-Target link, typed")
 
 - Typed, with added Linker (Verb, Type) definition, so any additional info about type of connection between two links can be stored here.
-- Типизированная, с добавленным поле Linker (Глагол, Тип, Связка, Предикат), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.
+- Типизированная, с добавленным поле Linker (Глагол, Тип, Связка, Предикат, Сказуемое), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.
 
 Links Platform is a system, that combine simple database (Links) and execution engine (Triggers). So it is provide ability to program that system in any way (also dynamically), due to fact that all algorithms are data inside this database. Idea behind Links Platform is a model of associative memory of human mind. So it is actually copy most of it advantages and disadvantages.
 
