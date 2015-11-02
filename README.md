@@ -11,12 +11,12 @@ There also at least two variants of Link structure:
 > ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png "Source-Target link, untyped")
 > ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png "Source-Target link, untyped")
 
-- Untyped, the simplest yet, each link contains only Source (Beginning, Subject) and Target (Ending, Predicate, Object).
+- Untyped, the simplest yet, each link contains only Source (Beginning, First, Left, Subject) and Target (Ending, Last, Right, Predicate, Object).
 
 > ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png "Source-Linker-Target link, typed")
 > ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png "Source-Linker-Target link, typed")
 
-- Typed, with added Linker (Verb, Type) definition, so any additional info about type of connection between two links can be stored here.
+- Typed, with added Linker definition ([verb](https://en.wikipedia.org/wiki/Verb), [action](https://en.wikipedia.org/wiki/Action_(philosophy)), [type](https://en.wikipedia.org/wiki/Type_system), [category](https://en.wikipedia.org/wiki/Category_theory), [predicate](https://en.wikipedia.org/wiki/Predicate), [transition](https://en.wikipedia.org/wiki/Transition_system), [algorithm](https://en.wikipedia.org/wiki/Algorithm)), so any additional info about type of connection between two links can be stored here.
 
 Links Platform is a system, that combine simple database (Links) and execution engine (Triggers). So it is provide ability to program that system in any way (also dynamically), due to fact that all algorithms are data inside this database. Idea behind Links Platform is a model of associative memory of human mind. So it is actually copy most of it advantages and disadvantages.
 
