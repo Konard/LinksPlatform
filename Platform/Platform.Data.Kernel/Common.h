@@ -1,4 +1,4 @@
-﻿#ifndef __LINKS_COMMON_H__
+#ifndef __LINKS_COMMON_H__
 #define __LINKS_COMMON_H__
 
 #define false 0
@@ -6,6 +6,7 @@
 #define bool unsigned
 
 #include <stdint.h>
+#include <inttypes.h>
 
 // Size for basic types
 // Размер для основных типов
@@ -37,7 +38,7 @@ typedef unsigned_integer link_index; // Short for links' array index, unsigned i
 // Linux,Unix
 #define PREFIX_DLL 
 #define public_calling_convention 
-#define __forceinline __attribute__((always_inline))
+#define __forceinline /* __inline__ __attribute__((always_inline)) */
 #endif
 
 #ifdef _DEBUG
@@ -53,27 +54,10 @@ typedef unsigned_integer link_index; // Short for links' array index, unsigned i
 #define ERROR_RESULT 0
 #define failed(x) SUCCESS_RESULT != (x)
 
-__forceinline signed_integer Error(char* message)
-{
-#ifdef DEBUG
-    printf("%s\n\n", message);
-#endif
-    return ERROR_RESULT;
-}
+__forceinline signed_integer Error(char* message);
 
-__forceinline signed_integer ErrorWithCode(char* message, signed_integer errorCode)
-{
-#ifdef DEBUG
-    printf("%s Error code: %ll.\n\n", message, errorCode);
-#endif
-    return SUCCESS_RESULT == errorCode ? ERROR_RESULT : errorCode;
-}
+__forceinline signed_integer ErrorWithCode(char* message, signed_integer errorCode);
 
-__forceinline void DebugInfo(char* message)
-{
-#ifdef DEBUG
-    printf("%s\n", message);
-#endif
-}
+__forceinline void DebugInfo(char* message);
 
 #endif

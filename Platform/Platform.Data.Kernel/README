@@ -1,4 +1,13 @@
 GNU C predefined macros, http://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html#Common-Predefined-Macros
 Microsoft Visual C++ predefined macros, http://msdn.microsoft.com/en-us/library/b0084kay%28VS.80%29.aspx
 
-od -tx2 -w128 test.bin | less -S
+Build library and test for it:
+$ make
+
+Run test:
+$ ./run.sh
+
+To enable debug output put -DDEBUG option into makefile.
+
+To view resulting database file in binary:
+$ od -tx2 -w128 test.links | less -S

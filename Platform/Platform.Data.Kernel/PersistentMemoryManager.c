@@ -7,6 +7,8 @@
 #elif defined(LINUX)
 // for 64-bit files
 #define _XOPEN_SOURCE 700
+// for memset
+#include <string.h>
 #include <unistd.h>
 
 // open()
@@ -54,7 +56,7 @@ Link*               pointerToUnusedMarker;              // Инициализи�
 __forceinline void PrintLinksDatabaseSize()
 {
 #ifdef DEBUG
-    printf("Links database size: %llu links, %llu bytes for links. Service block size (bytes): %llu.\n",
+    printf("Links database size: %" PRIu64 " links, %" PRIu64 " bytes for links. Service block size (bytes): %" PRIu64 ".\n",
         (uint64_t)(*pointerToLinksSize),
         (uint64_t)(*pointerToLinksSize * sizeof(Link)),
         (uint64_t)serviceBlockSizeInBytes);
@@ -204,7 +206,7 @@ void InitPersistentMemoryManager()
     storageFileMinSizeInBytes = serviceBlockSizeInBytes + baseBlockSizeInBytes;
 
 #ifdef DEBUG
-    printf("storageFileMinSizeInBytes = %llu\n", (uint64_t)storageFileMinSizeInBytes);
+    printf("storageFileMinSizeInBytes = %" PRIu64 "\n", (uint64_t)storageFileMinSizeInBytes);
 #endif
 
     ResetStorageFile();
@@ -247,7 +249,7 @@ signed_integer OpenStorageFile(char* filename)
 #endif
 
 #ifdef DEBUG
-    printf("storageFileSizeInBytes = %llu\n", (uint64_t)storageFileSizeInBytes);
+    printf("storageFileSizeInBytes = %" PRIu64 "\n", (uint64_t)storageFileSizeInBytes);
 
     printf("File %s opened.\n\n", filename);
 #endif
@@ -374,11 +376,11 @@ signed_integer SetStorageFileMemoryMapping()
     pointerToUnusedMarker = pointerToLinks;
 
 #ifdef DEBUG
-    printf("DataSeal            = %llu\n", *pointerToDataSeal);
-    printf("LinkIndexSize       = %llu\n", *pointerToLinkIndexSize);
-    printf("MappingLinksMaxSize = %llu\n", *pointerToMappingLinksMaxSize);
-    printf("LinksMaxSize        = %llu\n", (uint64_t)*pointerToLinksMaxSize);
-    printf("LinksSize           = %llu\n", (uint64_t)*pointerToLinksSize);
+    printf("DataSeal            = %" PRIu64 "\n", *pointerToDataSeal);
+    printf("LinkIndexSize       = %" PRIu64 "\n", *pointerToLinkIndexSize);
+    printf("MappingLinksMaxSize = %" PRIu64 "\n", *pointerToMappingLinksMaxSize);
+    printf("LinksMaxSize        = %" PRIu64 "\n", (uint64_t)*pointerToLinksMaxSize);
+    printf("LinksSize           = %" PRIu64 "\n", (uint64_t)*pointerToLinksSize);
 #endif
 
     uint64_t expectedMappingLinksMaxSize = baseLinksSizeInBytes / sizeof(link_index);
@@ -491,7 +493,7 @@ signed_integer ResetStorageFileMemoryMapping()
             }
 
             // Считаем реальный размер файла
-            int64_t lastFileSizeInBytes = *pointerToDataSeal == LINKS_DATA_SEAL_64BIT ? serviceBlockSizeInBytes + *pointerToLinksSize * sizeof(Link) : storageFileSizeInBytes;
+            int64_t lastFileSizeInBytes = *pointerToDataSeal == LINKS_DATA_SEAL_64BIT ? (int64_t)(serviceBlockSizeInBytes + *pointerToLinksSize * sizeof(Link)) : storageFileSizeInBytes;
 
 #if defined(WINDOWS)
             UnmapViewOfFile(pointerToMappedRegion);
