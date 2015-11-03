@@ -37,6 +37,7 @@ typedef unsigned_integer link_index; // Short for links' array index, unsigned i
 // Linux,Unix
 #define PREFIX_DLL 
 #define public_calling_convention 
+#define __forceinline __attribute__((always_inline))
 #endif
 
 #ifdef _DEBUG

@@ -350,7 +350,7 @@ signed_integer SetStorageFileMemoryMapping()
     //    ============================
     //    ! means it is always that size (does not depend on link_index size)
 
-    char* pointers[7] = {
+    void* pointers[7] = {
         // Service Block
         (char*)pointerToMappedRegion + sizeof(uint64_t) * 0, // 0
         (char*)pointerToMappedRegion + sizeof(uint64_t) * 1, // 1
