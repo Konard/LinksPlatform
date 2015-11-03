@@ -1,4 +1,4 @@
-﻿#ifndef __LINKS_PERSISTENT_MEMORY_MANAGER_H__
+#ifndef __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 #define __LINKS_PERSISTENT_MEMORY_MANAGER_H__
 
 // Persistent on drive memory manager (Менеджер хранимой на диске памяти).

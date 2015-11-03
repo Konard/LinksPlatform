@@ -196,6 +196,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Common.c" />
     <ClCompile Include="Link.c" />
     <ClCompile Include="PersistentMemoryManager.c" />
     <ClCompile Include="Timestamp.c" />
