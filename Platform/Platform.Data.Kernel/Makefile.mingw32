@@ -1,10 +1,10 @@
 CC=i586-mingw32msvc-gcc
 OPTS=-O3 --std=c99
-DEFS=-DLINKS_DLL
+DEFS=-DLINKS_DLL_EXPORT
 Platform.Data.Kernel.dll	: Link.h Link.c
 	${CC} ${OPTS} ${DEFS} -c -o Common.o Common.c
 	${CC} ${OPTS} ${DEFS} -c -o Timestamp.o Timestamp.c
 	${CC} ${OPTS} ${DEFS} -c -o Link.o Link.c
 	${CC} ${OPTS} ${DEFS} -c -o PersistentMemoryManager.o PersistentMemoryManager.c
-	${CC} -shared -o Platform.Data.Kernel.dll Link.o Common.o Timestamp.o PersistentMemoryManager.o -Wl,--out-implib,core.a
-	${CC} -o test test.c -L. -lPlatform.Data.Kernel.dll
+	${CC} -shared -o Platform.Data.Kernel.dll Link.o PersistentMemoryManager.o Common.o Timestamp.o -Wl,--out-implib,Platform.Data.Kernel.a
+	${CC} ${OPTS} -o test test.c -L. -l:Platform.Data.Kernel.dll

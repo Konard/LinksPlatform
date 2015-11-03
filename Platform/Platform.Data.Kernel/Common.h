@@ -18,7 +18,7 @@ typedef unsigned_integer link_index; // Short for links' array index, unsigned i
 #ifndef WINDOWS
 #define WINDOWS
 #endif
-#elif defined(__linux__)  // Для Linux: получения ./.o/.so:
+#elif defined(__linux__)  // Для Linux: получения ./.o/.so (dll):
 #ifndef LINUX
 #define LINUX
 #endif

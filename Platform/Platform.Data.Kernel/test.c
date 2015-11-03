@@ -6,7 +6,7 @@
 int main() {
     InitPersistentMemoryManager();
 
-    OpenStorageFile("test.links");
+    OpenStorageFile("db.links");
     SetStorageFileMemoryMapping();
 
     link_index isA = CreateLink(itself, itself, itself);

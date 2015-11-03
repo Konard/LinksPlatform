@@ -4,10 +4,12 @@ Microsoft Visual C++ predefined macros, http://msdn.microsoft.com/en-us/library/
 Build library and test for it:
 $ make
 
+It is actually builds into Platform.Data.Kernel.dll on Linux too, because it is referenced .NET Library like Platform.Data.Core.dll (exactly as "Platform.Data.Kernel.dll").
+
 Run test:
 $ ./run.sh
 
 To enable debug output put -DDEBUG option into makefile.
 
 To view resulting database file in binary:
-$ od -tx2 -w128 test.links | less -S
+$ od -tx2 -w128 db.links | less -S

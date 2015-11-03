@@ -1,6 +1,6 @@
 CC=gcc
 OPTS=-O3 --std=c99 -fPIC -W -Wall -Wextra -pedantic
-DEFS=-DLINKS_DLL -D_XOPEN_SOURCE=700
+DEFS=-DLINKS_DLL_EXPORT -D_XOPEN_SOURCE=700
 Platform.Data.Kernel.a	: Link.h Link.c
 	${CC} ${OPTS} ${DEFS} -c -o Common.o Common.c
 	${CC} ${OPTS} ${DEFS} -c -o Timestamp.o Timestamp.c
