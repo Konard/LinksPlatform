@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitString.cs" />
+    <Compile Include="IUniLinks.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Elements\DefaultElements.cs" />
     <Compile Include="Elements\IElements.RW.cs" />
