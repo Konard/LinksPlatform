@@ -1,14 +1,26 @@
 ﻿using System;
 
+// ReSharper disable TypeParameterCanBeVariant
+
 namespace Platform.Data.Core
 {
+    /// <remarks>Minimal sufficient universal Links API (for bulk operations).</remarks>
+    public partial interface IUniLinks<TLink>
+    {
+        TLink[][][] Trigger(TLink[] condition, TLink[] substitution);
+    }
+
+    /// <remarks>Minimal sufficient universal Links API (for step by step operations).</remarks>
+    public partial interface IUniLinks<TLink>
+    {
+        TLink Trigger(TLink[] condition, TLink[] substitution, Func<TLink[], TLink[], TLink> handler);
+    }
+
     /// <remarks>
-    /// Minimal sufficient universal Links API.
-    /// In stands for input.
-    /// Out stands for output.
+    /// In/Out aliases for IUniLinks.
     /// TLink can be any number type of any size.
     /// </remarks>
-    public interface IUniLinks<TLink>
+    public interface IUniLinksIO<TLink>
     {
         /// <remarks>
         /// default(TLink) means any link.
@@ -56,7 +68,7 @@ namespace Platform.Data.Core
     }
 
     /// <remarks>Contains some optimizations of Out.</remarks>
-    public interface IUniLinksWithOutEachExtensions<TLink> : IUniLinks<TLink>
+    public interface IUniLinksIOWithExtensions<TLink> : IUniLinksIO<TLink>
     {
         /// <remarks>
         /// default(TLink) means nothing or null.
