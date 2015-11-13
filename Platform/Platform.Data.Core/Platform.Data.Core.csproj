@@ -90,6 +90,8 @@
     <Compile Include="Triplets\XmlGenerator.cs" />
     <Compile Include="TreeMethods\SizeBalancedTreeMethods.cs" />
     <Compile Include="TreeMethods\SizeBalancedTreeMethods2.cs" />
+    <Compile Include="Walker\IPath.cs" />
+    <Compile Include="Walker\Walker.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
