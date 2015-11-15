@@ -5,6 +5,7 @@ namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {
+        // TODO: Объединить с константами
         public enum PathElement
         {
             Source,
@@ -24,7 +25,7 @@ namespace Platform.Data.Core.Pairs
                 {
                     var current = path[i];
 
-                    if (!ExistsCore(current))
+                    if (!_memoryManager.Exists(current))
                         throw new ArgumentLinkDoesNotExistsException<ulong>(current, "path");
 
                     if ((i + 1) < path.Length)
@@ -43,7 +44,7 @@ namespace Platform.Data.Core.Pairs
                     }
                 }
 
-                return Null;
+                return LinksConstants.Null;
             });
         }
 
@@ -54,7 +55,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!ExistsCore(root))
+                if (!_memoryManager.Exists(root))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(root, "root");
 
                 var currentLink = root;

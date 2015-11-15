@@ -61,6 +61,7 @@
     <Compile Include="Synchronization\UnsafeSynchronization.cs" />
     <Compile Include="TextHelpers.cs" />
     <Compile Include="ThreadHelpers.cs" />
+    <Compile Include="TypeHelpers.cs" />
     <Compile Include="UniqueTimestamp.cs" />
     <Compile Include="UniqueTimestampFactory.cs" />
   </ItemGroup>

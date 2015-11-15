@@ -8,13 +8,14 @@ namespace Platform.Sandbox
     {
         public static void TestGexf(string filename)
         {
-            using (var links = new Links(filename, 512*1024*1024))
+            using (var memoryManager = new LinksMemoryManager(filename, 512 * 1024 * 1024))
+            using (var links = new Links(memoryManager))
             {
                 const int linksToCreate = 1024;
 
                 links.RunRandomCreations(linksToCreate);
 
-                links.ExportSourcesTree(filename + ".gexf");
+                memoryManager.ExportSourcesTree(filename + ".gexf");
 
                 Console.ReadKey();
             }
@@ -24,11 +25,13 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var links = new Links(filename, 512*1024*1024))
+                using (var memoryManager = new LinksMemoryManager(filename, 512 * 1024 * 1024))
+                using (var links = new Links(memoryManager))
                 {
                     //links.EnterTransaction();
 
-                    links.TestBasicMemoryManagement();
+                    var link = memoryManager.AllocateLink();
+                    memoryManager.FreeLink(link);
 
                     Console.ReadKey();
 
@@ -44,7 +47,7 @@ namespace Platform.Sandbox
 
                     links.Each(0, 0, x =>
                     {
-                        links.PrintLink(x);
+                        memoryManager.PrintLink(x);
                         return true;
                     });
 
@@ -109,7 +112,7 @@ namespace Platform.Sandbox
 
                     links.Each(0, 0, x =>
                     {
-                        links.PrintLink(x);
+                        memoryManager.PrintLink(x);
                         return true;
                     });
 
@@ -131,7 +134,7 @@ namespace Platform.Sandbox
             Console.ReadKey();
         }
 
-        private static void PrintLink(this Links links, ulong link)
+        private static void PrintLink(this LinksMemoryManager links, ulong link)
         {
             Console.WriteLine(links.FormatLink(link));
         }

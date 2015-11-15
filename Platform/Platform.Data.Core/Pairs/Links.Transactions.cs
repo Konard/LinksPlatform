@@ -211,8 +211,8 @@ namespace Platform.Data.Core.Pairs
         private ConcurrentQueue<Transition> _currentTransactionTransitions;
         private bool _ignoreTransitions;
 
-        public Links(string address, string logAddress, long size)
-            : this(address, size)
+        public Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
+            : this(memoryManager)
         {
             // В первой строке файла хранится последняя закоммиченную тразнакцию.
             // При запуске это используется для проверки удачного закрытия файла лога.
@@ -302,17 +302,17 @@ namespace Platform.Data.Core.Pairs
         private void EnsureSelfReferencingLinkIsRestored(ulong source, ulong target)
         {
             // Возможно эту логику нужно перенисти в функцию Create
-            if (!ExistsCore(source) && !ExistsCore(target) && source == target)
+            if (!_memoryManager.Exists(source) && !_memoryManager.Exists(target) && source == target)
             {
                 if (Create(0, 0) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!ExistsCore(target))
+            else if (!_memoryManager.Exists(target))
             {
                 if (Create(source, 0) != target)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!ExistsCore(source))
+            else if (!_memoryManager.Exists(source))
             {
                 if (Create(0, target) != source)
                     throw new Exception("Невозможно восстановить связь");

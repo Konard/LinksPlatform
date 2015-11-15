@@ -6,6 +6,13 @@ using Platform.Data.Core.Structures;
 
 namespace Platform.Data.Core.Pairs
 {
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <remarks>
+    /// TODO: Переписать в реализацию ILinksMemoryManager
+    /// TODO: Реализовать Update.
+    /// </remarks>
     public class Links2 : ILinks<ILink>
     {
         public Links2()
@@ -24,6 +31,11 @@ namespace Platform.Data.Core.Pairs
             _linksBySource[source].Add(link);
             _linksByTarget[target].Add(link);
             return link;
+        }
+
+        public ILink Update(ILink source, ILink target, ILink newSource, ILink newTarget)
+        {
+            throw new NotImplementedException();
         }
 
         public void Delete(ILink link)
@@ -51,30 +63,31 @@ namespace Platform.Data.Core.Pairs
                 throw new ArgumentLinkDoesNotExistsException<ILink>(target, "target");
 
             if (source == null && target == null)
-                return _links.All(link => handler(link) != Break);
-            if (source == null)
+                return _links.All(link => handler(link) != LinksConstants.Break);
+            else if (source == null)
             {
                 HashSet<ILink> linksByTargetSet;
                 if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
-                    return true;
+                    return LinksConstants.Continue;
 
-                return linksByTargetSet.All(link => handler(link) != Break);
+                return linksByTargetSet.All(link => handler(link) != LinksConstants.Break);
             }
-            if (target == null)
+            else if (target == null)
             {
                 HashSet<ILink> linksBySourceSet;
                 if (!_linksBySource.TryGetValue(source, out linksBySourceSet))
-                    return true;
+                    return LinksConstants.Continue;
 
-                return linksBySourceSet.All(link => handler(link) != Break);
+                return linksBySourceSet.All(link => handler(link) != LinksConstants.Break);
             }
+            else 
             {
                 ILink link = SearchCore(source, target);
-                if (link != null && handler(link) == Break)
-                    return false;
+                if (link != null && handler(link) == LinksConstants.Break)
+                    return LinksConstants.Break;
             }
 
-            return true;
+            return LinksConstants.Continue;
         }
 
         public ulong Total
@@ -225,28 +238,6 @@ namespace Platform.Data.Core.Pairs
 
             #endregion
         }
-
-        #region Constants
-
-        /// <summary>Возвращает булевское значение, обозначающее продолжение прохода по связям.</summary>
-        /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
-        public const bool Continue = true;
-
-        /// <summary>Возвращает булевское значение, обозначающее остановку прохода по связям.</summary>
-        /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
-        public const bool Break = false;
-
-        /// <summary>Возвращает значение ulong, обозначающее отсутствие связи.</summary>
-        public const ulong Null = 0;
-
-        /// <summary>Возвращает значение ulong, обозначающее любую связь.</summary>
-        /// <remarks>
-        ///     Возможно нужно зарезервировать отдельное значение, тогда можно будет создавать все варианты
-        ///     последовательностей в функции Create.
-        /// </remarks>
-        public const ulong Any = 0;
-
-        #endregion
 
         #region Structure
 

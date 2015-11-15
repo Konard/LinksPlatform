@@ -31,7 +31,8 @@ namespace Platform.Data.MasterServer
                 File.Delete(DefaultDatabaseFilename);
 #endif
 
-                using (var links = new Links(DefaultDatabaseFilename, 8*1024*1024))
+                using (var memoryManager = new LinksMemoryManager(DefaultDatabaseFilename, 8 * 1024 * 1024))
+                using (var links = new Links(memoryManager))
                 {
                     InitUTF16(links);
 
@@ -198,13 +199,13 @@ namespace Platform.Data.MasterServer
             var linksSequenceQuery = new ulong[actualLength];
             for (var i = 0; i < actualLength; i++)
                 if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
-                    linksSequenceQuery[i] = Sequences.Any;
+                    linksSequenceQuery[i] = LinksConstants.Any;
                 else if (sequenceQuery[i] == '*')
                     linksSequenceQuery[i] = Sequences.ZeroOrMany;
                 else
                     linksSequenceQuery[i] = FromCharToLink(sequenceQuery[i]);
 
-            if (linksSequenceQuery.Contains(Sequences.Any) || linksSequenceQuery.Contains(Sequences.ZeroOrMany))
+            if (linksSequenceQuery.Contains(LinksConstants.Any) || linksSequenceQuery.Contains(Sequences.ZeroOrMany))
             {
                 var patternMatched = sequences.MatchPattern(linksSequenceQuery);
 

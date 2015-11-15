@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,25 +14,11 @@ namespace Platform.Tests.Data.Core
     {
         private const long Iterations = 10 * 1024;
 
-        private static readonly long DefaultLinksSize = (long)Links.LinkSizeInBytes *
-                                                        1 * 1024 * 1024;
+        private static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
 
         private static readonly Random Rnd = new Random();
 
         #region Concept
-
-        [TestMethod]
-        public void BasicMemoryTest()
-        {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var links = new Links(tempFilename, 1024 * 1024))
-            {
-                links.TestBasicMemoryManagement();
-            }
-
-            File.Delete(tempFilename);
-        }
 
         [TestMethod]
         public void CascadeUpdateTest()
@@ -41,10 +26,10 @@ namespace Platform.Tests.Data.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024 * 1024))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
@@ -74,9 +59,10 @@ namespace Platform.Tests.Data.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
@@ -99,11 +85,11 @@ namespace Platform.Tests.Data.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
             // Auto Reverted (Because no commit at transaction)
-            using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024 * 1024))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 using (var transaction = links.BeginTransaction())
                 {
@@ -126,8 +112,8 @@ namespace Platform.Tests.Data.Core
             // User Code Error (Autoreverted), no data saved
             try
             {
-                using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024 * 1024))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     using (var transaction = links.BeginTransaction())
                     {
@@ -167,8 +153,8 @@ namespace Platform.Tests.Data.Core
                 ulong l1;
                 ulong l2;
 
-                using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024*1024))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     l1 = links.Create(itself, itself);
                     l2 = links.Create(itself, itself);
@@ -181,8 +167,8 @@ namespace Platform.Tests.Data.Core
 
                 Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
 
-                using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024 * 1024))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     using (var transaction = links.BeginTransaction())
                     {
@@ -205,8 +191,8 @@ namespace Platform.Tests.Data.Core
             }
 
             // Commit
-            using (var links = new Links(tempDatabaseFilename,
-                    tempTransactionLogFilename, 1024 * 1024))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 using (var transaction = links.BeginTransaction())
                 {
@@ -235,8 +221,8 @@ namespace Platform.Tests.Data.Core
             try
             {
                 // TODO: Fix
-                using (var links = new Links(tempDatabaseFilename,
-                        tempTransactionLogFilename, 1024 * 1024))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     Global.Trash = links.Total;
                 }
@@ -264,11 +250,12 @@ namespace Platform.Tests.Data.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
             const Links.PathElement source = Links.PathElement.Source;
             const Links.PathElement target = Links.PathElement.Target;
 
-            using (var links = new Links(tempDatabaseFilename, tempTransactionLogFilename, 1024 * 1024))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
@@ -418,9 +405,10 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void GetSourceTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations.", Iterations);
 
@@ -428,17 +416,17 @@ namespace Platform.Tests.Data.Core
 
                 //var firstLink = links.First();
                 // Создаём одну связь, из которой будет производить считывание
-                ulong firstLink = links.Create(0, 0);
+                var firstLink = links.Create(0, 0);
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
                 // Тестируем саму функцию
                 for (ulong i = 0; i < Iterations; i++)
                     counter += links.GetSource(firstLink);
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
+                var iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 // Удаляем связь, из которой производилось считывание
                 links.Delete(firstLink);
@@ -454,18 +442,19 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void GetSourceInParallel()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 Console.WriteLine("Testing GetSource function with {0} Iterations in parallel.", Iterations);
 
                 long counter = 0;
 
                 //var firstLink = links.First();
-                ulong firstLink = links.Create(0, 0);
+                var firstLink = links.Create(0, 0);
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
                 // Тестируем саму функцию
                 Parallel.For(0, Iterations, x =>
@@ -474,9 +463,9 @@ namespace Platform.Tests.Data.Core
                     //Interlocked.Increment(ref counter);
                 });
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
+                var iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
@@ -491,25 +480,26 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void TestGetTarget()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations.", Iterations);
 
                 ulong counter = 0;
 
                 //var firstLink = links.First();
-                ulong firstLink = links.Create(0, 0);
+                var firstLink = links.Create(0, 0);
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
                 for (ulong i = 0; i < Iterations; i++)
                     counter += links.GetTarget(firstLink);
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
+                var iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
@@ -524,18 +514,19 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void TestGetTargetInParallel()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 Console.WriteLine("Testing GetTarget function with {0} Iterations in parallel.", Iterations);
 
                 long counter = 0;
 
                 //var firstLink = links.First();
-                ulong firstLink = links.Create(0, 0);
+                var firstLink = links.Create(0, 0);
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
                 Parallel.For(0, Iterations, x =>
                 {
@@ -543,9 +534,9 @@ namespace Platform.Tests.Data.Core
                     //Interlocked.Increment(ref counter);
                 });
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
+                var iterationsPerSecond = Iterations / elapsedTime.TotalSeconds;
 
                 links.Delete(firstLink);
 
@@ -564,13 +555,11 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
             {
                 long iterations = 64 * 1024 * 1024 / Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
 
                 ulong counter = 0;
-
-                var minLink = 1UL;
                 var maxLink = links.Total;
 
                 var rnd = new Random((int)DateTime.UtcNow.Ticks);
@@ -581,8 +570,8 @@ namespace Platform.Tests.Data.Core
 
                 for (var i = iterations; i > 0; i--)
                 {
-                    var source = rnd.NextUInt64(minLink, maxLink);
-                    var target = rnd.NextUInt64(minLink, maxLink);
+                    var source = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var target = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
 
                     counter += links.Search(source, target);
                 }
@@ -600,33 +589,33 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void TestRandomSearchAll()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 ulong counter = 0;
 
-                ulong minLink = 1UL;
-                ulong maxLink = links.Total;
+                var maxLink = links.Total;
 
-                ulong iterations = links.Total;
+                var iterations = links.Total;
                 var rnd = new Random((int)DateTime.UtcNow.Ticks);
 
                 Console.WriteLine("Testing Random Search with {0} Iterations.", links.Total);
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
-                for (ulong i = iterations; i > 0; i--)
+                for (var i = iterations; i > 0; i--)
                 {
-                    ulong source = rnd.NextUInt64(minLink, maxLink);
-                    ulong target = rnd.NextUInt64(minLink, maxLink);
+                    var source = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var target = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
 
                     counter += links.Search(source, target);
                 }
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double iterationsPerSecond = iterations / elapsedTime.TotalSeconds;
+                var iterationsPerSecond = iterations / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} Iterations of Random Search done in {1} ({2} Iterations per second), c: {3}",
                     iterations, elapsedTime, (long)iterationsPerSecond, counter);
@@ -638,15 +627,16 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void TestEach()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 ulong counter = 0;
 
                 Console.WriteLine("Testing Each function.");
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
                 links.Each(0, 0, x =>
                 {
@@ -655,9 +645,9 @@ namespace Platform.Tests.Data.Core
                     return true;
                 });
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                double linksPerSecond = counter / elapsedTime.TotalSeconds;
+                var linksPerSecond = counter / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} Iterations of Each's handler function done in {1} ({2} links per second)",
                     counter, elapsedTime, (long)linksPerSecond);
@@ -672,7 +662,7 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
             {
                 ulong counter = 0;
 
@@ -702,7 +692,7 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSize))
+            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
             {
 
                 long counter = 0;
@@ -730,17 +720,18 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public static void Create64BillionLinks()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
-                ulong linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Total;
 
-                long linksToCreate = 64 * 1024 * 1024 / Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / LinksMemoryManager.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links.", linksToCreate);
 
-                TimeSpan elapsedTime = PerformanceHelpers.Measure(() =>
+                var elapsedTime = PerformanceHelpers.Measure(() =>
                 {
                     for (long i = 0; i < linksToCreate; i++)
                     {
@@ -748,8 +739,8 @@ namespace Platform.Tests.Data.Core
                     }
                 });
 
-                ulong linksCreated = links.Total - linksBeforeTest;
-                double linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
+                var linksCreated = links.Total - linksBeforeTest;
+                var linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("Current links count: {0}.", links.Total);
 
@@ -763,24 +754,25 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public static void Create64BillionLinksInParallel()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
-                ulong linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Total;
 
-                Stopwatch sw = Stopwatch.StartNew();
+                var sw = Stopwatch.StartNew();
 
-                long linksToCreate = 64 * 1024 * 1024 / Links.LinkSizeInBytes;
+                long linksToCreate = 64 * 1024 * 1024 / LinksMemoryManager.LinkSizeInBytes;
 
                 Console.WriteLine("Creating {0} links in parallel.", linksToCreate);
 
                 Parallel.For(0, linksToCreate, x => links.Create(0, 0));
 
-                TimeSpan elapsedTime = sw.Elapsed;
+                var elapsedTime = sw.Elapsed;
 
-                ulong linksCreated = links.Total - linksBeforeTest;
-                double linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
+                var linksCreated = links.Total - linksBeforeTest;
+                var linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
                     (long)linksPerSecond);
@@ -792,18 +784,19 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public static void TestDeletionOfAllLinks()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Links(tempFilename, DefaultLinksSize))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
-                ulong linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Total;
 
                 Console.WriteLine("Deleting all links");
 
-                TimeSpan elapsedTime = PerformanceHelpers.Measure(links.DeleteAllLinks);
+                var elapsedTime = PerformanceHelpers.Measure(links.DeleteAllLinks);
 
-                ulong linksDeleted = linksBeforeTest - links.Total;
-                double linksPerSecond = linksDeleted / elapsedTime.TotalSeconds;
+                var linksDeleted = linksBeforeTest - links.Total;
+                var linksPerSecond = linksDeleted / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links deleted in {1} ({2} links per second)", linksDeleted, elapsedTime,
                     (long)linksPerSecond);

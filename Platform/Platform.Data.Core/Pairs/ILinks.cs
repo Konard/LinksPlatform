@@ -8,7 +8,6 @@ namespace Platform.Data.Core.Pairs
     /// </summary>
     /// <remarks>
     /// Регионы Read & Write можно выделить в отдельные интерфейсы.
-    /// TODO: Реализовать Update
     /// </remarks>
     public interface ILinks<TLink>
     {
@@ -75,6 +74,17 @@ namespace Platform.Data.Core.Pairs
         /// <param name="target">Индекс связи, которая является концом для создаваемой связи.</param>
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
         TLink Create(TLink source, TLink target);
+
+        /// <summary>
+        /// Обновляет связь с указанными началом (Source) и концом (Target)
+        /// на связь с указанными началом (NewSource) и концом (NewTarget).
+        /// </summary>
+        /// <param name="source">Индекс связи, которая является началом обновляемой связи.</param>
+        /// <param name="target">Индекс связи, которая является концом обновляемой связи.</param>
+        /// <param name="newSource">Индекс связи, которая является началом связи, на которую выполняется обновление.</param>
+        /// <param name="newTarget">Индекс связи, которая является концом связи, на которую выполняется обновление.</param>
+        /// <returns>Индекс обновлённой связи.</returns>
+        TLink Update(TLink source, TLink target, TLink newSource, TLink newTarget);
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>

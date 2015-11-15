@@ -3,7 +3,7 @@
     /// <remarks>
     /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.
     /// </remarks>
-    unsafe partial class Links
+    partial class Links
     {
         /// <summary>
         /// Возвращает значение, определяющее является ли связь с указанным индексом точкой (связью замкнутой на себе).
@@ -15,9 +15,16 @@
             return _sync.ExecuteReadOperation(() => IsPointCore(link));
         }
 
+        /// <remarks>
+        /// Вероятно следует изменить логику проверки, так чтобы достаточно было одной любой ссылки на себя.
+        /// Также в будущем можно будет проверять и всех родителей, чтобы проверить есть ли ссылки на себя (на эту связь).
+        /// </remarks>
         private bool IsPointCore(ulong link)
         {
-            return Exists(link) && _links[link].Source == link && _links[link].Target == link;
+            if (!_memoryManager.Exists(link)) return false;
+
+            var values = _memoryManager.GetLinkValue(link);
+            return values[LinksConstants.SourcePart] == link && values[LinksConstants.TargetPart] == link;
         }
     }
 }

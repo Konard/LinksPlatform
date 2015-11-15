@@ -13,21 +13,22 @@ namespace Platform.Tests.Data.Core
     [TestClass]
     public class SequencesTests
     {
-        public const long LinksSizeStep = 4 * 1024 * 1024;
+        public static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
 
         [TestMethod]
         public void CreateAllVariantsTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 8;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -41,7 +42,7 @@ namespace Platform.Tests.Data.Core
                 Assert.IsTrue(results1.Count > results2.Length);
                 Assert.IsTrue(sw1.Elapsed > sw2.Elapsed);
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -51,16 +52,17 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void AllVariantsSearchTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 8;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -90,7 +92,7 @@ namespace Platform.Tests.Data.Core
 
                 //Assert.IsTrue(sw1.Elapsed < sw2.Elapsed);
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -100,16 +102,17 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void BalancedVariantSearchTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 200;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -133,7 +136,7 @@ namespace Platform.Tests.Data.Core
 
                 //Assert.IsTrue(sw1.Elapsed < sw2.Elapsed);
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -143,16 +146,17 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void AllPartialVariantsSearchTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 8;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -186,7 +190,7 @@ namespace Platform.Tests.Data.Core
                 var intersection2 = createResults.Intersect(searchResults2).ToList();
                 Assert.IsTrue(intersection2.Count == createResults.Length);
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -196,16 +200,17 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void BalancedPartialVariantsSearchTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 200;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -226,7 +231,7 @@ namespace Platform.Tests.Data.Core
 
                 Assert.IsTrue(searchResults2.Count == 1 && balancedVariant == searchResults2.First());
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -236,13 +241,14 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void PatternMatchTest()
         {
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
-            const ulong itself = Links.Itself;
-            const ulong one = Sequences.Any;
+            const ulong itself = LinksConstants.Itself;
+            const ulong one = LinksConstants.Any;
             const ulong zeroOrMany = Sequences.ZeroOrMany;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var e1 = links.Create(itself, itself);
                 var e2 = links.Create(itself, itself);
@@ -280,7 +286,7 @@ namespace Platform.Tests.Data.Core
                 Assert.IsTrue(matchedSequences4.Contains(pair));
                 Assert.IsTrue(matchedSequences4.Contains(balancedVariant));
 
-                for (int i = 0; i < sequence.Length; i++)
+                for (var i = 0; i < sequence.Length; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -297,16 +303,17 @@ namespace Platform.Tests.Data.Core
         {
             InitBitString();
 
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 5;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -348,7 +355,7 @@ namespace Platform.Tests.Data.Core
                     Assert.IsTrue(intersection4.Count == searchResults4.Count);
                 }
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 
@@ -360,16 +367,17 @@ namespace Platform.Tests.Data.Core
         {
             InitBitString();
 
-            string tempFilename = Path.GetTempFileName();
+            var tempFilename = Path.GetTempFileName();
 
             const long sequenceLength = 3;
 
-            const ulong itself = Links.Itself;
+            const ulong itself = LinksConstants.Itself;
 
-            using (var links = new Links(tempFilename, LinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
             {
                 var sequence = new ulong[sequenceLength];
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
 
                 var sequences = new Sequences(links);
@@ -392,7 +400,7 @@ namespace Platform.Tests.Data.Core
                     Assert.IsTrue(intersection1.Count == linksTotalUsages2.Length);
                 }
 
-                for (int i = 0; i < sequenceLength; i++)
+                for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
 

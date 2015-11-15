@@ -7,15 +7,15 @@ namespace Platform.Data.Core.Pairs
     /// <remarks>
     /// Устранить дублирование логики.
     /// </remarks>
-    unsafe partial class Links
+    unsafe partial class LinksMemoryManager
     {
         private class LinksSourcesTreeMethods : SizeBalancedTreeMethods2
         {
-            private readonly Links _db;
+            private readonly LinksMemoryManager _db;
             private readonly Link* _links;
             private readonly LinksHeader* _header;
 
-            public LinksSourcesTreeMethods(Links links, LinksHeader* header)
+            public LinksSourcesTreeMethods(LinksMemoryManager links, LinksHeader* header)
             {
                 _db = links;
                 _links = links._links;
@@ -141,26 +141,26 @@ namespace Platform.Data.Core.Pairs
                 if (link == 0)
                     return true;
 
-                var linkSource = _db.GetSourceCore(link);
+                var linkSource = _db.GetLinkValue(link)[LinksConstants.SourcePart];  //_db.GetSourceCore(link);
 
                 if (linkSource > source)
                 {
-                    if (EachReferenceCore(source, *GetLeft(link), handler) == Break)
+                    if (EachReferenceCore(source, *GetLeft(link), handler) == LinksConstants.Break)
                         return false;
                 }
                 else if (linkSource < source)
                 {
-                    if (EachReferenceCore(source, *GetRight(link), handler) == Break)
+                    if (EachReferenceCore(source, *GetRight(link), handler) == LinksConstants.Break)
                         return false;
                 }
                 else //if (linkSource == source)
                 {
-                    if (handler(link) == Break)
+                    if (handler(link) == LinksConstants.Break)
                         return false;
 
-                    if (EachReferenceCore(source, *GetLeft(link), handler) == Break)
+                    if (EachReferenceCore(source, *GetLeft(link), handler) == LinksConstants.Break)
                         return false;
-                    if (EachReferenceCore(source, *GetRight(link), handler) == Break)
+                    if (EachReferenceCore(source, *GetRight(link), handler) == LinksConstants.Break)
                         return false;
                 }
 
@@ -170,11 +170,11 @@ namespace Platform.Data.Core.Pairs
 
         private class LinksTargetsTreeMethods : SizeBalancedTreeMethods2
         {
-            private readonly Links _db;
+            private readonly LinksMemoryManager _db;
             private readonly Link* _links;
             private readonly LinksHeader* _header;
 
-            public LinksTargetsTreeMethods(Links links, LinksHeader* header)
+            public LinksTargetsTreeMethods(LinksMemoryManager links, LinksHeader* header)
             {
                 _db = links;
                 _links = links._links;
@@ -261,26 +261,26 @@ namespace Platform.Data.Core.Pairs
                 if (link == 0)
                     return true;
 
-                var linkTarget = _db.GetTargetCore(link);
+                var linkTarget = _db.GetLinkValue(link)[LinksConstants.TargetPart]; //_db.GetTargetCore(link);
 
                 if (linkTarget > target)
                 {
-                    if (EachReferenceCore(target, *GetLeft(link), handler) == Break)
+                    if (EachReferenceCore(target, *GetLeft(link), handler) == LinksConstants.Break)
                         return false;
                 }
                 else if (linkTarget < target)
                 {
-                    if (EachReferenceCore(target, *GetRight(link), handler) == Break)
+                    if (EachReferenceCore(target, *GetRight(link), handler) == LinksConstants.Break)
                         return false;
                 }
                 else //if (linkTarget == target)
                 {
-                    if (handler(link) == Break)
+                    if (handler(link) == LinksConstants.Break)
                         return false;
 
-                    if (EachReferenceCore(target, *GetLeft(link), handler) == Break)
+                    if (EachReferenceCore(target, *GetLeft(link), handler) == LinksConstants.Break)
                         return false;
-                    if (EachReferenceCore(target, *GetRight(link), handler) == Break)
+                    if (EachReferenceCore(target, *GetRight(link), handler) == LinksConstants.Break)
                         return false;
                 }
 

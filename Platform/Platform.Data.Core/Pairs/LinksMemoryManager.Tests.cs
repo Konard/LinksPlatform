@@ -4,21 +4,10 @@ using System.Xml;
 
 namespace Platform.Data.Core.Pairs
 {
-    unsafe partial class Links
+    unsafe partial class LinksMemoryManager
     {
-        public void TestBasicMemoryManagement()
-        {
-            _sync.ExecuteWriteOperation(() =>
-            {
-                var link = AllocateLink();
-                FreeLink(link);
-            });
-        }
-
         public void ExportSourcesTree(string outputFilename)
         {
-            _sync.ExecuteReadOperation(() =>
-            {
                 using (var writer = XmlWriter.Create(outputFilename))
                 {
                     // <?xml version="1.0" encoding="UTF-8"?>
@@ -99,7 +88,6 @@ namespace Platform.Data.Core.Pairs
 
                     Console.WriteLine("Head of Sources: {0}", _header->FirstAsSource);
                 }
-            });
         }
 
         public void ExportTargetsTree()
@@ -109,8 +97,6 @@ namespace Platform.Data.Core.Pairs
 
         public void Export(string outputFilename)
         {
-            _sync.ExecuteReadOperation(() =>
-            {
                 using (var writer = XmlWriter.Create(outputFilename))
                 {
                     // <?xml version="1.0" encoding="UTF-8"?>
@@ -174,14 +160,11 @@ namespace Platform.Data.Core.Pairs
 
                     Console.WriteLine("Head of Sources: {0}", _header->FirstAsSource);
                 }
-            });
         }
 
         public string FormatLink(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
-            {
-                if (!ExistsCore(link))
+            if (!Exists(link))
                     throw new Exception(string.Format("Source link {0} is not exists.", link));
 
                 //return string.Format("{0}: {1} -> {2}", link, this.links[link].Source, this.links[link].Target);
@@ -191,7 +174,6 @@ namespace Platform.Data.Core.Pairs
                 //else
 
                 return string.Format("{1} {0} {2}", link, _links[link].Source, _links[link].Target);
-            });
         }
     }
 }

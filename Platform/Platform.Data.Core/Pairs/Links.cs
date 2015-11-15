@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
 using Platform.Helpers.Disposal;
 using Platform.Helpers.Synchronization;
-using Platform.Memory;
 
 #pragma warning disable 0649
 #pragma warning disable 169
@@ -14,10 +13,7 @@ namespace Platform.Data.Core.Pairs
     /// <summary>
     /// Представляет объект для работы с базой данных (файлом) в формате Links (массива взаимосвязей).
     /// </summary>
-    /// <remarks>
-    /// 
-    /// Заменить везде 0 на Null.
-    /// 
+    /// <remarks> 
     /// Возможные оптимизации:
     /// Объединение в одном поле Source и Target с уменьшением до 32 бит. 
     ///     + меньше объём БД
@@ -32,76 +28,15 @@ namespace Platform.Data.Core.Pairs
     /// 
     /// Текущее теоретическое ограничение на размер связей - long.MaxValue
     /// Желательно реализовать поддержку переключения между деревьями и битовыми индексами (битовыми строками) - вариант матрицы (выстраеваемой лениво).
+    /// 
+    /// Решить отключать ли проверки при компиляции под Release. Т.е. исключения будут выбрасываться только при #if DEBUG
     /// </remarks>
-    public sealed unsafe partial class Links : DisposalBase, ILinks<ulong>
+    public sealed partial class Links : DisposalBase, ILinks<ulong>
     {
-        #region Constants
-
-        /// <summary>Возвращает булевское значение, обозначающее продолжение прохода по связям.</summary>
-        /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
-        public const bool Continue = true;
-
-        /// <summary>Возвращает булевское значение, обозначающее остановку прохода по связям.</summary>
-        /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
-        public const bool Break = false;
-
-        /// <summary>Возвращает значение ulong, обозначающее отсутствие связи.</summary>
-        public const ulong Null = 0;
-
-        /// <summary>Возвращает значение ulong, обозначающее любую связь.</summary>
-        /// <remarks>Возможно нужно зарезервировать отдельное значение, тогда можно будет создавать все варианты последовательностей в функции Create.</remarks>
-        public const ulong Any = 0;
-
-        /// <summary>Возвращает значение ulong, обозначающее связь-ссылку на саму связь.</summary>
-        public const ulong Itself = 0;
-
-        /// <summary>Возвращает размер одной связи в байтах.</summary>
-        /// <remarks>
-        /// Используется только во вне класса, не рекомедуется использовать внутри.
-        /// Так как во вне не обязательно будет доступен unsafe С#.
-        /// </remarks>
-        public static readonly int LinkSizeInBytes = sizeof(Link);
-
-        #endregion
-
-        #region Low level structures
-
-        private struct Link
-        {
-            public ulong Source;
-            public ulong Target;
-            public ulong LeftAsSource;
-            public ulong RightAsSource;
-            public ulong SizeAsSource;
-            public ulong LeftAsTarget;
-            public ulong RightAsTarget;
-            public ulong SizeAsTarget;
-        }
-
-        private struct LinksHeader
-        {
-            public ulong AllocatedLinks;
-            public ulong ReservedLinks;
-            public ulong FreeLinks;
-            public ulong FirstFreeLink;
-            public ulong FirstAsSource;
-            public ulong FirstAsTarget;
-            public ulong Reserved7;
-            public ulong Reserved8;
-        }
-
-        #endregion
-
         #region Structure
 
         private readonly ISyncronization _sync = new UnsafeSynchronization();
-        private readonly long _memoryReservationStep;
-
-        private readonly IMemory _memory;
-        private LinksHeader* _header;
-        private Link* _links;
-        private LinksTargetsTreeMethods _targetsTreeMethods;
-        private LinksSourcesTreeMethods _sourcesTreeMethods;
+        private readonly ILinksMemoryManager<ulong> _memoryManager;
 
         #endregion
 
@@ -112,30 +47,16 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         public ulong Total
         {
-            get { return _sync.ExecuteReadOperation(() => _header->AllocatedLinks - _header->FreeLinks); }
+            get { return _sync.ExecuteReadOperation(() => _memoryManager.Total); }
         }
 
         #endregion
 
         #region Links Logic
 
-        /// <summary>
-        /// Создаёт экземпляр базы данных Links в файле по указанному адресу, с указанным минимальным шагом расширения базы данных.
-        /// </summary>
-        /// <param name="address">Полный пусть к файлу базы данных.</param>
-        /// <param name="size">Минимальный шаг расширения базы данных в байтах.</param>
-        public Links(string address, long size)
+        public Links(ILinksMemoryManager<ulong> memoryManager)
         {
-            _memoryReservationStep = size;
-            _memory = new FileMappedMemory(address, _memoryReservationStep);
-
-            UpdatePointers(_memory);
-
-            // Гарантия корректности _memory.UsedCapacity относительно _header->AllocatedLinks
-            _memory.UsedCapacity = (long)_header->AllocatedLinks * sizeof(Link) + sizeof(LinksHeader);
-
-            // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
-            _header->ReservedLinks = (ulong)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
+            _memoryManager = memoryManager;
         }
 
         /// <summary>
@@ -147,7 +68,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!ExistsCore(link))
+                if (!_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link);
 
                 return GetSourceCore(link);
@@ -164,7 +85,7 @@ namespace Platform.Data.Core.Pairs
             //if (_links[link].Target == Null)
             //    return 0;
 
-            return _links[link].Source;
+            return _memoryManager.GetLinkValue(link)[LinksConstants.SourcePart];
         }
 
         /// <summary>
@@ -176,7 +97,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!ExistsCore(link))
+                if (!_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link);
 
                 return GetTargetCore(link);
@@ -189,7 +110,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetTargetCore(ulong link)
         {
-            return _links[link].Target;
+            return _memoryManager.GetLinkValue(link)[LinksConstants.TargetPart];
         }
 
         /// <summary>
@@ -201,7 +122,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!ExistsCore(link))
+                if (!_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link);
 
                 return GetLinkCore(link);
@@ -210,7 +131,8 @@ namespace Platform.Data.Core.Pairs
 
         public Structures.Link GetLinkCore(ulong link)
         {
-            return new Structures.Link(GetSourceCore(link), GetTargetCore(link));
+            var values = _memoryManager.GetLinkValue(link);
+            return new Structures.Link(values[LinksConstants.SourcePart], values[LinksConstants.TargetPart]);
         }
 
         /// <summary>
@@ -220,13 +142,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Значение, определяющее существует ли связь.</returns>
         public bool Exists(ulong link)
         {
-            return _sync.ExecuteReadOperation(() => ExistsCore(link));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool ExistsCore(ulong link)
-        {
-            return link != Null && !IsUnusedLink(link) && link <= _header->AllocatedLinks;
+            return _sync.ExecuteReadOperation(() => _memoryManager.Exists(link));
         }
 
         /// <summary>
@@ -239,34 +155,37 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (source == Null || !ExistsCore(source))
+                if (source == LinksConstants.Null || !_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target == Null || !ExistsCore(target))
+                if (target == LinksConstants.Null || !_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
-                return _sourcesTreeMethods.Search(source, target);
+                return SearchCore(source, target);
             });
         }
 
         private ulong SearchCore(ulong source, ulong target)
         {
-            return _sourcesTreeMethods.Search(source, target);
+            var searchResult = LinksConstants.Null;
+
+            _memoryManager.Each(link =>
+            {
+                searchResult = link;
+                return LinksConstants.Continue;
+            }, source, target);
+
+            return searchResult;
         }
 
         public ulong CalculateReferences(ulong link)
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (link == Null || !ExistsCore(link))
+                if (link == LinksConstants.Null || !_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link, "link");
 
-                return CalculateReferencesCore(link);
+                return _memoryManager.CalculateLinkTotalReferences(link);
             });
-        }
-
-        private ulong CalculateReferencesCore(ulong link)
-        {
-            return _sourcesTreeMethods.CalculateReferences(link) + _targetsTreeMethods.CalculateReferences(link);
         }
 
         /// <summary>
@@ -280,44 +199,18 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (source != Null && !ExistsCore(source))
+                if (source != LinksConstants.Null && !_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != Null && !ExistsCore(target))
+                if (target != LinksConstants.Null && !_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
-                return EachCore(source, target, handler);
+                return _memoryManager.Each(handler, source, target);
             });
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool EachCore(ulong source, ulong target, Func<ulong, bool> handler)
         {
-            if (source == Null && target == Null)
-            {
-                // Этот блок используется в GetEnumerator, CopyTo, Clear
-                for (ulong link = 1; link <= _header->AllocatedLinks; link++)
-                    if (ExistsCore(link))
-                        if (handler(link) == Break)
-                            return false;
-            }
-            else if (source == Null)
-            {
-                return _targetsTreeMethods.EachReference(target, handler);
-            }
-            else if (target == Null)
-            {
-                return _sourcesTreeMethods.EachReference(source, handler);
-            }
-            else //if(source != Null && target != Null)
-            {
-                var link = _sourcesTreeMethods.Search(source, target);
-
-                if (link != Null)
-                    if (handler(link) == Break)
-                        return false;
-            }
-
-            return true;
+            return _memoryManager.Each(handler, source, target);
         }
 
         /// <summary>
@@ -330,39 +223,28 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (source != Null && !ExistsCore(source))
+                if (source != LinksConstants.Null && !_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != Null && !ExistsCore(target))
+                if (target != LinksConstants.Null && !_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
                 ulong linkIndex;
 
-                if (source != Null && target != Null)
+                if (source != LinksConstants.Null && target != LinksConstants.Null)
                 {
-                    linkIndex = _sourcesTreeMethods.Search(source, target);
+                    linkIndex = SearchCore(source, target);
 
-                    if (linkIndex == Null)
+                    if (linkIndex == LinksConstants.Null)
                     {
-                        linkIndex = AllocateLink();
-                        var link = &_links[linkIndex];
-
-                        link->Source = source;
-                        link->Target = target;
-
-                        _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
-                        _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
+                        linkIndex = _memoryManager.AllocateLink();
+                        _memoryManager.SetLinkValue(linkIndex, source, target);
                     }
                 }
                 else
                 {
-                    linkIndex = AllocateLink();
-                    var link = &_links[linkIndex];
-
-                    link->Source = source == Null ? linkIndex : source;
-                    link->Target = target == Null ? linkIndex : target;
-
-                    _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
-                    _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
+                    linkIndex = _memoryManager.AllocateLink();
+                    _memoryManager.SetLinkValue(linkIndex, source == LinksConstants.Null ? linkIndex : source,
+                                                           target == LinksConstants.Null ? linkIndex : target);
                 }
 
                 CommitCreation(GetLinkCore(linkIndex));
@@ -393,17 +275,17 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (!ExistsCore(source))
+                if (!_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (!ExistsCore(target))
+                if (!_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-                if (source != Null && !ExistsCore(newSource))
+                if (source != LinksConstants.Null && !_memoryManager.Exists(newSource))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(newSource, "newSource");
-                if (source != Null && !ExistsCore(newTarget))
+                if (source != LinksConstants.Null && !_memoryManager.Exists(newTarget))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(newTarget, "newTarget");
 
                 var linkIndex = SearchCore(source, target);
-                if (linkIndex == Null)
+                if (linkIndex == LinksConstants.Null)
                     return Create(newSource, newTarget);
                 if (newSource == source && newTarget == target)
                     return linkIndex;
@@ -415,20 +297,12 @@ namespace Platform.Data.Core.Pairs
         private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
         {
             var newLink = SearchCore(newSource, newTarget);
-            if (newLink == Null) // Actual update
+            if (newLink == LinksConstants.Null) // Actual update
             {
                 var before = GetLinkCore(linkIndex);
 
-                _sourcesTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsSource);
-                _targetsTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsTarget);
-
-                var link = &_links[linkIndex];
-
-                link->Source = newSource == Null ? linkIndex : newSource;
-                link->Target = newTarget == Null ? linkIndex : newTarget;
-
-                _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
-                _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
+                _memoryManager.SetLinkValue(linkIndex, newSource == LinksConstants.Null ? linkIndex : newSource,
+                                                       newTarget == LinksConstants.Null ? linkIndex : newTarget);
 
                 CommitUpdate(before, GetLinkCore(linkIndex));
 
@@ -439,16 +313,16 @@ namespace Platform.Data.Core.Pairs
                 var referencesAsSource = new List<ulong>();
                 var referencesAsTarget = new List<ulong>();
 
-                _sourcesTreeMethods.EachReference(linkIndex, x =>
+                _memoryManager.Each(x =>
                 {
                     referencesAsSource.Add(x);
-                    return true;
-                });
-                _targetsTreeMethods.EachReference(linkIndex, x =>
+                    return LinksConstants.Continue;
+                }, LinksConstants.Null, linkIndex);
+                _memoryManager.Each(x =>
                 {
                     referencesAsTarget.Add(x);
-                    return true;
-                });
+                    return LinksConstants.Continue;
+                }, linkIndex, LinksConstants.Null);
 
                 for (var i = 0; i < referencesAsSource.Count; i++)
                 {
@@ -459,12 +333,12 @@ namespace Platform.Data.Core.Pairs
                 for (var i = 0; i < referencesAsTarget.Count; i++)
                 {
                     var reference = referencesAsTarget[i];
-                    if(reference == linkIndex) continue;
+                    if (reference == linkIndex) continue;
                     UpdateCore(reference, GetSourceCore(reference), newLink);
                 }
 
                 DeleteCore(linkIndex);
-                
+
                 return newLink;
             }
         }
@@ -478,7 +352,7 @@ namespace Platform.Data.Core.Pairs
             {
                 var link = SearchCore(source, target);
 
-                if (link != Null)
+                if (link != LinksConstants.Null)
                     DeleteCore(link);
             });
         }
@@ -489,7 +363,7 @@ namespace Platform.Data.Core.Pairs
         {
             _sync.ExecuteWriteOperation(() =>
             {
-                if (link != Null && Exists(link))
+                if (link != LinksConstants.Null && Exists(link))
                     DeleteCore(link);
             });
         }
@@ -505,172 +379,30 @@ namespace Platform.Data.Core.Pairs
         /// <remarks>Версия функции без дополнительных проверок для ускорения работы рекурсии.</remarks>
         private void DeleteCore(ulong link)
         {
-            if (ExistsCore(link))
+            if (_memoryManager.Exists(link))
             {
                 var before = GetLinkCore(link);
 
-                _sourcesTreeMethods.RemoveUnsafe(link, &_header->FirstAsSource);
-                _targetsTreeMethods.RemoveUnsafe(link, &_header->FirstAsTarget);
-
-                _links[link].Source = 0;
-                _links[link].Target = 0;
+                _memoryManager.SetLinkValue(link, LinksConstants.Null, LinksConstants.Null);
 
                 var references = new List<ulong>();
 
-                _sourcesTreeMethods.EachReference(link, x =>
+                _memoryManager.Each(x =>
                 {
                     references.Add(x);
-                    return true;
-                });
-                _targetsTreeMethods.EachReference(link, x =>
+                    return LinksConstants.Continue;
+                }, LinksConstants.Null, link);
+                _memoryManager.Each(x =>
                 {
                     references.Add(x);
-                    return true;
-                });
+                    return LinksConstants.Continue;
+                }, link, LinksConstants.Null);
 
                 references.ForEach(DeleteCore);
 
-                FreeLink(link);
+                _memoryManager.FreeLink(link);
 
                 CommitDeletion(before);
-            }
-        }
-
-        #endregion
-
-        #region Low Level FileMappedMemory Management
-
-        /// <summary>
-        /// Выполняет обновление указателей на массив связей и заголовок базы данных.
-        /// </summary>
-        /// <param name="memory">Объект для работы с файлом как виртуальным блоком памяти.</param>
-        private void UpdatePointers(IMemory memory)
-        {
-            _header = (LinksHeader*)memory.Pointer;
-
-            // Указатель this.links может быть в том же месте, 
-            // так как 0-я связь не используется и имеет такой же размер как Header,
-            // поэтому header размещается в том же месте, что и 0-я связь
-            _links = (Link*)memory.Pointer;
-
-            _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
-            _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
-        }
-
-        // 3<1>2 1<2>3 2<3>1 V
-        private void AttachToFreeLinkList(ulong link)
-        {
-            if (_header->FirstFreeLink == Null)
-            {
-                _links[link].Source = link;
-                _links[link].Target = link;
-
-                _header->FirstFreeLink = link;
-            }
-            else
-            {
-                _links[link].Source = _links[_header->FirstFreeLink].Target;
-                _links[link].Target = _header->FirstFreeLink;
-
-                _links[_links[_header->FirstFreeLink].Target].Target = link;
-                _links[_header->FirstFreeLink].Source = link;
-            }
-
-            _header->FreeLinks++;
-        }
-
-        private void DetachFromFreeLinkList(ulong freeLink)
-        {
-            if (_header->FirstFreeLink == freeLink)
-            {
-                if (_links[freeLink].Source == freeLink)
-                {
-                    _header->FirstFreeLink = 0;
-                }
-                else
-                {
-                    _links[_links[freeLink].Source].Target = _links[freeLink].Target;
-                    _links[_links[freeLink].Target].Source = _links[freeLink].Source;
-
-                    _header->FirstFreeLink = 0;
-                }
-            }
-            else
-            {
-                _links[_links[freeLink].Source].Target = _links[freeLink].Target;
-                _links[_links[freeLink].Target].Source = _links[freeLink].Source;
-            }
-
-            _header->FreeLinks--;
-        }
-
-        /// <summary>
-        /// Выделяет следующую свободную связь и возвращает её индекс.
-        /// </summary>
-        /// <returns>Индекс свободной связи.</returns>
-        private ulong AllocateLink()
-        {
-            var freeLink = _header->FirstFreeLink;
-
-            if (freeLink != Null)
-                DetachFromFreeLinkList(freeLink);
-            else
-            {
-                if (_header->AllocatedLinks == long.MaxValue)
-                    throw new Exception(string.Format("Количество связей в базе данных не может превышать {0}.",
-                        long.MaxValue));
-
-                if (_header->AllocatedLinks >= (_header->ReservedLinks - 1))
-                {
-                    _memory.ReservedCapacity += _memoryReservationStep;
-                    UpdatePointers(_memory);
-                    _header->ReservedLinks = (ulong)(_memory.ReservedCapacity / sizeof(Link));
-                }
-
-                _header->AllocatedLinks++;
-                _memory.UsedCapacity += sizeof(Link);
-                freeLink = _header->AllocatedLinks;
-            }
-
-            return freeLink;
-        }
-
-        /// <summary>
-        /// Проверяет находится ли связь в списке свободных связей.
-        /// </summary>
-        /// <param name="link">Индекс проверяемой связи.</param>
-        /// <returns>Значение, определяющие включена ли связь в список свободных связей.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsUnusedLink(ulong link)
-        {
-            return _header->FirstFreeLink == link
-                   || (_links[link].SizeAsSource == Null && _links[link].Source != Null);
-        }
-
-        /// <summary>
-        /// Высвобождает используемое связью пространство.
-        /// </summary>
-        /// <param name="link">Индекс высвобождаемой связи.</param>
-        private void FreeLink(ulong link)
-        {
-            if (link < _header->AllocatedLinks)
-            {
-                AttachToFreeLinkList(link);
-            }
-            else if (link == _header->AllocatedLinks)
-            {
-                _header->AllocatedLinks--;
-                _memory.UsedCapacity -= sizeof(Link);
-
-                // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
-                // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
-                while (_header->AllocatedLinks > 0 && IsUnusedLink(_header->AllocatedLinks))
-                {
-                    DetachFromFreeLinkList(_header->AllocatedLinks);
-
-                    _header->AllocatedLinks--;
-                    _memory.UsedCapacity -= sizeof(Link);
-                }
             }
         }
 
@@ -681,9 +413,8 @@ namespace Platform.Data.Core.Pairs
         protected override void DisposeCore(bool manual)
         {
             DisposeTransitions();
-            _links = null;
-            if (_memory != null)
-                _memory.Dispose();
+            var memoryManager = _memoryManager as IDisposable;
+            if (memoryManager != null) memoryManager.Dispose();
         }
 
         #endregion
