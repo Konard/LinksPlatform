@@ -204,8 +204,10 @@ Thumbs.db
 # Linux files
 *.o
 
-# Platform.Data.Kernel Test
+# Platform.Data.Kernel
 Platform/Platform.Data.Kernel/test
+Platform/Platform.Data.Kernel/*.exe
+Platform/Platform.Data.Kernel/*.dll
 
 # Platform.Data ~ Links Database files
 *.links
