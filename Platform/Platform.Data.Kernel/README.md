@@ -1,6 +1,7 @@
 # Useful links to understand code
 
 GNU C predefined macros, http://gcc.gnu.org/onlinedocs/cpp/Common-Predefined-Macros.html#Common-Predefined-Macros
+
 Microsoft Visual C++ predefined macros, http://msdn.microsoft.com/en-us/library/b0084kay%28VS.80%29.aspx
 
 # Compile and Run
@@ -25,6 +26,7 @@ $ od -tx2 -w128 db.links | less -S
 ## On Windows
 
 To build the code on Windows the compiler is required:
+
 1. Visual Studio (Can be installed from https://www.visualstudio.com/ru-ru/products/vs-2015-product-editions.aspx)
 2. MinGW (Can be installed from http://www.mingw.org/)
 
