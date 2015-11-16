@@ -31,8 +31,8 @@ extern "C" {
     PREFIX_DLL link_index AllocateLink();
     PREFIX_DLL void FreeLink(link_index link);
 
-    __forceinline Link* GetLink(link_index linkIndex);
-    __forceinline link_index GetLinkIndex(Link* link);
+    Link* GetLink(link_index linkIndex);
+    link_index GetLinkIndex(Link* link);
 
 #if defined(__cplusplus)
 }

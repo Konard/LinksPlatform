@@ -40,10 +40,6 @@ typedef unsigned_integer link_index; // Short for links' array index, unsigned i
 #define public_calling_convention
 #endif
 
-#ifndef _MSC_VER
-#define __forceinline /* no value */
-#endif
-
 #ifdef _DEBUG
 #define DEBUG
 #endif

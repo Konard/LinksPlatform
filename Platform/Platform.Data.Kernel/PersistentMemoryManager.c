@@ -53,7 +53,7 @@ Link*               pointerToLinks;                     // Указатель н
 
 Link*               pointerToUnusedMarker;              // Инициализируется в SetStorageFileMemoryMapping()
 
-__forceinline void PrintLinksDatabaseSize()
+void PrintLinksDatabaseSize()
 {
 #ifdef DEBUG
     printf("Links database size: %" PRIu64 " links, %" PRIu64 " bytes for links. Service block size (bytes): %" PRIu64 ".\n",
@@ -63,27 +63,27 @@ __forceinline void PrintLinksDatabaseSize()
 #endif
 }
 
-__forceinline bool ExistsLink(Link* link)
+bool ExistsLink(Link* link)
 {
     return link && pointerToLinks != link && link->LinkerIndex; //link->SourceIndex && link->LinkerIndex && link->TargetIndex;
 }
 
-__forceinline bool ExistsLinkIndex(link_index linkIndex)
+bool ExistsLinkIndex(link_index linkIndex)
 {
     return ExistsLink(GetLink(linkIndex));
 }
 
-__forceinline bool IsNullLinkEmpty()
+bool IsNullLinkEmpty()
 {
     return !pointerToLinks->SourceIndex && !pointerToLinks->LinkerIndex && !pointerToLinks->TargetIndex;
 }
 
-__forceinline Link* GetLink(link_index linkIndex)
+Link* GetLink(link_index linkIndex)
 {
     return pointerToLinks + linkIndex;
 }
 
-__forceinline link_index GetLinkIndex(Link* link)
+link_index GetLinkIndex(Link* link)
 {
     return link - pointerToLinks;
 }
