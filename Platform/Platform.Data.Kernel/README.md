@@ -9,19 +9,25 @@ Microsoft Visual C++ predefined macros, http://msdn.microsoft.com/en-us/library/
 ## On Linux
 
 Build library and test for it:
+```
 $ make
+```
 
-It is actually builds into Platform.Data.Kernel.dll on Linux too, because it is referenced .NET Library like Platform.Data.Core.dll (exactly as "Platform.Data.Kernel.dll").
+It is actually builds into Platform.Data.Kernel.dll on Linux too, because it is referenced .NET Library like `Platform.Data.Core.dll` (exactly as `Platform.Data.Kernel.dll`).
 
 Run test:
+```
 $ ./run.sh
+```
 
 To enable debug output put -DDEBUG option into makefile.
 
 Compiled library will be available at `Platform\Platform.Data.Kernel` folder as `Platform.Data.Kernel.dll` file.
 
 To view resulting database file in binary:
+```
 $ od -tx2 -w128 db.links | less -S
+```
 
 ## On Windows
 
@@ -47,10 +53,14 @@ Run `cmd` with administrator rights.
 Change directory `cd` to `Platform\Platform.Data.Kernel` folder.
 
 Build library and test for it:
+```
 $ mingw32-make
+```
 
 Run test:
+```
 $ test
+```
 
 To enable debug output put -DDEBUG option into makefile.
 
