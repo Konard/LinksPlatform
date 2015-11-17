@@ -13,14 +13,14 @@ Build library and test for it:
 $ make
 ```
 
-It is actually builds into Platform.Data.Kernel.dll on Linux too, because it is referenced .NET Library like `Platform.Data.Core.dll` (exactly as `Platform.Data.Kernel.dll`).
+It is actually builds into `Platform.Data.Kernel.dll` on Linux too, because it is referenced .NET Library like `Platform.Data.Core.dll` (exactly as `Platform.Data.Kernel.dll`).
 
 Run test:
 ```
 $ ./run.sh
 ```
 
-To enable debug output put -DDEBUG option into makefile.
+To enable debug output put `-DDEBUG` option into makefile.
 
 Compiled library will be available at `Platform\Platform.Data.Kernel` folder as `Platform.Data.Kernel.dll` file.
 
@@ -44,7 +44,7 @@ Press `CTRL+SHIFT+B` or `F6` or use menu item (`Build Solution` or `Build Platfo
 
 Compiled library will be available at `Debug`/`Release` folder of in `Platform` folder as `Platform.Data.Kernel.dll` file.
 
-To Run tests in Visual Studio use Test Explorer. Actual test are located at `Platform.Data.Kernel.Tests` and `Platform.Tests` projects.
+To Run tests in Visual Studio use `Test Explorer`. Actual test are located at `Platform.Data.Kernel.Tests` and `Platform.Tests` projects.
 
 ### Using MinGW
 
@@ -62,7 +62,7 @@ Run test:
 $ test
 ```
 
-To enable debug output put -DDEBUG option into makefile.
+To enable debug output put `-DDEBUG` option into makefile.
 
 Compiled library will be available at `Platform\Platform.Data.Kernel` folder as `Platform.Data.Kernel.dll` file.
 
