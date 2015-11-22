@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 
-namespace Platform.Helpers.Synchronization
+namespace Platform.Helpers.Threading
 {
     public class SafeSynchronization : ISyncronization
     {

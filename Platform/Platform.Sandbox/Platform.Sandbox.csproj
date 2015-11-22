@@ -10,7 +10,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Platform.Sandbox</RootNamespace>
     <AssemblyName>Platform.Sandbox</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
@@ -64,6 +64,7 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net.Http" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compilier.cs" />
@@ -81,6 +82,7 @@
     <Compile Include="TextSearchTest.cs" />
     <Compile Include="Transactions.cs" />
     <Compile Include="TreeStructureExperiments.cs" />
+    <Compile Include="WebCrawler.cs" />
     <Compile Include="WebSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>

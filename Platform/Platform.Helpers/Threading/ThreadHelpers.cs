@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Threading;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Threading
 {
     public static class ThreadHelpers
     {
         public static void SyncInvokeWithExtendedStack<T>(T param, Action<object> action, int maxStackSize = 200 * 1024 * 1024)
         {
 #if DEBUG
-            var thread = new Thread((obj) =>
+            var thread = new Thread(obj =>
             {
                 try
                 {

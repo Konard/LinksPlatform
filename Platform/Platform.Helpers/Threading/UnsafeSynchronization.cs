@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers.Synchronization
+namespace Platform.Helpers.Threading
 {
     public class UnsafeSynchronization : ISyncronization
     {

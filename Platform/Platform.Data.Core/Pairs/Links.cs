@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
 using Platform.Helpers.Disposal;
-using Platform.Helpers.Synchronization;
+using Platform.Helpers.Threading;
 
 #pragma warning disable 0649
 #pragma warning disable 169

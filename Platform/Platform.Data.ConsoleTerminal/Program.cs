@@ -50,7 +50,7 @@ namespace Platform.Data.ConsoleTerminal
             }
             catch (Exception ex)
             {
-                ex.WriteToConsole();
+                Console.Write(ex.ToRecursiveString());
             }
 
             Console.CancelKeyPress -= OnCancelKeyPressed;

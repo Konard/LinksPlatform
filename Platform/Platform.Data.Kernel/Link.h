@@ -12,7 +12,7 @@ typedef struct Link
 {
     link_index          SourceIndex;            // Ссылка на начальную связь
     link_index          TargetIndex;            // Ссылка на конечную связь
-    link_index          LinkerIndex;            // Ссылка на связь-связку (если разместить это поле после Source и Target можно
+    link_index          LinkerIndex;            // Ссылка на связь-связку (если разместить это поле после Source и Target, то вероятно это поможет проще конвертировать тройки в пары)
     signed_integer      Timestamp;
     /* Referers (Index, Backlinks) */
     link_index          BySourceRootIndex;      // Ссылка на вершину дерева связей ссылающихся на эту связь в качестве начальной связи

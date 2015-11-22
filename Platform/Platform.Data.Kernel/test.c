@@ -1,8 +1,6 @@
 #include "Link.h"
 #include "PersistentMemoryManager.h"
 
-#include <stdio.h>
-
 int main() {
     InitPersistentMemoryManager();
 

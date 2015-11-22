@@ -1,6 +1,6 @@
 #LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
-![Intro animation](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif "Intro animation")
+[![introduction](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning)
 
 Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf).
 
@@ -21,7 +21,7 @@ There also at least two variants of Link structure:
 Links Platform is a system, that combine simple database (Links) and execution engine (Triggers). So it is provide ability to program that system in any way (also dynamically), due to fact that all algorithms are data inside this database. Idea behind Links Platform is a model of associative memory of human mind. So it is actually copy most of it advantages and disadvantages.
 
 ## Road map
-![Road Map, Status](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/RoadMap-status.png "Road Map, Status")
+[![Road Map, Status](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/RoadMap-status.png "Road Map, Status")](https://github.com/Konard/LinksPlatform/milestones)
 
 [Project status](https://github.com/Konard/LinksPlatform/milestones)
 

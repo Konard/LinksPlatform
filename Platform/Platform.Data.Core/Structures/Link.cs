@@ -10,6 +10,8 @@ namespace Platform.Data.Core.Structures
         public readonly ulong Source;
         public readonly ulong Target;
 
+        public static readonly Link Null = new Link();
+
         public Link(ulong source, ulong target)
         {
             Source = source;

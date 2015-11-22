@@ -5,8 +5,8 @@ using System.Text;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
-using Platform.Helpers.Synchronization;
-
+using Platform.Helpers.Collections;
+using Platform.Helpers.Threading;
 using LinkIndex = System.UInt64;
 
 namespace Platform.Data.Core.Sequences
@@ -74,7 +74,7 @@ namespace Platform.Data.Core.Sequences
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence == null || sequence.Length == 0)
+                if (sequence.IsNullOrEmpty())
                     return new ulong[0];
 
                 EnsureEachLinkExists(_links, sequence);
@@ -124,7 +124,7 @@ namespace Platform.Data.Core.Sequences
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence == null || sequence.Length == 0)
+                if (sequence.IsNullOrEmpty())
                     return new List<ulong>();
 
                 EnsureEachLinkExists(_links, sequence);
@@ -175,7 +175,7 @@ namespace Platform.Data.Core.Sequences
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence == null || sequence.Length == 0)
+                if (sequence.IsNullOrEmpty())
                     return LinksConstants.Null;
 
                 EnsureEachLinkExists(_links, sequence);
@@ -240,7 +240,7 @@ namespace Platform.Data.Core.Sequences
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence == null || sequence.Length == 0)
+                if (sequence.IsNullOrEmpty())
                     return LinksConstants.Null;
 
                 EnsureEachLinkIsAnyOrExists(_links, sequence);
@@ -264,7 +264,7 @@ namespace Platform.Data.Core.Sequences
 
         public void Each(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            if (sequence == null || sequence.Length == 0)
+            if (sequence.IsNullOrEmpty())
                 return;
 
             EnsureEachLinkIsAnyOrExists(_links, sequence);
@@ -367,7 +367,7 @@ namespace Platform.Data.Core.Sequences
 
         private void EachPartCore(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            if (sequence == null || sequence.Length == 0)
+            if (sequence.IsNullOrEmpty())
                 return;
 
             EnsureEachLinkIsAnyOrExists(_links, sequence);
@@ -520,12 +520,12 @@ namespace Platform.Data.Core.Sequences
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence == null || sequence.Length == 0)
+                if (sequence.IsNullOrEmpty())
                     ; // -> Create
                 else
                     EnsureEachLinkIsAnyOrExists(_links, sequence);
 
-                if (newSequence == null || newSequence.Length == 0)
+                if (newSequence.IsNullOrEmpty())
                     ; // -> Delete
                 else
                     EnsureEachLinkIsAnyOrExists(_links, newSequence);
@@ -1678,7 +1678,6 @@ namespace Platform.Data.Core.Sequences
         }
 
         #endregion
-
 
         #region Walkers
 

@@ -1,8 +1,5 @@
 ﻿namespace Platform.Helpers
 {
-    /// <summary>
-    /// 
-    /// </summary>
     /// <remarks>
     /// Resizable array (FileMappedMemory) for values cache may be used. or cached oeis.org
     /// </remarks>

@@ -18,7 +18,7 @@ namespace Platform.Helpers
         {
             if (minValue >= maxValue)
                 return minValue;
-            return (ulong) (rnd.NextDouble()*(maxValue - minValue)) + minValue;
+            return (ulong)(rnd.NextDouble() * (maxValue - minValue)) + minValue;
         }
     }
 }

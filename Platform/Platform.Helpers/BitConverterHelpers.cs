@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Platform.Helpers.Collections;
 
 namespace Platform.Helpers
 {
@@ -26,7 +27,7 @@ namespace Platform.Helpers
         public static T ToStructure<T>(byte[] bytes)
             where T : struct
         {
-            if (bytes == null || bytes.Length == 0)
+            if (bytes.IsNullOrEmpty())
                 throw new ArgumentNullException("bytes");
 
             var structureType = typeof (T);

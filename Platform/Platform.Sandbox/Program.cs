@@ -8,6 +8,10 @@ namespace Platform.Sandbox
     {
         private static void Main(string[] args)
         {
+            WebCrawler.Test();
+
+            return;
+            
             //Sequences.TestSimplify();
             //WrongPointerTest();
             //UDPTest();
