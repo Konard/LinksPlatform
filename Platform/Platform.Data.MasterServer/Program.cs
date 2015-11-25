@@ -16,7 +16,7 @@ namespace Platform.Data.MasterServer
         private const string DefaultDatabaseFilename = "db.links";
 
         private static bool LinksServerRunning = true;
-        private static UTF16Map UTF16Map;
+        private static UnicodeMap UnicodeMap;
 
         private static void Main()
         {
@@ -31,8 +31,8 @@ namespace Platform.Data.MasterServer
                 using (var memoryManager = new LinksMemoryManager(DefaultDatabaseFilename, 8 * 1024 * 1024))
                 using (var links = new Links(memoryManager))
                 {
-                    UTF16Map = new UTF16Map(links);
-                    UTF16Map.Init();
+                    UnicodeMap = new UnicodeMap(links);
+                    UnicodeMap.Init();
 
                     var sequences = new Sequences(links);
 
@@ -96,7 +96,7 @@ namespace Platform.Data.MasterServer
 
         private static void PrintContents(Links links, Sequences sequences)
         {
-            if (links.Total == UTF16Map.LastCharLink)
+            if (links.Total == UnicodeMap.LastCharLink)
                 Console.WriteLine("Database is empty.");
             else
             {
@@ -110,7 +110,7 @@ namespace Platform.Data.MasterServer
 
                 var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} → {{2:{0}}} {{3}}", printFormatBase);
 
-                for (var link = UTF16Map.LastCharLink + 1; link <= links.Total; link++)
+                for (var link = UnicodeMap.LastCharLink + 1; link <= links.Total; link++)
                 {
                     Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link),
                         sequences.FormatSequence(link, AppendLinkToString, true));
@@ -120,7 +120,7 @@ namespace Platform.Data.MasterServer
 
         private static void Create(this Sequences sequences, UdpSender sender, string sequence)
         {
-            var link = sequences.Create(UTF16Map.FromStringToLinkArray(sequence));
+            var link = sequences.Create(UnicodeMap.FromStringToLinkArray(sequence));
 
             sender.Send(string.Format("Sequence with balanced variant at {0} created.", link));
         }
@@ -128,7 +128,7 @@ namespace Platform.Data.MasterServer
         private static void AppendLinkToString(StringBuilder sb, ulong link)
         {
             if (link <= (char.MaxValue + 1))
-                sb.Append(UTF16Map.FromLinkToChar(link));
+                sb.Append(UnicodeMap.FromLinkToChar(link));
             else
                 sb.AppendFormat("({0})", link);
         }
@@ -143,7 +143,7 @@ namespace Platform.Data.MasterServer
                 else if (sequenceQuery[i] == '*')
                     linksSequenceQuery[i] = Sequences.ZeroOrMany;
                 else
-                    linksSequenceQuery[i] = UTF16Map.FromCharToLink(sequenceQuery[i]);
+                    linksSequenceQuery[i] = UnicodeMap.FromCharToLink(sequenceQuery[i]);
 
             if (linksSequenceQuery.Contains(LinksConstants.Any) || linksSequenceQuery.Contains(Sequences.ZeroOrMany))
             {

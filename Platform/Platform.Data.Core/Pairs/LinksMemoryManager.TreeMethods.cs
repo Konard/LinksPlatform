@@ -11,13 +11,11 @@ namespace Platform.Data.Core.Pairs
     {
         private class LinksSourcesTreeMethods : SizeBalancedTreeMethods2
         {
-            private readonly LinksMemoryManager _db;
             private readonly Link* _links;
             private readonly LinksHeader* _header;
 
             public LinksSourcesTreeMethods(LinksMemoryManager links, LinksHeader* header)
             {
-                _db = links;
                 _links = links._links;
                 _header = header;
             }
@@ -116,6 +114,7 @@ namespace Platform.Data.Core.Pairs
             /// <returns>Общее количество связей, "начинающихся" с указанной связи.</returns>
             public ulong CalculateReferences(ulong link)
             {
+                // TODO: Optimize Using node.Size
                 ulong references = 0;
                 EachReference(link, x =>
                 {
@@ -136,12 +135,14 @@ namespace Platform.Data.Core.Pairs
                 return EachReferenceCore(source, _header->FirstAsSource, handler);
             }
 
+            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker
             private bool EachReferenceCore(ulong source, ulong link, Func<ulong, bool> handler)
             {
                 if (link == 0)
                     return true;
 
-                var linkSource = _db.GetLinkValue(link)[LinksConstants.SourcePart];  //_db.GetSourceCore(link);
+                // TODO: Replace with GetFirstKeyValue (so the logic will be united for both sources and targets)
+                var linkSource = _links[link].Source;
 
                 if (linkSource > source)
                 {
@@ -170,13 +171,11 @@ namespace Platform.Data.Core.Pairs
 
         private class LinksTargetsTreeMethods : SizeBalancedTreeMethods2
         {
-            private readonly LinksMemoryManager _db;
             private readonly Link* _links;
             private readonly LinksHeader* _header;
 
             public LinksTargetsTreeMethods(LinksMemoryManager links, LinksHeader* header)
             {
-                _db = links;
                 _links = links._links;
                 _header = header;
             }
@@ -236,6 +235,7 @@ namespace Platform.Data.Core.Pairs
             /// <returns>Общее количество связей, "заканчивающихся" указанной связью.</returns>
             public ulong CalculateReferences(ulong link)
             {
+                // TODO: Optimize Using node.Size
                 ulong references = 0;
                 EachReference(link, x =>
                 {
@@ -256,12 +256,14 @@ namespace Platform.Data.Core.Pairs
                 return EachReferenceCore(target, _header->FirstAsTarget, handler);
             }
 
+            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker
             private bool EachReferenceCore(ulong target, ulong link, Func<ulong, bool> handler)
             {
                 if (link == 0)
                     return true;
 
-                var linkTarget = _db.GetLinkValue(link)[LinksConstants.TargetPart]; //_db.GetTargetCore(link);
+                // TODO: Replace with GetFirstKeyValue (so the logic will be united for both sources and targets)
+                var linkTarget = _links[link].Target;
 
                 if (linkTarget > target)
                 {

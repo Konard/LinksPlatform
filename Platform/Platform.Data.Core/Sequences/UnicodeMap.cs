@@ -1,11 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Platform.Data.Core.Pairs;
 
 namespace Platform.Data.Core.Sequences
 {
-    public class UTF16Map
+    public class UnicodeMap
     {
         public const long MapSize = 65536;
 
@@ -18,7 +19,7 @@ namespace Platform.Data.Core.Sequences
         public ulong FirstCharLink { get { return _firstCharLink; } }
         public ulong LastCharLink { get { return _lastCharLink; } }
 
-        public UTF16Map(ILinks<ulong> links)
+        public UnicodeMap(ILinks<ulong> links)
         {
             _links = links;
         }
@@ -75,6 +76,23 @@ namespace Platform.Data.Core.Sequences
         public static char FromLinkToChar(ulong link)
         {
             return (char)(link - 1);
+        }
+
+        public static string FromSequenceLinkToString(ulong link, Links links)
+        {
+            var sb = new StringBuilder();
+
+            if (links.Exists(link))
+            {
+                StopableSequenceWalker.WalkRight(link, links.GetSourceCore, links.GetTargetCore,
+                    x => x <= MapSize || links.GetSourceCore(x) == x || links.GetTargetCore(x) == x, element =>
+                    {
+                        sb.Append(FromLinkToChar(element));
+                        return true;
+                    });
+            }
+
+            return sb.ToString();
         }
 
         public static ulong[] FromStringToLinkArray(string sequence)

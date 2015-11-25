@@ -3,9 +3,11 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Structures;
+using Platform.Helpers;
 using Platform.Helpers.Collections;
 
 namespace Platform.Sandbox
@@ -19,7 +21,7 @@ namespace Platform.Sandbox
             using (var memoryManager = new LinksMemoryManager("web.links", 8 * 1024 * 1024))
             using (var links = new Links(memoryManager))
             {
-                var utfMap = new UTF16Map(links);
+                var utfMap = new UnicodeMap(links);
                 utfMap.Init();
 
                 var sequences = new Sequences(links);
@@ -32,36 +34,50 @@ namespace Platform.Sandbox
 
                     var totalChars = url.Length + response.Length;
 
-                    var urlLink = sequences.CreateBalancedVariant(UTF16Map.FromStringToLinkArray(url));
+                    Global.Trash = totalChars;
 
-                    //var responseLink = sequences.CreateBalancedVariant(UTF16Map.FromStringToLinkArray(response));
+                    var urlLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(url));
+
+                    //var responseLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(response));
 
                     //var sw0 = Stopwatch.StartNew();
-                    //var groups = UTF16Map.FromStringToLinkArrayGroups(response);
+                    //var groups = UnicodeMap.FromStringToLinkArrayGroups(response);
                     //var responseLink = sequences.CreateBalancedVariant(groups); sw0.Stop();
 
-              
-                    var responseSourceArray = UTF16Map.FromStringToLinkArray(response);
 
-                    //var sw1 = Stopwatch.StartNew();
-                    //var responseCompressedArray1 = links.PrecompressSequence1(responseSourceArray); sw1.Stop();
+                    var responseSourceArray = UnicodeMap.FromStringToLinkArray(response);
+
+                    var sw1 = Stopwatch.StartNew();
+                    var responseCompressedArray1 = links.PrecompressSequence1(responseSourceArray); sw1.Stop();
 
                     var sw2 = Stopwatch.StartNew();
                     var responseCompressedArray2 = links.PrecompressSequence2(responseSourceArray); sw2.Stop();
+
+                    ulong[] responseCompressedArray3 = null;
+
+                    for (var i = 0; i < 5; i++)
+                    {
+                        var sw3 = Stopwatch.StartNew();
+                        var compressor = new Compressor(links, sequences);
+                        responseCompressedArray3 = compressor.Precompress0(responseSourceArray); sw3.Stop();
+                        Console.WriteLine(sw3.Elapsed);
+                    }
 
                     //for (int i = 0; i < responseCompressedArray1.Length; i++)
                     //{
                     //    if (responseCompressedArray1[i] != responseCompressedArray2[i])
                     //    {
-                            
+
                     //    }
                     //}
 
                     //var responseLink1 = sequences.CreateBalancedVariant(responseCompressedArray1);
-                    var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray2);
+                    var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);
 
                     //var decompress1 = sequences.FormatSequence(responseLink1);
-                    //var decompress2 = sequences.FormatSequence(responseLink2);
+                    var decompress2 = sequences.FormatSequence(responseLink2);
+
+                    Global.Trash = decompress2;
 
                     //for (int i = 0; i < decompress1.Length; i++)
                     //{
@@ -71,20 +87,26 @@ namespace Platform.Sandbox
                     //    }
                     //}
 
-                    // TODO: Combine Groups and Compression
+                    var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, links);
 
-                    var totalLinks = links.Total - UTF16Map.MapSize;
+                    Global.Trash = (unpack == response);
+
+                    // TODO: Combine Groups and Compression (first Compression, then Groups)
+
+                    var totalLinks = links.Total - UnicodeMap.MapSize;
+
+                    Global.Trash = totalLinks;
 
                     links.Create(urlLink, responseLink2);
 
-                    var divLinksArray = UTF16Map.FromStringToLinkArray("div");
+                    var divLinksArray = UnicodeMap.FromStringToLinkArray("div");
 
                     var fullyMatched = sequences.GetAllMatchingSequences1(divLinksArray);
                     var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(divLinksArray);
-
-                    // TODO: Реализовать распаковку в Unicode строку для сравнения
                 }
             }
+
+            //Console.ReadKey();
         }
 
         /// <remarks>
@@ -234,15 +256,17 @@ namespace Platform.Sandbox
 
             while (!maxPair.IsNull())
             {
-                var maxPairLink = links.Create(maxPair.Source, maxPair.Target);
+                var maxPairSource = maxPair.Source;
+
+                var maxPairLink = links.Create(maxPairSource, maxPair.Target);
 
                 // Substitute all usages
                 for (var i = 1; i < copy.Length; i++)
                 {
-                    if (copy[i - 1] == maxPair.Source)
-                    {
-                        var startIndex = i - 1;
+                    var startIndex = i - 1;
 
+                    if (copy[startIndex] == maxPairSource)
+                    {
                         while (i < copy.Length && copy[i] == 0) i++;
                         if (i == copy.Length) break;
 
@@ -318,7 +342,7 @@ namespace Platform.Sandbox
 
                 //if (pairsFrequencies[maxPair] > 0)
                 //{
-                    
+
                 //}
 
                 maxPair = Link.Null;
@@ -326,18 +350,21 @@ namespace Platform.Sandbox
 
                 foreach (var pairsFrequency in pairsFrequencies)
                 {
-                    var pair = pairsFrequency.Key;
                     var frequency = pairsFrequency.Value;
+                    if (frequency > 1)
+                    {
+                        var pair = pairsFrequency.Key;
 
-                    if (maxFrequency < frequency)
-                    {
-                        maxFrequency = frequency;
-                        maxPair = pair;
-                    }
-                    if (frequency > 1 && maxFrequency == frequency &&
-                        (pair.Source + pair.Target) > (maxPair.Source + maxPair.Target))
-                    {
-                        maxPair = pair;
+                        if (maxFrequency < frequency)
+                        {
+                            maxFrequency = frequency;
+                            maxPair = pair;
+                        }
+                        if (maxFrequency == frequency &&
+                            (pair.Source + pair.Target) > (maxPair.Source + maxPair.Target))
+                        {
+                            maxPair = pair;
+                        }
                     }
                 }
 
@@ -374,7 +401,7 @@ namespace Platform.Sandbox
 
                 //    if (!maxPairCheck.Equals(maxPair) || maxFrequency != maxFrequencyCheck)
                 //    {
-                        
+
                 //    }
                 //}
             }
@@ -403,11 +430,728 @@ namespace Platform.Sandbox
             return final;
         }
 
+        public struct Compressor
+        {
+            private readonly Links _links;
+            private readonly Sequences _sequences;
+            private Link _maxPair;
+            private ulong _maxFrequency;
+            private Link _maxPair2;
+            private ulong _maxFrequency2;
+            private UnsafeDictionary<Link, ulong> _pairsFrequencies;
+
+            public Compressor(Links links, Sequences sequences)
+            {
+                _links = links;
+                _sequences = sequences;
+                _maxPair = Link.Null;
+                _maxFrequency = 1;
+                _maxPair2 = Link.Null;
+                _maxFrequency2 = 1;
+                _pairsFrequencies = new UnsafeDictionary<Link, ulong>();
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private ulong IncrementFrequency(Link pair)
+            {
+                ulong frequency;
+                if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                {
+                    frequency++;
+                    _pairsFrequencies[pair] = frequency;
+                }
+                else
+                {
+                    frequency = 1;
+                    _pairsFrequencies.Add(pair, frequency);
+                }
+                return frequency;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void DecrementFrequency(Link pair)
+            {
+                ulong frequency;
+                if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                {
+                    frequency--;
+
+                    if (frequency == 0)
+                        _pairsFrequencies.Remove(pair);
+                    else
+                        _pairsFrequencies[pair] = frequency;
+                }
+                //return frequency;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// </remarks>
+            public ulong[] Precompress0(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var oldLength = sequence.Length;
+                var newLength = sequence.Length;
+
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                copy[0] = sequence[0];
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    copy[i] = sequence[i];
+
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    UpdateMaxPair(pair, IncrementFrequency(pair));
+                }
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPairSource = _maxPair.Source;
+                    var maxPairTarget = _maxPair.Target;
+                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+
+                    oldLength--;
+                    var oldLengthMinusTwo = oldLength - 1;
+
+                    // Substitute all usages
+                    int w = 0, r = 0; // (r == read, w == write)
+                    for (; r < oldLength; r++)
+                    {
+                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        {
+                            if (r > 0)
+                            {
+                                var previous = copy[w - 1];
+                                DecrementFrequency(new Link(previous, maxPairSource));
+                                IncrementFrequency(new Link(previous, maxPairResult));
+                            }
+                            if (r < oldLengthMinusTwo)
+                            {
+                                var next = copy[r + 2];
+                                DecrementFrequency(new Link(maxPairTarget, next));
+                                IncrementFrequency(new Link(maxPairResult, next));
+                            }
+
+                            copy[w++] = maxPairResult;
+                            r++;
+                            newLength--;
+                        }
+                        else
+                        {
+                            copy[w++] = copy[r];
+                        }
+                    }
+                    copy[w] = copy[r];
+
+                    _pairsFrequencies.Remove(_maxPair);
+
+                    oldLength = newLength;
+
+                    // Медленный вариант UpdateMaxPair
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+
+                    //foreach (var pairsFrequency in _pairsFrequencies)
+                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+
+                    // Быстрее
+                    UpdateMaxPair2();
+                }
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
+
+                return final;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// </remarks>
+            public ulong[] Precompress1(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var newLength = sequence.Length;
+                var copy = new ulong[sequence.Length];
+                copy[0] = sequence[0];
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    copy[i] = sequence[i];
+
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+
+                    ulong frequency;
+                    if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                    {
+                        var newFrequency = frequency + 1;
+
+                        if (_maxFrequency < newFrequency)
+                        {
+                            _maxFrequency = newFrequency;
+                            _maxPair = pair;
+                        }
+
+                        _pairsFrequencies[pair] = newFrequency;
+                    }
+                    else
+                        _pairsFrequencies.Add(pair, 1);
+                }
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPair = _maxPair;
+
+                    //ResetMaxPair();
+
+                    var maxPairSource = maxPair.Source;
+
+                    var maxPairLink = _links.Create(maxPairSource, maxPair.Target);
+
+                    // Substitute all usages
+                    for (var i = 1; i < copy.Length; i++)
+                    {
+                        var startIndex = i - 1;
+
+                        if (copy[startIndex] == maxPairSource)
+                        {
+                            while (i < copy.Length && copy[i] == 0) i++;
+                            if (i == copy.Length) break;
+
+                            if (copy[i] == maxPair.Target)
+                            {
+                                var oldLeft = copy[startIndex];
+                                var oldRight = copy[i];
+
+                                copy[startIndex] = maxPairLink;
+                                copy[i] = 0; // TODO: Вместо записи нулевых дырок, можно хранить отрицательным числом размер диапазона (дырки) на которую надо прыгнуть, это дополнительно ускорило бы алгоритм.
+
+                                // Требуется отдельно, так как пары могут идти подряд,
+                                // например в "ааа" пара "аа" была посчитана дважды
+                                //pairsFrequencies[maxPair]--;
+
+                                ulong frequency;
+                                //ulong frequency = _pairsFrequencies[maxPair];
+                                //if (frequency == 1)
+                                //    _pairsFrequencies.Remove(maxPair);
+                                //else
+                                //    _pairsFrequencies[maxPair] = frequency - 1;
+
+                                //UpdateMaxPair2(maxPair, frequency);
+
+                                newLength--;
+
+                                if (startIndex > 0)
+                                {
+                                    var previous = startIndex - 1;
+                                    while (previous >= 0 && copy[previous] == 0) previous--;
+                                    if (previous >= 0)
+                                    {
+                                        var previousOldPair = new Link(copy[previous], oldLeft);
+                                        //if (!nextOldPair.Equals(maxPair))
+                                        {
+                                            //pairsFrequencies[nextOldPair]--;
+                                            if (_pairsFrequencies.TryGetValue(previousOldPair, out frequency))
+                                            {
+                                                if (frequency == 1)
+                                                    _pairsFrequencies.Remove(previousOldPair);
+                                                else
+                                                    _pairsFrequencies[previousOldPair] = frequency - 1;
+
+                                                //if(!maxPair.Equals(previousOldPair))
+                                                //    UpdateMaxPair2(previousOldPair, frequency - 1);
+                                            }
+                                        }
+
+                                        var previousNewPair = new Link(copy[previous], copy[startIndex]);
+                                        //pairsFrequencies[nextNewPair]++;
+                                        if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
+                                        {
+                                            _pairsFrequencies[previousNewPair] = frequency + 1;
+
+                                            //UpdateMaxPair(previousNewPair, frequency + 1);
+                                        }
+                                        else
+                                            _pairsFrequencies.Add(previousNewPair, 1);
+                                    }
+                                }
+
+                                if (i < copy.Length)
+                                {
+                                    var next = i;
+                                    while (next < copy.Length && copy[next] == 0) next++;
+                                    if (next < copy.Length)
+                                    {
+                                        var nextOldPair = new Link(oldRight, copy[next]);
+                                        //if (!nextOldPair.Equals(maxPair))
+                                        {
+                                            //pairsFrequencies[nextOldPair]--;
+                                            if (_pairsFrequencies.TryGetValue(nextOldPair, out frequency))
+                                            {
+                                                if (frequency == 1)
+                                                    _pairsFrequencies.Remove(nextOldPair);
+                                                else
+                                                    _pairsFrequencies[nextOldPair] = frequency - 1;
+
+                                                //if (!maxPair.Equals(nextOldPair))
+                                                //    UpdateMaxPair2(nextOldPair, frequency - 1);
+                                            }
+                                        }
+
+                                        var nextNewPair = new Link(copy[startIndex], copy[next]);
+                                        //pairsFrequencies[nextNewPair]++;
+                                        if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
+                                        {
+                                            _pairsFrequencies[nextNewPair] = frequency + 1;
+
+                                            //UpdateMaxPair(nextNewPair, frequency + 1);
+                                        }
+                                        else
+                                            _pairsFrequencies.Add(nextNewPair, 1);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    //////if (!_maxPair2.IsNull())
+                    //////{
+                    //////    UpdateMaxPair(_maxPair2, _maxFrequency2);
+                    //////}
+
+                    //pairsFrequencies[maxPair] = 0;
+                    //pairsFrequencies.Remove(maxPair);
+
+                    //if (pairsFrequencies[maxPair] > 0)
+                    //{
+
+                    //}
+
+                    _pairsFrequencies.Remove(_maxPair);
+
+                    _maxPair = Link.Null;
+                    _maxFrequency = 1;
+
+                    foreach (var pairsFrequency in _pairsFrequencies)
+                        UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    //for (var i = 1; i < copy.Length; i++)
+                    //{
+                    //    var startIndex = i - 1;
+
+                    //    while (i < copy.Length && copy[i] == 0) i++;
+                    //    if (i == copy.Length) break;
+
+                    //    var pair = new Link(copy[startIndex], copy[i]);
+
+                    //    var frequency = _pairsFrequencies[pair];
+                    //    UpdateMaxPair(pair, frequency);
+                    //}
+
+                    //{
+                    //    var pairsFrequenciesCheck = new Dictionary<Link, ulong>();
+                    //    var maxPairCheck = Link.Null;
+                    //    ulong maxFrequencyCheck = 1;
+
+                    //    for (var i = 1; i < copy.Length; i++)
+                    //    {
+                    //        var startIndex = i - 1;
+
+                    //        while (i < copy.Length && copy[i] == 0) i++;
+                    //        if (i == copy.Length) break;
+
+                    //        var pair = new Link(copy[startIndex], copy[i]);
+
+                    //        ulong frequency;
+                    //        if (pairsFrequenciesCheck.TryGetValue(pair, out frequency))
+                    //        {
+                    //            var newFrequency = frequency + 1;
+
+                    //            if (maxFrequencyCheck < newFrequency)
+                    //            {
+                    //                maxFrequencyCheck = newFrequency;
+                    //                maxPairCheck = pair;
+                    //            }
+
+                    //            pairsFrequenciesCheck[pair] = newFrequency;
+                    //        }
+                    //        else
+                    //            pairsFrequenciesCheck.Add(pair, 1);
+                    //    }
+
+                    //    if (!maxPairCheck.Equals(maxPair) || maxFrequency != maxFrequencyCheck)
+                    //    {
+
+                    //    }
+                    //}
+                }
+
+                var final = new ulong[newLength];
+
+                var j = 0;
+                for (var i = 0; i < copy.Length; i++)
+                {
+                    while (i < copy.Length && copy[i] == 0) i++;
+                    if (i == copy.Length) break;
+
+                    final[j++] = copy[i];
+                }
+
+                //var finalSequence = new ulong[groupedSequence.Count];
+
+                //for (int i = 0; i < finalSequence.Length; i++)
+                //{
+                //    var part = groupedSequence[i];
+                //    finalSequence[i] = part.Length == 1 ? part[0] : sequences.CreateBalancedVariant(part);
+                //}
+
+                //return sequences.CreateBalancedVariant(finalSequence);
+                //return sequences.CreateBalancedVariant(final);
+
+                return final;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// </remarks>
+            public ulong[] Precompress2(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var newLength = sequence.Length;
+                var copy = new ulong[sequence.Length];
+                copy[0] = sequence[0];
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    copy[i] = sequence[i];
+
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+
+                    ulong frequency;
+                    if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                    {
+                        var newFrequency = frequency + 1;
+
+                        if (_maxFrequency < newFrequency)
+                        {
+                            _maxFrequency = newFrequency;
+                            _maxPair = pair;
+                        }
+
+                        _pairsFrequencies[pair] = newFrequency;
+                    }
+                    else
+                        _pairsFrequencies.Add(pair, 1);
+                }
+
+                //var tempPair = new Link();
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPair = _maxPair;
+
+                    ResetMaxPair();
+
+                    var maxPairSource = maxPair.Source;
+
+                    var maxPairLink = _links.Create(maxPairSource, maxPair.Target);
+
+                    // Substitute all usages
+                    for (var i = 1; i < copy.Length; i++)
+                    {
+                        var startIndex = i - 1;
+
+                        while (startIndex < copy.Length && copy[startIndex] == 0)
+                        {
+                            i++;
+                            startIndex++;
+                        }
+                        if (startIndex == copy.Length - 1) break;
+
+                        if (copy[startIndex] == maxPairSource)
+                        {
+                            while (i < copy.Length && copy[i] == 0) i++;
+                            if (i == copy.Length) break;
+
+                            if (copy[i] == maxPair.Target)
+                            {
+                                var oldLeft = copy[startIndex];
+                                var oldRight = copy[i];
+
+                                copy[startIndex] = maxPairLink;
+                                copy[i] = 0;
+                                // TODO: Вместо записи нулевых дырок, можно хранить отрицательным числом размер диапазона (дырки) на которую надо прыгнуть, это дополнительно ускорило бы алгоритм.
+
+                                // Требуется отдельно, так как пары могут идти подряд,
+                                // например в "ааа" пара "аа" была посчитана дважды
+                                //pairsFrequencies[maxPair]--;
+
+                                var frequency = _pairsFrequencies[maxPair];
+                                if (frequency == 1)
+                                    _pairsFrequencies.Remove(maxPair);
+                                else
+                                    _pairsFrequencies[maxPair] = frequency - 1;
+
+                                //UpdateMaxPair2(maxPair, frequency);
+
+                                newLength--;
+
+                                if (startIndex > 0)
+                                {
+                                    var previous = startIndex - 1;
+                                    while (previous >= 0 && copy[previous] == 0) previous--;
+                                    if (previous >= 0)
+                                    {
+                                        var previousOldPair = new Link(copy[previous], oldLeft);
+                                        //if (!nextOldPair.Equals(maxPair))
+                                        {
+                                            //pairsFrequencies[nextOldPair]--;
+                                            if (_pairsFrequencies.TryGetValue(previousOldPair, out frequency))
+                                            {
+                                                if (frequency == 1)
+                                                    _pairsFrequencies.Remove(previousOldPair);
+                                                else
+                                                    _pairsFrequencies[previousOldPair] = frequency - 1;
+
+                                                //if(!maxPair.Equals(previousOldPair))
+                                                //    UpdateMaxPair2(previousOldPair, frequency - 1);
+                                            }
+                                        }
+
+                                        var previousNewPair = new Link(copy[previous], copy[startIndex]);
+                                        //pairsFrequencies[nextNewPair]++;
+                                        if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
+                                        {
+                                            _pairsFrequencies[previousNewPair] = frequency + 1;
+
+                                            //if (!maxPair.Equals(previousNewPair))
+                                            UpdateMaxPair(previousNewPair, frequency + 1);
+                                        }
+                                        else
+                                            _pairsFrequencies.Add(previousNewPair, 1);
+                                    }
+                                }
+
+                                if (i < copy.Length)
+                                {
+                                    var next = i;
+                                    while (next < copy.Length && copy[next] == 0) next++;
+                                    if (next < copy.Length)
+                                    {
+                                        var nextOldPair = new Link(oldRight, copy[next]);
+                                        //if (!nextOldPair.Equals(maxPair))
+                                        {
+                                            //pairsFrequencies[nextOldPair]--;
+                                            if (_pairsFrequencies.TryGetValue(nextOldPair, out frequency))
+                                            {
+                                                if (frequency == 1)
+                                                    _pairsFrequencies.Remove(nextOldPair);
+                                                else
+                                                    _pairsFrequencies[nextOldPair] = frequency - 1;
+
+                                                //if (!maxPair.Equals(nextOldPair))
+                                                //    UpdateMaxPair2(nextOldPair, frequency - 1);
+                                            }
+                                        }
+
+                                        var nextNewPair = new Link(copy[startIndex], copy[next]);
+                                        //pairsFrequencies[nextNewPair]++;
+                                        if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
+                                        {
+                                            _pairsFrequencies[nextNewPair] = frequency + 1;
+
+                                            //if (!maxPair.Equals(nextNewPair))
+                                            UpdateMaxPair(nextNewPair, frequency + 1);
+                                        }
+                                        else
+                                            _pairsFrequencies.Add(nextNewPair, 1);
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            while (i < copy.Length && copy[i] == 0) i++;
+                            if (i == copy.Length) break;
+
+                            //tempPair.Source = copy[startIndex];
+                            //tempPair.Target = copy[i];
+
+                            var pair = new Link(copy[startIndex], copy[i]);
+
+                            //if (!maxPair.Equals(pair))
+                            //{
+                            ulong frequency;
+                            if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                                UpdateMaxPair(pair, frequency);
+                            //}
+                        }
+                    }
+
+                    //////if (!_maxPair2.IsNull())
+                    //////{
+                    //////    UpdateMaxPair(_maxPair2, _maxFrequency2);
+                    //////}
+
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    //foreach (var pairsFrequency in _pairsFrequencies)
+                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                }
+
+                var final = new ulong[newLength];
+
+                var j = 0;
+                for (var i = 0; i < copy.Length; i++)
+                {
+                    while (i < copy.Length && copy[i] == 0) i++;
+                    if (i == copy.Length) break;
+
+                    final[j++] = copy[i];
+                }
+
+                return final;
+            }
+
+            public ulong Compress(ulong[] sequence)
+            {
+                var precompressedSequence = Precompress1(sequence);
+                return _sequences.CreateBalancedVariant(precompressedSequence);
+            }
+
+            private void ResetMaxPair()
+            {
+                _maxPair = Link.Null;
+                _maxFrequency = 1;
+                _maxPair2 = Link.Null;
+                _maxFrequency2 = 1;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private void UpdateMaxPair(Link pair, ulong frequency)
+            {
+                if (frequency > 1)
+                {
+                    if (_maxFrequency < frequency)
+                    {
+                        _maxFrequency = frequency;
+                        _maxPair = pair;
+                    }
+                    else if (_maxFrequency == frequency &&
+                        (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                    {
+                        _maxPair = pair;
+                    }
+                }
+            }
+
+            private void UpdateMaxPair2(Link pair, ulong frequency)
+            {
+                if (!_maxPair.Equals(pair))
+                {
+                    if (_maxPair2.Equals(pair))
+                    {
+                        _maxFrequency2 = frequency;
+                    }
+                    else if (_maxFrequency2 < frequency)
+                    {
+                        _maxFrequency2 = frequency;
+                        _maxPair2 = pair;
+                    }
+                    else if (_maxFrequency2 == frequency &&
+                             (pair.Source + pair.Target) > (_maxPair2.Source + _maxPair2.Target))
+                    {
+                        _maxPair = pair;
+                    }
+                }
+            }
+
+            private void UpdateMaxPair()
+            {
+                ResetMaxPair();
+
+                var entries = _pairsFrequencies.entries;
+                for (var i = 0; i < entries.Length; i++)
+                {
+                    if (entries[i].hashCode >= 0)
+                    {
+                        if (entries[i].value > 1)
+                        {
+                            if (_maxFrequency < entries[i].value)
+                            {
+                                _maxFrequency = entries[i].value;
+                                _maxPair = entries[i].key;
+                            }
+                            else if (_maxFrequency == entries[i].value &&
+                                (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
+                            {
+                                _maxPair = entries[i].key;
+                            }
+                        }
+                    }
+                }
+            }
+            
+            private void UpdateMaxPair2()
+            {
+                ResetMaxPair();
+
+                var entries = _pairsFrequencies.entries;
+                for (var i = 0; i < entries.Length; i++)
+                {
+                    if (entries[i].hashCode >= 0)
+                    {
+                        var frequency = entries[i].value;
+                        if (frequency > 1)
+                        {
+                            if (_maxFrequency > frequency)
+                                continue;
+                            
+                            if (_maxFrequency < frequency)
+                            {
+                                _maxFrequency = frequency;
+                                _maxPair = entries[i].key;
+                            }
+                            else if (_maxFrequency == frequency &&
+                                (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
+                            {
+                                _maxPair = entries[i].key;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public static ulong CreateBalancedVariant(this Sequences sequences, List<ulong[]> groupedSequence)
         {
             var finalSequence = new ulong[groupedSequence.Count];
 
-            for (int i = 0; i < finalSequence.Length; i++)
+            for (var i = 0; i < finalSequence.Length; i++)
             {
                 var part = groupedSequence[i];
                 finalSequence[i] = part.Length == 1 ? part[0] : sequences.CreateBalancedVariant(part);

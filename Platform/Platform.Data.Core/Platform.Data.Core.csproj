@@ -70,7 +70,7 @@
     <Compile Include="Sequences\Sequences.cs" />
     <Compile Include="Sequences\SequenceWalker.cs" />
     <Compile Include="Sequences\StopableSequenceWalker.cs" />
-    <Compile Include="Sequences\UTF16Map.cs" />
+    <Compile Include="Sequences\UnicodeMap.cs" />
     <Compile Include="Structures\ILink.cs" />
     <Compile Include="Structures\Link.cs" />
     <Compile Include="Structures\ServerType.cs" />
