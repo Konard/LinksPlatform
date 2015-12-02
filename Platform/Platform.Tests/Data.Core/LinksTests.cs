@@ -16,8 +16,6 @@ namespace Platform.Tests.Data.Core
 
         private static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
 
-        private static readonly Random Rnd = new Random();
-
         #region Concept
 
         [TestMethod]
@@ -239,6 +237,61 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempTransactionLogFilename);
         }
 
+        [TestMethod]
+        public void Bug1Test()
+        {
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            const ulong itself = LinksConstants.Itself;
+
+            // User Code Error (Autoreverted), some data saved
+            try
+            {
+                ulong l1;
+                ulong l2;
+
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
+                {
+                    l1 = links.Create(itself, itself);
+                    l2 = links.Create(itself, itself);
+
+                    l2 = links.Update(l2, l2, l1, l2);
+
+                    links.Create(l2, itself);
+                    links.Create(l2, itself);
+                }
+
+                Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
+
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var links = new Links(memoryManager, tempTransactionLogFilename))
+                {
+                    using (var transaction = links.BeginTransaction())
+                    {
+                        l2 = links.Update(l2, l1);
+
+                        links.Delete(l2);
+
+                        ExceptionThrower();
+
+                        transaction.Commit();
+                    }
+
+                    Global.Trash = links.Total;
+                }
+            }
+            catch
+            {
+                Global.Trash = FileHelpers
+                    .ReadAll<Links.Transition>(tempTransactionLogFilename);
+            }
+
+            File.Delete(tempDatabaseFilename);
+            File.Delete(tempTransactionLogFilename);
+        }
+
         public void ExceptionThrower()
         {
             throw new Exception();
@@ -388,12 +441,12 @@ namespace Platform.Tests.Data.Core
         {
             return Measure(() =>
             {
-                ulong maxValue = Rnd.NextUInt64();
+                ulong maxValue = RandomHelpers.DefaultFactory.NextUInt64();
                 ulong result = 0;
                 for (long i = 0; i < loops; i++)
                 {
-                    var source = Rnd.NextUInt64(maxValue);
-                    var target = Rnd.NextUInt64(maxValue);
+                    var source = RandomHelpers.DefaultFactory.NextUInt64(maxValue);
+                    var target = RandomHelpers.DefaultFactory.NextUInt64(maxValue);
 
                     result += maxValue + source + target;
                 }
@@ -562,16 +615,14 @@ namespace Platform.Tests.Data.Core
                 ulong counter = 0;
                 var maxLink = links.Total;
 
-                var rnd = new Random((int)DateTime.UtcNow.Ticks);
-
                 Console.WriteLine("Testing Random Search with {0} Iterations.", iterations);
 
                 var sw = Stopwatch.StartNew();
 
                 for (var i = iterations; i > 0; i--)
                 {
-                    var source = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
-                    var target = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var source = RandomHelpers.DefaultFactory.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var target = RandomHelpers.DefaultFactory.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
 
                     counter += links.Search(source, target);
                 }
@@ -599,7 +650,6 @@ namespace Platform.Tests.Data.Core
                 var maxLink = links.Total;
 
                 var iterations = links.Total;
-                var rnd = new Random((int)DateTime.UtcNow.Ticks);
 
                 Console.WriteLine("Testing Random Search with {0} Iterations.", links.Total);
 
@@ -607,8 +657,8 @@ namespace Platform.Tests.Data.Core
 
                 for (var i = iterations; i > 0; i--)
                 {
-                    var source = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
-                    var target = rnd.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var source = RandomHelpers.DefaultFactory.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
+                    var target = RandomHelpers.DefaultFactory.NextUInt64(LinksConstants.MinPossibleIndex, maxLink);
 
                     counter += links.Search(source, target);
                 }
@@ -793,7 +843,7 @@ namespace Platform.Tests.Data.Core
 
                 Console.WriteLine("Deleting all links");
 
-                var elapsedTime = PerformanceHelpers.Measure(links.DeleteAllLinks);
+                var elapsedTime = PerformanceHelpers.Measure(links.DeleteAll);
 
                 var linksDeleted = linksBeforeTest - links.Total;
                 var linksPerSecond = linksDeleted / elapsedTime.TotalSeconds;

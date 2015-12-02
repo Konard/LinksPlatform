@@ -59,7 +59,7 @@ namespace Platform.Data.Core.Structures
 
         private static string ToString(ulong source, ulong target)
         {
-            return string.Format("({0}->{1})", source, target);
+            return string.Format("({0}→{1})", source, target);
         }
 
         public override string ToString()

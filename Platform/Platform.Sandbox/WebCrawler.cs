@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
@@ -9,6 +10,7 @@ using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Structures;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Threading;
 
 namespace Platform.Sandbox
 {
@@ -21,92 +23,110 @@ namespace Platform.Sandbox
             using (var memoryManager = new LinksMemoryManager("web.links", 8 * 1024 * 1024))
             using (var links = new Links(memoryManager))
             {
-                var utfMap = new UnicodeMap(links);
-                utfMap.Init();
+                UnicodeMap.InitNew(links);
 
                 var sequences = new Sequences(links);
 
-                using (var client = new HttpClient())
+                // Get content
+                const string url = "https://en.wikipedia.org/wiki/Main_Page";
+                const string pageCacheFile = "response.html";
+
+                string pageContents;
+
+                if (File.Exists(pageCacheFile))
+                    pageContents = File.ReadAllText(pageCacheFile);
+                else
                 {
-                    var url = "https://en.wikipedia.org/wiki/Main_Page";
-                    //var response = client.GetStringAsync(url).AwaitResult();
-                    var response = File.ReadAllText("response.html");
-
-                    var totalChars = url.Length + response.Length;
-
-                    Global.Trash = totalChars;
-
-                    var urlLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(url));
-
-                    //var responseLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(response));
-
-                    //var sw0 = Stopwatch.StartNew();
-                    //var groups = UnicodeMap.FromStringToLinkArrayGroups(response);
-                    //var responseLink = sequences.CreateBalancedVariant(groups); sw0.Stop();
-
-
-                    var responseSourceArray = UnicodeMap.FromStringToLinkArray(response);
-
-                    var sw1 = Stopwatch.StartNew();
-                    var responseCompressedArray1 = links.PrecompressSequence1(responseSourceArray); sw1.Stop();
-
-                    var sw2 = Stopwatch.StartNew();
-                    var responseCompressedArray2 = links.PrecompressSequence2(responseSourceArray); sw2.Stop();
-
-                    ulong[] responseCompressedArray3 = null;
-
-                    for (var i = 0; i < 5; i++)
-                    {
-                        var sw3 = Stopwatch.StartNew();
-                        var compressor = new Compressor(links, sequences);
-                        responseCompressedArray3 = compressor.Precompress0(responseSourceArray); sw3.Stop();
-                        Console.WriteLine(sw3.Elapsed);
-                    }
-
-                    //for (int i = 0; i < responseCompressedArray1.Length; i++)
-                    //{
-                    //    if (responseCompressedArray1[i] != responseCompressedArray2[i])
-                    //    {
-
-                    //    }
-                    //}
-
-                    //var responseLink1 = sequences.CreateBalancedVariant(responseCompressedArray1);
-                    var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);
-
-                    //var decompress1 = sequences.FormatSequence(responseLink1);
-                    var decompress2 = sequences.FormatSequence(responseLink2);
-
-                    Global.Trash = decompress2;
-
-                    //for (int i = 0; i < decompress1.Length; i++)
-                    //{
-                    //    if (decompress1[i] != decompress2[i])
-                    //    {
-
-                    //    }
-                    //}
-
-                    var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, links);
-
-                    Global.Trash = (unpack == response);
-
-                    // TODO: Combine Groups and Compression (first Compression, then Groups)
-
-                    var totalLinks = links.Total - UnicodeMap.MapSize;
-
-                    Global.Trash = totalLinks;
-
-                    links.Create(urlLink, responseLink2);
-
-                    var divLinksArray = UnicodeMap.FromStringToLinkArray("div");
-
-                    var fullyMatched = sequences.GetAllMatchingSequences1(divLinksArray);
-                    var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(divLinksArray);
+                    using (var client = new HttpClient())
+                        pageContents = client.GetStringAsync(url).AwaitResult();
+                    File.WriteAllText(pageCacheFile, pageContents);
                 }
+
+                var totalChars = url.Length + pageContents.Length;
+
+                Global.Trash = totalChars;
+
+                var urlLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(url));
+
+                var responseSourceArray = UnicodeMap.FromStringToLinkArray(pageContents);
+
+                //for (var i = 0; i < 1; i++)
+                //{
+                //    var sw01 = Stopwatch.StartNew();
+                //    var responseLink = sequences.CreateBalancedVariant(responseSourceArray);
+                //    sw01.Stop();
+                //    Console.WriteLine(sw01.Elapsed);
+                //}
+
+                //var sw0 = Stopwatch.StartNew();
+                //var groups = UnicodeMap.FromStringToLinkArrayGroups(response);
+                //var responseLink = sequences.CreateBalancedVariant(groups); sw0.Stop();
+
+                //var sw1 = Stopwatch.StartNew();
+                //var responseCompressedArray1 = links.PrecompressSequence1(responseSourceArray); sw1.Stop();
+
+                //var sw2 = Stopwatch.StartNew();
+                //var responseCompressedArray2 = links.PrecompressSequence2(responseSourceArray); sw2.Stop();
+
+                // TODO: Можно попробовать искать не максимальный, а первый, который встречается как минимум дважды
+                // TODO: Или использовать не локальный словарь, а глобальный
+
+                ulong[] responseCompressedArray3 = null;
+
+                for (var i = 0; i < 1; i++)
+                {
+                    var sw3 = Stopwatch.StartNew();
+                    var compressor = new Compressor(links, sequences);
+                    responseCompressedArray3 = compressor.Precompress0(responseSourceArray); sw3.Stop();
+                    Console.WriteLine(sw3.Elapsed);
+                }
+
+                //for (int i = 0; i < responseCompressedArray1.Length; i++)
+                //{
+                //    if (responseCompressedArray1[i] != responseCompressedArray2[i])
+                //    {
+
+                //    }
+                //}
+
+                //var responseLink1 = sequences.CreateBalancedVariant(responseCompressedArray1);
+                var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);
+
+                //var decompress1 = sequences.FormatSequence(responseLink1);
+                var decompress2 = sequences.FormatSequence(responseLink2);
+
+                Global.Trash = decompress2;
+
+                //for (int i = 0; i < decompress1.Length; i++)
+                //{
+                //    if (decompress1[i] != decompress2[i])
+                //    {
+
+                //    }
+                //}
+
+                var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, links);
+
+                Global.Trash = (unpack == pageContents);
+
+                // TODO: Combine Groups and Compression (first Compression, then Groups)
+
+                var totalLinks = links.Total - UnicodeMap.MapSize;
+
+                Global.Trash = totalLinks;
+
+                links.Create(urlLink, responseLink2);
+
+                var divLinksArray = UnicodeMap.FromStringToLinkArray("div");
+
+                var fullyMatched = sequences.GetAllMatchingSequences1(divLinksArray);
+                var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(divLinksArray);
+
+                var intersection = fullyMatched.Intersect(partiallyMatched);
+
             }
 
-            //Console.ReadKey();
+            Console.ReadKey();
         }
 
         /// <remarks>
@@ -1115,7 +1135,7 @@ namespace Platform.Sandbox
                     }
                 }
             }
-            
+
             private void UpdateMaxPair2()
             {
                 ResetMaxPair();
@@ -1130,7 +1150,7 @@ namespace Platform.Sandbox
                         {
                             if (_maxFrequency > frequency)
                                 continue;
-                            
+
                             if (_maxFrequency < frequency)
                             {
                                 _maxFrequency = frequency;

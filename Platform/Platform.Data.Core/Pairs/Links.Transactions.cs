@@ -377,6 +377,8 @@ namespace Platform.Data.Core.Pairs
 
         public Transaction BeginTransaction()
         {
+            if(string.IsNullOrWhiteSpace(_logAddress))
+                throw new InvalidOperationException("Transaction log is not enabled.");
             return new Transaction(this);
         }
     }

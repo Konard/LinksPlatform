@@ -47,24 +47,25 @@ namespace Platform.Helpers.Disposal
 
         private void Dispose(bool manual)
         {
-            if (!_disposed)
-            {
-                try
-                {
-                    DisposeCore(manual);
-                }
-                catch 
-                {
-                    if (manual) throw;
-                    // else TODO: Log exception
-                }
-                finally
-                {
-                    _currentProcess.Exited -= OnProcessExit;
-                    _currentDomain.ProcessExit -= OnProcessExit;
-                    _disposed = true;
-                }
-            }
+            if (!_disposed) lock (this) if (!_disposed)
+                    {
+                        try
+                        {
+                            DisposeCore(manual);
+                        }
+                        catch
+                        {
+                            if (manual) throw;
+                            // else TODO: Log exception
+                        }
+                        finally
+                        {
+                            _currentProcess.Exited -= OnProcessExit;
+                            _currentDomain.ProcessExit -= OnProcessExit;
+                        }
+
+                        _disposed = true;
+                    }
         }
 
         protected abstract void DisposeCore(bool manual);

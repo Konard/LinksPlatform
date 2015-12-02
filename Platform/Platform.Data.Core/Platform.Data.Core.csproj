@@ -67,6 +67,7 @@
     <Compile Include="Pairs\LinksMemoryManager.Tests.cs" />
     <Compile Include="Pairs\LinksMemoryManager.TreeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Sequences\Compressor.cs" />
     <Compile Include="Sequences\Sequences.cs" />
     <Compile Include="Sequences\SequenceWalker.cs" />
     <Compile Include="Sequences\StopableSequenceWalker.cs" />

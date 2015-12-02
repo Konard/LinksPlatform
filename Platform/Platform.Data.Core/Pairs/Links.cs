@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
+using Platform.Helpers.Collections;
 using Platform.Helpers.Disposal;
 using Platform.Helpers.Threading;
 
@@ -155,9 +156,9 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (source == LinksConstants.Null || !_memoryManager.Exists(source))
+                if (!_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target == LinksConstants.Null || !_memoryManager.Exists(target))
+                if (!_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
                 return SearchCore(source, target);
@@ -181,7 +182,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (link == LinksConstants.Null || !_memoryManager.Exists(link))
+                if (!_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link, "link");
 
                 return _memoryManager.CalculateLinkTotalReferences(link);
@@ -199,9 +200,9 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (source != LinksConstants.Null && !_memoryManager.Exists(source))
+                if (source != LinksConstants.Any && !_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != LinksConstants.Null && !_memoryManager.Exists(target))
+                if (target != LinksConstants.Any && !_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
                 return _memoryManager.Each(handler, source, target);
@@ -223,33 +224,38 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (source != LinksConstants.Null && !_memoryManager.Exists(source))
+                if (source != LinksConstants.Itself && !_memoryManager.Exists(source))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != LinksConstants.Null && !_memoryManager.Exists(target))
+                if (target != LinksConstants.Itself && !_memoryManager.Exists(target))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
 
-                ulong linkIndex;
+                return CreateCore(source, target);
+            });
+        }
 
-                if (source != LinksConstants.Null && target != LinksConstants.Null)
-                {
-                    linkIndex = SearchCore(source, target);
+        public ulong CreateCore(ulong source, ulong target)
+        {
+            ulong linkIndex;
 
-                    if (linkIndex == LinksConstants.Null)
-                    {
-                        linkIndex = _memoryManager.AllocateLink();
-                        _memoryManager.SetLinkValue(linkIndex, source, target);
-                    }
-                }
-                else
+            if (source != LinksConstants.Null && target != LinksConstants.Null)
+            {
+                linkIndex = SearchCore(source, target);
+
+                if (linkIndex == LinksConstants.Null)
                 {
                     linkIndex = _memoryManager.AllocateLink();
-                    _memoryManager.SetLinkValue(linkIndex, source == LinksConstants.Null ? linkIndex : source,
-                                                           target == LinksConstants.Null ? linkIndex : target);
+                    _memoryManager.SetLinkValue(linkIndex, source, target);
                 }
+            }
+            else
+            {
+                linkIndex = _memoryManager.AllocateLink();
+                _memoryManager.SetLinkValue(linkIndex, source == LinksConstants.Null ? linkIndex : source,
+                                                       target == LinksConstants.Null ? linkIndex : target);
+            }
 
-                CommitCreation(GetLinkCore(linkIndex));
-                return linkIndex;
-            });
+            CommitCreation(GetLinkCore(linkIndex));
+            return linkIndex;
         }
 
         public ulong Update(ulong prevLink, ulong newLink)
@@ -285,7 +291,7 @@ namespace Platform.Data.Core.Pairs
                     throw new ArgumentLinkDoesNotExistsException<ulong>(newTarget, "newTarget");
 
                 var linkIndex = SearchCore(source, target);
-                if (linkIndex == LinksConstants.Null)
+                if (linkIndex == LinksConstants.Null) // Может лучше исключение?
                     return Create(newSource, newTarget);
                 if (newSource == source && newTarget == target)
                     return linkIndex;
@@ -313,16 +319,8 @@ namespace Platform.Data.Core.Pairs
                 var referencesAsSource = new List<ulong>();
                 var referencesAsTarget = new List<ulong>();
 
-                _memoryManager.Each(x =>
-                {
-                    referencesAsSource.Add(x);
-                    return LinksConstants.Continue;
-                }, LinksConstants.Null, linkIndex);
-                _memoryManager.Each(x =>
-                {
-                    referencesAsTarget.Add(x);
-                    return LinksConstants.Continue;
-                }, linkIndex, LinksConstants.Null);
+                _memoryManager.Each(referencesAsSource.AddAndReturnTrue, linkIndex, LinksConstants.Null);
+                _memoryManager.Each(referencesAsTarget.AddAndReturnTrue, LinksConstants.Null, linkIndex);
 
                 for (var i = 0; i < referencesAsSource.Count; i++)
                 {
@@ -368,12 +366,6 @@ namespace Platform.Data.Core.Pairs
             });
         }
 
-        // TODO: Возможно есть очень простой способ это сделать. (Например просто удалить файл, или изменить его размер таким образом, чтобы удалился весь контент)
-        //public void DeleteAll()
-        //{
-        //    _header->AllocatedLinks
-        //}
-
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
         /// <remarks>Версия функции без дополнительных проверок для ускорения работы рекурсии.</remarks>
@@ -387,18 +379,13 @@ namespace Platform.Data.Core.Pairs
 
                 var references = new List<ulong>();
 
-                _memoryManager.Each(x =>
-                {
-                    references.Add(x);
-                    return LinksConstants.Continue;
-                }, LinksConstants.Null, link);
-                _memoryManager.Each(x =>
-                {
-                    references.Add(x);
-                    return LinksConstants.Continue;
-                }, link, LinksConstants.Null);
+                _memoryManager.Each(references.AddAndReturnTrue, link, LinksConstants.Null);
+                _memoryManager.Each(references.AddAndReturnTrue, LinksConstants.Null, link);
 
-                references.ForEach(DeleteCore);
+                references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
+
+                for (int i = references.Count - 1; i >= 0; i--)
+                    DeleteCore(references[i]);
 
                 _memoryManager.FreeLink(link);
 

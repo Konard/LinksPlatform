@@ -20,13 +20,13 @@ namespace Platform.Sandbox
 
             do
             {
-                Console.Write("-> ");
+                Console.Write("→ ");
                 string readMessage = Console.ReadLine();
 
                 if (string.Compare("exit", readMessage, ignoreCase: true) == 0)
                     break;
 
-                Console.Write("<- ");
+                Console.Write("← ");
                 Console.WriteLine(readMessage);
             }
             while (true);

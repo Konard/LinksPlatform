@@ -10,7 +10,6 @@ namespace Platform.Data.Core.Structures
     {
         private const string DateFormat = "yyyy.MM.dd hh:mm:ss.fffffff";
 
-        private static readonly Random SeedFactory = new Random((int) DateTime.UtcNow.Ticks);
         public static readonly Unique Null = new Unique(0, 0);
 
         public readonly ulong Time;
@@ -27,11 +26,11 @@ namespace Platform.Data.Core.Structures
             var time = (ulong) DateTime.UtcNow.Ticks;
 
             //var rndBytes = new byte[8];
-            //SeedFactory.NextBytes(rndBytes);
+            //RandomHelpers.DefaultFactory.NextBytes(rndBytes);
             //var seed = BitConverter.ToUInt64(rndBytes, 0);
 
             // TODO: Сравнить производительность
-            var seed = SeedFactory.NextUInt64();
+            var seed = RandomHelpers.DefaultFactory.NextUInt64();
 
             return new Unique(time, seed);
         }

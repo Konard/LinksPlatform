@@ -1,15 +1,13 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core;
+using Platform.Helpers;
 
 namespace Platform.Tests.Data.Core
 {
     [TestClass]
     public class BitStringTests
     {
-        static private readonly Random Randomizer = new Random((int)DateTime.UtcNow.Ticks);
-
         [TestMethod]
         public void BitGetSetTest()
         {
@@ -20,7 +18,7 @@ namespace Platform.Tests.Data.Core
 
             for (var i = 0; i < n; i++)
             {
-                var value = Randomizer.Next(0, 2) == 0;
+                var value = RandomHelpers.DefaultFactory.Next(0, 2) == 0;
                 array.Set(i, value);
                 str.Set(i, value);
 

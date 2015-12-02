@@ -228,7 +228,7 @@ namespace Platform.Data.Core
             //_version++;
 
 #if DEBUG
-            Console.WriteLine("AND -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("AND → Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -252,7 +252,7 @@ namespace Platform.Data.Core
             //_version++;
 
 #if DEBUG
-            Console.WriteLine("OR -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            Console.WriteLine("OR → Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -599,7 +599,7 @@ namespace Platform.Data.Core
 #if DEBUG
             if (sw.Elapsed.TotalMilliseconds > 0.1)
             {
-                Console.WriteLine("HCB -> Min: {0}, Max: {1}, Delta: {2}, Steps: {3}, Time: {4}", from, to, to - from, steps, sw.Elapsed.TotalMilliseconds);
+                Console.WriteLine("HCB → Min: {0}, Max: {1}, Delta: {2}, Steps: {3}, Time: {4}", from, to, to - from, steps, sw.Elapsed.TotalMilliseconds);
             }
 #endif
 

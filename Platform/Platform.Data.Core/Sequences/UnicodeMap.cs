@@ -24,6 +24,13 @@ namespace Platform.Data.Core.Sequences
             _links = links;
         }
 
+        public static UnicodeMap InitNew(ILinks<ulong> links)
+        {
+            var map = new UnicodeMap(links);
+            map.Init();
+            return map;
+        }
+
         public void Init()
         {
             if (_initialized)

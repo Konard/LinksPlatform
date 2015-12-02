@@ -223,13 +223,17 @@ namespace Platform.Data.Core.Pairs
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
         }
 
+        // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно
+        // TODO: использовать не список а дерево, так как так можно быстрее проверить на наличие связи внутри
         // 3<1>2 1<2>3 2<3>1 V
         private void AttachToFreeLinkList(ulong link)
         {
             if (_header->FirstFreeLink == LinksConstants.Null)
             {
-                _links[link].Source = link;
-                _links[link].Target = link;
+                // Если мы используем циклически связанный список, то перед откреплением от списка
+                // нам потребуется обнулять значения
+                //_links[link].Source = link;
+                //_links[link].Target = link;
 
                 _header->FirstFreeLink = link;
             }
@@ -251,14 +255,14 @@ namespace Platform.Data.Core.Pairs
             {
                 if (_links[freeLink].Source == freeLink)
                 {
-                    _header->FirstFreeLink = 0;
+                    _header->FirstFreeLink = LinksConstants.Null;
                 }
                 else
                 {
                     _links[_links[freeLink].Source].Target = _links[freeLink].Target;
                     _links[_links[freeLink].Target].Source = _links[freeLink].Source;
 
-                    _header->FirstFreeLink = 0;
+                    _header->FirstFreeLink = LinksConstants.Null;
                 }
             }
             else
@@ -266,6 +270,8 @@ namespace Platform.Data.Core.Pairs
                 _links[_links[freeLink].Source].Target = _links[freeLink].Target;
                 _links[_links[freeLink].Target].Source = _links[freeLink].Source;
             }
+
+            // Вероятное место для обнуления связей если используется циклический список
 
             _header->FreeLinks--;
         }

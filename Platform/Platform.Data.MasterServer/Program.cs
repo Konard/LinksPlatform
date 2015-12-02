@@ -48,7 +48,7 @@ namespace Platform.Data.MasterServer
                         {
                             if (!string.IsNullOrWhiteSpace(message))
                             {
-                                Console.WriteLine("R.M.: {0}", message);
+                                Console.WriteLine("← {0}", message);
 
                                 if (message.EndsWith("?"))
                                     sequences.Search(sender, message);

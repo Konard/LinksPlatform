@@ -16,7 +16,7 @@ namespace Platform.Sandbox
             var match = StatementRegex.Match(statement);
             if (match.Success)
             {
-                Console.WriteLine("-> Statement parsed successfully.");
+                Console.WriteLine("→ Statement parsed successfully.");
 
 
                 foreach (Capture capture in match.Groups["part"].Captures)

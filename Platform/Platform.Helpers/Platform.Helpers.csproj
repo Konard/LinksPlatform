@@ -45,6 +45,7 @@
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILGeneratorExtensions.cs" />
     <Compile Include="PerformanceHelpers.cs" />
+    <Compile Include="RandomHelpers.cs" />
     <Compile Include="StreamExtensions.cs" />
     <Compile Include="Disposal\DefaultDisposal.cs" />
     <Compile Include="Disposal\DefaultDisposalUsageExample.cs" />

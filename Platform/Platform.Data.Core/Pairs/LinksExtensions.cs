@@ -5,15 +5,13 @@ namespace Platform.Data.Core.Pairs
 {
     public static class LinksExtensions
     {
-        private static readonly Random Rnd = new Random();
-
         public static ulong RunRandomCreations(this Links links, long amountOfCreations)
         {
             ulong result = 0;
             for (long i = 0; i < amountOfCreations; i++)
             {
-                var source = Rnd.NextUInt64(links.Total);
-                var target = Rnd.NextUInt64(links.Total);
+                var source = RandomHelpers.DefaultFactory.NextUInt64(links.Total);
+                var target = RandomHelpers.DefaultFactory.NextUInt64(links.Total);
 
                 result += links.Create(source, target);
             }
@@ -25,8 +23,8 @@ namespace Platform.Data.Core.Pairs
             ulong result = 0;
             for (long i = 0; i < amountOfSearches; i++)
             {
-                var source = Rnd.NextUInt64(1, links.Total);
-                var target = Rnd.NextUInt64(1, links.Total);
+                var source = RandomHelpers.DefaultFactory.NextUInt64(1, links.Total);
+                var target = RandomHelpers.DefaultFactory.NextUInt64(1, links.Total);
 
                 result += links.Search(source, target);
             }
@@ -41,7 +39,7 @@ namespace Platform.Data.Core.Pairs
 
             for (long i = 0; i < amountOfDeletions; i++)
             {
-                var link = Rnd.NextUInt64(min, links.Total);
+                var link = RandomHelpers.DefaultFactory.NextUInt64(min, links.Total);
                 result += link;
                 links.Delete(link);
                 if (links.Total < min)
@@ -50,7 +48,13 @@ namespace Platform.Data.Core.Pairs
             return result;
         }
 
-        public static void DeleteAllLinks(this Links links)
+        /// <remarks>
+        /// TODO: Возможно есть очень простой способ это сделать.
+        /// (Например просто удалить файл, или изменить его размер таким образом,
+        /// чтобы удалился весь контент)
+        /// Например через _header->AllocatedLinks в LinksMemoryManager
+        /// </remarks>
+        public static void DeleteAll(this Links links)
         {
             for (ulong i = links.Total; i > 0; i--)
             {

@@ -52,16 +52,19 @@ namespace Platform.Data.Core.Sequences
 
         private readonly Links _links;
         private readonly ISyncronization _sync = new SafeSynchronization();
+        private readonly Compressor _compressor;
 
         public Sequences(Links links)
         {
             _links = links;
+            _compressor = new Compressor(links, this);
         }
 
         public ulong Create(params ulong[] sequence)
         {
             //return Compact(sequence);
-            return CreateBalancedVariant(sequence);
+            //return CreateBalancedVariant(sequence);
+            return _compressor.Compress(sequence);
         }
 
         #region Create All Variants (Not Practical)
@@ -183,6 +186,9 @@ namespace Platform.Data.Core.Sequences
                 if (sequence.Length == 1)
                     return sequence[0];
 
+                if (sequence.Length == 2)
+                    return _links.CreateCore(sequence[0], sequence[1]);
+
                 return CreateBalancedVariantCore1(sequence);
             });
         }
@@ -197,7 +203,7 @@ namespace Platform.Data.Core.Sequences
                 var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
 
                 for (var i = 0; i < sequence.Length; i += 2)
-                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
+                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : _links.CreateCore(sequence[i], sequence[i + 1]);
 
                 sequence = innerSequence;
             } while (true);
@@ -214,7 +220,7 @@ namespace Platform.Data.Core.Sequences
                 var innerSequence = new ulong[length / 2 + length % 2];
 
                 for (var i = 0; i < length; i += 2)
-                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
+                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : _links.CreateCore(sequence[i], sequence[i + 1]);
 
                 sequence = innerSequence;
                 length = innerSequence.Length;
@@ -223,12 +229,12 @@ namespace Platform.Data.Core.Sequences
             while (length > 2)
             {
                 for (var i = 0; i < length; i += 2)
-                    sequence[i / 2] = i + 1 == length ? sequence[i] : _links.Create(sequence[i], sequence[i + 1]);
+                    sequence[i / 2] = i + 1 == length ? sequence[i] : _links.CreateCore(sequence[i], sequence[i + 1]);
 
                 length = length / 2 + length % 2;
             }
 
-            return _links.Create(sequence[0], sequence[1]);
+            return _links.CreateCore(sequence[0], sequence[1]);
         }
 
         /// <remarks>

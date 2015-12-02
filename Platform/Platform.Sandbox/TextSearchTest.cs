@@ -152,7 +152,7 @@
             }
         }
 
-        private static Random r = new Random();
+        //private static Random r = new Random(); // RandomHelpers.DefaultFactory
 
         private static Artist GenerateArtist()
         {
