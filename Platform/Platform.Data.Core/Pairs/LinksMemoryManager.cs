@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Triplets;
 using Platform.Helpers.Disposal;
 using Platform.Memory;
 
@@ -50,7 +49,10 @@ namespace Platform.Data.Core.Pairs
 
         private LinksTargetsTreeMethods _targetsTreeMethods;
         private LinksSourcesTreeMethods _sourcesTreeMethods;
-        //private UnusedLinksListMethods _unusedLinksListMethods;
+
+        // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно
+        // TODO: использовать не список а дерево, так как так можно быстрее проверить на наличие связи внутри
+        private UnusedLinksListMethods _unusedLinksListMethods;
 
         /// <summary>
         /// Возвращает общее число связей находящихся в хранилище.
@@ -159,8 +161,7 @@ namespace Platform.Data.Core.Pairs
             var freeLink = _header->FirstFreeLink;
 
             if (freeLink != LinksConstants.Null)
-                DetachFromFreeLinkList(freeLink);
-                //_unusedLinksListMethods.Detach(freeLink);
+                _unusedLinksListMethods.Detach(freeLink);
             else
             {
                 if (_header->AllocatedLinks == long.MaxValue)
@@ -190,8 +191,7 @@ namespace Platform.Data.Core.Pairs
         {
             if (link < _header->AllocatedLinks)
             {
-                AttachToFreeLinkList(link);
-                //_unusedLinksListMethods.AttachAsFirst(link);
+                _unusedLinksListMethods.AttachAsFirst(link);
             }
             else if (link == _header->AllocatedLinks)
             {
@@ -202,8 +202,7 @@ namespace Platform.Data.Core.Pairs
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
                 while (_header->AllocatedLinks > 0 && IsUnusedLink(_header->AllocatedLinks))
                 {
-                    DetachFromFreeLinkList(_header->AllocatedLinks);
-                    //_unusedLinksListMethods.Detach(_header->AllocatedLinks);
+                    _unusedLinksListMethods.Detach(_header->AllocatedLinks);
 
                     _header->AllocatedLinks--;
                     _memory.UsedCapacity -= sizeof(Link);
@@ -226,59 +225,7 @@ namespace Platform.Data.Core.Pairs
 
             _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
-            //_unusedLinksListMethods = new UnusedLinksListMethods(this, _header);
-        }
-
-        // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно
-        // TODO: использовать не список а дерево, так как так можно быстрее проверить на наличие связи внутри
-        // 3<1>2 1<2>3 2<3>1 V
-        private void AttachToFreeLinkList(ulong link)
-        {
-            if (_header->FirstFreeLink == LinksConstants.Null)
-            {
-                _links[link].Source = link;
-                _links[link].Target = link;
-
-                _header->FirstFreeLink = link;
-            }
-            else
-            {
-                _links[link].Source = _links[_header->FirstFreeLink].Target;
-                _links[link].Target = _header->FirstFreeLink;
-
-                _links[_links[_header->FirstFreeLink].Target].Target = link;
-                _links[_header->FirstFreeLink].Source = link;
-            }
-
-            _header->FreeLinks++;
-        }
-
-        private void DetachFromFreeLinkList(ulong freeLink)
-        {
-            if (_header->FirstFreeLink == freeLink)
-            {
-                if (_links[freeLink].Source == freeLink)
-                {
-                    _header->FirstFreeLink = LinksConstants.Null;
-                }
-                else
-                {
-                    _links[_links[freeLink].Source].Target = _links[freeLink].Target;
-                    _links[_links[freeLink].Target].Source = _links[freeLink].Source;
-
-                    _header->FirstFreeLink = LinksConstants.Null;
-                }
-            }
-            else
-            {
-                _links[_links[freeLink].Source].Target = _links[freeLink].Target;
-                _links[_links[freeLink].Target].Source = _links[freeLink].Source;
-            }
-
-            _links[freeLink].Source = LinksConstants.Null;
-            _links[freeLink].Target = LinksConstants.Null;
-
-            _header->FreeLinks--;
+            _unusedLinksListMethods = new UnusedLinksListMethods(this, _header);
         }
 
         /// <summary>

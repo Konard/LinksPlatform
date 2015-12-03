@@ -4,7 +4,7 @@ namespace Platform.Data.Core.Pairs
 {
     unsafe partial class LinksMemoryManager
     {
-        private class UnusedLinksListMethods : OpenDoublyLinkedListMethods
+        private class UnusedLinksListMethods : CircularDoublyLinkedListMethods
         {
             private readonly Link* _links;
             private readonly LinksHeader* _header;
