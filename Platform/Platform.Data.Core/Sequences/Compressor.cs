@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
-using Platform.Data.Core.Structures;
 using Platform.Helpers.Collections;
 
 namespace Platform.Data.Core.Sequences

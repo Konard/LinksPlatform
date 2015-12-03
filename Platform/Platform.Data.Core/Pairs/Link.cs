@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.Structures
+namespace Platform.Data.Core.Pairs
 {
     /// <summary>
     /// Структура описывающая уникальную связь.

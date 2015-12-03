@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Structures
+﻿namespace Platform.Data.Core.Cluster
 {
     public enum ServerType
     {

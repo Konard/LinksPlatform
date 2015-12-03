@@ -46,6 +46,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BitString.cs" />
+    <Compile Include="Cluster\ServerType.cs" />
+    <Compile Include="Cluster\ServerUnique.cs" />
+    <Compile Include="Cluster\Unique.cs" />
     <Compile Include="IUniLinks.cs" />
     <Compile Include="ListMethods\CircularDoublyLinkedListMethods.cs" />
     <Compile Include="ListMethods\OpenDoublyLinkedListMethods.cs" />
@@ -56,7 +59,9 @@
     <Compile Include="Elements\IElements.Helpers.cs" />
     <Compile Include="Elements\IElements.CRUD.cs" />
     <Compile Include="Exceptions\ArgumentLinkDoesNotExistsException.cs" />
+    <Compile Include="Pairs\ILink.cs" />
     <Compile Include="Pairs\ILinksMemoryManager.cs" />
+    <Compile Include="Pairs\Link.cs" />
     <Compile Include="Pairs\Links2.cs" />
     <Compile Include="Pairs\ILinks.cs" />
     <Compile Include="Pairs\Links.cs" />
@@ -76,11 +81,6 @@
     <Compile Include="Sequences\SequenceWalker.cs" />
     <Compile Include="Sequences\StopableSequenceWalker.cs" />
     <Compile Include="Sequences\UnicodeMap.cs" />
-    <Compile Include="Structures\ILink.cs" />
-    <Compile Include="Structures\Link.cs" />
-    <Compile Include="Structures\ServerType.cs" />
-    <Compile Include="Structures\ServerUnique.cs" />
-    <Compile Include="Structures\Unique.cs" />
     <Compile Include="SearchEngine.cs" />
     <Compile Include="TreeMethods\SizeBalancedTreeMethodsBase.cs" />
     <Compile Include="Triggers\ICondition.cs" />

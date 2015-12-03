@@ -85,8 +85,8 @@ namespace Platform.Data.Core.Pairs
             public static readonly long Size = Marshal.SizeOf(typeof(Transition));
 
             public ulong TransactionId;
-            public Structures.Link Before;
-            public Structures.Link After;
+            public Link Before;
+            public Link After;
             public UniqueTimestamp Timestamp;
 
             public override string ToString()
@@ -248,19 +248,19 @@ namespace Platform.Data.Core.Pairs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitCreation(Structures.Link after)
+        private void CommitCreation(Link after)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, After = after });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitUpdate(Structures.Link before, Structures.Link after)
+        private void CommitUpdate(Link before, Link after)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before, After = after });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitDeletion(Structures.Link before)
+        private void CommitDeletion(Link before)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before });
         }

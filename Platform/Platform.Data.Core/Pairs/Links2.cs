@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Data.Core.Exceptions;
-using Platform.Data.Core.Structures;
 
 namespace Platform.Data.Core.Pairs
 {
@@ -115,9 +114,9 @@ namespace Platform.Data.Core.Pairs
             return SearchCore(source, target);
         }
 
-        public Structures.Link GetLink(ILink link)
+        public Pairs.Link GetLink(ILink link)
         {
-            return Structures.Link.Create(link);
+            return Pairs.Link.Create(link);
         }
 
         public ILink Update(ILink link, ILink newSource, ILink newTarget)
@@ -205,7 +204,7 @@ namespace Platform.Data.Core.Pairs
 
             public override string ToString()
             {
-                return Structures.Link.ToString(this);
+                return Pairs.Link.ToString(this);
             }
 
             #endregion

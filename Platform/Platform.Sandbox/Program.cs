@@ -8,7 +8,7 @@ namespace Platform.Sandbox
     {
         private static void Main(string[] args)
         {
-            WebCrawler.Test();
+            CompressionExperiments.Test();
 
             return;
             

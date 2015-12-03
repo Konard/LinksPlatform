@@ -119,7 +119,7 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс связи.</param>
         /// <returns>Уникальную связь.</returns>
-        public Structures.Link GetLink(ulong link)
+        public Link GetLink(ulong link)
         {
             return _sync.ExecuteReadOperation(() =>
             {
@@ -130,10 +130,10 @@ namespace Platform.Data.Core.Pairs
             });
         }
 
-        public Structures.Link GetLinkCore(ulong link)
+        public Link GetLinkCore(ulong link)
         {
             var values = _memoryManager.GetLinkValue(link);
-            return new Structures.Link(values[LinksConstants.SourcePart], values[LinksConstants.TargetPart]);
+            return new Link(values[LinksConstants.SourcePart], values[LinksConstants.TargetPart]);
         }
 
         /// <summary>

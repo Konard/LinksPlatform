@@ -7,14 +7,13 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Structures;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
 
 namespace Platform.Sandbox
 {
-    public static class WebCrawler
+    public static class CompressionExperiments
     {
         public static void Test()
         {

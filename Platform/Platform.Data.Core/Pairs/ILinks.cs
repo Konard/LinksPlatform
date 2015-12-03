@@ -1,5 +1,4 @@
 ﻿using System;
-using Platform.Data.Core.Structures;
 
 namespace Platform.Data.Core.Pairs
 {

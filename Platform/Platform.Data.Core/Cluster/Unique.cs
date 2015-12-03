@@ -1,11 +1,17 @@
 ﻿using System;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Structures
+namespace Platform.Data.Core.Cluster
 {
     /// <summary>
     /// Структура описывающая уникальную пространственно-временную зависимость.
     /// </summary>
+    /// <remarks>
+    /// Как вариант семя (Seed) может вычисляться на основании предыдущего хэша (из 
+    /// времени и прошлого хэша) и все Unique могут составлять 
+    /// гарантированную последовательность (вариант Blockchain или вариант 
+    /// проверки на согласованность данных)
+    /// </remarks>
     public struct Unique : IEquatable<Unique>
     {
         private const string DateFormat = "yyyy.MM.dd hh:mm:ss.fffffff";
