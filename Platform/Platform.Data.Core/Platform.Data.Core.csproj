@@ -47,6 +47,9 @@
   <ItemGroup>
     <Compile Include="BitString.cs" />
     <Compile Include="IUniLinks.cs" />
+    <Compile Include="ListMethods\CircularDoublyLinkedListMethods.cs" />
+    <Compile Include="ListMethods\OpenDoublyLinkedListMethods.cs" />
+    <Compile Include="ListMethods\DoublyLinkedListMethodsBase.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Elements\DefaultElements.cs" />
     <Compile Include="Elements\IElements.RW.cs" />
@@ -64,6 +67,7 @@
     <Compile Include="Pairs\LinksConstants.cs" />
     <Compile Include="Pairs\LinksExtensions.cs" />
     <Compile Include="Pairs\LinksMemoryManager.cs" />
+    <Compile Include="Pairs\LinksMemoryManager.ListMethods.cs" />
     <Compile Include="Pairs\LinksMemoryManager.Tests.cs" />
     <Compile Include="Pairs\LinksMemoryManager.TreeMethods.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -78,6 +82,7 @@
     <Compile Include="Structures\ServerUnique.cs" />
     <Compile Include="Structures\Unique.cs" />
     <Compile Include="SearchEngine.cs" />
+    <Compile Include="TreeMethods\SizeBalancedTreeMethodsBase.cs" />
     <Compile Include="Triggers\ICondition.cs" />
     <Compile Include="Triggers\IContext.cs" />
     <Compile Include="Triggers\ITrigger.cs" />

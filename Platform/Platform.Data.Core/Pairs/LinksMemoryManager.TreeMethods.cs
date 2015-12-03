@@ -20,37 +20,31 @@ namespace Platform.Data.Core.Pairs
                 _header = header;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetLeft(ulong node)
             {
                 return &_links[node].LeftAsSource;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetRight(ulong node)
             {
                 return &_links[node].RightAsSource;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong GetSize(ulong node)
             {
                 return _links[node].SizeAsSource;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetLeft(ulong node, ulong left)
             {
                 _links[node].LeftAsSource = left;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetRight(ulong node, ulong right)
             {
                 _links[node].RightAsSource = right;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetSize(ulong node, ulong size)
             {
                 _links[node].SizeAsSource = size;
@@ -180,37 +174,31 @@ namespace Platform.Data.Core.Pairs
                 _header = header;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetLeft(ulong node)
             {
                 return &_links[node].LeftAsTarget;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong* GetRight(ulong node)
             {
                 return &_links[node].RightAsTarget;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override ulong GetSize(ulong node)
             {
                 return _links[node].SizeAsTarget;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetLeft(ulong node, ulong left)
             {
                 _links[node].LeftAsTarget = left;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetRight(ulong node, ulong right)
             {
                 _links[node].RightAsTarget = right;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void SetSize(ulong node, ulong size)
             {
                 _links[node].SizeAsTarget = size;

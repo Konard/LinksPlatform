@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Platform.Data.Core.Triplets;
 using Platform.Helpers.Disposal;
 using Platform.Memory;
 
@@ -37,7 +38,7 @@ namespace Platform.Data.Core.Pairs
             public ulong FirstFreeLink;
             public ulong FirstAsSource;
             public ulong FirstAsTarget;
-            public ulong Reserved7;
+            public ulong LastFreeLink;
             public ulong Reserved8;
         }
 
@@ -49,6 +50,7 @@ namespace Platform.Data.Core.Pairs
 
         private LinksTargetsTreeMethods _targetsTreeMethods;
         private LinksSourcesTreeMethods _sourcesTreeMethods;
+        //private UnusedLinksListMethods _unusedLinksListMethods;
 
         /// <summary>
         /// Возвращает общее число связей находящихся в хранилище.
@@ -158,6 +160,7 @@ namespace Platform.Data.Core.Pairs
 
             if (freeLink != LinksConstants.Null)
                 DetachFromFreeLinkList(freeLink);
+                //_unusedLinksListMethods.Detach(freeLink);
             else
             {
                 if (_header->AllocatedLinks == long.MaxValue)
@@ -188,6 +191,7 @@ namespace Platform.Data.Core.Pairs
             if (link < _header->AllocatedLinks)
             {
                 AttachToFreeLinkList(link);
+                //_unusedLinksListMethods.AttachAsFirst(link);
             }
             else if (link == _header->AllocatedLinks)
             {
@@ -199,6 +203,7 @@ namespace Platform.Data.Core.Pairs
                 while (_header->AllocatedLinks > 0 && IsUnusedLink(_header->AllocatedLinks))
                 {
                     DetachFromFreeLinkList(_header->AllocatedLinks);
+                    //_unusedLinksListMethods.Detach(_header->AllocatedLinks);
 
                     _header->AllocatedLinks--;
                     _memory.UsedCapacity -= sizeof(Link);
@@ -221,6 +226,7 @@ namespace Platform.Data.Core.Pairs
 
             _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
+            //_unusedLinksListMethods = new UnusedLinksListMethods(this, _header);
         }
 
         // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно
@@ -230,10 +236,8 @@ namespace Platform.Data.Core.Pairs
         {
             if (_header->FirstFreeLink == LinksConstants.Null)
             {
-                // Если мы используем циклически связанный список, то перед откреплением от списка
-                // нам потребуется обнулять значения
-                //_links[link].Source = link;
-                //_links[link].Target = link;
+                _links[link].Source = link;
+                _links[link].Target = link;
 
                 _header->FirstFreeLink = link;
             }
@@ -271,7 +275,8 @@ namespace Platform.Data.Core.Pairs
                 _links[_links[freeLink].Target].Source = _links[freeLink].Source;
             }
 
-            // Вероятное место для обнуления связей если используется циклический список
+            _links[freeLink].Source = LinksConstants.Null;
+            _links[freeLink].Target = LinksConstants.Null;
 
             _header->FreeLinks--;
         }

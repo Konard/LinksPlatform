@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Runtime.CompilerServices;
 
 namespace Platform.Data.Core.TreeMethods
 {
@@ -7,60 +6,8 @@ namespace Platform.Data.Core.TreeMethods
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.
     /// Также имеет смысл разобраться почему не работает версия с идеальной балансировкой.
     /// </remarks>
-    public abstract unsafe class SizeBalancedTreeMethods2
+    public abstract unsafe class SizeBalancedTreeMethods2 : SizeBalancedTreeMethodsBase
     {
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong* GetLeft(ulong node);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong* GetRight(ulong node);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong GetSize(ulong node);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetLeft(ulong node, ulong left);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetRight(ulong node, ulong right);
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetSize(ulong node, ulong size);
-        protected abstract bool FirstIsToTheLeftOfSecond(ulong first, ulong second);
-        protected abstract bool FirstIsToTheRightOfSecond(ulong first, ulong second);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void IncrementSize(ulong node)
-        {
-            SetSize(node, GetSize(node) + 1);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DecrementSize(ulong node)
-        {
-            SetSize(node, GetSize(node) - 1);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong GetSizeOrZero(ulong node)
-        {
-            return node == 0 ? 0 : GetSize(node);
-        }
-
-        private void FixSize(ulong node)
-        {
-            SetSize(node, GetSizeOrZero(*GetLeft(node)) + GetSizeOrZero(*GetRight(node)) + 1);
-        }
-
-        public bool Contains(ulong node, ulong root)
-        {
-            while (root != 0)
-            {
-                if (FirstIsToTheLeftOfSecond(node, root)) // node.Key < root.Key
-                    root = *GetLeft(root);
-                else if (FirstIsToTheRightOfSecond(node, root)) // node.Key > root.Key
-                    root = *GetRight(root);
-                else // node.Key == root.Key
-                    return true;
-            }
-            return false;
-        }
-
         private void Insert(ulong* root, ulong newNode)
         {
             if (*root == 0)
@@ -230,28 +177,6 @@ namespace Platform.Data.Core.TreeMethods
                 throw new Exception(string.Format("Элемент с {0} не содержится в дереве.", node));
 
             Detach(root, node);
-        }
-
-        private void LeftRotate(ulong* root)
-        {
-            var right = *GetRight(*root);
-            if (right == 0) return;
-            SetRight(*root, *GetLeft(right));
-            SetLeft(right, *root);
-            SetSize(right, GetSize(*root));
-            FixSize(*root);
-            *root = right;
-        }
-
-        private void RightRotate(ulong* root)
-        {
-            var left = *GetLeft(*root);
-            if (left == 0) return;
-            SetLeft(*root, *GetRight(left));
-            SetRight(left, *root);
-            SetSize(left, GetSize(*root));
-            FixSize(*root);
-            *root = left;
         }
     }
 }
