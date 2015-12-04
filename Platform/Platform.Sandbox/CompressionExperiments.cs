@@ -67,16 +67,17 @@ namespace Platform.Sandbox
                 //var sw2 = Stopwatch.StartNew();
                 //var responseCompressedArray2 = links.PrecompressSequence2(responseSourceArray); sw2.Stop();
 
-                // TODO: Можно попробовать искать не максимальный, а первый, который встречается как минимум дважды
-                // TODO: Или использовать не локальный словарь, а глобальный
+                // [+] Можно попробовать искать не максимальный, а первый, который встречается как минимум дважды - медленно, высокое качество, не наивысшее
+                // [+] Или использовать не локальный словарь, а глобальный (т.е. считать один раз, потом только делать замены) - быстро, но качество низкое
+                // Precompress0 - лучшее соотношение скорость / качество. (тоже что и Data.Core.Sequences.Compressor.Precompress)
 
                 ulong[] responseCompressedArray3 = null;
 
-                for (var i = 0; i < 1; i++)
+                for (var i = 0; i < 5; i++)
                 {
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Compressor(links, sequences);
-                    responseCompressedArray3 = compressor.Precompress0(responseSourceArray); sw3.Stop();
+                    var compressor = new Data.Core.Sequences.Compressor(links, sequences);
+                    responseCompressedArray3 = compressor.Precompress(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
                 }
 
@@ -1052,6 +1053,368 @@ namespace Platform.Sandbox
 
                     final[j++] = copy[i];
                 }
+
+                return final;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// If pair repeats twice it is maximum pair.
+            /// </remarks>
+            public ulong[] Precompress3(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var oldLength = sequence.Length;
+                var newLength = sequence.Length;
+
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                Array.Copy(sequence, copy, copy.Length);
+
+                var set = new HashSet<Link>();
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+
+                    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //if(_maxFrequency >= 2)
+                    //    break;
+
+                    if (!set.Add(pair))
+                    {
+                        _maxPair = pair;
+                        //_maxFrequency = 2;
+                        break;
+                    }
+                }
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPairSource = _maxPair.Source;
+                    var maxPairTarget = _maxPair.Target;
+                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+
+                    oldLength--;
+                    //var oldLengthMinusTwo = oldLength - 1;
+
+                    // Substitute all usages
+                    int w = 0, r = 0; // (r == read, w == write)
+                    for (; r < oldLength; r++)
+                    {
+                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        {
+                            //if (r > 0)
+                            //{
+                            //    var previous = copy[w - 1];
+                            //    DecrementFrequency(new Link(previous, maxPairSource));
+                            //    IncrementFrequency(new Link(previous, maxPairResult));
+                            //}
+                            //if (r < oldLengthMinusTwo)
+                            //{
+                            //    var next = copy[r + 2];
+                            //    DecrementFrequency(new Link(maxPairTarget, next));
+                            //    IncrementFrequency(new Link(maxPairResult, next));
+                            //}
+
+                            copy[w++] = maxPairResult;
+                            r++;
+                            newLength--;
+                        }
+                        else
+                        {
+                            copy[w++] = copy[r];
+                        }
+                    }
+                    copy[w] = copy[r];
+
+                    //_pairsFrequencies.Remove(_maxPair);
+
+                    _maxPair = Link.Null;
+
+                    //ResetMaxPair();
+                    set.Clear();
+                    //_pairsFrequencies = new UnsafeDictionary<Link, ulong>();
+
+                    oldLength = newLength;
+
+                    for (var i = 1; i < newLength; i++)
+                    {
+                        var pair = new Link(copy[i - 1], copy[i]);
+
+                        //UpdateMaxPair(pair, IncrementFrequency(pair));
+                        //if (_maxFrequency >= 2)
+                        //    break;
+
+                        if (!set.Add(pair))
+                        {
+                            _maxPair = pair;
+                            //_maxFrequency = 2;
+                            break;;
+                        }
+                    }
+
+                    // Медленный вариант UpdateMaxPair
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+
+                    //foreach (var pairsFrequency in _pairsFrequencies)
+                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+
+                    // Быстрее
+                    //UpdateMaxPair2();
+                }
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
+
+                return final;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// If pair repeats twice it is maximum pair.
+            /// </remarks>
+            public ulong[] Precompress4(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var oldLength = sequence.Length;
+                var newLength = sequence.Length;
+
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                Array.Copy(sequence, copy, copy.Length);
+
+                var set = new HashSet<Link>();
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+
+                    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //if(_maxFrequency >= 2)
+                    //    break;
+
+                    if (!set.Add(pair))
+                    {
+                        _maxPair = pair;
+                        //_maxFrequency = 2;
+                        break;
+                    }
+                }
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPairSource = _maxPair.Source;
+                    var maxPairTarget = _maxPair.Target;
+                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+
+                    oldLength--;
+                    var oldLengthMinusTwo = oldLength - 1;
+
+                    _maxPair = Link.Null;
+                    set.Clear();
+
+                    // Substitute all usages
+                    int w = 0, r = 0; // (r == read, w == write)
+                    for (; r < oldLength; r++)
+                    {
+                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        {
+                            //if (_maxPair.IsNull())
+                            //{
+                            //    if (r > 0)
+                            //    {
+                            //        var previous = copy[w - 1];
+                            //        set.Remove(new Link(previous, maxPairSource));
+                            //        var pair = new Link(previous, maxPairResult);
+                            //        if (!set.Add(pair)) _maxPair = pair;
+                            //        //DecrementFrequency(new Link(previous, maxPairSource));
+                            //        //IncrementFrequency(new Link(previous, maxPairResult));
+                            //    }
+                            //    if (r < oldLengthMinusTwo)
+                            //    {
+                            //        var next = copy[r + 2];
+                            //        set.Remove(new Link(maxPairTarget, next));
+                            //        var pair = new Link(maxPairResult, next);
+                            //        if (!set.Add(pair)) _maxPair = pair;
+                            //        //DecrementFrequency(new Link(maxPairTarget, next));
+                            //        //IncrementFrequency(new Link(maxPairResult, next));
+                            //    }
+                            //}
+
+                            copy[w++] = maxPairResult;
+                            r++;
+                            newLength--;
+                        }
+                        else
+                        {
+                            //if (_maxPair.IsNull() && w > 0) // 8 sec
+                            //{
+                            //    var pair = new Link(copy[w - 1], copy[w]);
+                            //    if (!set.Add(pair)) _maxPair = pair;
+                            //}
+
+                            if (_maxPair.IsNull()) // 4 sec
+                            {
+                                var pair = new Link(copy[r], copy[r + 1]);
+                                if (!set.Add(pair)) _maxPair = pair;
+                            }
+                            copy[w++] = copy[r];
+
+                            //if (_maxPair.IsNull()) // 8 sec
+                            //{
+                            //    var pair = new Link(copy[w - 1], copy[w]);
+                            //    if (!set.Add(pair)) _maxPair = pair;
+                            //}
+                        }
+                    }
+                    //if (_maxPair.IsNull()) // 8 sec
+                    //{
+                    //    var pair = new Link(copy[w - 1], copy[w]);
+                    //    if (!set.Add(pair)) _maxPair = pair;
+                    //}
+                    copy[w] = copy[r];
+
+                    //_pairsFrequencies.Remove(_maxPair);
+
+                    //_maxPair = Link.Null;
+                    //set.Clear();
+
+                    oldLength = newLength;
+
+                    //for (var i = 1; i < newLength; i++)
+                    //{
+                    //    var pair = new Link(copy[i - 1], copy[i]);
+
+                    //    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //    //if (_maxFrequency >= 2)
+                    //    //    break;
+
+                    //    if (!set.Add(pair))
+                    //    {
+                    //        _maxPair = pair;
+                    //        //_maxFrequency = 2;
+                    //        break; ;
+                    //    }
+                    //}
+
+                    // Медленный вариант UpdateMaxPair
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+
+                    //foreach (var pairsFrequency in _pairsFrequencies)
+                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+
+                    // Быстрее
+                    //UpdateMaxPair2();
+                }
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
+
+                return final;
+            }
+
+            /// <remarks>
+            /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+            /// Global dictionary
+            /// </remarks>
+            public ulong[] Precompress5(ulong[] sequence)
+            {
+                if (sequence.IsNullOrEmpty())
+                    return null;
+
+                if (sequence.Length == 1)
+                    return sequence;
+
+                var oldLength = sequence.Length;
+                var newLength = sequence.Length;
+
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                copy[0] = sequence[0];
+
+                for (var i = 1; i < sequence.Length; i++)
+                {
+                    copy[i] = sequence[i];
+
+                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    UpdateMaxPair(pair, IncrementFrequency(pair));
+                }
+
+                while (!_maxPair.IsNull())
+                {
+                    var maxPairSource = _maxPair.Source;
+                    var maxPairTarget = _maxPair.Target;
+                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+
+                    oldLength--;
+                    //var oldLengthMinusTwo = oldLength - 1;
+
+                    // Substitute all usages
+                    int w = 0, r = 0; // (r == read, w == write)
+                    for (; r < oldLength; r++)
+                    {
+                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        {
+                            //if (r > 0)
+                            //{
+                            //    var previous = copy[w - 1];
+                            //    DecrementFrequency(new Link(previous, maxPairSource));
+                            //    IncrementFrequency(new Link(previous, maxPairResult));
+                            //}
+                            //if (r < oldLengthMinusTwo)
+                            //{
+                            //    var next = copy[r + 2];
+                            //    DecrementFrequency(new Link(maxPairTarget, next));
+                            //    IncrementFrequency(new Link(maxPairResult, next));
+                            //}
+
+                            copy[w++] = maxPairResult;
+                            r++;
+                            newLength--;
+                        }
+                        else
+                        {
+                            copy[w++] = copy[r];
+                        }
+                    }
+                    copy[w] = copy[r];
+
+                    _pairsFrequencies.Remove(_maxPair);
+
+                    oldLength = newLength;
+
+                    // Медленный вариант UpdateMaxPair
+                    //_maxPair = Link.Null;
+                    //_maxFrequency = 1;
+
+                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+
+                    //foreach (var pairsFrequency in _pairsFrequencies)
+                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+
+                    // Быстрее
+                    UpdateMaxPair2();
+                }
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
 
                 return final;
             }
