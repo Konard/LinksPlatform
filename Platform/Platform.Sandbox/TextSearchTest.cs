@@ -260,7 +260,7 @@
         private static List<Link> GetStringsWithSubstring(Link substring)
         {
             List<Link> result = new List<Link>();
-            substring.WalkThroughReferersByTarget(referer => StringsBySubstringCollector(referer, result));
+            substring.WalkThroughReferersAsTarget(referer => StringsBySubstringCollector(referer, result));
             return result;
         }
 
@@ -272,15 +272,15 @@
             }
             else if (currentLink.Linker == Net.And)
             {
-                currentLink.WalkThroughReferersByTarget(referer => StringsBySubstringCollector(referer, collection));
-                currentLink.WalkThroughReferersByTarget(referer => StringsBySubstringCollector(referer, collection));
+                currentLink.WalkThroughReferersAsTarget(referer => StringsBySubstringCollector(referer, collection));
+                currentLink.WalkThroughReferersAsTarget(referer => StringsBySubstringCollector(referer, collection));
             }
         }
 
         private static List<Link> GetArtistsWithString(Link @string)
         {
             HashSet<Link> result = new HashSet<Link>();
-            @string.WalkThroughReferersByTarget(referer => ArtistsByStringCollector(referer, result));
+            @string.WalkThroughReferersAsTarget(referer => ArtistsByStringCollector(referer, result));
             return result.ToList();
         }
 
@@ -293,13 +293,13 @@
             }
             else if (Track.IsTrackLink(currentLink))
             {
-                currentLink.WalkThroughReferersByTarget(referer => ArtistsByStringCollector(referer, storage));
-                currentLink.WalkThroughReferersBySource(referer => ArtistsByStringCollector(referer, storage));
+                currentLink.WalkThroughReferersAsTarget(referer => ArtistsByStringCollector(referer, storage));
+                currentLink.WalkThroughReferersAsSource(referer => ArtistsByStringCollector(referer, storage));
             }
             else if (currentLink.Linker == Net.And)
             {
-                currentLink.WalkThroughReferersByTarget(referer => ArtistsByStringCollector(referer, storage));
-                currentLink.WalkThroughReferersByTarget(referer => ArtistsByStringCollector(referer, storage));
+                currentLink.WalkThroughReferersAsTarget(referer => ArtistsByStringCollector(referer, storage));
+                currentLink.WalkThroughReferersAsTarget(referer => ArtistsByStringCollector(referer, storage));
             }
         }
 

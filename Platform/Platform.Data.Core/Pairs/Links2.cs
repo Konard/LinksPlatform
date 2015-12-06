@@ -9,7 +9,7 @@ namespace Platform.Data.Core.Pairs
     /// 
     /// </summary>
     /// <remarks>
-    /// TODO: Переписать в реализацию ILinksMemoryManager
+    /// TODO: Переписать реализацию с использованием ILinksMemoryManager
     /// TODO: Реализовать Update.
     /// </remarks>
     public class Links2 : ILinks<ILink>
@@ -190,13 +190,13 @@ namespace Platform.Data.Core.Pairs
 
             #region Methods
 
-            public void WalkThroughReferersBySource(Action<ILink> walker)
+            public void WalkThroughReferersAsSource(Action<ILink> walker)
             {
                 foreach (ILink link in _links._linksBySource[this])
                     walker(link);
             }
 
-            public void WalkThroughReferersByTarget(Action<ILink> walker)
+            public void WalkThroughReferersAsTarget(Action<ILink> walker)
             {
                 foreach (ILink link in _links._linksByTarget[this])
                     walker(link);

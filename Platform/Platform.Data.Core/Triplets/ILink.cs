@@ -10,8 +10,8 @@ namespace NetLibrary
 		ILink Target { get; }
 
 		void WalkThroughReferersByLinker(Action<ILink> walker);
-		void WalkThroughReferersBySource(Action<ILink> walker);
-		void WalkThroughReferersByTarget(Action<ILink> walker);
+		void WalkThroughReferersAsSource(Action<ILink> walker);
+		void WalkThroughReferersAsTarget(Action<ILink> walker);
 
 		// И статические методы (общие для всех связей)
 

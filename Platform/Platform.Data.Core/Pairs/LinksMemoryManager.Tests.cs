@@ -167,7 +167,7 @@ namespace Platform.Data.Core.Pairs
             if (!Exists(link))
                 throw new Exception(string.Format("Source link {0} is not exists.", link));
 
-            //return string.Format("{0}: {1} → {2}", link, this.links[link].Source, this.links[link].Target);
+            //return string.Format("{0}: {1} -> {2}", link, this.links[link].Source, this.links[link].Target);
 
             //if (_links[link].Target == 0)
             //    return string.Format("0 {0} 0", link);

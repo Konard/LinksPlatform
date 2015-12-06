@@ -38,7 +38,7 @@ namespace Platform.Data.ConsoleTerminal
                             {
                                 var message = receiver.ReceiveString();
                                 if (!string.IsNullOrWhiteSpace(message))
-                                    Console.WriteLine("← {0}", message);
+                                    Console.WriteLine("<- {0}", message);
                             }
 
                             Thread.Sleep(1);

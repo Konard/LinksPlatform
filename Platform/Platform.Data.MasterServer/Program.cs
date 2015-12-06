@@ -48,7 +48,7 @@ namespace Platform.Data.MasterServer
                         {
                             if (!string.IsNullOrWhiteSpace(message))
                             {
-                                Console.WriteLine("← {0}", message);
+                                Console.WriteLine("<- {0}", message);
 
                                 if (message.EndsWith("?"))
                                     sequences.Search(sender, message);
@@ -108,7 +108,7 @@ namespace Platform.Data.MasterServer
 
                 // Выделить код по печати одной связи в Extensions
 
-                var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} → {{2:{0}}} {{3}}", printFormatBase);
+                var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} {{3}}", printFormatBase);
 
                 for (var link = UnicodeMap.LastCharLink + 1; link <= links.Total; link++)
                 {

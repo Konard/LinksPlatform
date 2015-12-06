@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Pairs
         ILink Source { get; }
         ILink Target { get; }
 
-        void WalkThroughReferersBySource(Action<ILink> walker);
-        void WalkThroughReferersByTarget(Action<ILink> walker);
+        void WalkThroughReferersAsSource(Action<ILink> walker);
+        void WalkThroughReferersAsTarget(Action<ILink> walker);
     }
 }

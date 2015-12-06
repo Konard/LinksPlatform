@@ -20,7 +20,7 @@
 
             //    if (Net.Name.ReferersBySourceCount < Net.ThatIsRepresentedBy.ReferersByLinkerCount)
             //    {
-            //        Net.Name.WalkThroughReferersBySource(referer =>
+            //        Net.Name.WalkThroughReferersAsSource(referer =>
             //        {
             //            checksCount++;
             //            if (referer.Linker == Net.ThatIsRepresentedBy)
@@ -50,9 +50,9 @@
             //    // Наивный вариант обратного сбора даёт 80*80 проходов в худшем случае (непредсказуемое поведение) N*N в худшем случае
 
 
-            //    Net.String.WalkThroughReferersBySource(stringReferer =>
+            //    Net.String.WalkThroughReferersAsSource(stringReferer =>
             //    {
-            //        stringReferer.WalkThroughReferersByTarget(stringRefererReferer =>
+            //        stringReferer.WalkThroughReferersAsTarget(stringRefererReferer =>
             //        {
             //            checksCount++;
             //            if (stringRefererReferer.Source == Net.Name && stringRefererReferer.Linker == Net.ThatIsRepresentedBy)
@@ -72,7 +72,7 @@
             //    // счётчик общего числа связей, которые может предстоять пройти
             //    long targetsTotalReferers = 0;
 
-            //    Net.String.WalkThroughReferersBySource(stringReferer =>
+            //    Net.String.WalkThroughReferersAsSource(stringReferer =>
             //    {
             //        targetsTotalReferers += stringReferer.ReferersByTargetCount;
 
@@ -95,7 +95,7 @@
             //    {
             //        foreach (var secondLevelMatch in secondLevelMatches)
             //        {
-            //            secondLevelMatch.WalkThroughReferersByTarget(referer =>
+            //            secondLevelMatch.WalkThroughReferersAsTarget(referer =>
             //            {
             //                if (referer.Source == Net.Name && referer.Linker == Net.ThatIsRepresentedBy)
             //                {
@@ -106,7 +106,7 @@
             //    }
             //    else
             //    {
-            //        Net.Name.WalkThroughReferersBySource(nameReferer =>
+            //        Net.Name.WalkThroughReferersAsSource(nameReferer =>
             //        {
             //            if (nameReferer.Linker == Net.ThatIsRepresentedBy)
             //            {

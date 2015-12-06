@@ -53,7 +53,7 @@ namespace Platform.Data.Core.Sequences
             {
                 for (var i = _firstCharLink + 1; i <= _lastCharLink; i++)
                 {
-                    // From NIL to It (NIL → Character) transformation meaning, (or infinite amount of NIL characters before actual Character)
+                    // From NIL to It (NIL -> Character) transformation meaning, (or infinite amount of NIL characters before actual Character)
                     var createdLink = _links.Create(firstLink, 0);
                     if (createdLink != i)
                         throw new Exception("Unable to initialize UTF 16 table.");
