@@ -1,6 +1,6 @@
 ﻿namespace Platform.Helpers.Disposal
 {
-    partial class DisposalBaseUsageExample : DisposalBase
+    internal class DisposalBaseUsageExample : DisposalBase
     {
         protected override void DisposeCore(bool manual)
         {

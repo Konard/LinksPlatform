@@ -57,7 +57,7 @@ namespace Platform.Data.Core.Pairs
         /// <summary>
         /// Возвращает общее число связей находящихся в хранилище.
         /// </summary>
-        public ulong Total
+        private ulong Total
         {
             get { return _header->AllocatedLinks - _header->FreeLinks; }
         }
@@ -85,6 +85,48 @@ namespace Platform.Data.Core.Pairs
         public bool Exists(ulong link)
         {
             return link != LinksConstants.Null && !IsUnusedLink(link) && link <= _header->AllocatedLinks;
+        }
+
+        public ulong Count(params ulong[] restrictions)
+        {
+            if (restrictions.Length == 0) // нет ограничений
+            {
+                // Общее число связей находящихся в хранилище.
+                return Total;
+            }
+            if (restrictions.Length == 1)
+            {
+                // Сколько есть всего ссылок на эту конкретную связь?
+                var link = restrictions[0];
+                //if (link == LinksConstants.Null) return 0; // На нулевую связь (пустую) никто никогда не ссылается
+                if (link == LinksConstants.Any) return Total; // Null - как отсутствие ограничения
+                return _sourcesTreeMethods.CalculateReferences(link) + _targetsTreeMethods.CalculateReferences(link);
+            }
+            if (restrictions.Length == 2)
+            {
+                //TODO: var id/index возможно в будущем нужно будет учитывать одновременное ограничение по трём параметрам (это важно чтобы отличать пары от точек)
+                var source = restrictions[LinksConstants.SourcePart];
+                var target = restrictions[LinksConstants.TargetPart];
+
+                if (source == LinksConstants.Any && target == LinksConstants.Any)
+                {
+                    return Total;
+                }
+                else if (source == LinksConstants.Any)
+                {
+                    return _targetsTreeMethods.CalculateReferences(target);
+                }
+                else if (target == LinksConstants.Any)
+                {
+                    return _sourcesTreeMethods.CalculateReferences(source);
+                }
+                else //if(source != Null && target != Null)
+                {
+                    var link = _sourcesTreeMethods.Search(source, target);
+                    return link != LinksConstants.Null ? 1UL : 0UL;
+                }
+            }
+            throw new NotSupportedException("Другие размеры и способы ограничений не поддерживаются.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

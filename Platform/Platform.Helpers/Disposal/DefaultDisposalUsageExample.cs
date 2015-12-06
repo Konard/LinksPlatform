@@ -2,7 +2,7 @@
 
 namespace Platform.Helpers.Disposal
 {
-    partial class DefaultDisposalUsageExample : IDisposable
+    internal class DefaultDisposalUsageExample : IDisposable
     {
         private readonly DefaultDisposal _disposal;
 

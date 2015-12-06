@@ -13,7 +13,8 @@ namespace Platform.Data.Core
     /// <remarks>Minimal sufficient universal Links API (for step by step operations).</remarks>
     public partial interface IUniLinks<TLink>
     {
-        TLink Trigger(TLink[] condition, TLink[] substitution, Func<TLink[], TLink[], TLink> handler);
+        void Trigger(TLink[] patternOrCondition, Func<TLink[], TLink> matchHandler,
+                     TLink[] substitution, Func<TLink[], TLink[], TLink> substitutionHandler);
     }
 
     /// <remarks>
@@ -49,11 +50,11 @@ namespace Platform.Data.Core
         /// * update if before != null && after != null
         /// * default(TLink) if before == null && after == null
         /// 
-        /// Possible interpretation of single element (array with length 1).
-        /// * In(null, new[] { 0 }) creates point (link that points to itself).
-        /// * In(new[] { 4 }, null) deletes link 4.
-        /// * In(new[] { 4 }, new [] { 2, 3 }) replaces link 4 with new link
-        /// (with 2 as source, and 3 as target).
+        /// Possible interpretation
+        /// * In(null, new[] { }) creates point (link that points to itself using minimum number of parts).
+        /// * In(new[] { 4 }, null) deletes 4th link.
+        /// * In(new[] { 4 }, new [] { 5 }) delete 5th link if it exists and moves 4th link to 5th index.
+        /// * In(new[] { 4 }, new [] { 0, 2, 3 }) replaces 4th link with new pair link (with 2 as source and 3 as target), 0 means it can be placed in any address.
         /// ...
         /// </remarks>
         TLink In(TLink[] before, TLink[] after);

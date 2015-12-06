@@ -299,6 +299,44 @@ namespace Platform.Tests.Data.Core
         }
 
         [TestMethod]
+        public void CompressionTest()
+        {
+            var tempFilename = Path.GetTempFileName();
+
+            const ulong itself = LinksConstants.Itself;
+
+            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Links(memoryManager))
+            {
+                var e1 = links.Create(itself, itself);
+                var e2 = links.Create(itself, itself);
+
+                var sequence = new[]
+                {
+                    e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
+                };
+
+                var sequences = new Sequences(links);
+
+                var compressor = new Compressor(links, sequences);
+
+                var compressedVariant = compressor.Compress(sequence);
+
+                // 1: [1]       (1->1) point
+                // 2: [2]       (2->2) point
+                // 3: [1,2]     (1->2) pair
+                // 4: [1,2,1,2] (3->3) pair
+
+                Assert.IsTrue(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
+                Assert.IsTrue(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
+                Assert.IsTrue(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
+                Assert.IsTrue(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
+            }
+
+            File.Delete(tempFilename);
+        }
+
+        [TestMethod]
         public void AllPossibleConnectionsTest()
         {
             InitBitString();

@@ -6,13 +6,15 @@ namespace Platform.Helpers.Disposal
     /// <summary>
     /// Представляет базовый класс реализующий основную логику необходимую для повышения вероятности корректного высвобождения памяти.
     /// </summary>
+    /// <example><code source="DisposalBaseUsageExample.cs" /></example>
     /// <remarks>
     /// TODO: Попробовать реализовать компилируемый автоматический вариант DisposeCore (находить все типы IDisposable, IDisposal и автоматически вычищать их).
     /// </remarks>
     public abstract class DisposalBase : IDisposal
     {
-        private readonly Process _currentProcess;
-        private readonly AppDomain _currentDomain;
+        private static readonly Process CurrentProcess = Process.GetCurrentProcess();
+        private static readonly AppDomain CurrentDomain = AppDomain.CurrentDomain;
+
         private bool _disposed;
 
         public bool Disposed { get { return _disposed; } }
@@ -20,8 +22,8 @@ namespace Platform.Helpers.Disposal
         protected DisposalBase()
         {
             _disposed = false;
-            (_currentProcess = Process.GetCurrentProcess()).Exited += OnProcessExit;
-            (_currentDomain = AppDomain.CurrentDomain).ProcessExit += OnProcessExit;
+            CurrentProcess.Exited += OnProcessExit;
+            CurrentDomain.ProcessExit += OnProcessExit;
         }
 
         public void Dispose()
@@ -38,6 +40,7 @@ namespace Platform.Helpers.Disposal
         private void OnProcessExit(object sender, EventArgs e)
         {
             Dispose(false);
+            GC.SuppressFinalize(this);
         }
 
         ~DisposalBase()
@@ -60,8 +63,15 @@ namespace Platform.Helpers.Disposal
                         }
                         finally
                         {
-                            _currentProcess.Exited -= OnProcessExit;
-                            _currentDomain.ProcessExit -= OnProcessExit;
+                            if (CurrentProcess != null)
+                                CurrentProcess.Exited -= OnProcessExit;
+                            //else
+                            //    Process.GetCurrentProcess().Exited -= OnProcessExit;
+
+                            if (CurrentDomain != null)
+                                CurrentDomain.ProcessExit -= OnProcessExit;
+                            //else
+                            //  AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
                         }
 
                         _disposed = true;

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
+using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Disposal;
 using Platform.Helpers.Threading;
@@ -48,7 +49,7 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         public ulong Total
         {
-            get { return _sync.ExecuteReadOperation(() => _memoryManager.Total); }
+            get { return _sync.ExecuteReadOperation(() => _memoryManager.Count()); }
         }
 
         #endregion
@@ -82,10 +83,6 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetSourceCore(ulong link)
         {
-            // Связь "точка" не имеет начала и конца
-            //if (_links[link].Target == Null)
-            //    return 0;
-
             return _memoryManager.GetLinkValue(link)[LinksConstants.SourcePart];
         }
 
@@ -185,7 +182,7 @@ namespace Platform.Data.Core.Pairs
                 if (!_memoryManager.Exists(link))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(link, "link");
 
-                return _memoryManager.CalculateLinkTotalReferences(link);
+                return _memoryManager.Count(link);
             });
         }
 
@@ -316,21 +313,25 @@ namespace Platform.Data.Core.Pairs
             }
             else // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
             {
-                var referencesAsSource = new List<ulong>();
-                var referencesAsTarget = new List<ulong>();
+                var referencesAsSourceCount = _memoryManager.Count(linkIndex, LinksConstants.Null);
+                var referencesAsTargetCount = _memoryManager.Count(LinksConstants.Null, linkIndex);
 
-                _memoryManager.Each(referencesAsSource.AddAndReturnTrue, linkIndex, LinksConstants.Null);
-                _memoryManager.Each(referencesAsTarget.AddAndReturnTrue, LinksConstants.Null, linkIndex);
+                var references = new ulong[referencesAsSourceCount + referencesAsTargetCount];
 
-                for (var i = 0; i < referencesAsSource.Count; i++)
+                var referencesFiller = new ArrayFiller<ulong>(references);
+
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, linkIndex, LinksConstants.Null);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, linkIndex);
+
+                for (ulong i = 0; i < referencesAsSourceCount; i++)
                 {
-                    var reference = referencesAsSource[i];
+                    var reference = references[i];
                     if (reference == linkIndex) continue;
                     UpdateCore(reference, newLink, GetTargetCore(reference));
                 }
-                for (var i = 0; i < referencesAsTarget.Count; i++)
+                for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
                 {
-                    var reference = referencesAsTarget[i];
+                    var reference = references[i];
                     if (reference == linkIndex) continue;
                     UpdateCore(reference, GetSourceCore(reference), newLink);
                 }
@@ -377,14 +378,20 @@ namespace Platform.Data.Core.Pairs
 
                 _memoryManager.SetLinkValue(link, LinksConstants.Null, LinksConstants.Null);
 
-                var references = new List<ulong>();
+                var referencesCount =
+                    _memoryManager.Count(link, LinksConstants.Null) +
+                    _memoryManager.Count(LinksConstants.Null, link);
 
-                _memoryManager.Each(references.AddAndReturnTrue, link, LinksConstants.Null);
-                _memoryManager.Each(references.AddAndReturnTrue, LinksConstants.Null, link);
+                var references = new ulong[referencesCount];
 
-                references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
+                var referencesFiller = new ArrayFiller<ulong>(references);
 
-                for (int i = references.Count - 1; i >= 0; i--)
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, link, LinksConstants.Null);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, link);
+
+                //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
+
+                for (var i = (long)referencesCount - 1; i >= 0; i--)
                     DeleteCore(references[i]);
 
                 _memoryManager.FreeLink(link);

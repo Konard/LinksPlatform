@@ -2,6 +2,7 @@
 {
     public delegate void DisposedDelegate(bool manual);
 
+    /// <example><code source="DefaultDisposalUsageExample.cs" /></example>
     public class DefaultDisposal : DisposalBase
     {
         public event DisposedDelegate OnDispose = m => { };

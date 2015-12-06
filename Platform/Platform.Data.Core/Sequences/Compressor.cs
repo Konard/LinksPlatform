@@ -66,7 +66,7 @@ namespace Platform.Data.Core.Sequences
                 return sequence;
 
             if (sequence.Length == 2)
-                return new [] { _links.Create(sequence[0], sequence[1]) };
+                return new[] { _links.Create(sequence[0], sequence[1]) };
 
             if (_pairsFrequencies != null)
                 throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
@@ -125,7 +125,7 @@ namespace Platform.Data.Core.Sequences
                         copy[w++] = copy[r];
                     }
                 }
-                copy[w] = copy[r];
+                if (w < newLength) copy[w] = copy[r];
 
                 _pairsFrequencies.Remove(_maxPair);
 

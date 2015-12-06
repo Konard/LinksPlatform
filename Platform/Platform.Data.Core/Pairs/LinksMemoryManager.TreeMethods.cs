@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.TreeMethods;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
@@ -109,13 +110,10 @@ namespace Platform.Data.Core.Pairs
             public ulong CalculateReferences(ulong link)
             {
                 // TODO: Optimize Using node.Size
-                ulong references = 0;
-                EachReference(link, x =>
-                {
-                    references++;
-                    return true;
-                });
-                return references;
+
+                var counter = new Counter();
+                EachReference(link, counter.IncrementAndReturnTrue);
+                return counter.Count;
             }
 
             /// <summary>
@@ -224,13 +222,10 @@ namespace Platform.Data.Core.Pairs
             public ulong CalculateReferences(ulong link)
             {
                 // TODO: Optimize Using node.Size
-                ulong references = 0;
-                EachReference(link, x =>
-                {
-                    references++;
-                    return true;
-                });
-                return references;
+
+                var counter = new Counter();
+                EachReference(link, counter.IncrementAndReturnTrue);
+                return counter.Count;
             }
 
             /// <summary>
