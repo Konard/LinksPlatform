@@ -24,12 +24,14 @@ namespace Platform.Data.Core.Walker
         {
             IsWalking = true;
 
-            return new Task(() => { while (IsWalking) Step(); });
+            var task = new Task(() => { while (IsWalking) Step(); });
+            task.Start();
+            return task;
         }
 
         public void Step()
         {
-            var method = Handle();
+            var method = Decide();
             var milestone = Move(method);
             Path.Step(method, milestone);
         }
@@ -41,6 +43,6 @@ namespace Platform.Data.Core.Walker
 
         protected abstract TMilestone Move(TMethod method);
 
-        protected abstract TMethod Handle();
+        protected abstract TMethod Decide();
     }
 }

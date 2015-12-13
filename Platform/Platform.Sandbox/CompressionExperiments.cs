@@ -111,7 +111,7 @@ namespace Platform.Sandbox
 
                 // TODO: Combine Groups and Compression (first Compression, then Groups)
 
-                var totalLinks = links.Total - UnicodeMap.MapSize;
+                var totalLinks = links.Count() - UnicodeMap.MapSize;
 
                 Global.Trash = totalLinks;
 

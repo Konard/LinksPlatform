@@ -55,7 +55,7 @@ namespace Platform.Sandbox
 
                     Console.WriteLine("---");
 
-                    Console.WriteLine(links.Total);
+                    Console.WriteLine(links.Count());
 
                     var sequences = new Sequences(links);
 
@@ -83,12 +83,12 @@ namespace Platform.Sandbox
 
                     Console.WriteLine(sequencesCount);
 
-                    Console.WriteLine(links.Total);
+                    Console.WriteLine(links.Count());
 
                     sequences.Create(temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1,
                         temp1);
 
-                    Console.WriteLine(links.Total);
+                    Console.WriteLine(links.Count());
 
 
                     Console.ReadKey();

@@ -54,6 +54,14 @@ namespace Platform.Data.Core.Pairs
             return _links.Contains(link);
         }
 
+        public ulong Count(params ILink[] restrictions)
+        {
+            if (restrictions.Length == 0)
+                return (ulong)_links.Count;
+
+            throw new NotImplementedException();
+        }
+
         public bool Each(ILink source, ILink target, Func<ILink, bool> handler)
         {
             if (source != null && !Exists(source))
@@ -87,11 +95,6 @@ namespace Platform.Data.Core.Pairs
             }
 
             return LinksConstants.Continue;
-        }
-
-        public ulong Total
-        {
-            get { return (ulong) _links.Count; }
         }
 
         public ILink GetSource(ILink link)

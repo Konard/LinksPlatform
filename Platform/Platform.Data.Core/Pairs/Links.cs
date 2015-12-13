@@ -40,18 +40,6 @@ namespace Platform.Data.Core.Pairs
 
         #endregion
 
-        #region Properties
-
-        /// <summary>
-        /// Возвращает общее число связей находящихся в хранилище.
-        /// </summary>
-        public ulong Total
-        {
-            get { return _sync.ExecuteReadOperation(() => _memoryManager.Count()); }
-        }
-
-        #endregion
-
         #region Links Logic
 
         public Links(ILinksMemoryManager<ulong> memoryManager)
@@ -173,14 +161,12 @@ namespace Platform.Data.Core.Pairs
             return searchResult;
         }
 
-        public ulong CalculateReferences(ulong link)
+        public ulong Count(params ulong[] restrictions)
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(link))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(link, "link");
-
-                return _memoryManager.Count(link);
+                this.EnsureEachLinkIsAnyOrExists(restrictions);
+                return _memoryManager.Count(restrictions);
             });
         }
 

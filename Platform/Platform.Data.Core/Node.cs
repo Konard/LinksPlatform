@@ -10,10 +10,20 @@ namespace Platform.Data.Core
     // Новая идея
     // "324234" -> [51][50][52][50][51][52]
     //
+    //48 = '0'
     //49 = '1'
     //50 = '2'
     //51 = '3'
     //52 = '4'
+    //
+    //
+    // Node представляет собой элемент свободного дерева, с неограниченным количеством элементов. 
+    // Однако каждая ветка/лист может содержаться в элементе только один раз.
+    // Такого рода структура может быть полезна для формирования индексов-группировки со свободной структурой.
+    // 
+    // Эта структура совместима с Links, и может быть представлена через связи. Но ближе всего к последоватеностям.
+    // Наивный подход, а именно связи: (51 50) (50 52) (52 50) (50 51) (51 52) не всегда будет функционировать корректно.
+    // ((((51 50) 52) 50) 51) 52) будет точнее.
 
     // Узнать почему нужен IComparable
     public class Node
@@ -53,9 +63,7 @@ namespace Platform.Data.Core
             get
             {
                 if (_childNodes == null)
-                {
                     _childNodes = new Dictionary<IComparable, Node>();
-                }
                 return _childNodes;
             }
             private set { _childNodes = value; }
@@ -67,9 +75,7 @@ namespace Platform.Data.Core
             {
                 Node child = GetChild(key);
                 if (child == null && CreateNullChildren)
-                {
                     child = AddChild(key);
-                }
                 return child;
             }
             set { SetChild(key); }
@@ -91,9 +97,7 @@ namespace Platform.Data.Core
         private void ValidateKeyAlreadyExists(IComparable key)
         {
             if (ChildNodes.ContainsKey(key))
-            {
                 throw new InvalidOperationException("Child collection already contains node with the same key.");
-            }
         }
 
         public Node AddChild(Node child)
@@ -112,9 +116,7 @@ namespace Platform.Data.Core
             {
                 node.ChildNodes.TryGetValue(keys[i], out node);
                 if (node == null)
-                {
                     return null;
-                }
             }
 
             return node;
@@ -125,9 +127,7 @@ namespace Platform.Data.Core
             Node childNode = GetChild(keys);
 
             if (childNode == null)
-            {
                 return null;
-            }
 
             return childNode.Value;
         }
@@ -154,9 +154,7 @@ namespace Platform.Data.Core
             {
                 Node child;
                 if (!node.ChildNodes.TryGetValue(keys[i], out child))
-                {
                     child = node.AddChild(keys[i], value);
-                }
                 node = child;
             }
             node.Value = value;
@@ -168,9 +166,7 @@ namespace Platform.Data.Core
         {
             Node child;
             if (!ChildNodes.TryGetValue(key, out child))
-            {
                 child = AddChild(key, value);
-            }
             child.Value = value;
 
             return child;

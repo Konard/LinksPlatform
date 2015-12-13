@@ -41,7 +41,7 @@ namespace Platform.Tests.Data.Core
 
                 links.Delete(l2);
 
-                Global.Trash = links.Total;
+                Global.Trash = links.Count();
             }
 
             Global.Trash = FileHelpers
@@ -101,7 +101,7 @@ namespace Platform.Tests.Data.Core
                     Global.Trash = transaction;
                 }
 
-                Global.Trash = links.Total;
+                Global.Trash = links.Count();
             }
 
             Global.Trash = FileHelpers
@@ -134,7 +134,7 @@ namespace Platform.Tests.Data.Core
                         transaction.Commit();
                     }
 
-                    Global.Trash = links.Total;
+                    Global.Trash = links.Count();
                 }
             }
             catch
@@ -179,7 +179,7 @@ namespace Platform.Tests.Data.Core
                         transaction.Commit();
                     }
 
-                    Global.Trash = links.Total;
+                    Global.Trash = links.Count();
                 }
             }
             catch
@@ -204,7 +204,7 @@ namespace Platform.Tests.Data.Core
                     transaction.Commit();
                 }
 
-                Global.Trash = links.Total;
+                Global.Trash = links.Count();
             }
 
             Global.Trash = FileHelpers
@@ -222,7 +222,7 @@ namespace Platform.Tests.Data.Core
                 using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
                 using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
-                    Global.Trash = links.Total;
+                    Global.Trash = links.Count();
                 }
             }
             catch (NotSupportedException ex)
@@ -279,7 +279,7 @@ namespace Platform.Tests.Data.Core
                         transaction.Commit();
                     }
 
-                    Global.Trash = links.Total;
+                    Global.Trash = links.Count();
                 }
             }
             catch
@@ -647,11 +647,11 @@ namespace Platform.Tests.Data.Core
             {
                 ulong counter = 0;
 
-                var maxLink = links.Total;
+                var maxLink = links.Count();
 
-                var iterations = links.Total;
+                var iterations = links.Count();
 
-                Console.WriteLine("Testing Random Search with {0} Iterations.", links.Total);
+                Console.WriteLine("Testing Random Search with {0} Iterations.", links.Count());
 
                 var sw = Stopwatch.StartNew();
 
@@ -775,7 +775,7 @@ namespace Platform.Tests.Data.Core
             using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
             using (var links = new Links(memoryManager))
             {
-                var linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Count();
 
                 long linksToCreate = 64 * 1024 * 1024 / LinksMemoryManager.LinkSizeInBytes;
 
@@ -789,10 +789,10 @@ namespace Platform.Tests.Data.Core
                     }
                 });
 
-                var linksCreated = links.Total - linksBeforeTest;
+                var linksCreated = links.Count() - linksBeforeTest;
                 var linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
-                Console.WriteLine("Current links count: {0}.", links.Total);
+                Console.WriteLine("Current links count: {0}.", links.Count());
 
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
                     (long)linksPerSecond);
@@ -809,7 +809,7 @@ namespace Platform.Tests.Data.Core
             using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
             using (var links = new Links(memoryManager))
             {
-                var linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Count();
 
                 var sw = Stopwatch.StartNew();
 
@@ -821,7 +821,7 @@ namespace Platform.Tests.Data.Core
 
                 var elapsedTime = sw.Elapsed;
 
-                var linksCreated = links.Total - linksBeforeTest;
+                var linksCreated = links.Count() - linksBeforeTest;
                 var linksPerSecond = linksCreated / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
@@ -839,13 +839,13 @@ namespace Platform.Tests.Data.Core
             using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
             using (var links = new Links(memoryManager))
             {
-                var linksBeforeTest = links.Total;
+                var linksBeforeTest = links.Count();
 
                 Console.WriteLine("Deleting all links");
 
                 var elapsedTime = PerformanceHelpers.Measure(links.DeleteAll);
 
-                var linksDeleted = linksBeforeTest - links.Total;
+                var linksDeleted = linksBeforeTest - links.Count();
                 var linksPerSecond = linksDeleted / elapsedTime.TotalSeconds;
 
                 Console.WriteLine("{0} links deleted in {1} ({2} links per second)", linksDeleted, elapsedTime,

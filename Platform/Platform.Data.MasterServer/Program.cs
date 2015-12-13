@@ -96,13 +96,13 @@ namespace Platform.Data.MasterServer
 
         private static void PrintContents(Links links, Sequences sequences)
         {
-            if (links.Total == UnicodeMap.LastCharLink)
+            if (links.Count() == UnicodeMap.LastCharLink)
                 Console.WriteLine("Database is empty.");
             else
             {
                 Console.WriteLine("Contents:");
 
-                var linksTotalLength = links.Total.ToString("0").Length;
+                var linksTotalLength = links.Count().ToString("0").Length;
 
                 var printFormatBase = new String('0', linksTotalLength);
 
@@ -110,7 +110,7 @@ namespace Platform.Data.MasterServer
 
                 var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} {{3}}", printFormatBase);
 
-                for (var link = UnicodeMap.LastCharLink + 1; link <= links.Total; link++)
+                for (var link = UnicodeMap.LastCharLink + 1; link <= links.Count(); link++)
                 {
                     Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link),
                         sequences.FormatSequence(link, AppendLinkToString, true));

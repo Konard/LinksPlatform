@@ -96,6 +96,9 @@ namespace Platform.Data.Core.Pairs
             }
             if (restrictions.Length == 1)
             {
+                // TODO: Подумать на тему объединения с Exists, возможно нужно две функции Count и CountReferences
+                // TODO: Или же нужно добавить 0-е ограничение отвечающие именно за индекс, тогда можно учитывать одновременно и адрес и содержимое (и можно полностью заменить Exists)
+                // TODO: Ещё один эквалент для Exists это указание всех значений содержимого (например и Source и Target)
                 // Сколько есть всего ссылок на эту конкретную связь?
                 var link = restrictions[0];
                 //if (link == LinksConstants.Null) return 0; // На нулевую связь (пустую) никто никогда не ссылается
@@ -122,6 +125,7 @@ namespace Platform.Data.Core.Pairs
                 }
                 else //if(source != Null && target != Null)
                 {
+                    // Эквивалент Exists(source, target) => Count(source, target) > 0
                     var link = _sourcesTreeMethods.Search(source, target);
                     return link != LinksConstants.Null ? 1UL : 0UL;
                 }

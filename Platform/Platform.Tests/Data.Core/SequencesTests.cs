@@ -69,6 +69,9 @@ namespace Platform.Tests.Data.Core
 
                 var createResults = sequences.CreateAllVariants2(sequence).Distinct().ToArray();
 
+                for (int i = 0; i < createResults.Length; i++)
+                    sequences.Create(createResults[i]);
+
                 var sw0 = Stopwatch.StartNew();
                 var searchResults0 = sequences.GetAllMatchingSequences0(sequence); sw0.Stop();
 
@@ -76,7 +79,10 @@ namespace Platform.Tests.Data.Core
                 var searchResults1 = sequences.GetAllMatchingSequences1(sequence); sw1.Stop();
 
                 var sw2 = Stopwatch.StartNew();
-                var searchResults2 = sequences.Each(sequence); sw2.Stop();
+                var searchResults2 = sequences.Each1(sequence); sw2.Stop();
+
+                var sw3 = Stopwatch.StartNew();
+                var searchResults3 = sequences.Each(sequence); sw3.Stop();
 
                 var intersection0 = createResults.Intersect(searchResults0).ToList();
                 Assert.IsTrue(intersection0.Count == searchResults0.Count);
@@ -90,7 +96,9 @@ namespace Platform.Tests.Data.Core
                 Assert.IsTrue(intersection2.Count == searchResults2.Count);
                 Assert.IsTrue(intersection2.Count == createResults.Length);
 
-                //Assert.IsTrue(sw1.Elapsed < sw2.Elapsed);
+                var intersection3 = createResults.Intersect(searchResults3).ToList();
+                Assert.IsTrue(intersection3.Count == searchResults3.Count);
+                Assert.IsTrue(intersection3.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
@@ -426,11 +434,11 @@ namespace Platform.Tests.Data.Core
 
                 for (var i = 0; i < 1; i++)
                 {
-                    var linksTotalUsages1 = new ulong[links.Total + 1];
+                    var linksTotalUsages1 = new ulong[links.Count() + 1];
 
                     sequences.CalculateAllUsages(linksTotalUsages1);
 
-                    var linksTotalUsages2 = new ulong[links.Total + 1];
+                    var linksTotalUsages2 = new ulong[links.Count() + 1];
 
                     sequences.CalculateAllUsages2(linksTotalUsages2);
 

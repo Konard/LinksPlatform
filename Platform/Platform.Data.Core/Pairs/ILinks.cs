@@ -13,11 +13,6 @@ namespace Platform.Data.Core.Pairs
         #region Read
 
         /// <summary>
-        /// Возвращает общее число связей находящихся в хранилище.
-        /// </summary>
-        ulong Total { get; }
-
-        /// <summary>
         /// Возвращает индекс начальной (Source) связи для указанной связи.
         /// </summary>
         /// <param name="link">Индекс связи.</param>
@@ -44,6 +39,13 @@ namespace Platform.Data.Core.Pairs
         /// <param name="link">Индекс проверяемой на существование связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         bool Exists(TLink link);
+
+        /// <summary>
+        /// Подсчитывает и возвращает общее число связей находящихся в хранилище, соответствующих указанным ограничениям.
+        /// </summary>
+        /// <param name="restrictions">Ограничения на содержимое связей.</param>
+        /// <returns>Общее число связей находящихся в хранилище, соответствующих указанным ограничениям.</returns>
+        ulong Count(params TLink[] restrictions);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
