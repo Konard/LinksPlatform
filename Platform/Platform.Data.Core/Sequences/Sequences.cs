@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
@@ -48,28 +49,25 @@ namespace Platform.Data.Core.Sequences
         public const ulong ZeroOrMany = ulong.MaxValue;
 
         private readonly Links _links;
-        public SequencesOptions<ulong> Options;
+        public SequencesOptions Options;
         private readonly ISyncronization _sync = new SafeSynchronization();
         private readonly Compressor _compressor;
 
         public Sequences(Links links)
-            : this(links, new SequencesOptions<ulong>())
+            : this(links, new SequencesOptions())
         {
         }
 
-        public Sequences(Links links, SequencesOptions<ulong> options)
+        public Sequences(Links links, SequencesOptions options)
         {
             _links = links;
             Options = options;
-            _compressor = new Compressor(links, this);
 
-            InitOptions();
-        }
+            Options.ValidateOptions();
+            Options.InitOptions(_links);
 
-        private void InitOptions()
-        {
-            if (Options.SequenceMarkerLink == LinksConstants.Null)
-                Options.SequenceMarkerLink = _links.Create(LinksConstants.Itself, LinksConstants.Itself);
+            if (Options.UseCompression)
+                _compressor = new Compressor(links, this);
         }
 
         private bool IsSequence(ulong sequence)
@@ -77,26 +75,85 @@ namespace Platform.Data.Core.Sequences
             return _links.Search(Options.SequenceMarkerLink, sequence) != LinksConstants.Null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private ulong GetSequenceByElements(ulong sequence)
+        {
+            if (Options.UseSequenceMarker)
+                return _links.Search(Options.SequenceMarkerLink, sequence);
+
+            return sequence;
+        }
+
+        private ulong GetSequenceElements(ulong sequence)
+        {
+            if (Options.UseSequenceMarker)
+            {
+                var linkContents = _links.GetLink(sequence);
+
+                if (linkContents.Source == Options.SequenceMarkerLink)
+                    return linkContents.Target;
+                if (linkContents.Target == Options.SequenceMarkerLink)
+                    return linkContents.Source;
+            }
+
+            return sequence;
+        }
+
+        #region Count
+
         public ulong Count(params ulong[] sequence)
         {
             if (sequence.Length == 0)
                 return _links.Count(Options.SequenceMarkerLink, LinksConstants.Any);
 
             if (sequence.Length == 1) // Первая связь это адрес
-                return sequence[0] == LinksConstants.Null ? 0 : _links.Count(Options.SequenceMarkerLink, sequence[0]);
+            {
+                if (sequence[0] == LinksConstants.Null)
+                    return 0;
+
+                if (Options.UseSequenceMarker)
+                    return _links.Count(Options.SequenceMarkerLink, sequence[0]);
+
+                return _links.Exists(sequence[0]) ? 1UL : 0;
+            }
 
             throw new NotImplementedException();
         }
 
-        public bool EachPart(Func<ulong, bool> handler, ulong sequence)
+        private ulong CountReferences(params ulong[] restrictions)
         {
-            return (new Walker(this)).WalkRight(sequence, handler);
+            if (restrictions.Length == 0)
+                return 0;
+
+            if (restrictions.Length == 1) // Первая связь это адрес
+            {
+                if (restrictions[0] == LinksConstants.Null)
+                    return 0;
+
+                if (Options.UseSequenceMarker)
+                {
+                    var elementsLink = GetSequenceElements(restrictions[0]);
+                    var sequenceLink = GetSequenceByElements(elementsLink);
+                    if (sequenceLink != LinksConstants.Null)
+                        return _links.Count(sequenceLink) + _links.Count(elementsLink) - 1;
+                    return _links.Count(elementsLink);
+                }
+
+                return _links.Count(restrictions[0]);
+            }
+
+            throw new NotImplementedException();
         }
+
+        #endregion
 
         #region Create
 
         public ulong Create(params ulong[] sequence)
         {
+            if (Options.EnforceSingleSequenceVersionOnWrite)
+                return Compact(sequence);
+
             return _sync.ExecuteWriteOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
@@ -104,18 +161,23 @@ namespace Platform.Data.Core.Sequences
 
                 _links.EnsureEachLinkExists(sequence);
 
-                ulong sequenceRoot;
-
-                if (Options.UseCompression)
-                    sequenceRoot = _compressor.Compress(sequence);
-                else
-                    sequenceRoot = CreateBalancedVariant(sequence);
-
-                if (Options.EnforceSingleSequenceVersionOnWrite)
-                    sequenceRoot = CompactCore(sequence);
-
-                return _links.Create(Options.SequenceMarkerLink, sequenceRoot);
+                return CreateCore(sequence);
             });
+        }
+
+        private ulong CreateCore(params ulong[] sequence)
+        {
+            ulong sequenceRoot;
+
+            if (Options.UseCompression)
+                sequenceRoot = _compressor.Compress(sequence);
+            else
+                sequenceRoot = CreateBalancedVariant(sequence);
+
+            if (Options.UseSequenceMarker)
+                _links.Create(Options.SequenceMarkerLink, sequenceRoot);
+
+            return sequenceRoot; // Возвращаем корень последовательности (т.е. сами элементы)
         }
 
         public ulong CreateBalancedVariant(params ulong[] sequence)
@@ -163,31 +225,6 @@ namespace Platform.Data.Core.Sequences
             }
 
             return _links.CreateCore(sequence[0], sequence[1]);
-        }
-
-        /// <remarks>
-        /// bestVariant можно выбирать по максимальному числу использований,
-        /// но балансированный позволяет гарантировать уникальность (если есть возможность,
-        /// гарантировать его использование в других местах).
-        /// 
-        /// Получается этот метод должен игнорировать Options.EnforceSingleSequenceVersionOnWrite
-        /// </remarks>
-        public ulong Compact(params ulong[] sequence)
-        {
-            return _sync.ExecuteWriteOperation(() =>
-            {
-                if (sequence.IsNullOrEmpty())
-                    return LinksConstants.Null;
-
-                _links.EnsureEachLinkIsAnyOrExists(sequence);
-
-                return CompactCore(sequence);
-            });
-        }
-
-        private ulong CompactCore(params ulong[] sequence)
-        {
-            return UpdateCore(sequence, sequence);
         }
 
         #endregion
@@ -244,17 +281,20 @@ namespace Platform.Data.Core.Sequences
                 var results = new HashSet<ulong>();
                 var matcher = new Matcher(this, sequence, results, handler);
 
+                // Временно возвращаем только фактические варианты последовательностей, а не связи с маркером.
+                // Чтобы возвращать сами последовательности нужна функция HandleFullMatchedSequence
+
                 if (sequence.Length >= 2)
-                    if (!StepRight((Func<ulong, bool>)matcher.HandleFullMatchedSequence, sequence[0], sequence[1]))
+                    if (!StepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[0], sequence[1]))
                         return false;
 
                 var last = sequence.Length - 2;
                 for (var i = 1; i < last; i++)
-                    if (!PartialStepRight((Func<ulong, bool>)matcher.HandleFullMatchedSequence, sequence[i], sequence[i + 1]))
+                    if (!PartialStepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[i], sequence[i + 1]))
                         return false;
 
                 if (sequence.Length >= 3)
-                    if (!StepLeft((Func<ulong, bool>)matcher.HandleFullMatchedSequence, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
+                    if (!StepLeft((Func<ulong, bool>)matcher.HandleFullMatched, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
                         return false;
             }
 
@@ -319,19 +359,26 @@ namespace Platform.Data.Core.Sequences
 
         #endregion
 
+        #region Update
+
         public ulong Update(ulong[] sequence, ulong[] newSequence)
         {
+            if (sequence.IsNullOrEmpty() && newSequence.IsNullOrEmpty())
+                return LinksConstants.Null;
+
+            if (sequence.IsNullOrEmpty())
+                return Create(newSequence);
+
+            if (newSequence.IsNullOrEmpty())
+            {
+                Delete(sequence);
+                return LinksConstants.Null;
+            }
+
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (sequence.IsNullOrEmpty())
-                    ; // -> Create
-                else
-                    _links.EnsureEachLinkIsAnyOrExists(sequence);
-
-                if (newSequence.IsNullOrEmpty())
-                    ; // -> Delete
-                else
-                    _links.EnsureEachLinkIsAnyOrExists(newSequence);
+                _links.EnsureEachLinkIsAnyOrExists(sequence);
+                _links.EnsureEachLinkExists(newSequence);
 
                 return UpdateCore(sequence, newSequence);
             });
@@ -339,55 +386,191 @@ namespace Platform.Data.Core.Sequences
 
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
         {
-            var bestVariant = CreateBalancedVariantCore0(newSequence);
+            var bestVariant = CreateCore(newSequence);
 
+            // Возможно нужно две версии Each, возвращающий фактические последовательности и с маркером,
+            // или возможно даже возвращать и тот и тот вариант. С другой стороны все варианты можно получить имея только фактические последовательности.
             foreach (var variant in Each(sequence))
                 if (variant != bestVariant)
-                {
-                    var source = _links.GetSource(variant);
-                    var target = _links.GetTarget(variant);
-
-                    bestVariant = _links.Update(variant, bestVariant);
-
-                    ClearGarbage(source, target);
-                }
+                    UpdateOneCore(variant, bestVariant);
 
             return bestVariant;
         }
 
-        private void ClearGarbage(ulong left, ulong right)
+        private void UpdateOneCore(ulong sequence, ulong newSequence)
         {
-            var leftSource = _links.GetSource(left);
-            var leftTarget = _links.GetTarget(left);
-
-            if (_links.Count(left) == 0)
+            if (Options.UseGarbageCollection)
             {
-                _links.Delete(left);
-                ClearGarbage(leftSource, leftTarget);
+                var sequenceElements = GetSequenceElements(sequence);
+                var sequenceElementsContents = _links.GetLink(sequenceElements);
+                var sequenceLink = GetSequenceByElements(sequenceElements);
+
+                var newSequenceElements = GetSequenceElements(newSequence);
+                var newSequenceLink = GetSequenceByElements(newSequenceElements);
+
+                if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
+                {
+                    if (sequenceLink != LinksConstants.Null)
+                        _links.Update(sequenceLink, newSequenceLink);
+                    _links.Update(sequenceElements, newSequenceElements);
+                }
+
+                ClearGarbage(sequenceElementsContents.Source);
+                ClearGarbage(sequenceElementsContents.Target);
             }
-
-            var rightSource = _links.GetSource(right);
-            var rightTarget = _links.GetTarget(right);
-
-            if (_links.Count(right) == 0)
+            else
             {
-                _links.Delete(right);
-                ClearGarbage(rightSource, rightTarget);
+                if (Options.UseSequenceMarker)
+                {
+                    var sequenceElements = GetSequenceElements(sequence);
+                    var sequenceLink = GetSequenceByElements(sequenceElements);
+
+                    var newSequenceElements = GetSequenceElements(newSequence);
+                    var newSequenceLink = GetSequenceByElements(newSequenceElements);
+
+                    if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
+                    {
+                        if (sequenceLink != LinksConstants.Null)
+                            _links.Update(sequenceLink, newSequenceLink);
+                        _links.Update(sequenceElements, newSequenceElements);
+                    }
+                }
+                else
+                {
+                    if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
+                        _links.Update(sequence, newSequence);
+                }
             }
         }
+
+        #endregion
+
+        #region Delete
 
         public void Delete(params ulong[] sequence)
         {
             _sync.ExecuteWriteOperation(() =>
             {
                 foreach (var linkToDelete in Each(sequence))
-                {
-                    _links.Delete(linkToDelete);
-                }
+                    DeleteOneCore(linkToDelete);
             });
         }
 
+        private void DeleteOneCore(ulong link)
+        {
+            if (Options.UseGarbageCollection)
+            {
+                var sequenceElements = GetSequenceElements(link);
+                var sequenceElementsContents = _links.GetLink(sequenceElements);
+                var sequenceLink = GetSequenceByElements(sequenceElements);
+
+                if (Options.UseCascadeDelete || CountReferences(link) == 0)
+                {
+                    if (sequenceLink != LinksConstants.Null)
+                        _links.Delete(sequenceLink);
+                    _links.Delete(link);
+                }
+
+                ClearGarbage(sequenceElementsContents.Source);
+                ClearGarbage(sequenceElementsContents.Target);
+            }
+            else
+            {
+                if (Options.UseSequenceMarker)
+                {
+                    var sequenceElements = GetSequenceElements(link);
+                    var sequenceLink = GetSequenceByElements(sequenceElements);
+
+                    if (Options.UseCascadeDelete || CountReferences(link) == 0)
+                    {
+                        if (sequenceLink != LinksConstants.Null)
+                            _links.Delete(sequenceLink);
+                        _links.Delete(link);
+                    }
+                }
+                else
+                {
+                    if (Options.UseCascadeDelete || CountReferences(link) == 0)
+                        _links.Delete(link);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Compactification
+
+        /// <remarks>
+        /// bestVariant можно выбирать по максимальному числу использований,
+        /// но балансированный позволяет гарантировать уникальность (если есть возможность,
+        /// гарантировать его использование в других местах).
+        /// 
+        /// Получается этот метод должен игнорировать Options.EnforceSingleSequenceVersionOnWrite
+        /// </remarks>
+        public ulong Compact(params ulong[] sequence)
+        {
+            return _sync.ExecuteWriteOperation(() =>
+            {
+                if (sequence.IsNullOrEmpty())
+                    return LinksConstants.Null;
+
+                _links.EnsureEachLinkIsAnyOrExists(sequence);
+
+                return CompactCore(sequence);
+            });
+        }
+
+        private ulong CompactCore(params ulong[] sequence)
+        {
+            return UpdateCore(sequence, sequence);
+        }
+
+        #endregion
+
+        #region Garbage Collection
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsGarbage(ulong link)
+        {
+            return link != Options.SequenceMarkerLink && _links.Count(link) == 0;
+        }
+
+        private void ClearGarbage(ulong link)
+        {
+            if (IsGarbage(link))
+            {
+                var contents = _links.GetLink(link);
+                _links.Delete(link);
+                ClearGarbage(contents.Source);
+                ClearGarbage(contents.Target);
+            }
+        }
+
+        private void ClearGarbage(ulong left, ulong right)
+        {
+            if (IsGarbage(left))
+            {
+                var leftLink = _links.GetLink(left);
+                _links.Delete(left);
+                ClearGarbage(leftLink.Source, leftLink.Target);
+            }
+
+            if (IsGarbage(right))
+            {
+                var rightLink = _links.GetLink(right);
+                _links.Delete(right);
+                ClearGarbage(rightLink.Source, rightLink.Target);
+            }
+        }
+
+        #endregion
+
         #region Walkers
+
+        public bool EachPart(Func<ulong, bool> handler, ulong sequence)
+        {
+            return (new Walker(this)).WalkRight(sequence, handler);
+        }
 
         public class Walker
         {
@@ -482,10 +665,18 @@ namespace Platform.Data.Core.Sequences
                     _results.Add(sequenceToMatch);
             }
 
+            public bool HandleFullMatched(ulong sequenceToMatch)
+            {
+                if (FullMatch(sequenceToMatch))
+                    return _stopableHandler(sequenceToMatch);
+                return true;
+            }
+
             public bool HandleFullMatchedSequence(ulong sequenceToMatch)
             {
-                if (FullMatch(sequenceToMatch) && Sequences.IsSequence(sequenceToMatch))
-                    return _stopableHandler(sequenceToMatch);
+                ulong sequence = Sequences.GetSequenceByElements(sequenceToMatch);
+                if (FullMatch(sequenceToMatch) && sequence != LinksConstants.Null)
+                    return _stopableHandler(sequence);
                 return true;
             }
 

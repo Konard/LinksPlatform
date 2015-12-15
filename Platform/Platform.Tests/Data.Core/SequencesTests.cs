@@ -69,8 +69,8 @@ namespace Platform.Tests.Data.Core
 
                 var createResults = sequences.CreateAllVariants2(sequence).Distinct().ToArray();
 
-                for (int i = 0; i < createResults.Length; i++)
-                    sequences.Create(createResults[i]);
+                //for (int i = 0; i < createResults.Length; i++)
+                //    sequences.Create(createResults[i]);
 
                 var sw0 = Stopwatch.StartNew();
                 var searchResults0 = sequences.GetAllMatchingSequences0(sequence); sw0.Stop();

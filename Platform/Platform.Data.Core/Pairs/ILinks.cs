@@ -17,6 +17,9 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс начальной связи для указанной связи.</returns>
+        /// <remarks>
+        /// TODO: Возможна замена на (TLink[] GetLink(TLink link))[1];
+        /// </remarks>
         TLink GetSource(TLink link);
 
         /// <summary>
@@ -24,6 +27,9 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс конечной связи для указанной связи.</returns>
+        /// <remarks>
+        /// TODO: Возможна замена на (TLink[] GetLink(TLink link))[2];
+        /// </remarks>
         TLink GetTarget(TLink link);
 
         /// <summary>
@@ -31,6 +37,9 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс связи.</param>
         /// <returns>Уникальную связь.</returns>
+        /// <remarks>
+        /// TODO: Заменить на TLink[] GetLink(TLink link); (в последствии возможна замена и через Each).
+        /// </remarks>
         Link GetLink(TLink link);
 
         /// <summary>
@@ -38,6 +47,9 @@ namespace Platform.Data.Core.Pairs
         /// </summary>
         /// <param name="link">Индекс проверяемой на существование связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
+        /// <remarks>
+        /// TODO: Возможна замена через Count/Each.
+        /// </remarks>
         bool Exists(TLink link);
 
         /// <summary>
@@ -62,6 +74,9 @@ namespace Platform.Data.Core.Pairs
         /// <param name="source">Индекс связи, которая является началом для искомой связи.</param>
         /// <param name="target">Индекс связи, которая является концом для искомой связи.</param>
         /// <returns>Индекс искомой связи с указанными Source (началом) и Target (концом)</returns>
+        /// <remarks>
+        /// TODO: Возможна замена через Each.
+        /// </remarks>
         TLink Search(TLink source, TLink target);
 
         #endregion
