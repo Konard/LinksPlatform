@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Threading;
+using System.Threading.Tasks;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers.Collections;
 
@@ -12,6 +15,69 @@ namespace Platform.Data.Core.Sequences
         private Link _maxPair;
         private ulong _maxFrequency;
         private UnsafeDictionary<Link, ulong> _pairsFrequencies;
+
+        /// <remarks>
+        /// Может стоит попробовать ref во всех методах
+        /// </remarks>
+        public class LinkComparer : IEqualityComparer<Link>
+        {
+            static public readonly LinkComparer Default = new LinkComparer();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public bool Equals(Link x, Link y)
+            {
+                return x.Source == y.Source &&
+                       x.Target == y.Target;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public int GetHashCode(Link obj)
+            {
+                unchecked // Overflow is fine, just wrap
+                {
+                    return (int)((obj.Source << 16) ^ obj.Target);
+
+                    //return (int)(obj.Source * 31 ^ obj.Target);
+
+                    //return (int)(obj.Source * 31 + obj.Target); // or 33
+
+                    //return (int)((obj.Source * 17) ^ obj.Target);
+
+                    //return (int)((527 + obj.Source) * 31 + obj.Target);
+
+                    //return (int)((629 + obj.Source) * 37 + obj.Target);
+
+                    //return (int)((391 + obj.Source) * 23 + obj.Target);
+
+                    //return (int)(obj.Source + obj.Target);
+
+                    //ulong hash = 17;
+                    //hash = hash * 31 + obj.Source;
+                    //hash = hash * 31 + obj.Target;
+                    //return (int)hash;
+
+                    //var hash = 17;
+                    //hash = hash * 31 + (int)(obj.Source ^ (obj.Source >> 32));
+                    //hash = hash * 31 + (int)(obj.Target ^ (obj.Target >> 32));
+                    //return hash;
+
+                    //var hash = 17;
+                    //hash = hash * 23 + obj.Source.GetHashCode();
+                    //hash = hash * 23 + obj.Target.GetHashCode();
+                    //return hash;
+
+                    //return new { obj.Source, obj.Target }.GetHashCode();
+
+                    //return 31 * obj.Source.GetHashCode() + obj.Target.GetHashCode();
+
+                    //return obj.Source.GetHashCode() ^ obj.Target.GetHashCode();
+
+                    //return (int)((obj.Source << 5) + 3 + obj.Source ^ obj.Target);
+
+                    //return (int) (obj.Source ^ obj.Target);
+                }
+            }
+        }
 
         public Compressor(Links links, Sequences sequences)
         {
@@ -71,10 +137,7 @@ namespace Platform.Data.Core.Sequences
             if (_pairsFrequencies != null)
                 throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
 
-            _pairsFrequencies = new UnsafeDictionary<Link, ulong>();
-
-            var oldLength = sequence.Length;
-            var newLength = sequence.Length;
+            _pairsFrequencies = new UnsafeDictionary<Link, ulong>(4096, LinkComparer.Default);
 
             // Can be faster if source sequence allowed to be changed
             var copy = new ulong[sequence.Length];
@@ -87,6 +150,25 @@ namespace Platform.Data.Core.Sequences
                 var pair = new Link(sequence[i - 1], sequence[i]);
                 UpdateMaxPair(pair, IncrementFrequency(pair));
             }
+
+            var newLength = MainLoop(copy);
+
+            _pairsFrequencies = null;
+
+            var final = new ulong[newLength];
+            Array.Copy(copy, final, newLength);
+
+            return final;
+        }
+
+        /// <remarks>
+        /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+        /// Faster version (pairs' frequencies dictionary is not recreated).
+        /// </remarks>
+        private int MainLoop(ulong[] copy)
+        {
+            var oldLength = copy.Length;
+            var newLength = copy.Length;
 
             while (!_maxPair.IsNull())
             {
@@ -133,14 +215,10 @@ namespace Platform.Data.Core.Sequences
 
                 // Быстрее
                 UpdateMaxPair();
+                //ParallelUpdateMaxPair();
             }
 
-            _pairsFrequencies = null;
-
-            var final = new ulong[newLength];
-            Array.Copy(copy, final, newLength);
-
-            return final;
+            return newLength;
         }
 
         public ulong Compress(ulong[] sequence)
@@ -178,29 +256,60 @@ namespace Platform.Data.Core.Sequences
             ResetMaxPair();
 
             var entries = _pairsFrequencies.entries;
-            for (var i = 0; i < entries.Length; i++)
-            {
-                if (entries[i].hashCode >= 0)
-                {
-                    var frequency = entries[i].value;
-                    if (frequency > 1)
-                    {
-                        if (_maxFrequency > frequency)
-                            continue;
 
-                        if (_maxFrequency < frequency)
-                        {
-                            _maxFrequency = frequency;
-                            _maxPair = entries[i].key;
-                        }
-                        else if (_maxFrequency == frequency &&
-                            (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
-                        {
-                            _maxPair = entries[i].key;
-                        }
+            //for (int i = 0; i < entries.Length; i++)
+            for (var i = entries.Length - 1; i >= 0; --i)
+            {
+                if (entries[i].hashCode < 0) continue;
+
+                //var frequency = entries[i].value;
+                if (entries[i].value > 1)
+                {
+                    if (_maxFrequency > entries[i].value)
+                        continue;
+
+                    if (_maxFrequency < entries[i].value)
+                    {
+                        _maxFrequency = entries[i].value;
+                        _maxPair = entries[i].key;
+                    }
+                    else if (_maxFrequency == entries[i].value &&
+                             (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
+                    {
+                        _maxPair = entries[i].key;
                     }
                 }
             }
         }
+
+        // Замедляет выполнение
+        //private void ParallelUpdateMaxPair()
+        //{
+        //    ResetMaxPair();
+
+        //    var entries = _pairsFrequencies.entries;
+
+        //    Parallel.For(0, entries.Length, (i, state) =>
+        //    {
+        //        if (entries[i].hashCode >= 0)
+        //        {
+        //            var frequency = (long)entries[i].value;
+        //            if (frequency > 1)
+        //            {
+        //                if (_maxFrequency < frequency)
+        //                {
+        //                    _maxPair = entries[i].key;
+        //                    Interlocked.Exchange(ref _maxFrequency, frequency);
+        //                }
+        //                //else if (_maxFrequency == frequency &&
+        //                //            (entries[i].key.Source + entries[i].key.Target) >
+        //                //            (_maxPair.Source + _maxPair.Target))
+        //                //{
+        //                //    _maxPair = entries[i].key;
+        //                //}
+        //            }
+        //        }
+        //    });
+        //}
     }
 }

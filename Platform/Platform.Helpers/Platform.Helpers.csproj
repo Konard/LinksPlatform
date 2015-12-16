@@ -43,6 +43,7 @@
     <Compile Include="Collections\ListExtensions.cs" />
     <Compile Include="Collections\SetExtensions.cs" />
     <Compile Include="Collections\UnsafeDictionary.cs" />
+    <Compile Include="Collections\UnsafeDictionary1.cs" />
     <Compile Include="Counter.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILGeneratorExtensions.cs" />

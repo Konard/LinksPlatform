@@ -388,6 +388,9 @@ namespace Platform.Data.Core.Sequences
         {
             var bestVariant = CreateCore(newSequence);
 
+            if (Options.EnforceSingleSequenceVersionOnWrite && !sequence.EqualTo(newSequence))
+                bestVariant = CompactCore(newSequence);
+
             // Возможно нужно две версии Each, возвращающий фактические последовательности и с маркером,
             // или возможно даже возвращать и тот и тот вариант. С другой стороны все варианты можно получить имея только фактические последовательности.
             foreach (var variant in Each(sequence))

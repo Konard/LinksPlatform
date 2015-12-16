@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.Serialization;
 using System.Security.Permissions;
 using System.Threading;
@@ -20,6 +21,7 @@ namespace Platform.Helpers.Collections
 
         private int[] buckets;
         public Entry[] entries;
+        private int capacity;
         private int count;
         private int version;
         private int freeList;
@@ -43,7 +45,8 @@ namespace Platform.Helpers.Collections
 
         public UnsafeDictionary(int capacity, IEqualityComparer<TKey> comparer)
         {
-            if (capacity < 0) throw new ArgumentOutOfRangeException("Capacity");
+            //if (capacity < 0) throw new ArgumentOutOfRangeException("Capacity");
+            this.capacity = capacity;
             if (capacity > 0) Initialize(capacity);
             if (comparer == null) comparer = EqualityComparer<TKey>.Default;
             this.comparer = comparer;
@@ -55,10 +58,10 @@ namespace Platform.Helpers.Collections
             this(dictionary != null ? dictionary.Count : 0, comparer)
         {
 
-            if (dictionary == null)
-            {
-                throw new ArgumentNullException("Dictionary");
-            }
+            //if (dictionary == null)
+            //{
+            //    throw new ArgumentNullException("Dictionary");
+            //}
 
             foreach (var pair in dictionary)
             {
@@ -105,7 +108,7 @@ namespace Platform.Helpers.Collections
             {
                 var i = FindEntry(key);
                 if (i >= 0) return entries[i].value;
-                throw new KeyNotFoundException();
+                //throw new KeyNotFoundException();
                 return default(TValue);
             }
             set
@@ -185,20 +188,20 @@ namespace Platform.Helpers.Collections
 
         private void CopyTo(KeyValuePair<TKey, TValue>[] array, int index)
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException("array");
-            }
+            //if (array == null)
+            //{
+            //    throw new ArgumentNullException("array");
+            //}
 
-            if (index < 0 || index > array.Length)
-            {
-                throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-            }
+            //if (index < 0 || index > array.Length)
+            //{
+            //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+            //}
 
-            if (array.Length - index < Count)
-            {
-                throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
-            }
+            //if (array.Length - index < Count)
+            //{
+            //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+            //}
 
             var count = this.count;
             var entries = this.entries;
@@ -224,10 +227,10 @@ namespace Platform.Helpers.Collections
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
         public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            if (info == null)
-            {
-                throw new ArgumentNullException("info");
-            }
+            //if (info == null)
+            //{
+            //    throw new ArgumentNullException("info");
+            //}
             info.AddValue(VersionName, version);
             info.AddValue(ComparerName, comparer, typeof(IEqualityComparer<TKey>));
             info.AddValue(HashSizeName, buckets == null ? 0 : buckets.Length); //This is the length of the bucket array.
@@ -241,10 +244,10 @@ namespace Platform.Helpers.Collections
 
         private int FindEntry(TKey key)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
+            //if (key == null)
+            //{
+            //    throw new ArgumentNullException("key");
+            //}
 
             if (buckets != null)
             {
@@ -288,12 +291,14 @@ namespace Platform.Helpers.Collections
 
         private int Insert(TKey key, TValue value, bool add)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
+            //if (key == null)
+            //{
+            //    throw new ArgumentNullException("key");
+            //}
 
-            if (buckets == null) Initialize(1000);
+
+
+            if (buckets == null) Initialize(capacity);
             var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
             for (var i = buckets[hashCode % buckets.Length]; i >= 0; i = entries[i].next)
             {
@@ -351,10 +356,10 @@ namespace Platform.Helpers.Collections
 
         public bool Remove(TKey key)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
+            //if (key == null)
+            //{
+            //    throw new ArgumentNullException("key");
+            //}
 
             if (buckets != null)
             {
@@ -411,30 +416,30 @@ namespace Platform.Helpers.Collections
 
         void ICollection.CopyTo(Array array, int index)
         {
-            if (array == null)
-            {
-                throw new ArgumentNullException("array");
-            }
+            //if (array == null)
+            //{
+            //    throw new ArgumentNullException("array");
+            //}
 
-            if (array.Rank != 1)
-            {
-                throw new ArgumentException("Arg_RankMultiDimNotSupported");
-            }
+            //if (array.Rank != 1)
+            //{
+            //    throw new ArgumentException("Arg_RankMultiDimNotSupported");
+            //}
 
-            if (array.GetLowerBound(0) != 0)
-            {
-                throw new ArgumentException("Arg_NonZeroLowerBound");
-            }
+            //if (array.GetLowerBound(0) != 0)
+            //{
+            //    throw new ArgumentException("Arg_NonZeroLowerBound");
+            //}
 
-            if (index < 0 || index > array.Length)
-            {
-                throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-            }
+            //if (index < 0 || index > array.Length)
+            //{
+            //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+            //}
 
-            if (array.Length - index < Count)
-            {
-                throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
-            }
+            //if (array.Length - index < Count)
+            //{
+            //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+            //}
 
             var pairs = array as KeyValuePair<TKey, TValue>[];
             if (pairs != null)
@@ -456,13 +461,13 @@ namespace Platform.Helpers.Collections
             else
             {
                 var objects = array as object[];
-                if (objects == null)
-                {
-                    throw new ArgumentException("Argument_InvalidArrayType");
-                }
+                //if (objects == null)
+                //{
+                //    throw new ArgumentException("Argument_InvalidArrayType");
+                //}
 
-                try
-                {
+                //try
+                //{
                     var count = this.count;
                     var entries = this.entries;
                     for (var i = 0; i < count; i++)
@@ -472,11 +477,11 @@ namespace Platform.Helpers.Collections
                             objects[index++] = new KeyValuePair<TKey, TValue>(entries[i].key, entries[i].value);
                         }
                     }
-                }
-                catch (ArrayTypeMismatchException)
-                {
-                    throw new ArgumentException("Argument_InvalidArrayType");
-                }
+                //}
+                //catch (ArrayTypeMismatchException)
+                //{
+                //    throw new ArgumentException("Argument_InvalidArrayType");
+                //}
             }
         }
 
@@ -526,70 +531,73 @@ namespace Platform.Helpers.Collections
         {
             get
             {
-                if (IsCompatibleKey(key))
-                {
+                //if (IsCompatibleKey(key))
+                //{
                     var i = FindEntry((TKey)key);
                     if (i >= 0)
                     {
                         return entries[i].value;
                     }
-                }
+                //}
                 return null;
             }
             set
             {
-                VerifyKey(key);
-                VerifyValueType(value);
+                //VerifyKey(key);
+                //VerifyValueType(value);
                 this[(TKey)key] = (TValue)value;
             }
         }
-
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void VerifyKey(object key)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
+            //if (key == null)
+            //{
+            //    throw new ArgumentNullException("key");
+            //}
 
-            if (!(key is TKey))
-            {
-                throw new ArgumentException("Invalid type", "key");
-            }
+            //if (!(key is TKey))
+            //{
+            //    throw new ArgumentException("Invalid type", "key");
+            //}
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static bool IsCompatibleKey(object key)
         {
-            if (key == null)
-            {
-                throw new ArgumentNullException("key");
-            }
+            //if (key == null)
+            //{
+            //    throw new ArgumentNullException("key");
+            //}
 
             return (key is TKey);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void VerifyValueType(object value)
         {
-            if ((value is TValue) || (value == null && !typeof(TValue).IsValueType))
-            {
-                return;
-            }
-            throw new ArgumentException("Invalid type", "value");
+            //if ((value is TValue) || (value == null && !typeof(TValue).IsValueType))
+            //{
+            //    return;
+            //}
+            //throw new ArgumentException("Invalid type", "value");
         }
 
         void IDictionary.Add(object key, object value)
         {
-            VerifyKey(key);
-            VerifyValueType(value);
+            //VerifyKey(key);
+            //VerifyValueType(value);
             Add((TKey)key, (TValue)value);
         }
 
         bool IDictionary.Contains(object key)
         {
-            if (IsCompatibleKey(key))
-            {
+            //if (IsCompatibleKey(key))
+            //{
                 return ContainsKey((TKey)key);
-            }
-            return false;
+            //}
+            //return false;
         }
 
         IDictionaryEnumerator IDictionary.GetEnumerator()
@@ -599,10 +607,10 @@ namespace Platform.Helpers.Collections
 
         void IDictionary.Remove(object key)
         {
-            if (IsCompatibleKey(key))
-            {
+            //if (IsCompatibleKey(key))
+            //{
                 Remove((TKey)key);
-            }
+            //}
         }
 
         [Serializable()]
@@ -629,10 +637,10 @@ namespace Platform.Helpers.Collections
 
             public bool MoveNext()
             {
-                if (version != dictionary.version)
-                {
-                    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                }
+                //if (version != dictionary.version)
+                //{
+                //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                //}
 
                 // Use unsigned comparison since we set index to dictionary.count+1 when the enumeration ends.
                 // dictionary.count+1 could be negative if dictionary.count is Int32.MaxValue
@@ -667,10 +675,10 @@ namespace Platform.Helpers.Collections
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.count + 1))
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                    }
+                    //if (index == 0 || (index == dictionary.count + 1))
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                    //}
 
                     if (getEnumeratorRetType == DictEntry)
                     {
@@ -685,10 +693,10 @@ namespace Platform.Helpers.Collections
 
             void IEnumerator.Reset()
             {
-                if (version != dictionary.version)
-                {
-                    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                }
+                //if (version != dictionary.version)
+                //{
+                //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                //}
 
                 index = 0;
                 current = new KeyValuePair<TKey, TValue>();
@@ -698,10 +706,10 @@ namespace Platform.Helpers.Collections
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.count + 1))
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                    }
+                    //if (index == 0 || (index == dictionary.count + 1))
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                    //}
 
                     return new DictionaryEntry(current.Key, current.Value);
                 }
@@ -711,10 +719,10 @@ namespace Platform.Helpers.Collections
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.count + 1))
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                    }
+                    //if (index == 0 || (index == dictionary.count + 1))
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                    //}
 
                     return current.Key;
                 }
@@ -724,10 +732,10 @@ namespace Platform.Helpers.Collections
             {
                 get
                 {
-                    if (index == 0 || (index == dictionary.count + 1))
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                    }
+                    //if (index == 0 || (index == dictionary.count + 1))
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                    //}
 
                     return current.Value;
                 }
@@ -742,10 +750,10 @@ namespace Platform.Helpers.Collections
 
             public KeyCollection(UnsafeDictionary<TKey, TValue> dictionary)
             {
-                if (dictionary == null)
-                {
-                    throw new ArgumentNullException("dictionary");
-                }
+                //if (dictionary == null)
+                //{
+                //    throw new ArgumentNullException("dictionary");
+                //}
                 this.dictionary = dictionary;
             }
 
@@ -756,20 +764,20 @@ namespace Platform.Helpers.Collections
 
             public void CopyTo(TKey[] array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException("array");
-                }
+                //if (array == null)
+                //{
+                //    throw new ArgumentNullException("array");
+                //}
 
-                if (index < 0 || index > array.Length)
-                {
-                    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-                }
+                //if (index < 0 || index > array.Length)
+                //{
+                //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+                //}
 
-                if (array.Length - index < dictionary.Count)
-                {
-                    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
-                }
+                //if (array.Length - index < dictionary.Count)
+                //{
+                //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+                //}
 
                 var count = dictionary.count;
                 var entries = dictionary.entries;
@@ -791,12 +799,12 @@ namespace Platform.Helpers.Collections
 
             void ICollection<TKey>.Add(TKey item)
             {
-                throw new NotSupportedException("NotSupported_KeyCollectionSet");
+                //throw new NotSupportedException("NotSupported_KeyCollectionSet");
             }
 
             void ICollection<TKey>.Clear()
             {
-                throw new NotSupportedException("NotSupported_KeyCollectionSet");
+                //throw new NotSupportedException("NotSupported_KeyCollectionSet");
             }
 
             bool ICollection<TKey>.Contains(TKey item)
@@ -806,7 +814,7 @@ namespace Platform.Helpers.Collections
 
             bool ICollection<TKey>.Remove(TKey item)
             {
-                throw new NotSupportedException("NotSupported_KeyCollectionSet");
+                //throw new NotSupportedException("NotSupported_KeyCollectionSet");
                 return false;
             }
 
@@ -822,30 +830,30 @@ namespace Platform.Helpers.Collections
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException("array");
-                }
+                //if (array == null)
+                //{
+                //    throw new ArgumentNullException("array");
+                //}
 
-                if (array.Rank != 1)
-                {
-                    throw new ArgumentException("Arg_RankMultiDimNotSupported");
-                }
+                //if (array.Rank != 1)
+                //{
+                //    throw new ArgumentException("Arg_RankMultiDimNotSupported");
+                //}
 
-                if (array.GetLowerBound(0) != 0)
-                {
-                    throw new ArgumentException("Arg_NonZeroLowerBound");
-                }
+                //if (array.GetLowerBound(0) != 0)
+                //{
+                //    throw new ArgumentException("Arg_NonZeroLowerBound");
+                //}
 
-                if (index < 0 || index > array.Length)
-                {
-                    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-                }
+                //if (index < 0 || index > array.Length)
+                //{
+                //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+                //}
 
-                if (array.Length - index < dictionary.Count)
-                {
-                    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
-                }
+                //if (array.Length - index < dictionary.Count)
+                //{
+                //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+                //}
 
                 var keys = array as TKey[];
                 if (keys != null)
@@ -855,24 +863,24 @@ namespace Platform.Helpers.Collections
                 else
                 {
                     var objects = array as object[];
-                    if (objects == null)
-                    {
-                        throw new ArgumentException("Argument_InvalidArrayType");
-                    }
+                    //if (objects == null)
+                    //{
+                    //    throw new ArgumentException("Argument_InvalidArrayType");
+                    //}
 
                     var count = dictionary.count;
                     var entries = dictionary.entries;
-                    try
-                    {
+                    //try
+                    //{
                         for (var i = 0; i < count; i++)
                         {
                             if (entries[i].hashCode >= 0) objects[index++] = entries[i].key;
                         }
-                    }
-                    catch (ArrayTypeMismatchException)
-                    {
-                        throw new ArgumentException("Argument_InvalidArrayType");
-                    }
+                    //}
+                    //catch (ArrayTypeMismatchException)
+                    //{
+                    //    throw new ArgumentException("Argument_InvalidArrayType");
+                    //}
                 }
             }
 
@@ -908,10 +916,10 @@ namespace Platform.Helpers.Collections
 
                 public bool MoveNext()
                 {
-                    if (version != dictionary.version)
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                    }
+                    //if (version != dictionary.version)
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    //}
 
                     while ((uint)index < (uint)dictionary.count)
                     {
@@ -941,10 +949,10 @@ namespace Platform.Helpers.Collections
                 {
                     get
                     {
-                        if (index == 0 || (index == dictionary.count + 1))
-                        {
-                            throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                        }
+                        //if (index == 0 || (index == dictionary.count + 1))
+                        //{
+                        //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                        //}
 
                         return currentKey;
                     }
@@ -952,10 +960,10 @@ namespace Platform.Helpers.Collections
 
                 void IEnumerator.Reset()
                 {
-                    if (version != dictionary.version)
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                    }
+                    //if (version != dictionary.version)
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    //}
 
                     index = 0;
                     currentKey = default(TKey);
@@ -971,10 +979,10 @@ namespace Platform.Helpers.Collections
 
             public ValueCollection(UnsafeDictionary<TKey, TValue> dictionary)
             {
-                if (dictionary == null)
-                {
-                    throw new ArgumentNullException("dictionary");
-                }
+                //if (dictionary == null)
+                //{
+                //    throw new ArgumentNullException("dictionary");
+                //}
                 this.dictionary = dictionary;
             }
 
@@ -985,20 +993,20 @@ namespace Platform.Helpers.Collections
 
             public void CopyTo(TValue[] array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException("array");
-                }
+                //if (array == null)
+                //{
+                //    throw new ArgumentNullException("array");
+                //}
 
-                if (index < 0 || index > array.Length)
-                {
-                    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-                }
+                //if (index < 0 || index > array.Length)
+                //{
+                //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+                //}
 
-                if (array.Length - index < dictionary.Count)
-                {
-                    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
-                }
+                //if (array.Length - index < dictionary.Count)
+                //{
+                //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+                //}
 
                 var count = dictionary.count;
                 var entries = dictionary.entries;
@@ -1020,18 +1028,18 @@ namespace Platform.Helpers.Collections
 
             void ICollection<TValue>.Add(TValue item)
             {
-                throw new NotSupportedException("NotSupported_ValueCollectionSet");
+                //throw new NotSupportedException("NotSupported_ValueCollectionSet");
             }
 
             bool ICollection<TValue>.Remove(TValue item)
             {
-                throw new NotSupportedException("NotSupported_ValueCollectionSet");
+                //throw new NotSupportedException("NotSupported_ValueCollectionSet");
                 return false;
             }
 
             void ICollection<TValue>.Clear()
             {
-                throw new NotSupportedException("NotSupported_ValueCollectionSet");
+                //throw new NotSupportedException("NotSupported_ValueCollectionSet");
             }
 
             bool ICollection<TValue>.Contains(TValue item)
@@ -1051,28 +1059,28 @@ namespace Platform.Helpers.Collections
 
             void ICollection.CopyTo(Array array, int index)
             {
-                if (array == null)
-                {
-                    throw new ArgumentNullException("array");
-                }
+                //if (array == null)
+                //{
+                //    throw new ArgumentNullException("array");
+                //}
 
-                if (array.Rank != 1)
-                {
-                    throw new ArgumentException("Arg_RankMultiDimNotSupported");
-                }
+                //if (array.Rank != 1)
+                //{
+                //    throw new ArgumentException("Arg_RankMultiDimNotSupported");
+                //}
 
-                if (array.GetLowerBound(0) != 0)
-                {
-                    throw new ArgumentException("Arg_NonZeroLowerBound");
-                }
+                //if (array.GetLowerBound(0) != 0)
+                //{
+                //    throw new ArgumentException("Arg_NonZeroLowerBound");
+                //}
 
-                if (index < 0 || index > array.Length)
-                {
-                    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
-                }
+                //if (index < 0 || index > array.Length)
+                //{
+                //    throw new ArgumentOutOfRangeException("index", "ArgumentOutOfRange_NeedNonNegNum");
+                //}
 
-                if (array.Length - index < dictionary.Count)
-                    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
+                //if (array.Length - index < dictionary.Count)
+                //    throw new ArgumentException("Arg_ArrayPlusOffTooSmall");
 
                 var values = array as TValue[];
                 if (values != null)
@@ -1082,24 +1090,24 @@ namespace Platform.Helpers.Collections
                 else
                 {
                     var objects = array as object[];
-                    if (objects == null)
-                    {
-                        throw new ArgumentException("Argument_InvalidArrayType");
-                    }
+                    //if (objects == null)
+                    //{
+                    //    throw new ArgumentException("Argument_InvalidArrayType");
+                    //}
 
                     var count = dictionary.count;
                     var entries = dictionary.entries;
-                    try
-                    {
+                    //try
+                    //{
                         for (var i = 0; i < count; i++)
                         {
                             if (entries[i].hashCode >= 0) objects[index++] = entries[i].value;
                         }
-                    }
-                    catch (ArrayTypeMismatchException)
-                    {
-                        throw new ArgumentException("Argument_InvalidArrayType");
-                    }
+                    //}
+                    //catch (ArrayTypeMismatchException)
+                    //{
+                    //    throw new ArgumentException("Argument_InvalidArrayType");
+                    //}
                 }
             }
 
@@ -1135,10 +1143,10 @@ namespace Platform.Helpers.Collections
 
                 public bool MoveNext()
                 {
-                    if (version != dictionary.version)
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                    }
+                    //if (version != dictionary.version)
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    //}
 
                     while ((uint)index < (uint)dictionary.count)
                     {
@@ -1167,10 +1175,10 @@ namespace Platform.Helpers.Collections
                 {
                     get
                     {
-                        if (index == 0 || (index == dictionary.count + 1))
-                        {
-                            throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
-                        }
+                        //if (index == 0 || (index == dictionary.count + 1))
+                        //{
+                        //    throw new InvalidOperationException("InvalidOperation_EnumOpCantHappen");
+                        //}
 
                         return currentValue;
                     }
@@ -1178,10 +1186,10 @@ namespace Platform.Helpers.Collections
 
                 void IEnumerator.Reset()
                 {
-                    if (version != dictionary.version)
-                    {
-                        throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
-                    }
+                    //if (version != dictionary.version)
+                    //{
+                    //    throw new InvalidOperationException("InvalidOperation_EnumFailedVersion");
+                    //}
                     index = 0;
                     currentValue = default(TValue);
                 }

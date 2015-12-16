@@ -8,10 +8,13 @@ namespace Platform.Data.Core.Sequences
         public ulong SequenceMarkerLink;
         public bool UseCascadeUpdate;
         public bool UseCascadeDelete;
-        public bool UseSequenceMarker; // TODO: UseGarbageCollection может фукнционировать только, если UseSequenceMarker == true
+        public bool UseSequenceMarker;
         public bool UseCompression;
         public bool UseGarbageCollection;
         public bool EnforceSingleSequenceVersionOnWrite;
+        public bool EnforceSingleSequenceVersionOnRead; // TODO: Реализовать компактификацию при чтении
+        public bool UseRequestMarker;
+        public bool StoreRequestResults;
 
         public void InitOptions(ILinks<ulong> links)
         {
