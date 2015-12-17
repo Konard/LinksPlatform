@@ -28,18 +28,7 @@ namespace Platform.Sandbox
 
                 // Get content
                 const string url = "https://en.wikipedia.org/wiki/Main_Page";
-                const string pageCacheFile = "response.html";
-
-                string pageContents;
-
-                if (File.Exists(pageCacheFile))
-                    pageContents = File.ReadAllText(pageCacheFile);
-                else
-                {
-                    using (var client = new HttpClient())
-                        pageContents = client.GetStringAsync(url).AwaitResult();
-                    File.WriteAllText(pageCacheFile, pageContents);
-                }
+                var pageContents = GetPageContents(url);
 
                 var totalChars = url.Length + pageContents.Length;
 
@@ -76,7 +65,7 @@ namespace Platform.Sandbox
                 for (var i = 0; i < 5; i++)
                 {
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Data.Core.Sequences.Compressor(links, sequences);
+                    var compressor = new Data.Core.Sequences.Compressor(links, sequences, 1);
                     responseCompressedArray3 = compressor.Precompress(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
                 }
@@ -113,6 +102,8 @@ namespace Platform.Sandbox
 
                 var totalLinks = links.Count() - UnicodeMap.MapSize;
 
+                Console.WriteLine(totalLinks);
+
                 Global.Trash = totalLinks;
 
                 links.Create(urlLink, responseLink2);
@@ -127,6 +118,79 @@ namespace Platform.Sandbox
             }
 
             Console.ReadKey();
+        }
+
+        public static void Stats()
+        {
+            // Get content
+            const string url = "https://en.wikipedia.org/wiki/Main_Page";
+            var pageContents = GetPageContents(url);
+
+            var responseSourceArray = UnicodeMap.FromStringToLinkArray(pageContents);
+
+            for (var i = 0; i < 3; i++)
+            {
+                File.Delete("stats.links");
+
+                using (var memoryManager = new LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var links = new Links(memoryManager))
+                {
+                    UnicodeMap.InitNew(links);
+
+                    var sequences = new Sequences(links);
+
+                    var sw3 = Stopwatch.StartNew(); sequences.CreateBalancedVariant(responseSourceArray); sw3.Stop();
+
+                    var totalLinks = links.Count() - UnicodeMap.MapSize;
+
+                    Console.WriteLine("Balanced Variant: {0}, {1}, {2}", sw3.Elapsed, responseSourceArray.Length, totalLinks);
+                }
+            }
+
+            var minFrequency = 0UL;
+
+            for (var i = 1; i < 200; i++)
+            {
+                minFrequency += (ulong)(1 + Math.Log(i));
+
+                File.Delete("stats.links");
+
+                using (var memoryManager = new LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var links = new Links(memoryManager))
+                {
+                    UnicodeMap.InitNew(links);
+
+                    var sequences = new Sequences(links);
+
+                    var sw3 = Stopwatch.StartNew();
+                    var compressor = new Data.Core.Sequences.Compressor(links, sequences, minFrequency);
+                    ulong[] responseCompressedArray3 = compressor.Precompress(responseSourceArray);
+                    sequences.CreateBalancedVariant(responseCompressedArray3); sw3.Stop();
+
+                    var totalLinks = links.Count() - UnicodeMap.MapSize;
+
+                    Console.WriteLine("{0}, {1}, {2}, {3}", sw3.Elapsed, minFrequency, responseSourceArray.Length, totalLinks);
+                }
+            }
+
+            Console.ReadKey();
+        }
+
+        private static string GetPageContents(string url)
+        {
+            const string pageCacheFile = "response.html";
+
+            string pageContents;
+
+            if (File.Exists(pageCacheFile))
+                pageContents = File.ReadAllText(pageCacheFile);
+            else
+            {
+                using (var client = new HttpClient())
+                    pageContents = client.GetStringAsync(url).AwaitResult();
+                File.WriteAllText(pageCacheFile, pageContents);
+            }
+            return pageContents;
         }
 
         /// <remarks>
@@ -1155,7 +1219,7 @@ namespace Platform.Sandbox
                         {
                             _maxPair = pair;
                             //_maxFrequency = 2;
-                            break;;
+                            break; ;
                         }
                     }
 

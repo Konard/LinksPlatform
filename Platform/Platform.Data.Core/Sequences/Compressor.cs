@@ -13,6 +13,7 @@ namespace Platform.Data.Core.Sequences
         private readonly Links _links;
         private readonly Sequences _sequences;
         private Link _maxPair;
+        private ulong _minFrequency;
         private ulong _maxFrequency;
         private UnsafeDictionary<Link, ulong> _pairsFrequencies;
 
@@ -80,9 +81,16 @@ namespace Platform.Data.Core.Sequences
         }
 
         public Compressor(Links links, Sequences sequences)
+            : this(links, sequences, 1)
+        {
+        }
+
+        public Compressor(Links links, Sequences sequences, ulong minFrequency)
         {
             _links = links;
             _sequences = sequences;
+            if (minFrequency == 0) minFrequency = 1;
+            _minFrequency = minFrequency;
             ResetMaxPair();
         }
 
@@ -139,33 +147,38 @@ namespace Platform.Data.Core.Sequences
 
             _pairsFrequencies = new UnsafeDictionary<Link, ulong>(4096, LinkComparer.Default);
 
-            // Can be faster if source sequence allowed to be changed
-            var copy = new ulong[sequence.Length];
-            copy[0] = sequence[0];
-
             for (var i = 1; i < sequence.Length; i++)
             {
-                copy[i] = sequence[i];
-
                 var pair = new Link(sequence[i - 1], sequence[i]);
                 UpdateMaxPair(pair, IncrementFrequency(pair));
             }
 
-            var newLength = MainLoop(copy);
+            if (_maxFrequency > _minFrequency)
+            {
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                Array.Copy(sequence, copy, sequence.Length);
+
+                var newLength = ReplacePairs(copy);
+
+                _pairsFrequencies = null;
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
+
+                return final;
+            }
 
             _pairsFrequencies = null;
 
-            var final = new ulong[newLength];
-            Array.Copy(copy, final, newLength);
-
-            return final;
+            return sequence;
         }
 
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
         /// Faster version (pairs' frequencies dictionary is not recreated).
         /// </remarks>
-        private int MainLoop(ulong[] copy)
+        private int ReplacePairs(ulong[] copy)
         {
             var oldLength = copy.Length;
             var newLength = copy.Length;
@@ -236,7 +249,7 @@ namespace Platform.Data.Core.Sequences
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateMaxPair(Link pair, ulong frequency)
         {
-            if (frequency > 1)
+            if (frequency > _minFrequency)
             {
                 if (_maxFrequency < frequency)
                 {
@@ -263,7 +276,7 @@ namespace Platform.Data.Core.Sequences
                 if (entries[i].hashCode < 0) continue;
 
                 //var frequency = entries[i].value;
-                if (entries[i].value > 1)
+                if (entries[i].value > _minFrequency)
                 {
                     if (_maxFrequency > entries[i].value)
                         continue;

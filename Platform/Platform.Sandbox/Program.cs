@@ -8,7 +8,7 @@ namespace Platform.Sandbox
     {
         private static void Main(string[] args)
         {
-            CompressionExperiments.Test();
+            CompressionExperiments.Stats();
 
             return;
             
