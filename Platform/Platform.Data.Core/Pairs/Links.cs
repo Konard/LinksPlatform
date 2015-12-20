@@ -56,9 +56,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(link))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(link);
-
+                EnsureLinkExists(link);
                 return GetSourceCore(link);
             });
         }
@@ -81,9 +79,7 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(link))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(link);
-
+                EnsureLinkExists(link);
                 return GetTargetCore(link);
             });
         }
@@ -106,13 +102,12 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(link))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(link);
-
+                EnsureLinkExists(link);
                 return GetLinkCore(link);
             });
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Link GetLinkCore(ulong link)
         {
             var values = _memoryManager.GetLinkValue(link);
@@ -139,15 +134,13 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(source))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (!_memoryManager.Exists(target))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-
+                EnsureLinkExists(source, "source");
+                EnsureLinkExists(target, "target");
                 return SearchCore(source, target);
             });
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ulong SearchCore(ulong source, ulong target)
         {
             var searchResult = LinksConstants.Null;
@@ -181,15 +174,13 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteReadOperation(() =>
             {
-                if (source != LinksConstants.Any && !_memoryManager.Exists(source))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != LinksConstants.Any && !_memoryManager.Exists(target))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-
+                EnsureLinkIsAnyOrExists(source, "source");
+                EnsureLinkIsAnyOrExists(target, "target");
                 return _memoryManager.Each(handler, source, target);
             });
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool EachCore(ulong source, ulong target, Func<ulong, bool> handler)
         {
             return _memoryManager.Each(handler, source, target);
@@ -205,11 +196,8 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (source != LinksConstants.Itself && !_memoryManager.Exists(source))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (target != LinksConstants.Itself && !_memoryManager.Exists(target))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-
+                EnsureLinkIsItselfOrExists(source, "source");
+                EnsureLinkIsItselfOrExists(target, "target");
                 return CreateCore(source, target);
             });
         }
@@ -262,14 +250,10 @@ namespace Platform.Data.Core.Pairs
         {
             return _sync.ExecuteWriteOperation(() =>
             {
-                if (!_memoryManager.Exists(source))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(source, "source");
-                if (!_memoryManager.Exists(target))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(target, "target");
-                if (source != LinksConstants.Null && !_memoryManager.Exists(newSource))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(newSource, "newSource");
-                if (source != LinksConstants.Null && !_memoryManager.Exists(newTarget))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(newTarget, "newTarget");
+                EnsureLinkExists(source, "source");
+                EnsureLinkExists(target, "target");
+                EnsureLinkIsItselfOrExists(newSource, "newSource");
+                EnsureLinkIsItselfOrExists(newTarget, "newTarget");
 
                 var linkIndex = SearchCore(source, target);
                 if (linkIndex == LinksConstants.Null) // Может лучше исключение?
@@ -283,13 +267,14 @@ namespace Platform.Data.Core.Pairs
 
         private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
         {
+            // TODO: Исправить баг с newSource и newTarget (случай когда они равны Itself)
             var newLink = SearchCore(newSource, newTarget);
             if (newLink == LinksConstants.Null) // Actual update
             {
                 var before = GetLinkCore(linkIndex);
 
-                _memoryManager.SetLinkValue(linkIndex, newSource == LinksConstants.Null ? linkIndex : newSource,
-                                                       newTarget == LinksConstants.Null ? linkIndex : newTarget);
+                _memoryManager.SetLinkValue(linkIndex, newSource == LinksConstants.Itself ? linkIndex : newSource,
+                                                       newTarget == LinksConstants.Itself ? linkIndex : newTarget);
 
                 CommitUpdate(before, GetLinkCore(linkIndex));
 
@@ -297,15 +282,15 @@ namespace Platform.Data.Core.Pairs
             }
             else // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
             {
-                var referencesAsSourceCount = _memoryManager.Count(linkIndex, LinksConstants.Null);
-                var referencesAsTargetCount = _memoryManager.Count(LinksConstants.Null, linkIndex);
+                var referencesAsSourceCount = _memoryManager.Count(linkIndex, LinksConstants.Any);
+                var referencesAsTargetCount = _memoryManager.Count(LinksConstants.Any, linkIndex);
 
                 var references = new ulong[referencesAsSourceCount + referencesAsTargetCount];
 
                 var referencesFiller = new ArrayFiller<ulong>(references);
 
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, linkIndex, LinksConstants.Null);
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, linkIndex);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, linkIndex, LinksConstants.Any);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Any, linkIndex);
 
                 for (ulong i = 0; i < referencesAsSourceCount; i++)
                 {
@@ -382,6 +367,34 @@ namespace Platform.Data.Core.Pairs
 
                 CommitDeletion(before);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnsureLinkExists(ulong link)
+        {
+            if (!_memoryManager.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<ulong>(link);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnsureLinkExists(ulong link, string argumentName)
+        {
+            if (!_memoryManager.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnsureLinkIsAnyOrExists(ulong link, string argumentName)
+        {
+            if (link != LinksConstants.Any && !_memoryManager.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void EnsureLinkIsItselfOrExists(ulong link, string argumentName)
+        {
+            if (link != LinksConstants.Itself && !_memoryManager.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
         }
 
         #endregion

@@ -1481,7 +1481,6 @@ namespace Platform.Data.Core.Sequences
                 _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != LinksConstants.Null && x != ZeroOrMany));
                 _results = results;
 
-                // TODO: Переместить в PatternMatcher
                 _pattern = CreateDetailedPattern();
             }
 

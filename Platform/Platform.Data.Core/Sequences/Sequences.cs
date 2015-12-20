@@ -72,7 +72,10 @@ namespace Platform.Data.Core.Sequences
 
         private bool IsSequence(ulong sequence)
         {
-            return _links.Search(Options.SequenceMarkerLink, sequence) != LinksConstants.Null;
+            if (Options.UseSequenceMarker)
+                return _links.Search(Options.SequenceMarkerLink, sequence) != LinksConstants.Null;
+
+            return !_links.IsPartialPointCore(sequence); // TODO: Или просто return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -172,7 +175,7 @@ namespace Platform.Data.Core.Sequences
             if (Options.UseCompression)
                 sequenceRoot = _compressor.Compress(sequence);
             else
-                sequenceRoot = CreateBalancedVariant(sequence);
+                sequenceRoot = CreateBalancedVariantCore(sequence);
 
             if (Options.UseSequenceMarker)
                 _links.Create(Options.SequenceMarkerLink, sequenceRoot);
@@ -189,12 +192,6 @@ namespace Platform.Data.Core.Sequences
 
                 _links.EnsureEachLinkExists(sequence);
 
-                if (sequence.Length == 1)
-                    return sequence[0];
-
-                if (sequence.Length == 2)
-                    return _links.CreateCore(sequence[0], sequence[1]);
-
                 return CreateBalancedVariantCore(sequence);
             });
         }
@@ -202,6 +199,12 @@ namespace Platform.Data.Core.Sequences
         private ulong CreateBalancedVariantCore(params ulong[] sequence)
         {
             var length = sequence.Length;
+
+            if (length == 1)
+                return sequence[0];
+
+            if (length == 2)
+                return _links.CreateCore(sequence[0], sequence[1]);
 
             // Needed only if we not allowed to change sequence itself (so it makes copy)
             // Нужно только если исходный массив последовательности изменять нельзя (тогда делается его копия)
@@ -253,50 +256,37 @@ namespace Platform.Data.Core.Sequences
 
                     if (link == LinksConstants.Any)
                         return _links.Each(LinksConstants.Any, LinksConstants.Any, handler);
-                    else
-                        return handler(link);
+
+                    return handler(link);
                 }
-                else if (sequence.Length == 2)
+                if (sequence.Length == 2)
                 {
                     return _links.Each(sequence[0], sequence[1], handler);
                 }
-                else
-                {
-                    if (_links.AnyLinkIsAny(sequence))
-                    {
-                        throw new NotImplementedException();
-                    }
-                    else
-                    {
-                        return EachCore(handler, sequence);
-                    }
-                }
+
+                return EachCore(handler, sequence);
             });
         }
 
         private bool EachCore(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            if (sequence.Length > 0)
-            {
-                var results = new HashSet<ulong>();
-                var matcher = new Matcher(this, sequence, results, handler);
+            var matcher = new Matcher(this, sequence, null, handler);
 
-                // Временно возвращаем только фактические варианты последовательностей, а не связи с маркером.
-                // Чтобы возвращать сами последовательности нужна функция HandleFullMatchedSequence
+            // Временно возвращаем только фактические варианты последовательностей, а не связи с маркером.
+            // Чтобы возвращать сами последовательности нужна функция HandleFullMatchedSequence
 
-                if (sequence.Length >= 2)
-                    if (!StepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[0], sequence[1]))
-                        return false;
+            //if (sequence.Length >= 2)
+            if (!StepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[0], sequence[1]))
+                return false;
 
-                var last = sequence.Length - 2;
-                for (var i = 1; i < last; i++)
-                    if (!PartialStepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[i], sequence[i + 1]))
-                        return false;
+            var last = sequence.Length - 2;
+            for (var i = 1; i < last; i++)
+                if (!PartialStepRight((Func<ulong, bool>)matcher.HandleFullMatched, sequence[i], sequence[i + 1]))
+                    return false;
 
-                if (sequence.Length >= 3)
-                    if (!StepLeft((Func<ulong, bool>)matcher.HandleFullMatched, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
-                        return false;
-            }
+            if (sequence.Length >= 3)
+                if (!StepLeft((Func<ulong, bool>)matcher.HandleFullMatched, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
+                    return false;
 
             return true;
         }
@@ -386,10 +376,11 @@ namespace Platform.Data.Core.Sequences
 
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
         {
-            var bestVariant = CreateCore(newSequence);
-
+            ulong bestVariant;
             if (Options.EnforceSingleSequenceVersionOnWrite && !sequence.EqualTo(newSequence))
                 bestVariant = CompactCore(newSequence);
+            else
+                bestVariant = CreateCore(newSequence);
 
             // Возможно нужно две версии Each, возвращающий фактические последовательности и с маркером,
             // или возможно даже возвращать и тот и тот вариант. С другой стороны все варианты можно получить имея только фактические последовательности.
@@ -532,10 +523,15 @@ namespace Platform.Data.Core.Sequences
 
         #region Garbage Collection
 
+        /// <remarks>
+        /// TODO: Добавить дополнительный обработчик / событие CanBeDeleted которое можно определить извне или в унаследованном классе
+        /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsGarbage(ulong link)
         {
-            return link != Options.SequenceMarkerLink && _links.Count(link) == 0;
+            return link != Options.SequenceMarkerLink
+                && !_links.IsPartialPointCore(link)
+                && _links.Count(link) == 0;
         }
 
         private void ClearGarbage(ulong link)
@@ -624,7 +620,7 @@ namespace Platform.Data.Core.Sequences
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != LinksConstants.Null && x != ZeroOrMany));
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != LinksConstants.Any && x != ZeroOrMany));
                 _results = results;
                 _stopableHandler = stopableHandler;
             }
@@ -651,14 +647,14 @@ namespace Platform.Data.Core.Sequences
                     return false;
                 }
 
-                if (element != _patternSequence[_filterPosition])
+                if (_patternSequence[_filterPosition] != LinksConstants.Any &&
+                    element != _patternSequence[_filterPosition])
                 {
                     _filterPosition = -1;
-                    return false; // Начинается иначе
+                    return false; // Начинается/Продолжается иначе
                 }
 
                 _filterPosition++;
-
                 return true;
             }
 
@@ -683,6 +679,9 @@ namespace Platform.Data.Core.Sequences
                 return true;
             }
 
+            /// <remarks>
+            /// TODO: Add support for LinksConstants.Any
+            /// </remarks>
             public bool PartialMatch(LinkIndex sequenceToMatch)
             {
                 _filterPosition = -1;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using Platform.Communication.Udp;
@@ -47,12 +47,14 @@ namespace Platform.Data.MasterServer
                         {
                             if (!string.IsNullOrWhiteSpace(message))
                             {
+                                message = message.Trim();
+
                                 Console.WriteLine("<- {0}", message);
 
-                                if (message.EndsWith("?"))
-                                    sequences.Search(sender, message);
+                                if (IsSearch(message))
+                                    sequences.Search(sender, ProcessSequenceForSearch(message));
                                 else
-                                    sequences.Create(sender, message);
+                                    sequences.Create(sender, ProcessSequenceForCreate(message));
                             }
                         };
 
@@ -117,13 +119,6 @@ namespace Platform.Data.MasterServer
             }
         }
 
-        private static void Create(this Sequences sequences, UdpSender sender, string sequence)
-        {
-            var link = sequences.Create(UnicodeMap.FromStringToLinkArray(sequence));
-
-            sender.Send(string.Format("Sequence with balanced variant at {0} created.", link));
-        }
-
         private static void AppendLinkToString(StringBuilder sb, ulong link)
         {
             if (link <= (char.MaxValue + 1))
@@ -132,45 +127,140 @@ namespace Platform.Data.MasterServer
                 sb.AppendFormat("({0})", link);
         }
 
-        private static void Search(this Sequences sequences, UdpSender sender, string sequenceQuery)
+        private static bool IsSearch(string message)
         {
-            var actualLength = sequenceQuery.Length - 1;
-            var linksSequenceQuery = new ulong[actualLength];
-            for (var i = 0; i < actualLength; i++)
-                if (sequenceQuery[i] == '_') // Добавить экранирование \_ в качестве _ (или что-то в этом роде)
-                    linksSequenceQuery[i] = LinksConstants.Any;
-                else if (sequenceQuery[i] == '*')
-                    linksSequenceQuery[i] = Sequences.ZeroOrMany;
-                else
-                    linksSequenceQuery[i] = UnicodeMap.FromCharToLink(sequenceQuery[i]);
-
-            if (linksSequenceQuery.Contains(LinksConstants.Any) || linksSequenceQuery.Contains(Sequences.ZeroOrMany))
+            var i = message.Length - 1;
+            if (message[i] == '?')
             {
-                var patternMatched = sequences.MatchPattern(linksSequenceQuery);
+                var escape = 0;
+                while (--i >= 0 && IsEscape(message[i]))
+                    escape++;
+                return escape % 2 == 0;
+            }
+            return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static bool IsEscape(char c)
+        {
+            return c == '\\' || c == '~';
+        }
+
+        private static ulong[] ProcessSequenceForSearch(string sequence)
+        {
+            return ProcessSequence(sequence, forSearch: true);
+        }
+
+        private static ulong[] ProcessSequenceForCreate(string sequence)
+        {
+            return ProcessSequence(sequence, forSearch: false);
+        }
+
+        private static ulong[] ProcessSequence(string sequence, bool forSearch = false)
+        {
+            var sequenceLength = sequence.Length;
+            var w = 0;
+            for (var r = 0; r < sequenceLength; r++)
+            {
+                if (IsEscape(sequence[r])) // Last Escape Symbol Ignored
+                {
+                    if ((r + 1) < sequenceLength)
+                    {
+                        w++;
+                        r++;
+                    }
+                }
+                else
+                    w++;
+            }
+
+            var result = new ulong[w];
+
+            w = 0;
+            if (forSearch)
+            {
+                for (var r = 0; r < sequenceLength; r++)
+                {
+                    if (IsEscape(sequence[r])) // Last Escape Symbol Ignored
+                    {
+                        if ((r + 1) < sequenceLength)
+                        {
+                            result[w++] = UnicodeMap.FromCharToLink(sequence[r + 1]);
+                            r++;
+                        }
+                    }
+                    else if (sequence[r] == '_')
+                        result[w++] = LinksConstants.Any;
+                    else if (sequence[r] == '*')
+                        result[w++] = Sequences.ZeroOrMany;
+                    else
+                        result[w++] = UnicodeMap.FromCharToLink(sequence[r]);
+                }
+            }
+            else
+            {
+                for (var r = 0; r < sequence.Length; r++)
+                {
+                    if (IsEscape(sequence[r])) // Last Escape Symbol Ignored
+                    {
+                        if ((r + 1) < sequence.Length)
+                        {
+                            result[w++] = UnicodeMap.FromCharToLink(sequence[r + 1]);
+                            r++;
+                        }
+                    }
+                    else
+                        result[w++] = UnicodeMap.FromCharToLink(sequence[r]);
+                }
+            }
+
+            return result;
+        }
+
+        private static void Create(this Sequences sequences, UdpSender sender, ulong[] sequence)
+        {
+            var link = sequences.Create(sequence);
+
+            sender.Send(string.Format("Sequence with balanced variant at {0} created.", link));
+        }
+
+        private static void Search(this Sequences sequences, UdpSender sender, ulong[] sequence)
+        {
+            var containsAny = Array.IndexOf(sequence, LinksConstants.Any) >= 0;
+            var containsZeroOrMany = Array.IndexOf(sequence, Sequences.ZeroOrMany) >= 0;
+
+            if (containsZeroOrMany)
+            {
+                var patternMatched = sequences.MatchPattern(sequence);
 
                 sender.Send(string.Format("{0} sequences matched pattern.", patternMatched.Count));
                 foreach (var result in patternMatched)
                     sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
             }
-            else
+            if (!containsZeroOrMany)
             {
-                var fullyMatched = sequences.GetAllMatchingSequences1(linksSequenceQuery);
+                var fullyMatched = sequences.Each(sequence);
 
                 sender.Send(string.Format("{0} sequences matched fully.", fullyMatched.Count));
                 foreach (var result in fullyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
-
-                var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(linksSequenceQuery);
+                    sender.Send(string.Format("\t{0}: {1}", result,
+                        sequences.FormatSequence(result, AppendLinkToString, false)));
+            }
+            if (!containsAny && !containsZeroOrMany)
+            {
+                var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(sequence);
 
                 sender.Send(string.Format("{0} sequences matched partially.", partiallyMatched.Count));
                 foreach (var result in partiallyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result,
+                        sequences.FormatSequence(result, AppendLinkToString, false)));
 
-                var allConnections = sequences.GetAllConnections(linksSequenceQuery);
+                var allConnections = sequences.GetAllConnections(sequence);
 
                 sender.Send(string.Format("{0} sequences connects query elements.", allConnections.Count));
                 foreach (var result in allConnections)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send(string.Format("\t{0}: {1}", result,
+                        sequences.FormatSequence(result, AppendLinkToString, false)));
             }
         }
     }

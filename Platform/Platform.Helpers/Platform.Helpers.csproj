@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayFiller.cs" />
+    <Compile Include="ArrayString.cs" />
     <Compile Include="BitConverterHelpers.cs" />
     <Compile Include="Collections\HashHelpers.cs" />
     <Compile Include="Collections\ListExtensions.cs" />
