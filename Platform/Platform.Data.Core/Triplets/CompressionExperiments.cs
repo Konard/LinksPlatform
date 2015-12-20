@@ -8,7 +8,7 @@ namespace Platform.Data.Core.Triplets
         {
             if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
             {
-                Link subJoint = Link.Search(subject.Target, Net.And, @object);
+                var subJoint = Link.Search(subject.Target, Net.And, @object);
                 if (subJoint != null && subJoint != subject)
                 {
                     Link.Update(ref subject, subject.Source, Net.And, subJoint);
@@ -50,7 +50,7 @@ namespace Platform.Data.Core.Triplets
         {
             if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
             {
-                Link subJoint = Link.Search(@object, Net.And, subject.Source);
+                var subJoint = Link.Search(@object, Net.And, subject.Source);
                 if (subJoint != null && subJoint != subject)
                 {
                     Link.Update(ref subject, subJoint, Net.And, subject.Target);
@@ -179,7 +179,7 @@ namespace Platform.Data.Core.Triplets
             {
             }
 
-            Link directConnection = Link.Search(first, Net.And, second);
+            var directConnection = Link.Search(first, Net.And, second);
             if (directConnection == null)
             {
                 directConnection = TryReconstructConnection(first, second);
@@ -188,7 +188,7 @@ namespace Platform.Data.Core.Triplets
             Link rightCrossConnection = null;
             if (second.Linker == Net.And)
             {
-                Link assumedRightCrossConnection = Link.Search(first, Net.And, second.Source);
+                var assumedRightCrossConnection = Link.Search(first, Net.And, second.Source);
                 if (assumedRightCrossConnection != null && second != assumedRightCrossConnection)
                 {
                     rightCrossConnection = assumedRightCrossConnection;
@@ -202,7 +202,7 @@ namespace Platform.Data.Core.Triplets
             Link leftCrossConnection = null;
             if (first.Linker == Net.And)
             {
-                Link assumedLeftCrossConnection = Link.Search(first.Target, Net.And, second);
+                var assumedLeftCrossConnection = Link.Search(first.Target, Net.And, second);
                 if (assumedLeftCrossConnection != null && first != assumedLeftCrossConnection)
                 {
                     leftCrossConnection = assumedLeftCrossConnection;
@@ -304,7 +304,7 @@ namespace Platform.Data.Core.Triplets
                 //TryReconstructConnection(first, second.Source);
                 //TryReconstructConnection(rightCrossConnection, second.Target); // ухудшает стабильность
 
-                Link resultConnection = rightCrossConnection & second.Target;
+                var resultConnection = rightCrossConnection & second.Target;
 
                 //if (second.TotalReferers == 0)
                 //    Link.Delete(ref second);
@@ -331,7 +331,7 @@ namespace Platform.Data.Core.Triplets
                 //TryReconstructConnection(first.Target, second);
                 //TryReconstructConnection(first.Source, leftCrossConnection); // ухудшает стабильность
 
-                Link resultConnection = first.Source & leftCrossConnection;
+                var resultConnection = first.Source & leftCrossConnection;
 
                 //if (first.TotalReferers == 0)
                 //    Link.Delete(ref first);
@@ -382,7 +382,7 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 1 && couple.ReferersBySourceCount == 0)
                     {
-                        Link neighbour = couple.FirstRefererByTarget;
+                        var neighbour = couple.FirstRefererByTarget;
                         if (neighbour.Linker == Net.And && neighbour.Source == first)
                         {
                             if (directConnection == null)
@@ -395,7 +395,7 @@ namespace Platform.Data.Core.Triplets
 
                     if (couple.Linker == Net.And)
                     {
-                        Link neighbour = couple.FirstRefererByTarget;
+                        var neighbour = couple.FirstRefererByTarget;
                         if (neighbour.Linker == Net.And && neighbour.Source == first)
                         {
 
@@ -414,7 +414,7 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (couple.Linker == Net.And)
                     {
-                        Link neighbour = couple.Target;
+                        var neighbour = couple.Target;
                         if (neighbour.Linker == Net.And && neighbour.Source == second)
                         {
                             if (neighbour.ReferersByTargetCount == 1 && neighbour.ReferersBySourceCount == 0)
@@ -441,7 +441,7 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (couple.Linker == Net.And)
                     {
-                        Link neighbour = couple.Source;
+                        var neighbour = couple.Source;
                         if (neighbour.Linker == Net.And && neighbour.Target == first)
                         {
                             if (neighbour.ReferersByTargetCount == 0 && neighbour.ReferersBySourceCount == 1)
@@ -467,7 +467,7 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 0 && couple.ReferersBySourceCount == 1)
                     {
-                        Link neighbour = couple.FirstRefererBySource;
+                        var neighbour = couple.FirstRefererBySource;
                         if (neighbour.Linker == Net.And && neighbour.Target == second)
                         {
                             if (directConnection == null)
@@ -755,11 +755,11 @@ namespace Platform.Data.Core.Triplets
 
         public static Link FromList(List<Link> links)
         {
-            int i = links.Count - 1;
-            Link element = links[i];
+            var i = links.Count - 1;
+            var element = links[i];
             while (--i >= 0)
             {
-                Link x = links[i];
+                var x = links[i];
                 element = CombinedJoin(ref x, ref element); // LeftJoin(ref element, links[i]);
             }
             return element;
@@ -767,8 +767,8 @@ namespace Platform.Data.Core.Triplets
 
         public static Link FromList(Link[] links)
         {
-            int i = links.Length - 1;
-            Link element = links[i];
+            var i = links.Length - 1;
+            var element = links[i];
             while (--i >= 0) element = CombinedJoin(ref links[i], ref element); // LeftJoin(ref element, links[i]);
             return element;
         }

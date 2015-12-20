@@ -52,7 +52,7 @@ namespace Platform.Data.Core.Triplets
         {
             if (character.Source == Net.Character && character.Linker == Net.ThatHas)
             {
-                Link code = character.Target;
+                var code = character.Target;
                 if (code.Source == Net.Code && code.Linker == Net.ThatIsRepresentedBy)
                 {
                     var charCode = (char)LinkConverter.ToNumber(code.Target);
@@ -70,7 +70,7 @@ namespace Platform.Data.Core.Triplets
 
         private static void CreateLatinAlphabet()
         {
-            char[] lettersCharacters = new char[]
+            var lettersCharacters = new[]
             {
                 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j',
                 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't',
@@ -82,7 +82,7 @@ namespace Platform.Data.Core.Triplets
 
         private static void CreateCyrillicAlphabet()
         {
-            char[] lettersCharacters = new char[]
+            var lettersCharacters = new[]
             {
                 'а', 'б', 'в', 'г', 'д', 'е', 'ё', 'ж', 'з', 'и',
                 'й', 'к', 'л', 'м', 'н', 'о', 'п', 'р', 'с', 'т',
@@ -98,12 +98,12 @@ namespace Platform.Data.Core.Triplets
             Link alphabet;
             if (Link.TryGetMapped(mapping, out alphabet))
             {
-                Link letters = alphabet.Target;
+                var letters = alphabet.Target;
 
                 letters.WalkThroughSequence(letter =>
                 {
-                    Link lowerCaseLetter = Link.Search(Net.LowerCase, Net.Of, letter);
-                    Link upperCaseLetter = Link.Search(Net.UpperCase, Net.Of, letter);
+                    var lowerCaseLetter = Link.Search(Net.LowerCase, Net.Of, letter);
+                    var upperCaseLetter = Link.Search(Net.UpperCase, Net.Of, letter);
 
                     if (lowerCaseLetter != null && upperCaseLetter != null)
                     {
@@ -119,14 +119,14 @@ namespace Platform.Data.Core.Triplets
             else
             {
                 alphabet = Net.CreateMappedThing(mapping);
-                Link letterOfAlphabet = Link.Create(Net.Letter, Net.Of, alphabet);
-                Link[] lettersLinks = new Link[lettersCharacters.Length];
+                var letterOfAlphabet = Link.Create(Net.Letter, Net.Of, alphabet);
+                var lettersLinks = new Link[lettersCharacters.Length];
 
                 GenerateAlphabetBasis(ref alphabet, ref letterOfAlphabet, lettersLinks);
 
-                for (int i = 0; i < lettersCharacters.Length; i++)
+                for (var i = 0; i < lettersCharacters.Length; i++)
                 {
-                    char lowerCaseCharacter = lettersCharacters[i];
+                    var lowerCaseCharacter = lettersCharacters[i];
                     Link lowerCaseLink, upperCaseLink;
                     SetLetterCodes(lettersLinks[i], lowerCaseCharacter, out lowerCaseLink, out upperCaseLink);
 
@@ -135,7 +135,7 @@ namespace Platform.Data.Core.Triplets
 
                     if (upperCaseLink != null)
                     {
-                        char upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
+                        var upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
                         CharactersToLinks[upperCaseCharacter] = upperCaseLink;
                         LinksToCharacters[upperCaseLink] = upperCaseCharacter;
                     }
@@ -143,10 +143,10 @@ namespace Platform.Data.Core.Triplets
 
                 alphabet.SetName(alphabetName);
 
-                for (int i = 0; i < lettersCharacters.Length; i++)
+                for (var i = 0; i < lettersCharacters.Length; i++)
                 {
-                    char lowerCaseCharacter = lettersCharacters[i];
-                    char upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
+                    var lowerCaseCharacter = lettersCharacters[i];
+                    var upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
 
                     if (lowerCaseCharacter != upperCaseCharacter)
                     {
@@ -166,10 +166,10 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (referer.Linker == Net.Has)
                     {
-                        Link target = referer.Target;
+                        var target = referer.Target;
                         if (target.Source == Net.Code && target.Linker == Net.ThatIsRepresentedBy)
                         {
-                            char charCode = (char)LinkConverter.ToNumber(target.Target);
+                            var charCode = (char)LinkConverter.ToNumber(target.Target);
 
                             CharactersToLinks[charCode] = letter;
                             LinksToCharacters[letter] = charCode;
@@ -189,20 +189,20 @@ namespace Platform.Data.Core.Triplets
             //y: letter of latin alphabet that is between (x and z).
             //z: letter of latin alphabet that is after y.
 
-            int firstLetterIndex = 0;
+            const int firstLetterIndex = 0;
 
-            for (int i = firstLetterIndex; i < letters.Length; i++)
+            for (var i = firstLetterIndex; i < letters.Length; i++)
             {
                 letters[i] = Net.CreateThing();
             }
 
-            int lastLetterIndex = letters.Length - 1;
+            var lastLetterIndex = letters.Length - 1;
 
             Link.Update(ref letters[firstLetterIndex], letterOfAlphabet, Net.ThatIsBefore, letters[firstLetterIndex + 1]);
             Link.Update(ref letters[lastLetterIndex], letterOfAlphabet, Net.ThatIsAfter, letters[lastLetterIndex - 1]);
 
-            int secondLetterIndex = firstLetterIndex + 1;
-            for (int i = secondLetterIndex; i < lastLetterIndex; i++)
+            const int secondLetterIndex = firstLetterIndex + 1;
+            for (var i = secondLetterIndex; i < lastLetterIndex; i++)
             {
                 Link.Update(ref letters[i], letterOfAlphabet, Net.ThatIsBetween, letters[i - 1] & letters[i + 1]);
             }
@@ -212,17 +212,17 @@ namespace Platform.Data.Core.Triplets
 
         private static void SetLetterCodes(Link letter, char lowerCaseCharacter, out Link lowerCase, out Link upperCase)
         {
-            char upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
+            var upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
 
             if (upperCaseCharacter != lowerCaseCharacter)
             {
                 lowerCase = Link.Create(Net.LowerCase, Net.Of, letter);
-                Link lowerCaseCharacterCode = Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(lowerCaseCharacter));
+                var lowerCaseCharacterCode = Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(lowerCaseCharacter));
 
                 Link.Create(lowerCase, Net.Has, lowerCaseCharacterCode);
 
                 upperCase = Link.Create(Net.UpperCase, Net.Of, letter);
-                Link upperCaseCharacterCode = Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(upperCaseCharacter));
+                var upperCaseCharacterCode = Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(upperCaseCharacter));
 
                 Link.Create(upperCase, Net.Has, upperCaseCharacterCode);
             }
@@ -268,7 +268,7 @@ namespace Platform.Data.Core.Triplets
                 }
                 else
                 {
-                    Link simpleCharacter = CreateSimpleCharacterLink(character);
+                    var simpleCharacter = CreateSimpleCharacterLink(character);
                     CharactersToLinks[character] = simpleCharacter;
                     LinksToCharacters[simpleCharacter] = character;
                     return simpleCharacter;

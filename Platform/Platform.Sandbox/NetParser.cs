@@ -21,7 +21,7 @@ namespace Platform.Sandbox
 
                 foreach (Capture capture in match.Groups["part"].Captures)
                 {
-                    string value = capture.Value.ToLower();
+                    var value = capture.Value.ToLower();
 
 
 

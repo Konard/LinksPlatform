@@ -40,19 +40,19 @@ namespace Platform.Data.Core.Triplets
 
         private static Link FromPowerOf2(long powerOf2)
         {
-            Link result = NumbersToLinks[powerOf2];
+            var result = NumbersToLinks[powerOf2];
             if (result == null)
             {
-                Link previousPowerOf2Link = NumbersToLinks[powerOf2 - 1];
+                var previousPowerOf2Link = NumbersToLinks[powerOf2 - 1];
 
                 if (previousPowerOf2Link == null)
                 {
                     previousPowerOf2Link = NumbersToLinks[0];
-                    for (int i = 1; i < powerOf2; i++)
+                    for (var i = 1; i < powerOf2; i++)
                     {
                         if (NumbersToLinks[i] == null)
                         {
-                            Link numberLink = Link.Create(Net.Sum, Net.Of, previousPowerOf2Link & previousPowerOf2Link);
+                            var numberLink = Link.Create(Net.Sum, Net.Of, previousPowerOf2Link & previousPowerOf2Link);
 
                             var num = (long)Math.Pow(2, i);
 
@@ -95,7 +95,7 @@ namespace Platform.Data.Core.Triplets
             else
                 throw new NotSupportedException("Negative numbers are not supported yet.");
 
-            Link sum = Link.Create(Net.Sum, Net.Of, LinkConverter.FromList(links));
+            var sum = Link.Create(Net.Sum, Net.Of, LinkConverter.FromList(links));
             return sum;
         }
 
@@ -108,7 +108,7 @@ namespace Platform.Data.Core.Triplets
 
             if (link.IsSum())
             {
-                List<Link> numberParts = LinkConverter.ToList(link.Target);
+                var numberParts = LinkConverter.ToList(link.Target);
 
                 long number = 0;
                 for (var i = 0; i < numberParts.Count; i++)
@@ -127,14 +127,14 @@ namespace Platform.Data.Core.Triplets
         {
             if (!LinksToNumbers.TryGetValue(link, out number))
             {
-                Link previousNumberLink = link.Target.Source;
+                var previousNumberLink = link.Target.Source;
 
                 GoDownAndTakeIt(previousNumberLink, out number);
 
                 var previousNumberIndex = (int)Math.Log(number, 2);
 
-                int newNumberIndex = previousNumberIndex + 1;
-                Link newNumberLink = Link.Create(Net.Sum, Net.Of, previousNumberLink & previousNumberLink);
+                var newNumberIndex = previousNumberIndex + 1;
+                var newNumberLink = Link.Create(Net.Sum, Net.Of, previousNumberLink & previousNumberLink);
 
                 number = number + number;
 

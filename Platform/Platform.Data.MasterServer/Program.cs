@@ -41,7 +41,6 @@ namespace Platform.Data.MasterServer
                     Console.WriteLine("Links server started.");
                     Console.WriteLine("Press CTRL+C or ESC to stop server.");
 
-
                     using (var sender = new UdpSender(8888))
                     {
                         MessageHandlerCallback handleMessage = message =>

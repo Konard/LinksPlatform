@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace Platform.WindowsAPI
 {
+    /// <remarks>
+    /// TODO: Определить, нужно ли обязательно указывать расширение для библиотеки (например, ".dll").
+    /// </remarks>
     public static class Kernel32
     {
         #region Virtual Memory
@@ -178,7 +181,7 @@ namespace Platform.WindowsAPI
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
 
-        [DllImport("Kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
+        [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
         public static extern void MoveMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
 
         #endregion

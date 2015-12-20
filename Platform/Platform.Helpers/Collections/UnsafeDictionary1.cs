@@ -108,7 +108,7 @@ namespace Platform.Helpers.Collections1 {
             //    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.dictionary);
             //}
 
-            foreach (KeyValuePair<TKey,TValue> pair in dictionary) {
+            foreach (var pair in dictionary) {
                 Add(pair.Key, pair.Value);
             }
         }
@@ -177,7 +177,7 @@ namespace Platform.Helpers.Collections1 {
 
         public TValue this[TKey key] {
             get {
-                int i = FindEntry(key);
+                var i = FindEntry(key);
                 if (i >= 0) return entries[i].value;
                 //ThrowHelper.ThrowKeyNotFoundException();
                 return default(TValue);
@@ -196,7 +196,7 @@ namespace Platform.Helpers.Collections1 {
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Contains(KeyValuePair<TKey, TValue> keyValuePair) {
-            int i = FindEntry(keyValuePair.Key);
+            var i = FindEntry(keyValuePair.Key);
             if( i >= 0 && EqualityComparer<TValue>.Default.Equals(entries[i].value, keyValuePair.Value)) {
                 return true;
             }
@@ -204,7 +204,7 @@ namespace Platform.Helpers.Collections1 {
         }
 
         bool ICollection<KeyValuePair<TKey, TValue>>.Remove(KeyValuePair<TKey, TValue> keyValuePair) {
-            int i = FindEntry(keyValuePair.Key);
+            var i = FindEntry(keyValuePair.Key);
             if( i >= 0 && EqualityComparer<TValue>.Default.Equals(entries[i].value, keyValuePair.Value)) {
                 Remove(keyValuePair.Key);
                 return true;
@@ -214,7 +214,7 @@ namespace Platform.Helpers.Collections1 {
 
         public void Clear() {
             if (count > 0) {
-                for (int i = 0; i < buckets.Length; i++) buckets[i] = -1;
+                for (var i = 0; i < buckets.Length; i++) buckets[i] = -1;
                 Array.Clear(entries, 0, count);
                 freeList = -1;
                 count = 0;
@@ -229,13 +229,13 @@ namespace Platform.Helpers.Collections1 {
 
         public bool ContainsValue(TValue value) {
             if (value == null) {
-                for (int i = 0; i < count; i++) {
+                for (var i = 0; i < count; i++) {
                     if (entries[i].hashCode >= 0 && entries[i].value == null) return true;
                 }
             }
             else {
-                EqualityComparer<TValue> c = EqualityComparer<TValue>.Default;
-                for (int i = 0; i < count; i++) {
+                var c = EqualityComparer<TValue>.Default;
+                for (var i = 0; i < count; i++) {
                     if (entries[i].hashCode >= 0 && c.Equals(entries[i].value, value)) return true;
                 }
             }
@@ -255,9 +255,9 @@ namespace Platform.Helpers.Collections1 {
             //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
             //}
 
-            int count = this.count;
-            Entry[] entries = this.entries;
-            for (int i = 0; i < count; i++) {
+            var count = this.count;
+            var entries = this.entries;
+            for (var i = 0; i < count; i++) {
                 if (entries[i].hashCode >= 0) {
                     array[index++] = new KeyValuePair<TKey,TValue>(entries[i].key, entries[i].value);
                 }
@@ -287,7 +287,7 @@ namespace Platform.Helpers.Collections1 {
 
             info.AddValue(HashSizeName, buckets == null ? 0 : buckets.Length); //This is the length of the bucket array.
             if( buckets != null) {
-                KeyValuePair<TKey, TValue>[] array = new KeyValuePair<TKey, TValue>[Count];
+                var array = new KeyValuePair<TKey, TValue>[Count];
                 CopyTo(array, 0);
                 info.AddValue(KeyValuePairsName, array, typeof(KeyValuePair<TKey, TValue>[]));
             }
@@ -299,8 +299,8 @@ namespace Platform.Helpers.Collections1 {
             //}
 
             if (buckets != null) {
-                int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-                for (int i = buckets[hashCode % buckets.Length]; i >= 0; i = entries[i].next) {
+                var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+                for (var i = buckets[hashCode % buckets.Length]; i >= 0; i = entries[i].next) {
                     if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) return i;
                 }
             }
@@ -308,9 +308,9 @@ namespace Platform.Helpers.Collections1 {
         }
 
         private void Initialize(int capacity) {
-            int size = HashHelpers.GetPrime(capacity);
+            var size = HashHelpers.GetPrime(capacity);
             buckets = new int[size];
-            for (int i = 0; i < buckets.Length; i++) buckets[i] = -1;
+            for (var i = 0; i < buckets.Length; i++) buckets[i] = -1;
             entries = new Entry[size];
             freeList = -1;
         }
@@ -322,14 +322,14 @@ namespace Platform.Helpers.Collections1 {
             //}
 
             if (buckets == null) Initialize(0);
-            int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-            int targetBucket = hashCode % buckets.Length;
+            var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+            var targetBucket = hashCode % buckets.Length;
 
 #if FEATURE_RANDOMIZED_STRING_HASHING
             int collisionCount = 0;
 #endif
 
-            for (int i = buckets[targetBucket]; i >= 0; i = entries[i].next) {
+            for (var i = buckets[targetBucket]; i >= 0; i = entries[i].next) {
                 if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
                     //if (add) { 
                     //    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_AddingDuplicate);
@@ -388,24 +388,24 @@ namespace Platform.Helpers.Collections1 {
                 return;
             }            
             
-            int realVersion = siInfo.GetInt32(VersionName);
-            int hashsize = siInfo.GetInt32(HashSizeName);
+            var realVersion = siInfo.GetInt32(VersionName);
+            var hashsize = siInfo.GetInt32(HashSizeName);
             comparer   = (IEqualityComparer<TKey>)siInfo.GetValue(ComparerName, typeof(IEqualityComparer<TKey>));
             
             if( hashsize != 0) {
                 buckets = new int[hashsize];
-                for (int i = 0; i < buckets.Length; i++) buckets[i] = -1;
+                for (var i = 0; i < buckets.Length; i++) buckets[i] = -1;
                 entries = new Entry[hashsize];
                 freeList = -1;
 
-                KeyValuePair<TKey, TValue>[] array = (KeyValuePair<TKey, TValue>[]) 
+                var array = (KeyValuePair<TKey, TValue>[]) 
                     siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]));
 
                 //if (array==null) {
                 //    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
                 //}
 
-                for (int i=0; i<array.Length; i++) {
+                for (var i=0; i<array.Length; i++) {
                     //if ( array[i].Key == null) {
                     //    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_NullKey);
                     //}
@@ -426,20 +426,20 @@ namespace Platform.Helpers.Collections1 {
 
         private void Resize(int newSize, bool forceNewHashCodes) {
             Contract.Assert(newSize >= entries.Length);
-            int[] newBuckets = new int[newSize];
-            for (int i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
-            Entry[] newEntries = new Entry[newSize];
+            var newBuckets = new int[newSize];
+            for (var i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
+            var newEntries = new Entry[newSize];
             Array.Copy(entries, 0, newEntries, 0, count);
             if(forceNewHashCodes) {
-                for (int i = 0; i < count; i++) {
+                for (var i = 0; i < count; i++) {
                     if(newEntries[i].hashCode != -1) {
                         newEntries[i].hashCode = (comparer.GetHashCode(newEntries[i].key) & 0x7FFFFFFF);
                     }
                 }
             }
-            for (int i = 0; i < count; i++) {
+            for (var i = 0; i < count; i++) {
                 if (newEntries[i].hashCode >= 0) {
-                    int bucket = newEntries[i].hashCode % newSize;
+                    var bucket = newEntries[i].hashCode % newSize;
                     newEntries[i].next = newBuckets[bucket];
                     newBuckets[bucket] = i;
                 }
@@ -454,10 +454,10 @@ namespace Platform.Helpers.Collections1 {
             //}
 
             if (buckets != null) {
-                int hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
-                int bucket = hashCode % buckets.Length;
-                int last = -1;
-                for (int i = buckets[bucket]; i >= 0; last = i, i = entries[i].next) {
+                var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+                var bucket = hashCode % buckets.Length;
+                var last = -1;
+                for (var i = buckets[bucket]; i >= 0; last = i, i = entries[i].next) {
                     if (entries[i].hashCode == hashCode && comparer.Equals(entries[i].key, key)) {
                         if (last < 0) {
                             buckets[bucket] = entries[i].next;
@@ -480,7 +480,7 @@ namespace Platform.Helpers.Collections1 {
         }
 
         public bool TryGetValue(TKey key, out TValue value) {
-            int i = FindEntry(key);
+            var i = FindEntry(key);
             if (i >= 0) {
                 value = entries[i].value;
                 return true;
@@ -494,7 +494,7 @@ namespace Platform.Helpers.Collections1 {
         // This allows them to continue getting that behavior with minimal code delta. This is basically
         // TryGetValue without the out param
         internal TValue GetValueOrDefault(TKey key) {
-            int i = FindEntry(key);
+            var i = FindEntry(key);
             if (i >= 0) {
                 return entries[i].value;
             }
@@ -530,29 +530,29 @@ namespace Platform.Helpers.Collections1 {
             //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
             //}
             
-            KeyValuePair<TKey,TValue>[] pairs = array as KeyValuePair<TKey,TValue>[];
+            var pairs = array as KeyValuePair<TKey,TValue>[];
             if (pairs != null) {
                 CopyTo(pairs, index);
             }
             else if( array is DictionaryEntry[]) {
-                DictionaryEntry[] dictEntryArray = array as DictionaryEntry[];
-                Entry[] entries = this.entries;
-                for (int i = 0; i < count; i++) {
+                var dictEntryArray = array as DictionaryEntry[];
+                var entries = this.entries;
+                for (var i = 0; i < count; i++) {
                     if (entries[i].hashCode >= 0) {
                         dictEntryArray[index++] = new DictionaryEntry(entries[i].key, entries[i].value);
                     }
                 }                
             }
             else {
-                object[] objects = array as object[];
+                var objects = array as object[];
                 //if (objects == null) {
                 //    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidArrayType);
                 //}
 
                 //try {
-                    int count = this.count;
-                    Entry[] entries = this.entries;
-                    for (int i = 0; i < count; i++) {
+                    var count = this.count;
+                    var entries = this.entries;
+                    for (var i = 0; i < count; i++) {
                         if (entries[i].hashCode >= 0) {
                             objects[index++] = new KeyValuePair<TKey,TValue>(entries[i].key, entries[i].value);
                         }
@@ -600,7 +600,7 @@ namespace Platform.Helpers.Collections1 {
         object IDictionary.this[object key] {
             get { 
                 if( IsCompatibleKey(key)) {                
-                    int i = FindEntry((TKey)key);
+                    var i = FindEntry((TKey)key);
                     if (i >= 0) { 
                         return entries[i].value;                
                     }
@@ -615,7 +615,7 @@ namespace Platform.Helpers.Collections1 {
                 //ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
                 //try {
-                    TKey tempKey = (TKey)key;
+                    var tempKey = (TKey)key;
                     //try {
                         this[tempKey] = (TValue)value; 
                     //}
@@ -644,7 +644,7 @@ namespace Platform.Helpers.Collections1 {
             //ThrowHelper.IfNullAndNullsAreIllegalThenThrow<TValue>(value, ExceptionArgument.value);
 
             //try {
-                TKey tempKey = (TKey)key;
+                var tempKey = (TKey)key;
 
                 //try {
                     Add(tempKey, (TValue)value);
@@ -810,9 +810,9 @@ namespace Platform.Helpers.Collections1 {
                 //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 //}
                 
-                int count = dictionary.count;
-                Entry[] entries = dictionary.entries;
-                for (int i = 0; i < count; i++) {
+                var count = dictionary.count;
+                var entries = dictionary.entries;
+                for (var i = 0; i < count; i++) {
                     if (entries[i].hashCode >= 0) array[index++] = entries[i].key;
                 }
             }
@@ -871,20 +871,20 @@ namespace Platform.Helpers.Collections1 {
                 //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 //}
                 
-                TKey[] keys = array as TKey[];
+                var keys = array as TKey[];
                 if (keys != null) {
                     CopyTo(keys, index);
                 }
                 else {
-                    object[] objects = array as object[];
+                    var objects = array as object[];
                     //if (objects == null) {
                     //    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidArrayType);
                     //}
                                          
-                    int count = dictionary.count;
-                    Entry[] entries = dictionary.entries;
+                    var count = dictionary.count;
+                    var entries = dictionary.entries;
                     //try {
-                        for (int i = 0; i < count; i++) {
+                        for (var i = 0; i < count; i++) {
                             if (entries[i].hashCode >= 0) objects[index++] = entries[i].key;
                         }
                     //}                    
@@ -997,9 +997,9 @@ namespace Platform.Helpers.Collections1 {
                 //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 //}
                 
-                int count = dictionary.count;
-                Entry[] entries = dictionary.entries;
-                for (int i = 0; i < count; i++) {
+                var count = dictionary.count;
+                var entries = dictionary.entries;
+                for (var i = 0; i < count; i++) {
                     if (entries[i].hashCode >= 0) array[index++] = entries[i].value;
                 }
             }
@@ -1057,20 +1057,20 @@ namespace Platform.Helpers.Collections1 {
                 //if (array.Length - index < dictionary.Count)
                 //    ThrowHelper.ThrowArgumentException(ExceptionResource.Arg_ArrayPlusOffTooSmall);
                 
-                TValue[] values = array as TValue[];
+                var values = array as TValue[];
                 if (values != null) {
                     CopyTo(values, index);
                 }
                 else {
-                    object[] objects = array as object[];
+                    var objects = array as object[];
                     //if (objects == null) {
                     //    ThrowHelper.ThrowArgumentException(ExceptionResource.Argument_InvalidArrayType);
                     //}
 
-                    int count = dictionary.count;
-                    Entry[] entries = dictionary.entries;
+                    var count = dictionary.count;
+                    var entries = dictionary.entries;
                     //try {
-                        for (int i = 0; i < count; i++) {
+                        for (var i = 0; i < count; i++) {
                             if (entries[i].hashCode >= 0) objects[index++] = entries[i].value;
                         }
                     //}

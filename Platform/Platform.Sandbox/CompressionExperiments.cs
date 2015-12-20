@@ -62,13 +62,20 @@ namespace Platform.Sandbox
 
                 ulong[] responseCompressedArray3 = null;
 
-                for (var i = 0; i < 5; i++)
+                for (var i = 0; i < 1; i++)
                 {
                     var sw3 = Stopwatch.StartNew();
                     var compressor = new Data.Core.Sequences.Compressor(links, sequences, 1);
                     responseCompressedArray3 = compressor.Precompress(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
                 }
+
+                // Combine Groups and Compression (first Compression, then Groups) (DONE)
+                // Как после сжатия не группируй, больше сжатия не получить (странно, но это факт)
+                //var groups = UnicodeMap.FromLinkArrayToLinkArrayGroups(responseCompressedArray3);
+                //var responseLink2 = sequences.CreateBalancedVariant(groups);
+                // Equal to `var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);`
+
 
                 //for (int i = 0; i < responseCompressedArray1.Length; i++)
                 //{
@@ -97,8 +104,6 @@ namespace Platform.Sandbox
                 var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, links);
 
                 Global.Trash = (unpack == pageContents);
-
-                // TODO: Combine Groups and Compression (first Compression, then Groups)
 
                 var totalLinks = links.Count() - UnicodeMap.MapSize;
 
@@ -164,7 +169,7 @@ namespace Platform.Sandbox
 
                     var sw3 = Stopwatch.StartNew();
                     var compressor = new Data.Core.Sequences.Compressor(links, sequences, minFrequency);
-                    ulong[] responseCompressedArray3 = compressor.Precompress(responseSourceArray);
+                    var responseCompressedArray3 = compressor.Precompress(responseSourceArray);
                     sequences.CreateBalancedVariant(responseCompressedArray3); sw3.Stop();
 
                     var totalLinks = links.Count() - UnicodeMap.MapSize;

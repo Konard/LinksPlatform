@@ -73,7 +73,7 @@ namespace Platform.Data.Core
         {
             get
             {
-                Node child = GetChild(key);
+                var child = GetChild(key);
                 if (child == null && CreateNullChildren)
                     child = AddChild(key);
                 return child;
@@ -111,8 +111,8 @@ namespace Platform.Data.Core
 
         public Node GetChild(params IComparable[] keys)
         {
-            Node node = this;
-            for (int i = 0; i < keys.Length; i++)
+            var node = this;
+            for (var i = 0; i < keys.Length; i++)
             {
                 node.ChildNodes.TryGetValue(keys[i], out node);
                 if (node == null)
@@ -124,7 +124,7 @@ namespace Platform.Data.Core
 
         public object GetChildValue(params IComparable[] keys)
         {
-            Node childNode = GetChild(keys);
+            var childNode = GetChild(keys);
 
             if (childNode == null)
                 return null;
@@ -149,8 +149,8 @@ namespace Platform.Data.Core
 
         public Node SetChildValue(object value, params IComparable[] keys)
         {
-            Node node = this;
-            for (int i = 0; i < keys.Length; i++)
+            var node = this;
+            for (var i = 0; i < keys.Length; i++)
             {
                 Node child;
                 if (!node.ChildNodes.TryGetValue(keys[i], out child))

@@ -28,7 +28,7 @@ namespace Platform.Sandbox
                     return false;
                 }
 
-                int estimatedSize = 1;
+                var estimatedSize = 1;
 
                 if (Left != null && Left.Size < Size)
                 {
@@ -64,7 +64,7 @@ namespace Platform.Sandbox
 
         private static void LeftRotate(ref TreeNode root)
         {
-            TreeNode newRoot = root.Right;
+            var newRoot = root.Right;
             if (newRoot == null) return;
             root.Right = newRoot.Left == root ? newRoot : newRoot.Left;
             newRoot.Left = root;
@@ -75,7 +75,7 @@ namespace Platform.Sandbox
 
         private static void RightRotate(ref TreeNode root)
         {
-            TreeNode newRoot = root.Left;
+            var newRoot = root.Left;
             if (newRoot == null) return;
             root.Left = newRoot.Right == root ? newRoot : newRoot.Right;
             newRoot.Right = root;
@@ -97,7 +97,7 @@ namespace Platform.Sandbox
             {
                 if (IsRightThreaded(treeRoot))
                 {
-                    TreeNode node = new TreeNode()
+                    var node = new TreeNode()
                     {
                         Left = treeRoot,
                         Right = treeRoot.Right,
@@ -139,7 +139,7 @@ namespace Platform.Sandbox
             {
                 if (IsLeftThreaded(treeRoot))
                 {
-                    TreeNode node = new TreeNode()
+                    var node = new TreeNode()
                     {
                         Left = treeRoot.Left,
                         Right = treeRoot,
@@ -313,7 +313,7 @@ namespace Platform.Sandbox
 
         private static TreeNode Search(TreeNode treeRoot, int value)
         {
-            TreeNode currentNode = treeRoot;
+            var currentNode = treeRoot;
 
             while (true)
             {
@@ -334,14 +334,14 @@ namespace Platform.Sandbox
 
         private static TreeNode GetFirstNode(TreeNode treeRoot)
         {
-            TreeNode currentNode = treeRoot;
+            var currentNode = treeRoot;
             while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size) currentNode = currentNode.Left;
             return currentNode;
         }
 
         private static TreeNode GetLastNode(TreeNode treeRoot)
         {
-            TreeNode currentNode = treeRoot;
+            var currentNode = treeRoot;
             while (currentNode.Right != null && currentNode.Size >= currentNode.Right.Size) currentNode = currentNode.Right;
             return currentNode;
         }
@@ -369,7 +369,7 @@ namespace Platform.Sandbox
 
         private static void Travel(TreeNode treeRoot, Action<int> action)
         {
-            TreeNode currentNode = GetFirstNode(treeRoot);
+            var currentNode = GetFirstNode(treeRoot);
 
             while (currentNode != null)
             {
@@ -381,7 +381,7 @@ namespace Platform.Sandbox
 
         private static IEnumerable<int> GetNodesEnumerator(TreeNode treeRoot)
         {
-            TreeNode currentNode = GetFirstNode(treeRoot);
+            var currentNode = GetFirstNode(treeRoot);
 
             while (currentNode != null)
             {
@@ -393,23 +393,23 @@ namespace Platform.Sandbox
 
         public static void RunExperiment()
         {
-            int seed = 0;
+            var seed = 0;
 
             //for (; seed < 10000; seed++)
             //{
-            Random rnd = new Random(seed);
+            var rnd = new Random(seed);
 
             // Fill the tree
 
-            TreeNode treeRoot = new TreeNode()
+            var treeRoot = new TreeNode()
             {
                 Size = 1,
                 Value = rnd.Next(1000)
             };
 
-            for (int i = 0; i < 128; i++)
+            for (var i = 0; i < 128; i++)
             {
-                int value = rnd.Next(1000);
+                var value = rnd.Next(1000);
 
                 if (Search(treeRoot, value) == null)
                     UnsafeInsert(ref treeRoot, value);

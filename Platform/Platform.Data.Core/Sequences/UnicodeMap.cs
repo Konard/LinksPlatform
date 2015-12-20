@@ -8,16 +8,13 @@ namespace Platform.Data.Core.Sequences
 {
     public class UnicodeMap
     {
-        public const long MapSize = 65536;
+        public const ulong FirstCharLink = 1;
+        public const ulong LastCharLink = FirstCharLink + char.MaxValue;
+        public const long MapSize = 1 + char.MaxValue;
 
         private readonly ILinks<ulong> _links;
 
         private bool _initialized;
-        private ulong _firstCharLink;
-        private ulong _lastCharLink;
-
-        public ulong FirstCharLink { get { return _firstCharLink; } }
-        public ulong LastCharLink { get { return _lastCharLink; } }
 
         public UnicodeMap(ILinks<ulong> links)
         {
@@ -37,12 +34,10 @@ namespace Platform.Data.Core.Sequences
                 return;
 
             _initialized = true;
-            _firstCharLink = 1;
-            _lastCharLink = _firstCharLink + char.MaxValue;
 
             var firstLink = _links.Create(0, 0);
 
-            if (firstLink != _firstCharLink)
+            if (firstLink != FirstCharLink)
             {
                 _links.Delete(firstLink);
 #if DEBUG
@@ -51,7 +46,7 @@ namespace Platform.Data.Core.Sequences
             }
             else
             {
-                for (var i = _firstCharLink + 1; i <= _lastCharLink; i++)
+                for (var i = FirstCharLink + 1; i <= LastCharLink; i++)
                 {
                     // From NIL to It (NIL -> Character) transformation meaning, (or infinite amount of NIL characters before actual Character)
                     var createdLink = _links.Create(firstLink, 0);
@@ -64,7 +59,7 @@ namespace Platform.Data.Core.Sequences
             }
 
 #if DEBUG
-            Console.WriteLine("Total links count: {0}.", _links.Total);
+            Console.WriteLine("Total links count: {0}.", _links.Count());
 #endif
         }
 
@@ -135,6 +130,52 @@ namespace Platform.Data.Core.Sequences
                 var maxLength = offset + relativeLength;
                 for (var i = offset; i < maxLength; i++)
                     innerSequence[i - offset] = FromCharToLink(sequence[i]);
+                result.Add(innerSequence);
+
+                offset += relativeLength;
+            }
+
+            return result;
+        }
+
+        public static List<ulong[]> FromLinkArrayToLinkArrayGroups(ulong[] array)
+        {
+            var result = new List<ulong[]>();
+
+            var offset = 0;
+
+            while (offset < array.Length)
+            {
+                var relativeLength = 1;
+
+                if (array[offset] <= LastCharLink)
+                {
+                    var currentCategory = char.GetUnicodeCategory(FromLinkToChar(array[offset]));
+
+                    var absoluteLength = offset + relativeLength;
+                    while (absoluteLength < array.Length &&
+                           array[absoluteLength] <= LastCharLink &&
+                           currentCategory == char.GetUnicodeCategory(FromLinkToChar(array[absoluteLength])))
+                    {
+                        relativeLength++;
+                        absoluteLength++;
+                    }
+                }
+                else
+                {
+                    var absoluteLength = offset + relativeLength;
+                    while (absoluteLength < array.Length && array[absoluteLength] > LastCharLink)
+                    {
+                        relativeLength++;
+                        absoluteLength++;
+                    }
+                }
+
+                // copy array
+                var innerSequence = new ulong[relativeLength];
+                var maxLength = offset + relativeLength;
+                for (var i = offset; i < maxLength; i++)
+                    innerSequence[i - offset] = array[i];
                 result.Add(innerSequence);
 
                 offset += relativeLength;

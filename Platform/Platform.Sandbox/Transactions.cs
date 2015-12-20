@@ -56,7 +56,7 @@ namespace Platform.Sandbox
             OpenFile();
 
 
-            TransactionItem item = new TransactionItem()
+            var item = new TransactionItem()
             {
                 TransactionId = CurrentState.LastTransactionId,
                 DateTime = DateTime.UtcNow,
@@ -111,7 +111,7 @@ namespace Platform.Sandbox
 
         static void EnsureFileSize()
         {
-            long sizeInItems = CurrentState.FileSizeInTransactionItems;
+            var sizeInItems = CurrentState.FileSizeInTransactionItems;
             if ((CurrentState.FileEndOffset - BasicTransactionsOffset) / TransactionItemSize == sizeInItems)
             {
                 if (sizeInItems < 16)
@@ -149,7 +149,7 @@ namespace Platform.Sandbox
             long savedSizeInBytes = 0;
             if (File.Exists(TransactionsFileName))
             {
-                FileInfo fileInfo = new FileInfo(TransactionsFileName);
+                var fileInfo = new FileInfo(TransactionsFileName);
                 savedSizeInBytes = fileInfo.Length;
             }
 

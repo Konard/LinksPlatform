@@ -43,7 +43,7 @@ namespace Platform.Sandbox
         public static Func<Link, bool> CompileSelectionCheck(Action<ILGenerator> emitter)
         {
             SelectionChecksMethodsCounter++;
-            string methodName = "c" + SelectionChecksMethodsCounter;
+            var methodName = "c" + SelectionChecksMethodsCounter;
 
             // Разобраться можно ли обойтись без множественной генерации классов, чтобы можно было тупо добавлять методы в класс.
             var typeBuilder = ModuleBuilder.DefineType("selection_checks_" + methodName, TypeAttributes.Class | TypeAttributes.Public);
@@ -51,7 +51,7 @@ namespace Platform.Sandbox
             // Так же имеет смысл задуматься об удалении методов.
             // А может быть даже о возможности просто создавать делегаты, без привязки к каким либо типам, чисто лямбда выражения (динамические созданные), ведь класс то в сущности не обязателен.
             var argTypes = new Type[] { typeof(Link) };
-            MethodBuilder meth = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static, typeof(bool), argTypes);
+            var meth = typeBuilder.DefineMethod(methodName, MethodAttributes.Public | MethodAttributes.Static, typeof(bool), argTypes);
 
             emitter(meth.GetILGenerator());
 

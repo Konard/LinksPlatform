@@ -8,7 +8,14 @@ namespace Platform.Sandbox
     {
         private static void Main(string[] args)
         {
-            CompressionExperiments.Stats();
+            //using (var crawler = new WebCrawlerInstance("crawled.links"))
+            //{
+            //    crawler.Start(new Uri("https://abotx.org/"));
+            //}
+
+            //WebCrawler.TestSingle1();
+
+            CompressionExperiments.Test();
 
             return;
             
@@ -17,7 +24,7 @@ namespace Platform.Sandbox
             //UDPTest();
             //Links();
 
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 
             //Link.StartMemoryManager(@"data.dat");
 
@@ -107,7 +114,7 @@ namespace Platform.Sandbox
 
                 fixed (byte* pointer = array)
                 {
-                    byte value = *(pointer - 259);
+                    var value = *(pointer - 259);
                 }
             }
             catch (Exception ex)
@@ -117,7 +124,7 @@ namespace Platform.Sandbox
 
         private static void Links()
         {
-            string filename = (new Random(2)).Next(1, 99999).ToString();
+            var filename = (new Random(2)).Next(1, 99999).ToString();
 
             //if (File.Exists(filename))
             //    File.Delete(filename);

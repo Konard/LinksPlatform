@@ -89,7 +89,7 @@ namespace Platform.Data.Core.Pairs
             }
             else 
             {
-                ILink link = SearchCore(source, target);
+                var link = SearchCore(source, target);
                 if (link != null && handler(link) == LinksConstants.Break)
                     return LinksConstants.Break;
             }
@@ -141,7 +141,7 @@ namespace Platform.Data.Core.Pairs
             if (!_linksByTarget.TryGetValue(target, out linksByTargetSet))
                 return null;
 
-            HashSet<ILink> copy = linksBySourceSet.Count < linksByTargetSet.Count
+            var copy = linksBySourceSet.Count < linksByTargetSet.Count
                 ? new HashSet<ILink>(linksBySourceSet)
                 : new HashSet<ILink>(linksByTargetSet);
 
@@ -195,13 +195,13 @@ namespace Platform.Data.Core.Pairs
 
             public void WalkThroughReferersAsSource(Action<ILink> walker)
             {
-                foreach (ILink link in _links._linksBySource[this])
+                foreach (var link in _links._linksBySource[this])
                     walker(link);
             }
 
             public void WalkThroughReferersAsTarget(Action<ILink> walker)
             {
-                foreach (ILink link in _links._linksByTarget[this])
+                foreach (var link in _links._linksByTarget[this])
                     walker(link);
             }
 

@@ -8,16 +8,16 @@ namespace Platform.Data.Core.Triplets
     {
         public static Link FromList(List<Link> links)
         {
-            int i = links.Count - 1;
-            Link element = links[i];
+            var i = links.Count - 1;
+            var element = links[i];
             while (--i >= 0) element = links[i] & element;
             return element;
         }
 
         public static Link FromList(Link[] links)
         {
-            int i = links.Length - 1;
-            Link element = links[i];
+            var i = links.Length - 1;
+            var element = links[i];
             while (--i >= 0) element = links[i] & element;
             return element;
         }
@@ -116,7 +116,7 @@ namespace Platform.Data.Core.Triplets
 
         public static Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
         {
-            int length = takeUntil - takeFrom;
+            var length = takeUntil - takeFrom;
 
             if (length <= 0)
                 throw new ArgumentOutOfRangeException("length", "Нельзя преобразовать пустой список к связям.");
@@ -133,7 +133,7 @@ namespace Platform.Data.Core.Triplets
         {
             var copy = new Link[str.Length];
 
-            for (int i = 0; i < copy.Length; i++)
+            for (var i = 0; i < copy.Length; i++)
                 copy[i] = FromChar(str[i]);
 
             return FromList(copy);
@@ -143,10 +143,10 @@ namespace Platform.Data.Core.Triplets
         {
             var copy = new Link[str.Length];
 
-            for (int i = 0; i < copy.Length; i++)
+            for (var i = 0; i < copy.Length; i++)
                 copy[i] = FromChar(str[i]);
 
-            Link strLink = Link.Create(Net.String, Net.ThatConsistsOf, FromList(copy));
+            var strLink = Link.Create(Net.String, Net.ThatConsistsOf, FromList(copy));
             return strLink;
         }
 
@@ -161,7 +161,7 @@ namespace Platform.Data.Core.Triplets
         public static string ToString(List<Link> charLinks)
         {
             var chars = new char[charLinks.Count];
-            for (int i = 0; i < charLinks.Count; i++)
+            for (var i = 0; i < charLinks.Count; i++)
                 chars[i] = ToChar(charLinks[i]);
 
             return new string(chars);

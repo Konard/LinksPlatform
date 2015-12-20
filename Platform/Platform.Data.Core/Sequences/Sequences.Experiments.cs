@@ -494,7 +494,7 @@ namespace Platform.Data.Core.Sequences
 
         public string FormatSequence(LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
         {
-            int visitedElements = 0;
+            var visitedElements = 0;
 
             var linksInSequence = new HashSet<ulong>(knownElements);
 
@@ -541,7 +541,7 @@ namespace Platform.Data.Core.Sequences
 
                     var results = new HashSet<ulong>();
 
-                    for (int i = 0; i < sequence.Length; i++)
+                    for (var i = 0; i < sequence.Length; i++)
                         AllUsagesCore(sequence[i], results);
 
                     var filteredResults = new List<ulong>();
@@ -597,7 +597,7 @@ namespace Platform.Data.Core.Sequences
                     _links.EnsureEachLinkExists(sequence);
 
                     var results = new HashSet<ulong>();
-                    for (int i = 0; i < sequence.Length; i++)
+                    for (var i = 0; i < sequence.Length; i++)
                         AllUsagesCore(sequence[i], results);
 
                     var filteredResults = new HashSet<ulong>();
@@ -1076,7 +1076,7 @@ namespace Platform.Data.Core.Sequences
 
                     AllUsagesCore(linksToConnect[0], results);
 
-                    for (int i = 1; i < linksToConnect.Length; i++)
+                    for (var i = 1; i < linksToConnect.Length; i++)
                     {
                         var next = new HashSet<ulong>();
                         AllUsagesCore(linksToConnect[i], next);
@@ -1102,7 +1102,7 @@ namespace Platform.Data.Core.Sequences
                     var collector1 = new AllUsagesCollector(_links, results);
                     collector1.Collect(linksToConnect[0]);
 
-                    for (int i = 1; i < linksToConnect.Length; i++)
+                    for (var i = 1; i < linksToConnect.Length; i++)
                     {
                         var next = new HashSet<ulong>();
                         var collector = new AllUsagesCollector(_links, next);
@@ -1131,7 +1131,7 @@ namespace Platform.Data.Core.Sequences
 
                     //AllUsagesCore(linksToConnect[0], results);
 
-                    for (int i = 1; i < linksToConnect.Length; i++)
+                    for (var i = 1; i < linksToConnect.Length; i++)
                     {
                         var next = new HashSet<ulong>();
                         var collector = new AllUsagesIntersectingCollector(_links, results, next);
@@ -1162,7 +1162,7 @@ namespace Platform.Data.Core.Sequences
                     var collector1 = new AllUsagesCollector2(_links, results);
                     collector1.Collect(linksToConnect[0]);
 
-                    for (int i = 1; i < linksToConnect.Length; i++)
+                    for (var i = 1; i < linksToConnect.Length; i++)
                     {
                         var next = new BitString((long)_links.Count() + 1); //new BitArray((int)_links.Total + 1);
                         var collector = new AllUsagesCollector2(_links, next);
@@ -1180,8 +1180,8 @@ namespace Platform.Data.Core.Sequences
         {
             // Считаем новый размер последовательности
             long newLength = 0;
-            bool zeroOrManyStepped = false;
-            for (int i = 0; i < sequence.Length; i++)
+            var zeroOrManyStepped = false;
+            for (var i = 0; i < sequence.Length; i++)
             {
                 if (sequence[i] == ZeroOrMany)
                 {
@@ -1204,7 +1204,7 @@ namespace Platform.Data.Core.Sequences
             zeroOrManyStepped = false;
             var newSequence = new ulong[newLength];
             long j = 0;
-            for (int i = 0; i < sequence.Length; i++)
+            for (var i = 0; i < sequence.Length; i++)
             {
                 //var current = zeroOrManyStepped;
                 //zeroOrManyStepped = patternSequence[i] == zeroOrMany;
@@ -1267,11 +1267,11 @@ namespace Platform.Data.Core.Sequences
                 throw new Exception("Подпоследовательности с одним элементом не поддерживаются.");
             }
 
-            int leftBound = 0;
-            int rightBound = links.Length - 1;
+            var leftBound = 0;
+            var rightBound = links.Length - 1;
 
-            ulong left = links[leftBound++];
-            ulong right = links[rightBound--];
+            var left = links[leftBound++];
+            var right = links[rightBound--];
 
             var results = new List<ulong>();
             CollectMatchingSequences(left, leftBound, links, right, rightBound, ref results);
@@ -1280,17 +1280,17 @@ namespace Platform.Data.Core.Sequences
 
         private void CollectMatchingSequences(ulong leftLink, int leftBound, ulong[] middleLinks, ulong rightLink, int rightBound, ref List<ulong> results)
         {
-            ulong leftLinkTotalReferers = _links.Count(leftLink);
-            ulong rightLinkTotalReferers = _links.Count(rightLink);
+            var leftLinkTotalReferers = _links.Count(leftLink);
+            var rightLinkTotalReferers = _links.Count(rightLink);
 
             if (leftLinkTotalReferers <= rightLinkTotalReferers)
             {
                 var nextLeftLink = middleLinks[leftBound];
 
-                ulong[] elements = GetRightElements(leftLink, nextLeftLink);
+                var elements = GetRightElements(leftLink, nextLeftLink);
                 if (leftBound <= rightBound)
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != 0)
@@ -1301,7 +1301,7 @@ namespace Platform.Data.Core.Sequences
                 }
                 else
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != 0)
@@ -1315,11 +1315,11 @@ namespace Platform.Data.Core.Sequences
             {
                 var nextRightLink = middleLinks[rightBound];
 
-                ulong[] elements = GetLeftElements(rightLink, nextRightLink);
+                var elements = GetLeftElements(rightLink, nextRightLink);
 
                 if (leftBound <= rightBound)
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != 0)
@@ -1330,7 +1330,7 @@ namespace Platform.Data.Core.Sequences
                 }
                 else
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != 0)
@@ -1365,7 +1365,7 @@ namespace Platform.Data.Core.Sequences
 
         public bool TryStepRight(ulong startLink, ulong rightLink, ulong[] result, int offset)
         {
-            int added = 0;
+            var added = 0;
 
             _links.Each(startLink, 0, couple =>
             {
@@ -1415,7 +1415,7 @@ namespace Platform.Data.Core.Sequences
 
         public bool TryStepLeft(ulong startLink, ulong leftLink, ulong[] result, int offset)
         {
-            int added = 0;
+            var added = 0;
 
             _links.Each(0, startLink, couple =>
             {

@@ -114,33 +114,33 @@ namespace Platform.Sandbox
 
 
 
-            Link dummyLink = Net.CreateThing();
+            var dummyLink = Net.CreateThing();
             dummyLink.SetName("dummyLink");
 
             // Проверить удаление, и после этого можно спокойно приступать к работе с операциями
 
-            Link dummyLinkDefinition = CreateDefinitionFromLink(dummyLink);
-            Link dummyLinkDefinitionAfterUpdate = Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink) & Link.Create(Net.IsNotA, _as, _linkerLink) & Link.Create(Net.Letter, _as, _targetLink));
+            var dummyLinkDefinition = CreateDefinitionFromLink(dummyLink);
+            var dummyLinkDefinitionAfterUpdate = Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink) & Link.Create(Net.IsNotA, _as, _linkerLink) & Link.Create(Net.Letter, _as, _targetLink));
 
 
 
-            Link creationSample = Link.Create(_creation, Net.Of, Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink) & Link.Create(Net.IsNotA, _as, _linkerLink) & Link.Create(Net.Letter, _as, _targetLink)));
+            var creationSample = Link.Create(_creation, Net.Of, Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink) & Link.Create(Net.IsNotA, _as, _linkerLink) & Link.Create(Net.Letter, _as, _targetLink)));
 
-            Link updateSample = Link.Create(Link.Create(_update, Net.Of, dummyLinkDefinition), _to, dummyLinkDefinitionAfterUpdate);
+            var updateSample = Link.Create(Link.Create(_update, Net.Of, dummyLinkDefinition), _to, dummyLinkDefinitionAfterUpdate);
 
-            Link selectionOfManySample = Link.Create(_selection, Net.Of,
+            var selectionOfManySample = Link.Create(_selection, Net.Of,
                 Link.Create(_links, _with, Link.Create(Net.Name, _as, _sourceLink) & Link.Create(Net.ThatIsRepresentedBy, _as, _linkerLink)
                                              & Link.Create(Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink)), _as, _targetLink)));
 
-            Link selectionOfOneSample = Link.Create(_selection, Net.Of, CreateDefinitionFromLink(Net.Of));
+            var selectionOfOneSample = Link.Create(_selection, Net.Of, CreateDefinitionFromLink(Net.Of));
 
-            Link selectionOfPartSample = Link.Create(_selection, Net.Of, Link.Create(_sourceLink, Net.Of, Link.Create(_linkerLink, Net.Of, Link.Create(_targetLink, Net.Of, Net.Of))));
+            var selectionOfPartSample = Link.Create(_selection, Net.Of, Link.Create(_sourceLink, Net.Of, Link.Create(_linkerLink, Net.Of, Link.Create(_targetLink, Net.Of, Net.Of))));
 
-            Link deletionSample = Link.Create(_deletion, Net.Of, dummyLinkDefinitionAfterUpdate);
+            var deletionSample = Link.Create(_deletion, Net.Of, dummyLinkDefinitionAfterUpdate);
 
-            Link executionSample = Link.Create(Link.Create(_execution, Net.Of, creationSample & updateSample & selectionOfManySample & selectionOfOneSample & selectionOfPartSample & deletionSample), _for, Net.CreateThing());
+            var executionSample = Link.Create(Link.Create(_execution, Net.Of, creationSample & updateSample & selectionOfManySample & selectionOfOneSample & selectionOfPartSample & deletionSample), _for, Net.CreateThing());
 
-            Func<Link, bool> checker = CreateSelectionChecker(selectionOfManySample);
+            var checker = CreateSelectionChecker(selectionOfManySample);
 
             var set = Net.CreateSet().SetName("set of 'name' link referers");
             Net.Name.WalkThroughReferersBySource(referer =>
@@ -148,7 +148,7 @@ namespace Platform.Sandbox
                 Link.Create(referer, Net.ContainedBy, set);
             });
 
-            Link selectionOfManyFromContext = Link.Create(Link.Create(_selection, Net.Of,
+            var selectionOfManyFromContext = Link.Create(Link.Create(_selection, Net.Of,
                 Link.Create(_links, _with, Link.Create(Net.Name, _as, _sourceLink) & Link.Create(Net.ThatIsRepresentedBy, _as, _linkerLink)
                                              & Link.Create(Link.Create(Net.Link, _with, Link.Create(Net.String, _as, _sourceLink)), _as, _targetLink))), _from, set);
 
@@ -161,10 +161,10 @@ namespace Platform.Sandbox
             // _вСлучаеЕслиСопоставляемымЗначениемЯвляется
             // _inCaseMatchingValueIs // это упростит логику
 
-            Link alternativeOperationsSequence = L(L(_creation, Net.Of, dummyLinkDefinition), _inCaseMatchingValueIs, CreateDefinition(Net.Of, Net.Of, Net.Of)) &
+            var alternativeOperationsSequence = L(L(_creation, Net.Of, dummyLinkDefinition), _inCaseMatchingValueIs, CreateDefinition(Net.Of, Net.Of, Net.Of)) &
                 L(L(_creation, Net.Of, CreateDefinition(dummyLink, Net.And, dummyLink)), _inCaseMatchingValueIs, CreateDefinitionFromLink(_representationOfAbsenceOfLink));
 
-            Link matchingSample = L(L(_execution, _ofMatchingOperationFrom, alternativeOperationsSequence),
+            var matchingSample = L(L(_execution, _ofMatchingOperationFrom, alternativeOperationsSequence),
                     _for, L(_result, Net.Of, L(_selection, Net.Of, CreateDefinition(Net.Of, Net.Of, Net.Of))));
 
             //ExecuteLinksOperationsExecution(executionSample, Net.CreateThing());
@@ -180,36 +180,36 @@ namespace Platform.Sandbox
         private static Link CompileMatchingQueryExecutionOperation(Link matchingQuery)
         {
             // = argumentLink.Source; <- Operations alternatives
-            Link resultOfSelectionOfSourceOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_sourceLink, Net.Of, _representationOfArgumentLink)));
+            var resultOfSelectionOfSourceOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_sourceLink, Net.Of, _representationOfArgumentLink)));
 
             // = argumentLink.Target <- Matching value
 
             // = argumentLink.Target.Source;
-            Link resultOfSelectionOfSourceOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_sourceLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
+            var resultOfSelectionOfSourceOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_sourceLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
             // = argumentLink.Target.Linker;
-            Link resultOfSelectionOfLinkerOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_linkerLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
+            var resultOfSelectionOfLinkerOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_linkerLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
             // = argumentLink.Target.Target;
-            Link resultOfSelectionOfTargetOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_linkerLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
+            var resultOfSelectionOfTargetOfTargetOfArgumentLink = L(_result, Net.Of, L(_selection, Net.Of, L(_linkerLink, Net.Of, L(_targetLink, Net.Of, _representationOfArgumentLink))));
 
             // = (link with ((argumentLink.Target.Source as source link) and ('as' as linker link) and ('source link' as target link)))
-            Link linkDefitionSelectorSource = L(Net.Link, _with, L(resultOfSelectionOfSourceOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_sourceLink, _as, _targetLink));
+            var linkDefitionSelectorSource = L(Net.Link, _with, L(resultOfSelectionOfSourceOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_sourceLink, _as, _targetLink));
             // = (link with ((argumentLink.Target.Target as source link) and ('as' as linker link) and ('target link' as target link)))
-            Link linkDefitionSelectorLinker = L(Net.Link, _with, L(resultOfSelectionOfLinkerOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_linkerLink, _as, _targetLink));
+            var linkDefitionSelectorLinker = L(Net.Link, _with, L(resultOfSelectionOfLinkerOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_linkerLink, _as, _targetLink));
             // = (link with ((argumentLink.Target.Linker as source link) and ('as' as linker link) and ('linker link' as target link)))
-            Link linkDefitionSelectorTarget = L(Net.Link, _with, L(resultOfSelectionOfTargetOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_targetLink, _as, _targetLink));
+            var linkDefitionSelectorTarget = L(Net.Link, _with, L(resultOfSelectionOfTargetOfTargetOfArgumentLink, _as, _sourceLink) & L(_as, _as, _linkerLink) & L(_targetLink, _as, _targetLink));
 
-            Link linkDefitionSelectorPart = L(Net.Link, _with, L(linkDefitionSelectorSource, _as, _sourceLink) & L(linkDefitionSelectorLinker, _as, _linkerLink) & L(linkDefitionSelectorTarget, _as, _targetLink));
+            var linkDefitionSelectorPart = L(Net.Link, _with, L(linkDefitionSelectorSource, _as, _sourceLink) & L(linkDefitionSelectorLinker, _as, _linkerLink) & L(linkDefitionSelectorTarget, _as, _targetLink));
 
-            Link caseSelectionQuery = L(L(_selection, Net.Of, L(_links, _with, L(_inCaseMatchingValueIs, _as, _linkerLink)
+            var caseSelectionQuery = L(L(_selection, Net.Of, L(_links, _with, L(_inCaseMatchingValueIs, _as, _linkerLink)
                                                                         & L(linkDefitionSelectorPart, _as, _targetLink))), _from, resultOfSelectionOfSourceOfArgumentLink);
 
             // Решить что должно быть аргументом для выполняемой операции. (см. null)
 
-            Link exeuctionOfSelectedCase = L(L(_execution, Net.Of, L(_execution, Net.Of, resultOfSelectionOfSourceOfArgumentLink)), _for, caseSelectionQuery);
+            var exeuctionOfSelectedCase = L(L(_execution, Net.Of, L(_execution, Net.Of, resultOfSelectionOfSourceOfArgumentLink)), _for, caseSelectionQuery);
 
-            Link cases = matchingQuery.Source.Target;
-            Link argument = matchingQuery.Target;
-            Link resultQuery = L(L(_execution, Net.Of, exeuctionOfSelectedCase), _for, L(Net.Set, Net.ThatConsistsOf, cases) & argument);
+            var cases = matchingQuery.Source.Target;
+            var argument = matchingQuery.Target;
+            var resultQuery = L(L(_execution, Net.Of, exeuctionOfSelectedCase), _for, L(Net.Set, Net.ThatConsistsOf, cases) & argument);
 
             return resultQuery;
         }
@@ -256,17 +256,17 @@ namespace Platform.Sandbox
 
         private static Link ExecuteLinksOperationsExecution(Link executionQuery, Link argument)
         {
-            Link operations = executionQuery.Source.Target;
-            Link arguments = executionQuery.Target;
+            var operations = executionQuery.Source.Target;
+            var arguments = executionQuery.Target;
 
-            List<Link> operationsList = new List<Link>();
+            var operationsList = new List<Link>();
 
             if (operations.Linker == Net.And)
                 operations.WalkThroughSequence(operation => operationsList.Add(operation));
             else
                 operationsList.Add(operations);
 
-            List<Link> argumentsList = new List<Link>();
+            var argumentsList = new List<Link>();
 
             if (arguments.Linker == Net.And)
                 arguments.WalkThroughSequence(arg => argumentsList.Add(arg));
@@ -283,14 +283,14 @@ namespace Platform.Sandbox
 
             Link result = null;
 
-            for (int j = 0; j < argumentsList.Count; j++)
+            for (var j = 0; j < argumentsList.Count; j++)
             {
-                Link operationArgument = argumentsList[j];
+                var operationArgument = argumentsList[j];
 
                 if (operationArgument == _representationOfArgumentLink)
                     operationArgument = argument;
 
-                for (int i = 0; i < operationsList.Count; i++)
+                for (var i = 0; i < operationsList.Count; i++)
                 {
                     result = ExecuteLinkOperationCore(operationsList[i], operationArgument);
                 }
@@ -317,7 +317,7 @@ namespace Platform.Sandbox
                 else if (operation.Target.Source == _links)
                 {
                     var set = Net.CreateSet();
-                    HashSet<Link> selectionResult = ExecuteLinksSelection(operation, argument);
+                    var selectionResult = ExecuteLinksSelection(operation, argument);
                     foreach (var item in selectionResult)
                         Link.Create(item, Net.ContainedBy, set);
                     return set;
@@ -353,7 +353,7 @@ namespace Platform.Sandbox
 
         private static Link ExecuteLinkCreation(Link creationQuery, Link argument)
         {
-            Link definition = GetLinksDescriptionDefinition(creationQuery.Target);
+            var definition = GetLinksDescriptionDefinition(creationQuery.Target);
             return ExecuteLinkCreationCore(definition, argument);
         }
 
@@ -364,17 +364,17 @@ namespace Platform.Sandbox
 
             if (sourceLink != null && !IsLinkDescriptionParamSourceSpecific(sourceLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(sourceLink);
+                var subDefinition = GetLinksDescriptionDefinition(sourceLink);
                 sourceLink = ExecuteLinkCreationCore(subDefinition, argument);
             }
             if (linkerLink != null && !IsLinkDescriptionParamSourceSpecific(linkerLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(linkerLink);
+                var subDefinition = GetLinksDescriptionDefinition(linkerLink);
                 linkerLink = ExecuteLinkCreationCore(subDefinition, argument);
             }
             if (targetLink != null && !IsLinkDescriptionParamSourceSpecific(targetLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(targetLink);
+                var subDefinition = GetLinksDescriptionDefinition(targetLink);
                 targetLink = ExecuteLinkCreationCore(targetLink, argument);
             }
 
@@ -388,13 +388,13 @@ namespace Platform.Sandbox
 
         private static Link ExecuteLinkUpdate(Link updateQuery, Link argument)
         {
-            Link definition = GetLinksDescriptionDefinition(updateQuery.Target);
+            var definition = GetLinksDescriptionDefinition(updateQuery.Target);
 
             Link sourceLink, linkerLink, targetLink;
             GetLinks(definition, out sourceLink, out linkerLink, out targetLink);
 
-            Link updateableLinkDefinition = updateQuery.Source.Target;
-            Link updateableLink = ExecuteLinkSelectionByDefinition(updateableLinkDefinition, argument);
+            var updateableLinkDefinition = updateQuery.Source.Target;
+            var updateableLink = ExecuteLinkSelectionByDefinition(updateableLinkDefinition, argument);
 
             if (updateableLink != null)
             {
@@ -409,15 +409,15 @@ namespace Platform.Sandbox
 
         private static void ExecuteLinkDeletion(Link deletionQuery, Link argument)
         {
-            Link deletableLinkDefinition = deletionQuery.Target;
-            Link deletableLink = ExecuteLinkSelectionByDefinition(deletableLinkDefinition, argument);
+            var deletableLinkDefinition = deletionQuery.Target;
+            var deletableLink = ExecuteLinkSelectionByDefinition(deletableLinkDefinition, argument);
             if (deletableLink != null)
                 Link.Delete(ref deletableLink);
         }
 
         private static Link ExecuteLinkPartSelection(Link selectionQuery, Link argument)
         {
-            Link definition = selectionQuery.Target;
+            var definition = selectionQuery.Target;
             return ExecuteLinkPartSelectionCore(definition, argument);
         }
 
@@ -427,17 +427,17 @@ namespace Platform.Sandbox
             {
                 if (definition.Source == _sourceLink)
                 {
-                    Link link = ExecuteLinkPartSelectionCore(definition.Target, argument);
+                    var link = ExecuteLinkPartSelectionCore(definition.Target, argument);
                     return link.Source;
                 }
                 else if (definition.Source == _linkerLink)
                 {
-                    Link link = ExecuteLinkPartSelectionCore(definition.Target, argument);
+                    var link = ExecuteLinkPartSelectionCore(definition.Target, argument);
                     return link.Linker;
                 }
                 else if (definition.Source == _targetLink)
                 {
-                    Link link = ExecuteLinkPartSelectionCore(definition.Target, argument);
+                    var link = ExecuteLinkPartSelectionCore(definition.Target, argument);
                     return link.Target;
                 }
             }
@@ -446,7 +446,7 @@ namespace Platform.Sandbox
 
         private static Link ExecuteLinkSelection(Link selectionQuery, Link argument)
         {
-            Link resultLink = ExecuteLinkSelectionByDefinition(selectionQuery.Target, argument);
+            var resultLink = ExecuteLinkSelectionByDefinition(selectionQuery.Target, argument);
 
             if (resultLink == null)
                 resultLink = _representationOfAbsenceOfLink;
@@ -461,17 +461,17 @@ namespace Platform.Sandbox
 
             if (sourceLink != null && !IsLinkDescriptionParamSourceSpecific(sourceLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(sourceLink);
+                var subDefinition = GetLinksDescriptionDefinition(sourceLink);
                 sourceLink = ExecuteLinkSelectionByDefinition(subDefinition, argument);
             }
             if (linkerLink != null && !IsLinkDescriptionParamSourceSpecific(linkerLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(linkerLink);
+                var subDefinition = GetLinksDescriptionDefinition(linkerLink);
                 linkerLink = ExecuteLinkSelectionByDefinition(subDefinition, argument);
             }
             if (targetLink != null && !IsLinkDescriptionParamSourceSpecific(targetLink))
             {
-                Link subDefinition = GetLinksDescriptionDefinition(targetLink);
+                var subDefinition = GetLinksDescriptionDefinition(targetLink);
                 targetLink = ExecuteLinkSelectionByDefinition(targetLink, argument);
             }
 
@@ -495,9 +495,9 @@ namespace Platform.Sandbox
                 SelectionQueriesCheckers.Add(selectionQuery, checker);
             }
 
-            Link set = selectionQuery.Target;
+            var set = selectionQuery.Target;
 
-            HashSet<Link> result = new HashSet<Link>();
+            var result = new HashSet<Link>();
 
             if (set.Is(Net.Set))
             {
@@ -533,14 +533,14 @@ namespace Platform.Sandbox
 
         private static Func<Link, bool> CreateSelectionChecker(Link selectionQuery)
         {
-            Link definition = selectionQuery.Linker == _from ? GetLinksDescriptionDefinition(selectionQuery.Source.Target) : GetLinksDescriptionDefinition(selectionQuery.Target);
+            var definition = selectionQuery.Linker == _from ? GetLinksDescriptionDefinition(selectionQuery.Source.Target) : GetLinksDescriptionDefinition(selectionQuery.Target);
 
             return Compilier.CompileSelectionCheck((il) =>
                 {
                     il.DeclareLocal(typeof(Link)); // SelectionTemporaryVar
 
-                    Label exitOnFalseLabel = il.DefineLabel();
-                    Label finalExitLabel = il.DefineLabel();
+                    var exitOnFalseLabel = il.DefineLabel();
+                    var finalExitLabel = il.DefineLabel();
 
                     EmitSelectionCheckerCore(il, exitOnFalseLabel, new List<string>(), definition);
 
@@ -626,9 +626,9 @@ namespace Platform.Sandbox
 
         private static HashSet<Link> ExecuteLinksSelection(Link selectionQuery, Link argument)
         {
-            Link definition = GetLinksDescriptionDefinition(selectionQuery.Target);
+            var definition = GetLinksDescriptionDefinition(selectionQuery.Target);
 
-            int specificLinksCount = 0;
+            var specificLinksCount = 0;
             definition.WalkThroughSequence(param =>
             {
                 if (IsLinkDescriptionParamSourceSpecific(param.Source))
@@ -640,8 +640,8 @@ namespace Platform.Sandbox
                 Link sourceLink, linkerLink, targetLink;
                 GetLinks(definition, out sourceLink, out linkerLink, out targetLink);
 
-                HashSet<Link> resultSet = new HashSet<Link>();
-                Link resultLink = Link.Search(sourceLink, linkerLink, targetLink);
+                var resultSet = new HashSet<Link>();
+                var resultLink = Link.Search(sourceLink, linkerLink, targetLink);
                 if (resultLink != null)
                     resultSet.Add(resultLink);
                 return resultSet;
@@ -652,21 +652,21 @@ namespace Platform.Sandbox
 
         private static HashSet<Link> ExecuteLinksSelectionCore(Link definition, Link argument)
         {
-            HashSet<Link>[] possibleResults = new HashSet<Link>[3];
-            int possibleResultsCount = 0;
+            var possibleResults = new HashSet<Link>[3];
+            var possibleResultsCount = 0;
 
             definition.WalkThroughSequence(param =>
                 {
                     if (IsLinkDescriptionParamSourceSpecific(param.Source))
                     {
-                        HashSet<Link> referers = CollectParamLinkReferers(param);
+                        var referers = CollectParamLinkReferers(param);
                         possibleResults[possibleResultsCount++] = referers;
                     }
                     else
                     {
-                        Link subDefinition = GetLinksDescriptionDefinition(param.Source);
-                        HashSet<Link> possibleValues = ExecuteLinksSelectionCore(subDefinition, argument);
-                        HashSet<Link> referersOfPossibleValues = CollectParamLinkReferers(param, possibleValues);
+                        var subDefinition = GetLinksDescriptionDefinition(param.Source);
+                        var possibleValues = ExecuteLinksSelectionCore(subDefinition, argument);
+                        var referersOfPossibleValues = CollectParamLinkReferers(param, possibleValues);
                         possibleResults[possibleResultsCount++] = referersOfPossibleValues;
                     }
                 });
@@ -675,9 +675,9 @@ namespace Platform.Sandbox
             {
                 Array.Sort(possibleResults, 0, possibleResultsCount, SetsCountComparer.Default);
 
-                HashSet<Link> result = possibleResults[0];
+                var result = possibleResults[0];
 
-                for (int i = 1; i < possibleResultsCount; i++)
+                for (var i = 1; i < possibleResultsCount; i++)
                 {
                     result.IntersectWith(possibleResults[i]);
                 }
@@ -710,7 +710,7 @@ namespace Platform.Sandbox
 
         private static HashSet<Link> CollectParamLinkReferers(Link param, HashSet<Link> paramValues)
         {
-            HashSet<Link> result = new HashSet<Link>();
+            var result = new HashSet<Link>();
 
             if (param.Target == _sourceLink)
             {
@@ -733,7 +733,7 @@ namespace Platform.Sandbox
 
         private static HashSet<Link> CollectParamLinkReferers(Link param)
         {
-            HashSet<Link> result = new HashSet<Link>();
+            var result = new HashSet<Link>();
 
             if (param.Target == _sourceLink)
             {
@@ -807,19 +807,19 @@ namespace Platform.Sandbox
 
         private static void CollectAllSpecificLinks(Link linkDescription, ref HashSet<Link> result)
         {
-            Link linkDescriptionParamsSequence = linkDescription.Target;
-            List<Link> linkDescriptionParams = LinkConverter.ToList(linkDescriptionParamsSequence);
+            var linkDescriptionParamsSequence = linkDescription.Target;
+            var linkDescriptionParams = LinkConverter.ToList(linkDescriptionParamsSequence);
 
             foreach (var param in linkDescriptionParams)
             {
-                Link paramSource = param.Source;
+                var paramSource = param.Source;
                 if (IsLinkDescriptionParamSourceSpecific(paramSource))
                 {
                     result.Add(paramSource);
                 }
                 else
                 {
-                    Link subLinkDescription = paramSource;
+                    var subLinkDescription = paramSource;
                     CollectAllSpecificLinks(subLinkDescription, ref result);
                 }
             }

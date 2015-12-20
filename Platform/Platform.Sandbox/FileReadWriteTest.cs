@@ -16,7 +16,7 @@ namespace Platform.Sandbox
             //t.ThreadState == ThreadState.
 
 
-            MemoryMappedFile f = MemoryMappedFile.CreateFromFile("C:\file.txt");
+            var f = MemoryMappedFile.CreateFromFile("C:\file.txt");
 
             var a = f.CreateViewAccessor();
 
@@ -49,12 +49,12 @@ namespace Platform.Sandbox
 
                     //while (true)
                     //{
-                    long linksBefore = Net.And.ReferersByLinkerCount;
+                    var linksBefore = Net.And.ReferersByLinkerCount;
                     //long charsLinksBefore = Net.Character.ReferersBySourceCount;
 
-                    int totalBytesRead = 0;
+                    var totalBytesRead = 0;
 
-                    char[] chars = FileHelpers.ReadAllChars(readableFilename);
+                    var chars = FileHelpers.ReadAllChars(readableFilename);
 
                     SmartTextParsing(chars, 0, chars.Length);
 
@@ -66,7 +66,7 @@ namespace Platform.Sandbox
 
                     totalBytesRead += chars.Length;
 
-                    long linksAfter = Net.And.ReferersByLinkerCount - linksBefore;
+                    var linksAfter = Net.And.ReferersByLinkerCount - linksBefore;
                     //long charsLinksAfter = Net.Character.ReferersBySourceCount - charsLinksBefore;
 
                     Console.Write(totalBytesRead);
@@ -94,7 +94,7 @@ namespace Platform.Sandbox
 
             readableFilename = @"C:\Texts\result.txt";
 
-            string xmlFilename = Path.Combine(Path.GetDirectoryName(readableFilename), Path.GetFileNameWithoutExtension(readableFilename) + ".gexf");
+            var xmlFilename = Path.Combine(Path.GetDirectoryName(readableFilename), Path.GetFileNameWithoutExtension(readableFilename) + ".gexf");
 
             XmlGenerator.ToFile(xmlFilename, link =>
             {
@@ -114,16 +114,16 @@ namespace Platform.Sandbox
             Link result = null;
             Link group = null;
 
-            Link holder = Net.CreateThing();
-            Link holderPair = holder & holder;
+            var holder = Net.CreateThing();
+            var holderPair = holder & holder;
 
 
             UnicodeCategory? currentUnicodeCategory = null;
-            int currentUnicodeCategoryStartIndex = takeFrom;
+            var currentUnicodeCategoryStartIndex = takeFrom;
 
-            for (int i = takeFrom; i < takeUntil; i++)
+            for (var i = takeFrom; i < takeUntil; i++)
             {
-                char c = text[i];
+                var c = text[i];
 
                 var charCategory = char.GetUnicodeCategory(c);
 

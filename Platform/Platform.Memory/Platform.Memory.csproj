@@ -38,10 +38,6 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-  </ItemGroup>
-  <ItemGroup>
     <Compile Include="HeapMemory.cs" />
     <Compile Include="IMemory.cs" />
     <Compile Include="FileMappedMemory.cs" />

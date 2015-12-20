@@ -68,6 +68,7 @@
     <WarningLevel>0</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
@@ -89,10 +90,14 @@
     <Compile Include="TextSearchTest.cs" />
     <Compile Include="Transactions.cs" />
     <Compile Include="TreeStructureExperiments.cs" />
+    <Compile Include="WebCrawler.cs" />
+    <Compile Include="WebCrawlerInstance.cs" />
     <Compile Include="WebSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.config" />
+    <None Include="app.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj">

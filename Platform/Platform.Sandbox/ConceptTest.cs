@@ -35,11 +35,11 @@ namespace Platform.Sandbox
 
                     Console.ReadKey();
 
-                    ulong temp1 = links.Create(0, 0);
-                    ulong temp2 = links.Create(0, 0);
-                    ulong temp3 = links.Create(temp1, temp2);
-                    ulong temp4 = links.Create(temp1, temp3);
-                    ulong temp5 = links.Create(temp4, temp2);
+                    var temp1 = links.Create(0, 0);
+                    var temp2 = links.Create(0, 0);
+                    var temp3 = links.Create(temp1, temp2);
+                    var temp4 = links.Create(temp1, temp3);
+                    var temp5 = links.Create(temp4, temp2);
 
                     //links.Delete(links.GetSource(temp2), links.GetTarget(temp2));
 
@@ -61,7 +61,7 @@ namespace Platform.Sandbox
 
                     //var seq = sequences.Create(temp1, temp5, temp2, temp1, temp2); //, temp5);
 
-                    ulong sequence = sequences.Create(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1,
+                    var sequence = sequences.Create(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1,
                         temp5);
                     //, temp5);
 
@@ -70,7 +70,7 @@ namespace Platform.Sandbox
                     //sequences.Each((x, isAPoint) => { links.PrintLink(x); return true; }, temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
 
 
-                    int sequencesCount = 0;
+                    var sequencesCount = 0;
 
                     sequences.Each(x =>
                     {

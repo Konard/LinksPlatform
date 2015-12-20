@@ -677,7 +677,7 @@ namespace Platform.Data.Core.Sequences
 
             public bool HandleFullMatchedSequence(ulong sequenceToMatch)
             {
-                ulong sequence = Sequences.GetSequenceByElements(sequenceToMatch);
+                var sequence = Sequences.GetSequenceByElements(sequenceToMatch);
                 if (FullMatch(sequenceToMatch) && sequence != LinksConstants.Null)
                     return _stopableHandler(sequence);
                 return true;

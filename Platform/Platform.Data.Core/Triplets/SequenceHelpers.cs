@@ -5,6 +5,10 @@ using Platform.Data.Core.Sequences;
 
 namespace Platform.Data.Core.Triplets
 {
+    /// <remarks>
+    /// TODO: Check that CollectMatchingSequences algorithm is working, if not throw it out.
+    /// TODO: Think of the abstraction on Sequences that can be equally usefull for triple links, pair links and so on.
+    /// </remarks>
     public class SequenceHelpers
     {
         public const int MaxSequenceFormatSize = 20;
@@ -15,9 +19,9 @@ namespace Platform.Data.Core.Triplets
 
         public static string FormatSequence(Link sequence)
         {
-            int visitedElements = 0;
+            var visitedElements = 0;
 
-            StringBuilder sb = new StringBuilder();
+            var sb = new StringBuilder();
 
             sb.Append('{');
 
@@ -53,30 +57,30 @@ namespace Platform.Data.Core.Triplets
                 throw new Exception("Подпоследовательности с одним элементом не поддерживаются.");
             }
 
-            int leftBound = 0;
-            int rightBound = links.Length - 1;
+            var leftBound = 0;
+            var rightBound = links.Length - 1;
 
-            Link left = links[leftBound++];
-            Link right = links[rightBound--];
+            var left = links[leftBound++];
+            var right = links[rightBound--];
 
-            List<Link> results = new List<Link>();
+            var results = new List<Link>();
             CollectMatchingSequences(left, leftBound, links, right, rightBound, ref results);
             return results;
         }
 
         private static void CollectMatchingSequences(Link leftLink, int leftBound, Link[] middleLinks, Link rightLink, int rightBound, ref List<Link> results)
         {
-            long leftLinkTotalReferers = leftLink.ReferersBySourceCount + leftLink.ReferersByTargetCount;
-            long rightLinkTotalReferers = rightLink.ReferersBySourceCount + rightLink.ReferersByTargetCount;
+            var leftLinkTotalReferers = leftLink.ReferersBySourceCount + leftLink.ReferersByTargetCount;
+            var rightLinkTotalReferers = rightLink.ReferersBySourceCount + rightLink.ReferersByTargetCount;
 
             if (leftLinkTotalReferers <= rightLinkTotalReferers)
             {
                 var nextLeftLink = middleLinks[leftBound];
 
-                Link[] elements = GetRightElements(leftLink, nextLeftLink);
+                var elements = GetRightElements(leftLink, nextLeftLink);
                 if (leftBound <= rightBound)
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != null)
@@ -87,7 +91,7 @@ namespace Platform.Data.Core.Triplets
                 }
                 else
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != null)
@@ -101,11 +105,11 @@ namespace Platform.Data.Core.Triplets
             {
                 var nextRightLink = middleLinks[rightBound];
 
-                Link[] elements = GetLeftElements(rightLink, nextRightLink);
+                var elements = GetLeftElements(rightLink, nextRightLink);
 
                 if (leftBound <= rightBound)
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != null)
@@ -116,7 +120,7 @@ namespace Platform.Data.Core.Triplets
                 }
                 else
                 {
-                    for (int i = elements.Length - 1; i >= 0; i--)
+                    for (var i = elements.Length - 1; i >= 0; i--)
                     {
                         var element = elements[i];
                         if (element != null)
@@ -148,7 +152,7 @@ namespace Platform.Data.Core.Triplets
 
         public static bool TryStepRight(Link startLink, Link rightLink, Link[] result, int offset)
         {
-            int added = 0;
+            var added = 0;
 
             startLink.WalkThroughReferersBySource(couple =>
                 {
@@ -195,7 +199,7 @@ namespace Platform.Data.Core.Triplets
 
         public static bool TryStepLeft(Link startLink, Link leftLink, Link[] result, int offset)
         {
-            int added = 0;
+            var added = 0;
 
             startLink.WalkThroughReferersByTarget(couple =>
                 {

@@ -26,11 +26,11 @@ namespace Platform.Data.Core
         {
             BitSetsIn16Bits = new byte[65536][];
 
-            for (int i = 0; i < 65536; i++)
+            for (var i = 0; i < 65536; i++)
             {
                 // Calculating size of array (number of positive bits)
-                int c = 0;
-                for (int k = 1; k <= 65536; k = k << 1)
+                var c = 0;
+                for (var k = 1; k <= 65536; k = k << 1)
                     if ((i & k) == k) c++;
 
                 var array = new byte[c];
@@ -38,7 +38,7 @@ namespace Platform.Data.Core
                 // Adding positive bits indices into array
                 byte j = 0;
                 c = 0;
-                for (int k = 1; k <= 65536; k = k << 1)
+                for (var k = 1; k <= 65536; k = k << 1)
                 {
                     if ((i & k) == k)
                         array[c++] = j;
@@ -93,7 +93,7 @@ namespace Platform.Data.Core
             if (defaultValue)
             {
                 const int fillValue = unchecked(((int)0xffffffff));
-                for (int i = 0; i < _array.Length; i++)
+                for (var i = 0; i < _array.Length; i++)
                 {
                     _array[i] = fillValue;
                 }
@@ -159,8 +159,8 @@ namespace Platform.Data.Core
                 // Currently we never shrink the array
                 if (value > _length)
                 {
-                    long numints = (value + 63) / 64;
-                    long oldNumints = (_length + 63) / 64;
+                    var numints = (value + 63) / 64;
+                    var oldNumints = (_length + 63) / 64;
                     if (numints > _array.Length)
                     {
                         var newArr = new long[numints];
@@ -172,7 +172,7 @@ namespace Platform.Data.Core
                         Array.Clear(_array, (int)oldNumints, (int)(numints - oldNumints));
                     }
 
-                    int mask = (int)_length % 64;
+                    var mask = (int)_length % 64;
                     if (mask > 0)
                     {
                         _array[oldNumints - 1] &= ((long)1 << mask) - 1;
@@ -198,7 +198,7 @@ namespace Platform.Data.Core
 
         public BitString Not()
         {
-            long ints = (_length + 63) / 64;
+            var ints = (_length + 63) / 64;
             for (long i = 0; i < ints; i++)
             {
                 _array[i] = ~_array[i];
@@ -217,7 +217,7 @@ namespace Platform.Data.Core
 
             EnsureArgumentIsValid(other);
 
-            long ints = (_length + 63) / 64;
+            var ints = (_length + 63) / 64;
             var otherArray = other._array;
             for (long i = 0; i < ints; i++)
             {
@@ -242,7 +242,7 @@ namespace Platform.Data.Core
 
             EnsureArgumentIsValid(value);
 
-            long ints = (_length + 63) / 64;
+            var ints = (_length + 63) / 64;
             for (long i = 0; i < ints; i++)
             {
                 _array[i] |= value._array[i];
@@ -262,7 +262,7 @@ namespace Platform.Data.Core
         {
             EnsureArgumentIsValid(value);
 
-            long ints = (_length + 63) / 64;
+            var ints = (_length + 63) / 64;
             for (long i = 0; i < ints; i++)
             {
                 _array[i] ^= value._array[i];
@@ -313,7 +313,7 @@ namespace Platform.Data.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool GetCore(long index)
         {
-            long wordIndex = index >> 6;
+            var wordIndex = index >> 6;
             return (_array[wordIndex] & ((long)1 << (int)(index & 63))) != 0;
         }
 
@@ -328,8 +328,8 @@ namespace Platform.Data.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void SetCore(long index)
         {
-            long wordIndex = index >> 6;
-            long mask = ((long)1 << (int)(index & 63));
+            var wordIndex = index >> 6;
+            var mask = ((long)1 << (int)(index & 63));
 
             _array[wordIndex] |= mask;
             RefreshBordersByWord(wordIndex);
@@ -348,8 +348,8 @@ namespace Platform.Data.Core
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ResetCore(long index)
         {
-            long wordIndex = index >> 6;
-            long mask = ((long)1 << (int)(index & 63));
+            var wordIndex = index >> 6;
+            var mask = ((long)1 << (int)(index & 63));
 
             _array[wordIndex] &= ~mask;
 
@@ -369,8 +369,8 @@ namespace Platform.Data.Core
 
         public void SetAll(bool value)
         {
-            long fillValue = value ? unchecked(((long)0xffffffffffffffff)) : 0;
-            long ints = (_length + 63) / 64;
+            var fillValue = value ? unchecked(((long)0xffffffffffffffff)) : 0;
+            var ints = (_length + 63) / 64;
             for (long i = 0; i < ints; i++)
             {
                 _array[i] = fillValue;
@@ -391,10 +391,10 @@ namespace Platform.Data.Core
 
         public int CountSet()
         {
-            int result = 0;
-            for (int i = 0; i < _array.Length; i++)
+            var result = 0;
+            for (var i = 0; i < _array.Length; i++)
             {
-                long n = _array[i];
+                var n = _array[i];
                 if (n != 0)
                 {
                     result += BitSetsIn16Bits[(int)(n & 0xffffu)].Length +
@@ -409,12 +409,12 @@ namespace Platform.Data.Core
         public List<int> GetSetIndeces()
         {
 #if DEBUG
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 #endif
             var result = new List<int>();
-            for (int i = 0; i < _array.Length; i++)
+            for (var i = 0; i < _array.Length; i++)
             {
-                long n = _array[i];
+                var n = _array[i];
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -422,16 +422,16 @@ namespace Platform.Data.Core
                     var bits3 = BitSetsIn16Bits[(int)((n >> 32) & 0xffffu)];
                     var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
 
-                    for (int j = 0; j < bits1.Length; j++)
+                    for (var j = 0; j < bits1.Length; j++)
                         result.Add(bits1[j] + i * 64);
 
-                    for (int j = 0; j < bits2.Length; j++)
+                    for (var j = 0; j < bits2.Length; j++)
                         result.Add(bits2[j] + 16 + i * 64);
 
-                    for (int j = 0; j < bits3.Length; j++)
+                    for (var j = 0; j < bits3.Length; j++)
                         result.Add(bits3[j] + 32 + i * 64);
 
-                    for (int j = 0; j < bits4.Length; j++)
+                    for (var j = 0; j < bits4.Length; j++)
                         result.Add(bits4[j] + 48 + i * 64);
                 }
             }
@@ -445,7 +445,7 @@ namespace Platform.Data.Core
         public List<ulong> GetSetUInt64Indices()
         {
 #if DEBUG
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 #endif
             // TODO: Возможно нужно считать общее число установленных бит, тогда здесь можно будет создавать сразу массив
             var result = new List<ulong>();
@@ -481,10 +481,10 @@ namespace Platform.Data.Core
 
         public int GetFirstSetBitIndex()
         {
-            Stopwatch sw = Stopwatch.StartNew();
-            for (int i = 0; i < _array.Length; i++)
+            var sw = Stopwatch.StartNew();
+            for (var i = 0; i < _array.Length; i++)
             {
-                long n = _array[i];
+                var n = _array[i];
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -512,12 +512,12 @@ namespace Platform.Data.Core
         public int GetLastSetBitIndex()
         {
 #if DEBUG
-            Stopwatch sw = Stopwatch.StartNew();
+            var sw = Stopwatch.StartNew();
 #endif
 
-            for (int i = _array.Length - 1; i >= 0; i--)
+            for (var i = _array.Length - 1; i >= 0; i--)
             {
-                long n = _array[i];
+                var n = _array[i];
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -544,10 +544,10 @@ namespace Platform.Data.Core
 
         public int GetSetIndecesCount()
         {
-            int result = 0;
-            for (int i = 0; i < _array.Length; i++)
+            var result = 0;
+            for (var i = 0; i < _array.Length; i++)
             {
-                long n = _array[i];
+                var n = _array[i];
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -572,23 +572,23 @@ namespace Platform.Data.Core
             var sw = Stopwatch.StartNew();
 #endif
 
-            long from = Math.Max(_minPositiveWord, other._minPositiveWord);
-            long to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
+            var from = Math.Max(_minPositiveWord, other._minPositiveWord);
+            var to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
 
-            bool result = false;
+            var result = false;
 
 #if DEBUG
-            int steps = 0;
+            var steps = 0;
 #endif
-            long[] otherArray = other._array;
+            var otherArray = other._array;
 
-            for (long i = from; i <= to; i++)
+            for (var i = from; i <= to; i++)
             {
 #if DEBUG
                 steps++;
 #endif
-                long v1 = _array[i];
-                long v2 = otherArray[i];
+                var v1 = _array[i];
+                var v2 = otherArray[i];
                 if (v1 != 0 && v2 != 0 && ((v1 & v2) != 0))
                 {
                     result = true;
@@ -613,18 +613,18 @@ namespace Platform.Data.Core
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            long from = Math.Max(_minPositiveWord, other._minPositiveWord);
-            long to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
+            var from = Math.Max(_minPositiveWord, other._minPositiveWord);
+            var to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
 
-            int result = 0;
+            var result = 0;
 
-            long[] otherArray = other._array;
+            var otherArray = other._array;
 
-            for (long i = from; i <= to; i++)
+            for (var i = from; i <= to; i++)
             {
-                long v1 = _array[i];
-                long v2 = otherArray[i];
-                long n = v1 & v2;
+                var v1 = _array[i];
+                var v2 = otherArray[i];
+                var n = v1 & v2;
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -646,18 +646,18 @@ namespace Platform.Data.Core
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            long from = Math.Max(_minPositiveWord, other._minPositiveWord);
-            long to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
+            var from = Math.Max(_minPositiveWord, other._minPositiveWord);
+            var to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
 
             var result = new List<int>();
 
-            long[] otherArray = other._array;
+            var otherArray = other._array;
 
-            for (long i = from; i <= to; i++)
+            for (var i = from; i <= to; i++)
             {
-                long v1 = _array[i];
-                long v2 = otherArray[i];
-                long n = v1 & v2;
+                var v1 = _array[i];
+                var v2 = otherArray[i];
+                var n = v1 & v2;
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];
@@ -686,16 +686,16 @@ namespace Platform.Data.Core
                 throw new ArgumentException("Bit strings must have same size", "other");
             }
 
-            long from = Math.Max(_minPositiveWord, other._minPositiveWord);
-            long to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
+            var from = Math.Max(_minPositiveWord, other._minPositiveWord);
+            var to = Math.Min(_maxPositiveWord, other._maxPositiveWord);
 
-            long[] otherArray = other._array;
+            var otherArray = other._array;
 
-            for (long i = from; i <= to; i++)
+            for (var i = from; i <= to; i++)
             {
-                long v1 = _array[i];
-                long v2 = otherArray[i];
-                long n = v1 & v2;
+                var v1 = _array[i];
+                var v2 = otherArray[i];
+                var n = v1 & v2;
                 if (n != 0)
                 {
                     var bits1 = BitSetsIn16Bits[(int)(n & 0xffffu)];

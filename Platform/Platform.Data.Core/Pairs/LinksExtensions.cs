@@ -36,7 +36,7 @@ namespace Platform.Data.Core.Pairs
         {
             ulong result = 0;
 
-            ulong min = (ulong)amountOfDeletions > links.Count() ? 1 : links.Count() - (ulong)amountOfDeletions;
+            var min = (ulong)amountOfDeletions > links.Count() ? 1 : links.Count() - (ulong)amountOfDeletions;
 
             for (long i = 0; i < amountOfDeletions; i++)
             {
@@ -57,7 +57,7 @@ namespace Platform.Data.Core.Pairs
         /// </remarks>
         public static void DeleteAll(this Links links)
         {
-            for (ulong i = links.Count(); i > 0; i--)
+            for (var i = links.Count(); i > 0; i--)
             {
                 links.Delete(i);
                 if (links.Count() != i - 1)

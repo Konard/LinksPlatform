@@ -11,9 +11,9 @@ namespace Platform.Sandbox
         {
             Link.CreatedEvent += LinkCreated;
 
-            Link x = Net.CreateThing();
+            var x = Net.CreateThing();
 
-            Link number = NumberHelpers.FromNumber(4637694687);
+            var number = NumberHelpers.FromNumber(4637694687);
 
 
             return;
@@ -21,7 +21,7 @@ namespace Platform.Sandbox
             do
             {
                 Console.Write("-> ");
-                string readMessage = Console.ReadLine();
+                var readMessage = Console.ReadLine();
 
                 if (string.Compare("exit", readMessage, ignoreCase: true) == 0)
                     break;

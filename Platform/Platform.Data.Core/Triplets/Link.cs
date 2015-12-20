@@ -567,7 +567,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersBySourceCount;
+            var referers = ReferersBySourceCount;
             if (referers == 1)
             {
                 return walker(FirstRefererBySource);
@@ -587,7 +587,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersBySourceCount;
+            var referers = ReferersBySourceCount;
             if (referers == 1)
             {
                 walker(FirstRefererBySource);
@@ -603,7 +603,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersByLinkerCount;
+            var referers = ReferersByLinkerCount;
             if (referers == 1)
             {
                 return walker(FirstRefererByLinker);
@@ -623,7 +623,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersByLinkerCount;
+            var referers = ReferersByLinkerCount;
             if (referers == 1)
             {
                 walker(FirstRefererByLinker);
@@ -639,7 +639,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersByTargetCount;
+            var referers = ReferersByTargetCount;
             if (referers == 1)
             {
                 return walker(FirstRefererByTarget);
@@ -659,7 +659,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            long referers = ReferersByTargetCount;
+            var referers = ReferersByTargetCount;
             if (referers == 1)
             {
                 walker(FirstRefererByTarget);

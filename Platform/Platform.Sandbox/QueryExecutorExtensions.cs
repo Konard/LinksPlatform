@@ -21,7 +21,7 @@ namespace Platform.Sandbox
         public static IEnumerable<T> Execute<T>(this Links links,
             Expression<Func<Links, IEnumerable<T>>> query)
         {
-            string queryId = query.ToString();
+            var queryId = query.ToString();
             Func<Links, IEnumerable<T>> compiledQuery;
             if (!CompiledQueriesCache<T>.compiledQueries.TryGetValue(queryId, out compiledQuery))
             {

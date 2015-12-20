@@ -90,7 +90,7 @@ namespace Platform.Data.Core.Triplets
                 {
                     if (referer.Linker == Net.Has)
                     {
-                        Link nameLink = referer.Target;
+                        var nameLink = referer.Target;
                         if (nameLink.Source == Net.Name && nameLink.Linker == Net.ThatIsRepresentedBy)
                         {
                             nameLocal = LinkConverter.ToString(nameLink.Target);
@@ -160,7 +160,7 @@ namespace Platform.Data.Core.Triplets
             else
             {
                 var array = new Link[link.ReferersBySourceCount];
-                int index = 0;
+                var index = 0;
                 link.WalkThroughReferersBySource(referer => array[index++] = referer);
                 return array;
             }
@@ -173,7 +173,7 @@ namespace Platform.Data.Core.Triplets
             else
             {
                 var array = new Link[link.ReferersByLinkerCount];
-                int index = 0;
+                var index = 0;
                 link.WalkThroughReferersByLinker(referer => array[index++] = referer);
                 return array;
             }
@@ -186,7 +186,7 @@ namespace Platform.Data.Core.Triplets
             else
             {
                 var array = new Link[link.ReferersByTargetCount];
-                int index = 0;
+                var index = 0;
                 link.WalkThroughReferersByTarget(referer => array[index++] = referer);
                 return array;
             }

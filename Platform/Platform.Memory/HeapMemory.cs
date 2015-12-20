@@ -230,7 +230,7 @@ namespace Platform.Memory
         // automatically initialized to zero.
         public static void* Alloc(int size)
         {
-            void* result =
+            var result =
                 Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr((uint) size))
                     .ToPointer();
             if (result == null) throw new OutOfMemoryException();
@@ -268,7 +268,7 @@ namespace Platform.Memory
         // initialized to zero.
         public static void* ReAlloc(void* block, int size)
         {
-            void* result =
+            var result =
                 Kernel32.HeapReAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new IntPtr(block),
                     new UIntPtr((uint) size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
@@ -278,7 +278,7 @@ namespace Platform.Memory
         // Returns the size of a memory block.
         public static int SizeOf(void* block)
         {
-            int result = (int) Kernel32.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
+            var result = (int) Kernel32.HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
             if (result == -1) throw new InvalidOperationException();
             return result;
         }

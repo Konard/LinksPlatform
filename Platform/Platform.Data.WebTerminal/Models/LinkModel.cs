@@ -25,7 +25,7 @@ namespace Platform.Data.WebTerminal.Models
             //{
             const int currentLevel = 0;
             var visitedLinks = new HashSet<Link>();
-            LinkModel result = CreateLinkModel(link, visitedLinks, currentLevel, nestingLevel);
+            var result = CreateLinkModel(link, visitedLinks, currentLevel, nestingLevel);
             //});
 
             return result;

@@ -44,5 +44,11 @@ namespace Platform.Communication.Protocol.Gexf
             writer.WriteEndElement();
             writer.WriteEndDocument();
         }
+
+        public static void WriteXml(XmlWriter writer, Action writeNodes, Action writeEdges, string version = CurrentVersion,
+            GraphMode mode = GraphMode.Static, GraphDefaultEdgeType defaultEdgeType = GraphDefaultEdgeType.Directed)
+        {
+            WriteXml(writer, () => Graph.WriteXml(writer, writeNodes, writeEdges, mode, defaultEdgeType), version);
+        }
     }
 }
