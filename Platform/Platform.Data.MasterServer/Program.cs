@@ -159,6 +159,7 @@ namespace Platform.Data.MasterServer
         private static ulong[] ProcessSequence(string sequence, bool forSearch = false)
         {
             var sequenceLength = sequence.Length;
+            if (forSearch) sequenceLength--;
             var w = 0;
             for (var r = 0; r < sequenceLength; r++)
             {
