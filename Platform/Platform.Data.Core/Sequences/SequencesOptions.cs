@@ -12,13 +12,14 @@ namespace Platform.Data.Core.Sequences
         public bool UseCompression;
         public bool UseGarbageCollection;
         public bool EnforceSingleSequenceVersionOnWrite;
-        public bool EnforceSingleSequenceVersionOnRead; // TODO: Реализовать компактификацию при чтении
-        public bool UseRequestMarker;
-        public bool StoreRequestResults;
+        // TODO: Реализовать компактификацию при чтении
+        //public bool EnforceSingleSequenceVersionOnRead; 
+        //public bool UseRequestMarker;
+        //public bool StoreRequestResults;
 
         public void InitOptions(ILinks<ulong> links)
         {
-            if (SequenceMarkerLink == LinksConstants.Null)
+            if (UseSequenceMarker && SequenceMarkerLink == LinksConstants.Null)
                 SequenceMarkerLink = links.Create(LinksConstants.Itself, LinksConstants.Itself);
         }
 
