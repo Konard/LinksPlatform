@@ -202,12 +202,12 @@ namespace Platform.Memory
                 {
                     newCapacity = previousCapacity;
                     /* Пока не понятно, нужны ли такие манипуляции
-					AlignCapacityToSystemPageSize(ref newCapacity);
-					if (newCapacity != previousCapacity)
-					{
-						fs.SetLength(newCapacity);
-					}
-					*/
+                    AlignCapacityToSystemPageSize(ref newCapacity);
+                    if (newCapacity != previousCapacity)
+                    {
+                        fs.SetLength(newCapacity);
+                    }
+                    */
                 }
             }
         }

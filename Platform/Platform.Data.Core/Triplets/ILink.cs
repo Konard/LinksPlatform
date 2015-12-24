@@ -3,23 +3,23 @@
 using System;
 namespace NetLibrary
 {
-	interface ILink
-	{
-		ILink Source { get; }
-		ILink Linker { get; }
-		ILink Target { get; }
+    interface ILink
+    {
+        ILink Source { get; }
+        ILink Linker { get; }
+        ILink Target { get; }
 
-		void WalkThroughReferersByLinker(Action<ILink> walker);
-		void WalkThroughReferersAsSource(Action<ILink> walker);
-		void WalkThroughReferersAsTarget(Action<ILink> walker);
+        void WalkThroughReferersByLinker(Action<ILink> walker);
+        void WalkThroughReferersAsSource(Action<ILink> walker);
+        void WalkThroughReferersAsTarget(Action<ILink> walker);
 
-		// И статические методы (общие для всех связей)
+        // И статические методы (общие для всех связей)
 
-		public static ILink Create(ILink source, ILink linker, ILink target);
-		public static void Update(ref ILink link, ILink newSource, ILink newLinker, ILink newTarget);
-		public static void Delete(ref ILink link);
-		public static ILink Search(ILink source, ILink linker, ILink target);
-	}
+        public static ILink Create(ILink source, ILink linker, ILink target);
+        public static void Update(ref ILink link, ILink newSource, ILink newLinker, ILink newTarget);
+        public static void Delete(ref ILink link);
+        public static ILink Search(ILink source, ILink linker, ILink target);
+    }
 }
 
 */
