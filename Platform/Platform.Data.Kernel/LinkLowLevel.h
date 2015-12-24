@@ -132,7 +132,7 @@
     _DecrementNumberOfReferers(that, of(previousValue));                                    \
     _SetNextSiblingRefererBy(that, of(linkIndex), to(null));                                \
     _SetPreviousSiblingRefererBy(that, of(linkIndex), to(null));                            \
-}                                                                                                                        
+}
 
 #define SubscribeToListOfReferersBy(that, linkIndex, newValue)                                                   \
 {                                                                                                                \
@@ -220,7 +220,7 @@
         Concat(IsRefererGreaterThanOtherRefererBy, referesToThat), \
         Concat(__GetPreviousSiblingRefererBy, referesToThat), Concat(__SetPreviousSiblingRefererBy, referesToThat), \
         Concat(__GetNextSiblingRefererBy, referesToThat), Concat(__SetNextSiblingRefererBy, referesToThat), \
-        Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat)) 
+        Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat))
 
 #define DefineAllReferersTreeMethods(referesToThat) \
     DefineReferersTreeLeftRotateMethod(referesToThat) \

@@ -89,7 +89,7 @@ void methodName(elementType* rootIndex)                                         
     void LeftMaintain(elementType* rootIndex);                                                                                               \
     void RightMaintain(elementType* rootIndex);                                                                                              \
     DefineTreeLeftMaintainMethod(LeftMaintain, RightMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)  \
-    DefineTreeRightMaintainMethod(RightMaintain, LeftMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)                            
+    DefineTreeRightMaintainMethod(RightMaintain, LeftMaintain, elementType, LeftRotate, RightRotate, GetLeftNode, GetRightNode, GetNodeSize)
 
 #define DefineTreeInsertMethod(methodName, elementType, LeftMaintain, RightMaintain, IsElementLessThanOtherElement, GetLeftNode, GetRightNode, GetNodeSize, SetNodeSize) \
 void methodName(elementType* rootIndex, elementType newNodeIndex)                                                                                                        \
@@ -200,7 +200,7 @@ void methodName(elementType* rootIndex, elementType nodeToDetach)               
                 break;                                                 \
             else                                                       \
             {                                                          \
-                __asm { pop element }                                                    
+                __asm { pop element }
 
 #define EndWalkThroughtTree(element, GetRightNode) \
                 element = GetRightNode(element);   \

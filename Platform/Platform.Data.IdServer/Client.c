@@ -140,7 +140,7 @@ int ClientInitialize(const char *hostname, const char *port)
     }
 
     struct addrinfo *result = NULL, hints;
-    
+
     // We can provide hints about the type of socket supported through an addrinfo structure
     // pointed to by the pHints parameter:
     // * AF_UNSPEC indicates the caller will accept any protocol family
