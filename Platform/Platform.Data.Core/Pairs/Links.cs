@@ -35,7 +35,7 @@ namespace Platform.Data.Core.Pairs
     {
         #region Structure
 
-        private readonly ISyncronization _sync = new UnsafeSynchronization();
+        private readonly ISyncronization _sync = new SafeSynchronization();
         private readonly ILinksMemoryManager<ulong> _memoryManager;
 
         #endregion

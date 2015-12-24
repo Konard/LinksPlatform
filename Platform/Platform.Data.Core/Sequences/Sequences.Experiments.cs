@@ -610,6 +610,28 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
+        public bool GetAllPartiallyMatchingSequences2(Func<ulong, bool> handler, params ulong[] sequence)
+        {
+            return _sync.ExecuteReadOperation(() =>
+            {
+                if (sequence.Length > 0)
+                {
+                    _links.EnsureEachLinkExists(sequence);
+
+                    var results = new HashSet<ulong>();
+                    var filteredResults = new HashSet<ulong>();
+                    var matcher = new Matcher(this, sequence, filteredResults, handler);
+                    for (var i = 0; i < sequence.Length; i++)
+                        if (!AllUsagesCore1(sequence[i], results, matcher.HandlePartialMatched))
+                            return false;
+
+                    return true;
+                }
+
+                return true;
+            });
+        }
+
         public List<ulong> GetAllPartiallyMatchingSequences(params ulong[] sequence)
         {
             return _sync.ExecuteReadOperation(() =>
@@ -745,6 +767,24 @@ namespace Platform.Data.Core.Sequences
             };
             _links.EachCore(link, 0, handler);
             _links.EachCore(0, link, handler);
+        }
+
+        private bool AllUsagesCore1(ulong link, HashSet<ulong> usages, Func<ulong, bool> outerHandler)
+        {
+            Func<ulong, bool> handler = pair =>
+            {
+                if (usages.Add(pair))
+                {
+                    if (!outerHandler(pair))
+                        return false;
+
+                    if (!AllUsagesCore1(pair, usages, outerHandler))
+                        return false;
+                }
+                return true;
+            };
+            return _links.EachCore(link, 0, handler)
+                && _links.EachCore(0, link, handler);
         }
 
         public void CalculateAllUsages(ulong[] totals)

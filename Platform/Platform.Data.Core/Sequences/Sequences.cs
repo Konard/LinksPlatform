@@ -694,14 +694,14 @@ namespace Platform.Data.Core.Sequences
             private bool PartialMatchCore(LinkIndex element)
             {
                 if (_filterPosition == (_patternSequence.Length - 1))
-                    return false;
+                    return false; // Нашлось
 
                 if (_filterPosition >= 0)
                 {
                     if (element == _patternSequence[_filterPosition + 1])
                         _filterPosition++;
                     else
-                        return false;
+                        _filterPosition = -1;
                 }
 
                 if (_filterPosition < 0)
@@ -710,13 +710,20 @@ namespace Platform.Data.Core.Sequences
                         _filterPosition = 0;
                 }
 
-                return true;
+                return true; // Ищем дальше
             }
 
             public void AddPartialMatchedToResults(ulong sequenceToMatch)
             {
                 if (PartialMatch(sequenceToMatch))
                     _results.Add(sequenceToMatch);
+            }
+
+            public bool HandlePartialMatched(ulong sequenceToMatch)
+            {
+                if (PartialMatch(sequenceToMatch))
+                    return _stopableHandler(sequenceToMatch);
+                return true;
             }
 
             public void AddAllPartialMatchedToResults(IEnumerable<ulong> sequencesToMatch)
