@@ -302,19 +302,19 @@ namespace Platform.Data.Core.Pairs
         private void EnsureSelfReferencingLinkIsRestored(ulong source, ulong target)
         {
             // Возможно эту логику нужно перенисти в функцию Create
-            if (!_memoryManager.Exists(source) && !_memoryManager.Exists(target) && source == target)
+            if (_memoryManager.Count(source) == 0 && _memoryManager.Count(target) == 0 && source == target)
             {
-                if (Create(0, 0) != source)
+                if (Create(LinksConstants.Itself, LinksConstants.Itself) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!_memoryManager.Exists(target))
+            else if (_memoryManager.Count(target) == 0)
             {
-                if (Create(source, 0) != target)
+                if (Create(source, LinksConstants.Itself) != target)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!_memoryManager.Exists(source))
+            else if (_memoryManager.Count(source) == 0)
             {
-                if (Create(0, target) != source)
+                if (Create(LinksConstants.Itself, target) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
         }
