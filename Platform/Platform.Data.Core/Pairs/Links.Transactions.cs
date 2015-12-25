@@ -85,6 +85,7 @@ namespace Platform.Data.Core.Pairs
             public static readonly long Size = Marshal.SizeOf(typeof(Transition));
 
             public ulong TransactionId;
+            // TODO: Возможно точнее будет хранить не только Source и Target, но и Index
             public Link Before;
             public Link After;
             public UniqueTimestamp Timestamp;

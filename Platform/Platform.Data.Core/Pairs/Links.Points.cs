@@ -1,6 +1,4 @@
-﻿using Platform.Data.Core.Exceptions;
-
-namespace Platform.Data.Core.Pairs
+﻿namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
     /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.

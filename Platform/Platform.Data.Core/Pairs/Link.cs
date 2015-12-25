@@ -4,6 +4,7 @@ namespace Platform.Data.Core.Pairs
 {
     /// <summary>
     /// Структура описывающая уникальную связь.
+    /// TODO: Возможно Index тоже должен быть частью этой структуры, можно попробовать реализовать IList[ulong], тогда структура сможет восприниматься как массив значений связи
     /// </summary>
     public struct Link : IEquatable<Link>
     {
