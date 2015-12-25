@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core;
+using Platform.Data.Core.Collections;
 using Platform.Helpers;
 
 namespace Platform.Tests.Data.Core

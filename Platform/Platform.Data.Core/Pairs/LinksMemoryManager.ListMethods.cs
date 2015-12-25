@@ -1,4 +1,4 @@
-﻿using Platform.Data.Core.ListMethods;
+﻿using Platform.Data.Core.Collections.Lists;
 
 namespace Platform.Data.Core.Pairs
 {

@@ -3,7 +3,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Disposal;
 
-namespace Platform.Communication.Udp
+namespace Platform.Communication.Protocol.Udp
 {
     /// <summary>
     /// Представляет отправителя сообщений по протоколу UDP.

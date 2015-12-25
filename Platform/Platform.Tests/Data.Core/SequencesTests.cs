@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core;
+using Platform.Data.Core.Collections;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;

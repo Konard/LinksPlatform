@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Threading;
-using Platform.Communication.Udp;
+using Platform.Communication.Protocol.Udp;
 using Platform.Helpers;
 
 namespace Platform.Data.ConsoleTerminal

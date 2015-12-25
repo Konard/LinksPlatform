@@ -4,7 +4,7 @@ using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
-using Platform.Communication.Udp;
+using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
