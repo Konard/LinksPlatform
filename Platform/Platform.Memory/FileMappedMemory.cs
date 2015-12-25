@@ -218,7 +218,7 @@ namespace Platform.Memory
 
         protected override void DisposeCore(bool manual)
         {
-            if (manual) UnmapFile();
+            UnmapFile();
             ForceResize(_address, ref _usedCapacity);
         }
 

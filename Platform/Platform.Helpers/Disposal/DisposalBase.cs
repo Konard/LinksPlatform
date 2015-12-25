@@ -50,19 +50,14 @@ namespace Platform.Helpers.Disposal
 
         private void Dispose(bool manual)
         {
-            if (!_disposed) lock (this) if (!_disposed)
+            if (!_disposed)
+                lock (this)
+                    if (!_disposed)
                     {
                         try
                         {
                             DisposeCore(manual);
-                        }
-                        catch
-                        {
-                            if (manual) throw;
-                            // else TODO: Log exception
-                        }
-                        finally
-                        {
+
                             if (CurrentProcess != null)
                                 CurrentProcess.Exited -= OnProcessExit;
                             //else
@@ -72,9 +67,14 @@ namespace Platform.Helpers.Disposal
                                 CurrentDomain.ProcessExit -= OnProcessExit;
                             //else
                             //  AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
-                        }
 
-                        _disposed = true;
+                            _disposed = true;
+                        }
+                        catch
+                        {
+                            if (manual) throw;
+                            // else TODO: Log exception
+                        }
                     }
         }
 
