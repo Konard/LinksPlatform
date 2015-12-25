@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Diagnostics;
-using System.IO;
 using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -13,7 +12,6 @@ using log4net.Config;
 using Platform.Communication.Udp;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers.Threading;
 
 namespace Platform.Data.CrawlerServer
 {
@@ -60,8 +58,6 @@ namespace Platform.Data.CrawlerServer
                     sequencesOptions.SequenceMarkerLink = sequencesMarker;
 
                     var sequences = new Sequences(links, sequencesOptions);
-
-                    //PrintContents(links, sequences);
 
                     Console.WriteLine("Сервер запущен.");
                     Console.WriteLine("Нажмите CTRL+C или ESC чтобы остановить.");
@@ -136,32 +132,6 @@ namespace Platform.Data.CrawlerServer
             e.Cancel = true;
             LinksServerRunning = false;
         }
-
-        //private static void PrintContents(Links links, Sequences sequences)
-        //{
-        //    if (links.Count() == UnicodeMap.LastCharLink)
-        //        Console.WriteLine("База данных пуста.");
-        //    else
-        //    {
-        //        /*
-        //        Console.WriteLine("Содержимое базы данных:");
-
-
-        //        var linksTotalLength = links.Count().ToString("0").Length;
-
-        //        var printFormatBase = new String('0', linksTotalLength);
-
-        //        // Выделить код по печати одной связи в Extensions
-
-        //        var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} {{3}}", printFormatBase);
-
-        //        for (var link = UnicodeMap.LastCharLink + 1; link <= links.Count(); link++)
-        //        {
-        //            Console.WriteLine(printFormat, link, links.GetSource(link), links.GetTarget(link),
-        //                sequences.FormatSequence(link, AppendLinkToString, true));
-        //        }*/
-        //    }
-        //}
 
         private static void AppendLinkToString(StringBuilder sb, ulong link)
         {
