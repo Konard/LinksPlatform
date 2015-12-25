@@ -11,10 +11,8 @@ namespace Platform.Memory
     /// </summary>
     /// <remarks>
     /// Необходимо реализовать либо класс TemporaryMemory или встроить свойство определяющее используется ли реальный файл
-    /// -> Реализовать пустой конструктор (в этом случае внутри используется
+    /// -> Реализовать пустой конструктор (в этом случае внутри используется HeapMemory)
     /// После использования WinApi подумать над реализацией под Mono
-    /// После реализации кроссплатформенной версии этот класс и его интерфейс IMemory можно опубликовать,
-    /// для этого реализацию этого класса нужно будет перенести в проект Konard.Helpers
     /// </remarks>
     public unsafe class FileMappedMemory : DisposalBase, IMemory
     {
@@ -202,12 +200,12 @@ namespace Platform.Memory
                 {
                     newCapacity = previousCapacity;
                     /* Пока не понятно, нужны ли такие манипуляции
-					AlignCapacityToSystemPageSize(ref newCapacity);
-					if (newCapacity != previousCapacity)
-					{
-						fs.SetLength(newCapacity);
-					}
-					*/
+                    AlignCapacityToSystemPageSize(ref newCapacity);
+                    if (newCapacity != previousCapacity)
+                    {
+                        fs.SetLength(newCapacity);
+                    }
+                    */
                 }
             }
         }
@@ -218,7 +216,7 @@ namespace Platform.Memory
 
         protected override void DisposeCore(bool manual)
         {
-            if (manual) UnmapFile();
+            UnmapFile();
             ForceResize(_address, ref _usedCapacity);
         }
 

@@ -156,7 +156,7 @@ namespace Platform.Sandbox
 
 
             // execution <of matching operation from> (sequence)
-            //		for (result of ... )
+            //        for (result of ... )
 
             // _вСлучаеЕслиСопоставляемымЗначениемЯвляется
             // _inCaseMatchingValueIs // это упростит логику

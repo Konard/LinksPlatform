@@ -96,67 +96,67 @@
 #define BeginWalkThroughReferersByTarget(elementIndex, linkIndex) BeginWalkThroughLinksList(elementIndex, _GetFirstRefererBy(Target, linkIndex))
 #define EndWalkThroughReferersByTarget(elementIndex) EndWalkThroughLinksList(elementIndex, __GetNextSiblingRefererByTarget)
 
-#define BeginWalkThroughLinksList(elementIndex, firstIndex)																		\
-{																														\
-	link_index firstElementIndex = firstIndex;																							\
-	if (firstElementIndex != null) 																							\
-	{																													\
-		link_index elementIndex = firstElementIndex;																					\
-		do																												\
-		{																												
+#define BeginWalkThroughLinksList(elementIndex, firstIndex) \
+{                                                           \
+    link_index firstElementIndex = firstIndex;              \
+    if (firstElementIndex != null)                          \
+    {                                                       \
+        link_index elementIndex = firstElementIndex;        \
+        do                                                  \
+        {
 
-#define EndWalkThroughLinksList(elementIndex, nextSelector)																	\
-			elementIndex = nextSelector(elementIndex);																			\
-		}																												\
-		while (elementIndex != firstElementIndex);																				\
-	}																													\
+#define EndWalkThroughLinksList(elementIndex, nextSelector) \
+            elementIndex = nextSelector(elementIndex);      \
+        }                                                   \
+        while (elementIndex != firstElementIndex);          \
+    }                                                       \
 }
 
-#define UnSubscribeFromListOfReferersBy(that, linkIndex, previousValue) 																		\
-{																														\
-	link_index nextRefererIndex = _GetNextSiblingRefererBy(that,linkIndex);																\
-																														\
-	if (nextRefererIndex != linkIndex)																							\
-	{																													\
-		link_index previousRefererIndex = _GetPreviousSiblingRefererBy(that,linkIndex);													\
-																														\
-		_SetPreviousSiblingRefererBy(that, of(nextRefererIndex), to(previousRefererIndex));										\
-		_SetNextSiblingRefererBy(that, of(previousRefererIndex), to(nextRefererIndex));											\
-																														\
-		if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)															\
-			_SetFirstRefererBy(that, of(previousValue), to(nextRefererIndex));												\
-	}																													\
-	else if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)														\
-		_SetFirstRefererBy(that, of(previousValue), to(null)); 															\
-																														\
-	_DecrementNumberOfReferers(that, of(previousValue));																	 \
-	_SetNextSiblingRefererBy(that, of(linkIndex), to(null));																		  \
-	_SetPreviousSiblingRefererBy(that, of(linkIndex), to(null));																	  \
-}																														
+#define UnSubscribeFromListOfReferersBy(that, linkIndex, previousValue)                     \
+{                                                                                           \
+    link_index nextRefererIndex = _GetNextSiblingRefererBy(that,linkIndex);                 \
+                                                                                            \
+    if (nextRefererIndex != linkIndex)                                                      \
+    {                                                                                       \
+        link_index previousRefererIndex = _GetPreviousSiblingRefererBy(that,linkIndex);     \
+                                                                                            \
+        _SetPreviousSiblingRefererBy(that, of(nextRefererIndex), to(previousRefererIndex)); \
+        _SetNextSiblingRefererBy(that, of(previousRefererIndex), to(nextRefererIndex));     \
+                                                                                            \
+        if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)                       \
+            _SetFirstRefererBy(that, of(previousValue), to(nextRefererIndex));              \
+    }                                                                                       \
+    else if (_GetFirstRefererBy(that, of(previousValue)) == linkIndex)                      \
+        _SetFirstRefererBy(that, of(previousValue), to(null));                              \
+                                                                                            \
+    _DecrementNumberOfReferers(that, of(previousValue));                                    \
+    _SetNextSiblingRefererBy(that, of(linkIndex), to(null));                                \
+    _SetPreviousSiblingRefererBy(that, of(linkIndex), to(null));                            \
+}
 
-#define SubscribeToListOfReferersBy(that, linkIndex, newValue)																\
-{																														\
-	link_index previousFirstRefererIndex = _GetFirstRefererBy(that, of(newValue));												\
-																														\
-	if (previousFirstRefererIndex != null)																					\
-	{																													\
-		link_index previousLastRefererIndex = _GetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex));						\
-																														\
-		_SetNextSiblingRefererBy(that, of(linkIndex), to(previousFirstRefererIndex));												\
-		_SetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex), to(linkIndex));											\
-																														\
-		_SetPreviousSiblingRefererBy(that, of(linkIndex), to(previousLastRefererIndex));											\
-		_SetNextSiblingRefererBy(that, of(previousLastRefererIndex), to(linkIndex));												\
-	}																													\
-	else																												\
-	{																													\
-		_SetNextSiblingRefererBy(that, of(linkIndex), to(linkIndex));																\
-		_SetPreviousSiblingRefererBy(that, of(linkIndex), to(linkIndex));															\
-	}																													\
-																														\
-	_SetFirstRefererBy(that, of(newValue), to(linkIndex));																	\
-																														\
-	_IncrementNumberOfReferers(that, of(newValue));																		\
+#define SubscribeToListOfReferersBy(that, linkIndex, newValue)                                                   \
+{                                                                                                                \
+    link_index previousFirstRefererIndex = _GetFirstRefererBy(that, of(newValue));                               \
+                                                                                                                 \
+    if (previousFirstRefererIndex != null)                                                                       \
+    {                                                                                                            \
+        link_index previousLastRefererIndex = _GetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex)); \
+                                                                                                                 \
+        _SetNextSiblingRefererBy(that, of(linkIndex), to(previousFirstRefererIndex));                            \
+        _SetPreviousSiblingRefererBy(that, of(previousFirstRefererIndex), to(linkIndex));                        \
+                                                                                                                 \
+        _SetPreviousSiblingRefererBy(that, of(linkIndex), to(previousLastRefererIndex));                         \
+        _SetNextSiblingRefererBy(that, of(previousLastRefererIndex), to(linkIndex));                             \
+    }                                                                                                            \
+    else                                                                                                         \
+    {                                                                                                            \
+        _SetNextSiblingRefererBy(that, of(linkIndex), to(linkIndex));                                            \
+        _SetPreviousSiblingRefererBy(that, of(linkIndex), to(linkIndex));                                        \
+    }                                                                                                            \
+                                                                                                                 \
+    _SetFirstRefererBy(that, of(newValue), to(linkIndex));                                                       \
+                                                                                                                 \
+    _IncrementNumberOfReferers(that, of(newValue));                                                              \
 }
 
 #define IsRefererLessThanOtherRefererBySourceCore(refererIndex, otherRefererLinkerIndex, otherRefererTargetIndex) (__GetLinkerIndex(refererIndex) < (otherRefererLinkerIndex) || (__GetLinkerIndex(refererIndex) == (otherRefererLinkerIndex) && __GetTargetIndex(refererIndex) < (otherRefererTargetIndex)))
@@ -178,56 +178,56 @@
 #define IsRefererGreaterThanOtherRefererByTarget(refererIndex, otherRefererIndex) IsRefererGreaterThanOtherRefererByTargetCore(refererIndex, __GetLinkerIndex(otherRefererIndex), __GetSourceIndex(otherRefererIndex))
 
 #define DefineReferersTreeLeftRotateMethod(referesToThat) \
-	DefineTreeLeftRotateMethod( \
-		Concat3(By,referesToThat,TreeLeftRotate), \
-		link_index, \
-		Concat(__GetLeftBy,referesToThat),Concat(__SetLeftBy,referesToThat), \
-		Concat(__GetRightBy,referesToThat),Concat(__SetRightBy,referesToThat), \
-		Concat(__GetCountBy,referesToThat),Concat(__SetCountBy,referesToThat))
+    DefineTreeLeftRotateMethod( \
+        Concat3(By,referesToThat,TreeLeftRotate), \
+        link_index, \
+        Concat(__GetLeftBy,referesToThat),Concat(__SetLeftBy,referesToThat), \
+        Concat(__GetRightBy,referesToThat),Concat(__SetRightBy,referesToThat), \
+        Concat(__GetCountBy,referesToThat),Concat(__SetCountBy,referesToThat))
 
 #define DefineReferersTreeRightRotateMethod(referesToThat) \
-	DefineTreeRightRotateMethod( \
-		Concat3(By, referesToThat, TreeRightRotate), \
-		link_index, \
-		Concat(__GetLeftBy, referesToThat), Concat(__SetLeftBy, referesToThat), \
-		Concat(__GetRightBy, referesToThat), Concat(__SetRightBy, referesToThat), \
-		Concat(__GetCountBy, referesToThat), Concat(__SetCountBy, referesToThat))
+    DefineTreeRightRotateMethod( \
+        Concat3(By, referesToThat, TreeRightRotate), \
+        link_index, \
+        Concat(__GetLeftBy, referesToThat), Concat(__SetLeftBy, referesToThat), \
+        Concat(__GetRightBy, referesToThat), Concat(__SetRightBy, referesToThat), \
+        Concat(__GetCountBy, referesToThat), Concat(__SetCountBy, referesToThat))
 
 #define DefineReferersTreeMaintainMethod(referesToThat) \
-	DefineTreeMaintainMethods( \
-		Concat3(By, referesToThat, TreeLeftMaintain), \
-		Concat3(By, referesToThat, TreeRightMaintain), \
-		link_index, \
-		Concat3(By, referesToThat, TreeLeftRotate), \
-		Concat3(By, referesToThat, TreeRightRotate), \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat))
+    DefineTreeMaintainMethods( \
+        Concat3(By, referesToThat, TreeLeftMaintain), \
+        Concat3(By, referesToThat, TreeRightMaintain), \
+        link_index, \
+        Concat3(By, referesToThat, TreeLeftRotate), \
+        Concat3(By, referesToThat, TreeRightRotate), \
+        Concat(__GetPreviousSiblingRefererBy, referesToThat), \
+        Concat(__GetNextSiblingRefererBy, referesToThat), \
+        Concat(__GetNumberOfReferersBy, referesToThat))
 
 #define DefineReferersTreeInsertMethod(referesToThat) \
-	DefineTreeInsertMethod(Concat3(By, referesToThat, TreeInsert), link_index, \
-		Concat3(By, referesToThat, TreeLeftMaintain), \
-		Concat3(By, referesToThat, TreeRightMaintain), \
-		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat), \
-		Concat(__SetNumberOfReferersBy, referesToThat))
+    DefineTreeInsertMethod(Concat3(By, referesToThat, TreeInsert), link_index, \
+        Concat3(By, referesToThat, TreeLeftMaintain), \
+        Concat3(By, referesToThat, TreeRightMaintain), \
+        Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
+        Concat(__GetPreviousSiblingRefererBy, referesToThat), \
+        Concat(__GetNextSiblingRefererBy, referesToThat), \
+        Concat(__GetNumberOfReferersBy, referesToThat), \
+        Concat(__SetNumberOfReferersBy, referesToThat))
 
 #define DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
-	DefineUnsafeDetachFromTreeMethod(Concat(UnsafeDetachFromTreeOfReferersBy, referesToThat), link_index, \
-		Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
-		Concat(IsRefererGreaterThanOtherRefererBy, referesToThat), \
-		Concat(__GetPreviousSiblingRefererBy, referesToThat), Concat(__SetPreviousSiblingRefererBy, referesToThat), \
-		Concat(__GetNextSiblingRefererBy, referesToThat), Concat(__SetNextSiblingRefererBy, referesToThat), \
-		Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat)) 
+    DefineUnsafeDetachFromTreeMethod(Concat(UnsafeDetachFromTreeOfReferersBy, referesToThat), link_index, \
+        Concat(IsRefererLessThanOtherRefererBy, referesToThat), \
+        Concat(IsRefererGreaterThanOtherRefererBy, referesToThat), \
+        Concat(__GetPreviousSiblingRefererBy, referesToThat), Concat(__SetPreviousSiblingRefererBy, referesToThat), \
+        Concat(__GetNextSiblingRefererBy, referesToThat), Concat(__SetNextSiblingRefererBy, referesToThat), \
+        Concat(__GetNumberOfReferersBy, referesToThat), Concat(__SetNumberOfReferersBy, referesToThat))
 
 #define DefineAllReferersTreeMethods(referesToThat) \
-	DefineReferersTreeLeftRotateMethod(referesToThat) \
-	DefineReferersTreeRightRotateMethod(referesToThat) \
-	DefineReferersTreeMaintainMethod(referesToThat) \
-	DefineReferersTreeInsertMethod(referesToThat) \
-	DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
+    DefineReferersTreeLeftRotateMethod(referesToThat) \
+    DefineReferersTreeRightRotateMethod(referesToThat) \
+    DefineReferersTreeMaintainMethod(referesToThat) \
+    DefineReferersTreeInsertMethod(referesToThat) \
+    DefineUnsafeDetachFromReferersTreeMethod(referesToThat) \
 
 #define DefineAllReferersBySourceTreeMethods() DefineAllReferersTreeMethods(Source)
 #define DefineAllReferersByLinkerTreeMethods() DefineAllReferersTreeMethods(Linker)
@@ -263,87 +263,87 @@
 #define GetNumberOfReferersByLinker(linkIndex) GetNumberOfReferersInList(Linker, linkIndex)
 #define GetNumberOfReferersByTarget(linkIndex) GetNumberOfReferersInTree(Target, linkIndex)
 
-#define DefineSearchInListOfReferersBySourceMethod()															 \
-link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetIndex, link_index refererLinkerIndex)								 \
-{																												 \
-	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
-		if (__GetTargetIndex(referer) == refererTargetIndex && __GetLinkerIndex(referer) == refererLinkerIndex)								 \
-			return referer;																						 \
-	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+#define DefineSearchInListOfReferersBySourceMethod()                                                                 \
+link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetIndex, link_index refererLinkerIndex) \
+{                                                                                                                    \
+    BeginWalkThroughReferersByTarget(referer, in(linkIndex))                                                         \
+        if (__GetTargetIndex(referer) == refererTargetIndex && __GetLinkerIndex(referer) == refererLinkerIndex)      \
+            return referer;                                                                                          \
+    EndWalkThroughReferersByTarget(referer);                                                                         \
+    return null;                                                                                                     \
 }
 
-#define DefineSearchInListOfReferersByLinkerMethod()															 \
-link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceIndex, link_index refererTargetIndex)								 \
-{																												 \
-	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
-		if (__GetSourceIndex(referer) == refererSourceIndex && __GetTargetIndex(referer) == refererTargetIndex)								 \
-			return referer;																						 \
-	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+#define DefineSearchInListOfReferersByLinkerMethod()                                                                 \
+link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceIndex, link_index refererTargetIndex) \
+{                                                                                                                    \
+    BeginWalkThroughReferersByTarget(referer, in(linkIndex))                                                         \
+        if (__GetSourceIndex(referer) == refererSourceIndex && __GetTargetIndex(referer) == refererTargetIndex)      \
+            return referer;                                                                                          \
+    EndWalkThroughReferersByTarget(referer);                                                                         \
+    return null;                                                                                                     \
 }
 
-#define DefineSearchInListOfReferersByTargetMethod()															 \
-link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceIndex, link_index refererLinkerIndex)								 \
-{																												 \
-	BeginWalkThroughReferersByTarget(referer, in(linkIndex))															 \
-		if (__GetSourceIndex(referer) == refererSourceIndex && __GetLinkerIndex(referer) == refererLinkerIndex)								 \
-			return referer;																						 \
-	EndWalkThroughReferersByTarget(referer);																	 \
-	return null;																								 \
+#define DefineSearchInListOfReferersByTargetMethod()                                                                 \
+link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceIndex, link_index refererLinkerIndex) \
+{                                                                                                                    \
+    BeginWalkThroughReferersByTarget(referer, in(linkIndex))                                                         \
+        if (__GetSourceIndex(referer) == refererSourceIndex && __GetLinkerIndex(referer) == refererLinkerIndex)      \
+            return referer;                                                                                          \
+    EndWalkThroughReferersByTarget(referer);                                                                         \
+    return null;                                                                                                     \
 }
 
-#define DefineSearchInTreeOfReferersBySourceMethod()															 \
-link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetIndex, link_index refererLinkerIndex)								 \
-{																												 \
-	link_index currentNode = _GetFirstRefererBy(Source, of(linkIndex));													 \
-																												 \
-	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))			 \
-			currentNode = _GetPreviousSiblingRefererBy(Source, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))			 \
-			currentNode = _GetNextSiblingRefererBy(Source, currentNode);										 \
-		else																									 \
-			return currentNode;																					 \
-																												 \
-	return null;																								 \
+#define DefineSearchInTreeOfReferersBySourceMethod()                                                                 \
+link_index SearchRefererOfSource(link_index linkIndex, link_index refererTargetIndex, link_index refererLinkerIndex) \
+{                                                                                                                    \
+    link_index currentNode = _GetFirstRefererBy(Source, of(linkIndex));                                              \
+                                                                                                                     \
+    while (currentNode)                                                                                              \
+        if (IsRefererGreaterThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))       \
+            currentNode = _GetPreviousSiblingRefererBy(Source, currentNode);                                         \
+        else if (IsRefererLessThanOtherRefererBySourceCore(currentNode, refererLinkerIndex, refererTargetIndex))     \
+            currentNode = _GetNextSiblingRefererBy(Source, currentNode);                                             \
+        else                                                                                                         \
+            return currentNode;                                                                                      \
+                                                                                                                     \
+    return null;                                                                                                     \
 }
 
-#define DefineSearchInTreeOfReferersByLinkerMethod()															 \
-link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceIndex, link_index refererTargetIndex)								 \
-{																												 \
-	link_index currentNode = _GetFirstRefererBy(Linker, of(linkIndex));													 \
-																												 \
-	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))			 \
-			currentNode = _GetPreviousSiblingRefererBy(Linker, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))			 \
-			currentNode = _GetNextSiblingRefererBy(Linker, currentNode);										 \
-		else																									 \
-			return currentNode;																					 \
-																												 \
-	return null;																								 \
+#define DefineSearchInTreeOfReferersByLinkerMethod()                                                                 \
+link_index SearchRefererOfLinker(link_index linkIndex, link_index refererSourceIndex, link_index refererTargetIndex) \
+{                                                                                                                    \
+    link_index currentNode = _GetFirstRefererBy(Linker, of(linkIndex));                                              \
+                                                                                                                     \
+    while (currentNode)                                                                                              \
+        if (IsRefererGreaterThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))       \
+            currentNode = _GetPreviousSiblingRefererBy(Linker, currentNode);                                         \
+        else if (IsRefererLessThanOtherRefererByLinkerCore(currentNode, refererSourceIndex, refererTargetIndex))     \
+            currentNode = _GetNextSiblingRefererBy(Linker, currentNode);                                             \
+        else                                                                                                         \
+            return currentNode;                                                                                      \
+                                                                                                                     \
+    return null;                                                                                                     \
 }
 
-#define DefineSearchInTreeOfReferersByTargetMethod()															 \
-link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceIndex, link_index refererLinkerIndex)								 \
-{																												 \
-	link_index currentNode = _GetFirstRefererBy(Target, of(linkIndex));													 \
-																												 \
-	while (currentNode)																							 \
-		if (IsRefererGreaterThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))			 \
-			currentNode = _GetPreviousSiblingRefererBy(Target, currentNode);									 \
-		else if (IsRefererLessThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))			 \
-			currentNode = _GetNextSiblingRefererBy(Target, currentNode);										 \
-		else																									 \
-			return currentNode;																					 \
-																												 \
-	return null;																								 \
+#define DefineSearchInTreeOfReferersByTargetMethod()                                                                 \
+link_index SearchRefererOfTarget(link_index linkIndex, link_index refererSourceIndex, link_index refererLinkerIndex) \
+{                                                                                                                    \
+    link_index currentNode = _GetFirstRefererBy(Target, of(linkIndex));                                              \
+                                                                                                                     \
+    while (currentNode)                                                                                              \
+        if (IsRefererGreaterThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))       \
+            currentNode = _GetPreviousSiblingRefererBy(Target, currentNode);                                         \
+        else if (IsRefererLessThanOtherRefererByTargetCore(currentNode, refererLinkerIndex, refererSourceIndex))     \
+            currentNode = _GetNextSiblingRefererBy(Target, currentNode);                                             \
+        else                                                                                                         \
+            return currentNode;                                                                                      \
+                                                                                                                     \
+    return null;                                                                                                     \
 }
 
 #define DefineAllSearchMethods() \
-	DefineSearchInTreeOfReferersBySourceMethod() \
-	DefineSearchInListOfReferersByLinkerMethod() \
-	DefineSearchInTreeOfReferersByTargetMethod()
+    DefineSearchInTreeOfReferersBySourceMethod() \
+    DefineSearchInListOfReferersByLinkerMethod() \
+    DefineSearchInTreeOfReferersByTargetMethod()
 
 #endif

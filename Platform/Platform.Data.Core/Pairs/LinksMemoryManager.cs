@@ -8,6 +8,9 @@ using Platform.Memory;
 
 namespace Platform.Data.Core.Pairs
 {
+    /// <remarks>
+    /// TODO: Вместо address и size принимать IMemory
+    /// </remarks>
     public unsafe partial class LinksMemoryManager : DisposalBase, ILinksMemoryManager<ulong>
     {
         /// <summary>Возвращает размер одной связи в байтах.</summary>
