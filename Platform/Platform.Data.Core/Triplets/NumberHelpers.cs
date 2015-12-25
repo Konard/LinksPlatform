@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace Platform.Data.Core.Triplets
 {
@@ -59,7 +60,7 @@ namespace Platform.Data.Core.Triplets
                             NumbersToLinks[i] = numberLink;
                             LinksToNumbers[numberLink] = num;
 
-                            numberLink.SetName(num.ToString());
+                            numberLink.SetName(num.ToString(CultureInfo.InvariantCulture));
                         }
                         previousPowerOf2Link = NumbersToLinks[i];
                     }
@@ -72,7 +73,7 @@ namespace Platform.Data.Core.Triplets
                 NumbersToLinks[powerOf2] = result;
                 LinksToNumbers[result] = number;
 
-                result.SetName(number.ToString());
+                result.SetName(number.ToString(CultureInfo.InvariantCulture));
             }
             return result;
         }

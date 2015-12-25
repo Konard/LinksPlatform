@@ -1,7 +1,9 @@
 ﻿using System;
-using System.Globalization;
 using System.Xml;
+using Platform.Communication.Protocol.Gexf;
 using Platform.Data.Core.Exceptions;
+
+using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Data.Core.Pairs
 {
@@ -27,7 +29,7 @@ namespace Platform.Data.Core.Pairs
                 writer.WriteStartElement("nodes");
                 for (ulong link = 1; link <= _header->AllocatedLinks; link++)
                     if (Exists(link))
-                        WriteNode(writer, link, FormatLink(link));
+                        GexfNode.WriteXml(writer, (long)link, FormatLink(link));
 
                 // </nodes>
                 writer.WriteEndElement();
@@ -41,10 +43,10 @@ namespace Platform.Data.Core.Pairs
                     if (Exists(link))
                     {
                         if (_links[link].LeftAsSource != 0)
-                            WriteEdge(writer, edges++, link, _links[link].LeftAsSource);
+                            Edge.WriteXml(writer, (long)edges++, (long)link, (long)_links[link].LeftAsSource);
 
                         if (_links[link].RightAsSource != 0)
-                            WriteEdge(writer, edges++, link, _links[link].RightAsSource);
+                            Edge.WriteXml(writer, (long)edges++, (long)link, (long)_links[link].RightAsSource);
                     }
                 }
                 // </edges>
@@ -82,7 +84,7 @@ namespace Platform.Data.Core.Pairs
                 writer.WriteStartElement("nodes");
                 for (ulong link = 1; link <= _header->AllocatedLinks; link++)
                     if (Exists(link))
-                        WriteNode(writer, link, FormatLink(link));
+                        GexfNode.WriteXml(writer, (long)link, FormatLink(link));
 
                 // </nodes>
                 writer.WriteEndElement();
@@ -96,10 +98,10 @@ namespace Platform.Data.Core.Pairs
                     if (Exists(link))
                     {
                         if (_links[link].LeftAsTarget != 0)
-                            WriteEdge(writer, edges++, link, _links[link].LeftAsTarget);
+                            Edge.WriteXml(writer, (long)edges++, (long)link, (long)_links[link].LeftAsTarget);
 
                         if (_links[link].RightAsTarget != 0)
-                            WriteEdge(writer, edges++, link, _links[link].RightAsTarget);
+                            Edge.WriteXml(writer, (long)edges++, (long)link, (long)_links[link].RightAsTarget);
                     }
                 }
                 // </edges>
@@ -137,7 +139,7 @@ namespace Platform.Data.Core.Pairs
                 writer.WriteStartElement("nodes");
                 for (ulong link = 1; link <= _header->AllocatedLinks; link++)
                     if (Exists(link))
-                        WriteNode(writer, link, FormatLink(link));
+                        GexfNode.WriteXml(writer, (long)link, FormatLink(link));
 
                 // </nodes>
                 writer.WriteEndElement();
@@ -148,7 +150,7 @@ namespace Platform.Data.Core.Pairs
                 writer.WriteStartElement("edges");
                 for (ulong link = 1; link <= _header->AllocatedLinks; link++)
                     if (Exists(link))
-                        WriteEdge(writer, edges++, _links[link].Source, _links[link].Target);
+                        Edge.WriteXml(writer, (long)edges++, (long)_links[link].Source, (long)_links[link].Target);
 
                 // </edges>
                 writer.WriteEndElement();
@@ -163,25 +165,6 @@ namespace Platform.Data.Core.Pairs
 
                 Console.WriteLine("Head of Sources: {0}", _header->FirstAsSource);
             }
-        }
-
-        private static void WriteNode(XmlWriter writer, ulong link, string label)
-        {
-            // <node id="0" label="0" />
-            writer.WriteStartElement("node");
-            writer.WriteAttributeString("id", link.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("label", label);
-            writer.WriteEndElement();
-        }
-
-        private static void WriteEdge(XmlWriter writer, ulong id, ulong source, ulong target)
-        {
-            // <edge id="0" source="0" target="1" />
-            writer.WriteStartElement("edge");
-            writer.WriteAttributeString("id", id.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("source", source.ToString(CultureInfo.InvariantCulture));
-            writer.WriteAttributeString("target", target.ToString(CultureInfo.InvariantCulture));
-            writer.WriteEndElement();
         }
 
         public string FormatLink(ulong link)
