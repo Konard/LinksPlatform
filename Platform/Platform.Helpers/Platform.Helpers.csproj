@@ -37,6 +37,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ArrayFiller.cs" />
+    <Compile Include="ArrayPool.cs" />
     <Compile Include="ArrayString.cs" />
     <Compile Include="BitConverterHelpers.cs" />
     <Compile Include="Collections\HashHelpers.cs" />
@@ -44,7 +45,10 @@
     <Compile Include="Collections\SetExtensions.cs" />
     <Compile Include="Collections\UnsafeDictionary.cs" />
     <Compile Include="Collections\UnsafeDictionary1.cs" />
+    <Compile Include="ConcurrentArrayPool.cs" />
     <Compile Include="Counter.cs" />
+    <Compile Include="Disposal\DisposableValue.cs" />
+    <Compile Include="DynamicExtensions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILGeneratorExtensions.cs" />
     <Compile Include="PerformanceHelpers.cs" />
