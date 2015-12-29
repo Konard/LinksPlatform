@@ -212,34 +212,40 @@ namespace Platform.Data.Core.Pairs
         private ConcurrentQueue<Transition> _currentTransactionTransitions;
         private bool _ignoreTransitions;
 
+        // TODO: Переосмыслить как включать/выключать транзакции
         public Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
             : this(memoryManager)
         {
-            // В первой строке файла хранится последняя закоммиченную тразнакцию.
-            // При запуске это используется для проверки удачного закрытия файла лога.
-
-            var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
-
-            var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
-
-            if (!Equals(lastCommitedTransition, lastWrittenTransition))
+            if (!string.IsNullOrWhiteSpace(logAddress))
             {
-                Dispose();
-                throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
+                // В первой строке файла хранится последняя закоммиченную транзакцию.
+                // При запуске это используется для проверки удачного закрытия файла лога.
+
+                var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
+
+                var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
+
+                if (!Equals(lastCommitedTransition, lastWrittenTransition))
+                {
+                    Dispose();
+                    throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
+                }
+
+                if (Equals(lastCommitedTransition, default(Transition)))
+                    FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
+
+                _lastCommitedTransition = lastCommitedTransition;
+
+                _uniqueTimestampFactory = new UniqueTimestampFactory();
+
+                _logAddress = logAddress;
+                _binaryLogger = FileHelpers.Append(logAddress);
+                _transitions = new ConcurrentQueue<Transition>();
+                _transitionsPusher = new Task(TransitionsPusher);
+                _transitionsPusher.Start();
             }
-
-            if (Equals(lastCommitedTransition, default(Transition)))
-                FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
-
-            _lastCommitedTransition = lastCommitedTransition;
-
-            _uniqueTimestampFactory = new UniqueTimestampFactory();
-
-            _logAddress = logAddress;
-            _binaryLogger = FileHelpers.Append(logAddress);
-            _transitions = new ConcurrentQueue<Transition>();
-            _transitionsPusher = new Task(TransitionsPusher);
-            _transitionsPusher.Start();
+            else
+                _ignoreTransitions = true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

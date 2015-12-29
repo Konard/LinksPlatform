@@ -40,6 +40,7 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
@@ -73,6 +74,7 @@
     <Compile Include="Pairs\Links.Transactions.cs" />
     <Compile Include="Pairs\LinksConstants.cs" />
     <Compile Include="Pairs\LinksExtensions.cs" />
+    <Compile Include="Pairs\LinksInstancesCache.cs" />
     <Compile Include="Pairs\LinksMemoryManager.cs" />
     <Compile Include="Pairs\LinksMemoryManager.ListMethods.cs" />
     <Compile Include="Pairs\LinksMemoryManager.Tests.cs" />
