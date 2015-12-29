@@ -5,8 +5,6 @@
     /// </remarks>
     public class MathHelpers
     {
-        const double TopCatalanMultiplier = 2;
-
         // Source: https://oeis.org/A000142/list
         private static readonly long[] Factorials =
         {
@@ -42,7 +40,7 @@
             if (n <= 1) return 1;
             if (n < Catalans.Length) return Catalans[(long)n];
 
-            return Factorial(TopCatalanMultiplier * n) / (Factorial(n + 1) * Factorial(n));
+            return Factorial(2 * n) / (Factorial(n + 1) * Factorial(n));
         }
     }
 }

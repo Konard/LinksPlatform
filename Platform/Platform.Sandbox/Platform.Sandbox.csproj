@@ -92,7 +92,6 @@
     <Compile Include="TreeStructureExperiments.cs" />
     <Compile Include="WebCrawler.cs" />
     <Compile Include="WebCrawlerInstance.cs" />
-    <Compile Include="WebSocketTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">

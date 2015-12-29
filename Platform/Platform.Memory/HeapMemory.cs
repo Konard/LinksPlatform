@@ -9,9 +9,10 @@ namespace Platform.Memory
     /// Представляет блок неуправляемой куче памяти предоставляемой операционной системой Windows.
     /// </summary>
     /// <remarks>
-    /// После использования WinApi подумать над реализацией под Mono
     /// TODO: Реализовать вариант с Virtual Memory
     /// TODO: Реализовать абстрактный класс MemoryBase
+    /// TODO: После использования WinApi подумать над реализацией под Mono
+    /// TODO: Move Low Level functions to Kernel32
     /// </remarks>
     public unsafe class HeapMemory : DisposalBase, IMemory
     {
@@ -140,9 +141,7 @@ namespace Platform.Memory
         // automatically initialized to zero.
         public static void* Alloc(ulong size)
         {
-            var result =
-                Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr(size))
-                    .ToPointer();
+            var result = Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr(size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }

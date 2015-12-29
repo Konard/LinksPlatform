@@ -11,12 +11,12 @@ namespace Platform.Data.Core.Sequences
         private readonly Links _links;
         private readonly Sequences _sequences;
         private Link _maxPair;
-        private ulong _minFrequency;
+        private readonly ulong _minFrequency;
         private ulong _maxFrequency;
         private UnsafeDictionary<Link, ulong> _pairsFrequencies;
 
         /// <remarks>
-        /// Может стоит попробовать ref во всех методах
+        /// TODO: Может стоит попробовать ref во всех методах
         /// </remarks>
         public class LinkComparer : IEqualityComparer<Link>
         {
