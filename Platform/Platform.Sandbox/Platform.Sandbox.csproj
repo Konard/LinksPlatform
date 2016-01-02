@@ -76,6 +76,7 @@
   <ItemGroup>
     <Compile Include="Compilier.cs" />
     <Compile Include="CompressionExperiments.cs" />
+    <Compile Include="DllImportTest.cs" />
     <Compile Include="FileReadWriteTest.cs" />
     <Compile Include="NetParser.cs" />
     <Compile Include="NetParserTest.cs" />
