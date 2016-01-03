@@ -339,6 +339,20 @@ namespace Platform.Tests.Data.Core
                 Assert.IsTrue(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
                 Assert.IsTrue(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
                 Assert.IsTrue(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
+
+                const long source = LinksConstants.SourcePart;
+                const long target = LinksConstants.TargetPart;
+
+                Assert.IsTrue(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
+                Assert.IsTrue(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
+                Assert.IsTrue(links.GetByKeys(compressedVariant, target, source) == sequence[2]);
+                Assert.IsTrue(links.GetByKeys(compressedVariant, target, target) == sequence[3]);
+
+                // 4 - length of sequence
+                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 0) == sequence[0]);
+                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
+                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
+                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
             }
 
             File.Delete(tempFilename);

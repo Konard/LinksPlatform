@@ -1,4 +1,8 @@
-﻿namespace Platform.Data.Core.Pairs
+﻿using System;
+using System.Collections;
+using Platform.Helpers;
+
+namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {
@@ -11,7 +15,7 @@
         /// </remarks>
         public bool CheckPathExistance(params ulong[] path)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var current = path[0];
 
@@ -46,13 +50,35 @@
         /// </remarks>
         public ulong GetByKeys(ulong root, params long[] path)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(root, "root");
 
                 var currentLink = root;
                 for (var i = 0; i < path.Length; i++)
                     currentLink = _memoryManager.GetLinkValue(currentLink)[path[i]];
+                return currentLink;
+            });
+        }
+
+        public ulong GetSequenceElementByIndex(ulong root, ulong size, ulong index)
+        {
+            const long source = LinksConstants.SourcePart;
+            const long target = LinksConstants.TargetPart;
+
+            if (!MathHelpers.IsPowerOfTwo(size))
+                throw new ArgumentOutOfRangeException("size", "Sequences with sizes other than powers of two are not supported.");
+
+            var path = new BitArray(BitConverter.GetBytes(index));
+            var length = MathHelpers.GetLowestBitPosition(size);
+
+            return Sync.ExecuteReadOperation(() =>
+            {
+                EnsureLinkExists(root, "root");
+
+                var currentLink = root;
+                for (var i = length - 1; i >= 0; i--)
+                    currentLink = _memoryManager.GetLinkValue(currentLink)[path[i] ? target : source];
                 return currentLink;
             });
         }

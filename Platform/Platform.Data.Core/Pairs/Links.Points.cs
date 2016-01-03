@@ -25,7 +25,7 @@
         /// <returns>Значение, определяющее является ли связь точкой полностью.</returns>
         public bool IsFullPoint(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return IsFullPointCore(link);
@@ -43,7 +43,7 @@
         /// <returns>Значение, определяющее является ли связь точкой частично.</returns>
         public bool IsPartialPoint(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return IsFullPointCore(link);

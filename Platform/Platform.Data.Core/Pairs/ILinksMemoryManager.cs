@@ -2,6 +2,7 @@
 
 namespace Platform.Data.Core.Pairs
 {
+    // TODO: Decide between IList and Array (or make both and compare)
     public interface ILinksMemoryManager<TLink>
     {
         ulong Count(params TLink[] restrictions);

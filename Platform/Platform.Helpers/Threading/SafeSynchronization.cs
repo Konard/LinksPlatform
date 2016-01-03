@@ -3,16 +3,22 @@ using System.Threading;
 
 namespace Platform.Helpers.Threading
 {
+    /// <summary>
+    /// TODO: Сравнить что производительнее использовать анонимную функцию или using (создание объекта + dispose)
+    /// </summary>
     public class SafeSynchronization : ISyncronization
     {
+#if DEBUG
+        private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
+#else
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
+#endif
 
         public void ExecuteReadOperation(Action action)
         {
+            _rwLock.EnterReadLock();
             try
             {
-                _rwLock.EnterReadLock();
-
                 action();
             }
 #if DEBUG
@@ -31,10 +37,9 @@ namespace Platform.Helpers.Threading
 
         public T ExecuteReadOperation<T>(Func<T> func)
         {
+            _rwLock.EnterReadLock();
             try
             {
-                _rwLock.EnterReadLock();
-
                 return func();
             }
 #if DEBUG
@@ -53,10 +58,9 @@ namespace Platform.Helpers.Threading
 
         public void ExecuteWriteOperation(Action action)
         {
+            _rwLock.EnterWriteLock();
             try
             {
-                _rwLock.EnterWriteLock();
-
                 action();
             }
 #if DEBUG
@@ -75,10 +79,9 @@ namespace Platform.Helpers.Threading
 
         public T ExecuteWriteOperation<T>(Func<T> func)
         {
+            _rwLock.EnterWriteLock();
             try
             {
-                _rwLock.EnterWriteLock();
-
                 return func();
             }
 #if DEBUG

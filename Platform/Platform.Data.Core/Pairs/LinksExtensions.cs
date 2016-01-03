@@ -90,7 +90,7 @@ namespace Platform.Data.Core.Pairs
                 return;
 
             for (var i = 0; i < sequence.Length; i++)
-                if (!links.Exists(sequence[i]))
+                if (!links.ExistsCore(sequence[i]))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
                         string.Format("patternSequence[{0}]", i));
         }
@@ -101,7 +101,7 @@ namespace Platform.Data.Core.Pairs
                 return;
 
             for (var i = 0; i < sequence.Length; i++)
-                if (sequence[i] != LinksConstants.Any && !links.Exists(sequence[i]))
+                if (sequence[i] != LinksConstants.Any && !links.ExistsCore(sequence[i]))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
                         string.Format("patternSequence[{0}]", i));
         }

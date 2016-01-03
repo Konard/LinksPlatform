@@ -42,5 +42,35 @@
 
             return Factorial(2 * n) / (Factorial(n + 1) * Factorial(n));
         }
+
+        public static int GetLowestBitPosition(ulong value)
+        {
+            if (value == 0)
+                return -1;
+
+            var position = 0;
+            while ((value & 1UL) == 0)
+            {
+                value >>= 1;
+                ++position;
+            }
+            return position;
+        }
+
+        public static bool IsPowerOfTwo(ulong x)
+        {
+            return (x & (x - 1)) == 0;
+        }
+
+        public static long CountBits(long x)
+        {
+            long n = 0;
+            while (x != 0)
+            {
+                n++;
+                x = x & (x - 1);
+            }
+            return n;
+        }
     }
 }
