@@ -25,7 +25,7 @@ namespace Platform.Data.CrawlerServer
         {
             var crawler = new PoliteWebCrawler();
 
-            crawler.PageCrawlCompletedAsync += crawler_ProcessPageCrawlCompleted;
+            crawler.PageCrawlCompleted += crawler_ProcessPageCrawlCompleted;
 
             crawler.ShouldCrawlPage(DecisionMaker);
 
@@ -35,16 +35,11 @@ namespace Platform.Data.CrawlerServer
         private CrawlDecision DecisionMaker(PageToCrawl pageToCrawl, CrawlContext crawlContext)
         {
             if (!Program.LinksServerRunning)
-            {
-                //crawlContext.IsCrawlStopRequested = true;
                 return new CrawlDecision { ShouldStopCrawl = true, Reason = "Сервер остановлен." };
-            }
 
             var maxTimestamp = GetUriLastCrawledTimestamp(pageToCrawl.Uri);
 
-            var now = DateTime.UtcNow;
-
-            if ((now - maxTimestamp) < TimeSpan.FromDays(1))
+            if ((DateTime.UtcNow - maxTimestamp) < TimeSpan.FromDays(1))
                 return new CrawlDecision { Allow = false, Reason = "Страница уже запрашивалась в течение 24 часов." };
 
             return new CrawlDecision { Allow = true };
@@ -52,16 +47,10 @@ namespace Platform.Data.CrawlerServer
 
         private void crawler_ProcessPageCrawlCompleted(object sender, PageCrawlCompletedArgs e)
         {
-            if (!Program.Threads.Contains(Thread.CurrentThread))
-                Program.Threads.Add(Thread.CurrentThread);
-
             if (!Program.LinksServerRunning)
-            {
                 e.CrawlContext.IsCrawlStopRequested = true;
-                return;
-            }
-
-            StoreCrawledPage(e.CrawledPage);
+            else
+                StoreCrawledPage(e.CrawledPage);
         }
 
         private DateTime GetUriLastCrawledTimestamp(Uri uri)
