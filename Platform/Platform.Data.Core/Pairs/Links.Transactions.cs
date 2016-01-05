@@ -85,6 +85,7 @@ namespace Platform.Data.Core.Pairs
             public static readonly long Size = Marshal.SizeOf(typeof(Transition));
 
             public ulong TransactionId;
+            // TODO: Возможно точнее будет хранить не только Source и Target, но и Index
             public Link Before;
             public Link After;
             public UniqueTimestamp Timestamp;
@@ -211,34 +212,40 @@ namespace Platform.Data.Core.Pairs
         private ConcurrentQueue<Transition> _currentTransactionTransitions;
         private bool _ignoreTransitions;
 
+        // TODO: Переосмыслить как включать/выключать транзакции
         public Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
             : this(memoryManager)
         {
-            // В первой строке файла хранится последняя закоммиченную тразнакцию.
-            // При запуске это используется для проверки удачного закрытия файла лога.
-
-            var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
-
-            var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
-
-            if (!Equals(lastCommitedTransition, lastWrittenTransition))
+            if (!string.IsNullOrWhiteSpace(logAddress))
             {
-                Dispose();
-                throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
+                // В первой строке файла хранится последняя закоммиченную транзакцию.
+                // При запуске это используется для проверки удачного закрытия файла лога.
+
+                var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
+
+                var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
+
+                if (!Equals(lastCommitedTransition, lastWrittenTransition))
+                {
+                    Dispose();
+                    throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
+                }
+
+                if (Equals(lastCommitedTransition, default(Transition)))
+                    FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
+
+                _lastCommitedTransition = lastCommitedTransition;
+
+                _uniqueTimestampFactory = new UniqueTimestampFactory();
+
+                _logAddress = logAddress;
+                _binaryLogger = FileHelpers.Append(logAddress);
+                _transitions = new ConcurrentQueue<Transition>();
+                _transitionsPusher = new Task(TransitionsPusher);
+                _transitionsPusher.Start();
             }
-
-            if (Equals(lastCommitedTransition, default(Transition)))
-                FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
-
-            _lastCommitedTransition = lastCommitedTransition;
-
-            _uniqueTimestampFactory = new UniqueTimestampFactory();
-
-            _logAddress = logAddress;
-            _binaryLogger = FileHelpers.Append(logAddress);
-            _transitions = new ConcurrentQueue<Transition>();
-            _transitionsPusher = new Task(TransitionsPusher);
-            _transitionsPusher.Start();
+            else
+                _ignoreTransitions = true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -302,19 +309,19 @@ namespace Platform.Data.Core.Pairs
         private void EnsureSelfReferencingLinkIsRestored(ulong source, ulong target)
         {
             // Возможно эту логику нужно перенисти в функцию Create
-            if (!_memoryManager.Exists(source) && !_memoryManager.Exists(target) && source == target)
+            if (_memoryManager.Count(source) == 0 && _memoryManager.Count(target) == 0 && source == target)
             {
-                if (Create(0, 0) != source)
+                if (Create(LinksConstants.Itself, LinksConstants.Itself) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!_memoryManager.Exists(target))
+            else if (_memoryManager.Count(target) == 0)
             {
-                if (Create(source, 0) != target)
+                if (Create(source, LinksConstants.Itself) != target)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (!_memoryManager.Exists(source))
+            else if (_memoryManager.Count(source) == 0)
             {
-                if (Create(0, target) != source)
+                if (Create(LinksConstants.Itself, target) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
         }

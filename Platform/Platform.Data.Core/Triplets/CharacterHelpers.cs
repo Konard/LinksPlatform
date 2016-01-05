@@ -282,12 +282,10 @@ namespace Platform.Data.Core.Triplets
 
         public static char ToChar(Link link)
         {
-            char c;
-            if (!LinksToCharacters.TryGetValue(link, out c))
-            {
-                throw new ArgumentOutOfRangeException("charLink", "Указанная связь не являяется символом.");
-            }
-            return c;
+            char @char;
+            if (!LinksToCharacters.TryGetValue(link, out @char))
+                throw new ArgumentOutOfRangeException("link", "Указанная связь не являяется символом.");
+            return @char;
         }
 
         public static bool IsChar(Link link)

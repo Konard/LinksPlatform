@@ -1,78 +1,86 @@
 ﻿using System;
-using Platform.Data.Core.Exceptions;
+using System.Collections;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
     public partial class Links
     {
-        // TODO: Объединить с константами
-        public enum PathElement
-        {
-            Source,
-            Target
-        }
-
         /// <remarks>
+        /// TODO: Как так? Как то что ниже может быть корректно?
         /// Скорее всего практически не применимо
         /// Предполагалось, что можно было конвертировать формируемый в проходе через SequenceWalker 
         /// Stack в конкретный путь из Source, Target до связи, но это не всегда так.
+        /// TODO: Возможно нужен метод, который именно выбрасывает исключения (EnsurePathExists)
         /// </remarks>
-        public ulong Get(params ulong[] path)
+        public bool CheckPathExistance(params ulong[] path)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
-                for (var i = 0; i < path.Length; i++)
+                var current = path[0];
+
+                //EnsureLinkExists(current, "path");
+                if (_memoryManager.Count(current) == 0)
+                    return false;
+
+                for (var i = 1; i < path.Length; i++)
                 {
-                    var current = path[i];
+                    var next = path[i];
 
-                    if (!_memoryManager.Exists(current))
-                        throw new ArgumentLinkDoesNotExistsException<ulong>(current, "path");
+                    var values = _memoryManager.GetLinkValue(current);
+                    var source = values[LinksConstants.SourcePart];
+                    var target = values[LinksConstants.TargetPart];
 
-                    if ((i + 1) < path.Length)
-                    {
-                        var next = path[i + 1];
-                        var source = GetSourceCore(current);
-                        var target = GetTargetCore(current);
-                        if (source == target && source == next)
-                            throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
-                        if (next != source && next != target)
-                            throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
-                    }
-                    else
-                    {
-                        return current;
-                    }
+                    if (source == target && source == next)
+                        //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
+                        return false;
+                    if (next != source && next != target)
+                        //throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
+                        return false;
+
+                    current = next;
                 }
 
-                return LinksConstants.Null;
+                return true;
             });
         }
 
         /// <remarks>
         /// Может потребовать дополнительного стека для PathElement's при использовании SequenceWalker.
         /// </remarks>
-        public ulong Get(ulong root, params PathElement[] path)
+        public ulong GetByKeys(ulong root, params long[] path)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
-                if (!_memoryManager.Exists(root))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(root, "root");
+                EnsureLinkExists(root, "root");
 
                 var currentLink = root;
                 for (var i = 0; i < path.Length; i++)
-                    currentLink = GetNextCore(currentLink, path[i]);
+                    currentLink = _memoryManager.GetLinkValue(currentLink)[path[i]];
                 return currentLink;
             });
         }
 
-        private ulong GetNextCore(ulong root, PathElement element)
+        public ulong GetSequenceElementByIndex(ulong root, ulong size, ulong index)
         {
-            if (element == PathElement.Source)
-                return GetSourceCore(root);
-            if (element == PathElement.Target)
-                return GetTargetCore(root);
+            const long source = LinksConstants.SourcePart;
+            const long target = LinksConstants.TargetPart;
 
-            throw new NotSupportedException();
+            if (!MathHelpers.IsPowerOfTwo(size))
+                throw new ArgumentOutOfRangeException("size", "Sequences with sizes other than powers of two are not supported.");
+
+            var path = new BitArray(BitConverter.GetBytes(index));
+            var length = MathHelpers.GetLowestBitPosition(size);
+
+            return Sync.ExecuteReadOperation(() =>
+            {
+                EnsureLinkExists(root, "root");
+
+                var currentLink = root;
+                for (var i = length - 1; i >= 0; i--)
+                    currentLink = _memoryManager.GetLinkValue(currentLink)[path[i] ? target : source];
+                return currentLink;
+            });
         }
     }
 }

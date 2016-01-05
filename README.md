@@ -2,6 +2,8 @@
 
 [![introduction](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning)
 
+[Graphical introduction](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning)
+
 Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf).
 
 This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams. So the Item or Point is a specific case of link, which references itself.

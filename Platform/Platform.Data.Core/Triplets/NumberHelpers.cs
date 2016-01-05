@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Triplets
 {
@@ -27,17 +29,6 @@ namespace Platform.Data.Core.Triplets
             Create();
         }
 
-        private static long CountBits(long x)
-        {
-            long n = 0;
-            while (x != 0)
-            {
-                n++;
-                x = x & (x - 1);
-            }
-            return n;
-        }
-
         private static Link FromPowerOf2(long powerOf2)
         {
             var result = NumbersToLinks[powerOf2];
@@ -59,7 +50,7 @@ namespace Platform.Data.Core.Triplets
                             NumbersToLinks[i] = numberLink;
                             LinksToNumbers[numberLink] = num;
 
-                            numberLink.SetName(num.ToString());
+                            numberLink.SetName(num.ToString(CultureInfo.InvariantCulture));
                         }
                         previousPowerOf2Link = NumbersToLinks[i];
                     }
@@ -72,7 +63,7 @@ namespace Platform.Data.Core.Triplets
                 NumbersToLinks[powerOf2] = result;
                 LinksToNumbers[result] = number;
 
-                result.SetName(number.ToString());
+                result.SetName(number.ToString(CultureInfo.InvariantCulture));
             }
             return result;
         }
@@ -84,7 +75,7 @@ namespace Platform.Data.Core.Triplets
             if (number == 1)
                 return Net.One;
 
-            var links = new Link[CountBits(number)];
+            var links = new Link[MathHelpers.CountBits(number)];
 
             if (number >= 0)
             {

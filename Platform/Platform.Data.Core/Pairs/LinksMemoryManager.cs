@@ -9,7 +9,7 @@ using Platform.Memory;
 namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
-    /// TODO: Вместо address и size принимать IMemory
+    /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).
     /// </remarks>
     public unsafe partial class LinksMemoryManager : DisposalBase, ILinksMemoryManager<ulong>
     {
@@ -84,98 +84,169 @@ namespace Platform.Data.Core.Pairs
             _header->ReservedLinks = (ulong)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Exists(ulong link)
-        {
-            return link != LinksConstants.Null && !IsUnusedLink(link) && link <= _header->AllocatedLinks;
-        }
-
         public ulong Count(params ulong[] restrictions)
         {
-            if (restrictions.Length == 0) // нет ограничений
-            {
-                // Общее число связей находящихся в хранилище.
+            // Если нет ограничений, тогда возвращаем общее число связей находящихся в хранилище.
+            if (restrictions.Length == 0)
                 return Total;
-            }
             if (restrictions.Length == 1)
-            {
-                // TODO: Подумать на тему объединения с Exists, возможно нужно две функции Count и CountReferences
-                // TODO: Или же нужно добавить 0-е ограничение отвечающие именно за индекс, тогда можно учитывать одновременно и адрес и содержимое (и можно полностью заменить Exists)
-                // TODO: Ещё один эквалент для Exists это указание всех значений содержимого (например и Source и Target)
-                // Сколько есть всего ссылок на эту конкретную связь?
-                var link = restrictions[0];
-                //if (link == LinksConstants.Null) return 0; // На нулевую связь (пустую) никто никогда не ссылается
-                if (link == LinksConstants.Any) return Total; // Null - как отсутствие ограничения
-                return _sourcesTreeMethods.CalculateReferences(link) + _targetsTreeMethods.CalculateReferences(link);
-            }
+                return Exists(restrictions[LinksConstants.IndexPart]) ? 1UL : 0;
             if (restrictions.Length == 2)
             {
-                //TODO: var id/index возможно в будущем нужно будет учитывать одновременное ограничение по трём параметрам (это важно чтобы отличать пары от точек)
+                var index = restrictions[LinksConstants.IndexPart];
+                var value = restrictions[1];
+
+                if (index == LinksConstants.Null)
+                {
+                    if (value == LinksConstants.Any)
+                        return Total; // Null - как отсутствие ограничения
+
+                    return _sourcesTreeMethods.CalculateReferences(value)
+                         + _targetsTreeMethods.CalculateReferences(value);
+                }
+                else
+                {
+                    if (!Exists(index))
+                        return 0;
+
+                    if (value == LinksConstants.Any)
+                        return 1;
+
+                    var storedLinkValue = GetLinkValue(index);
+                    if (storedLinkValue[LinksConstants.SourcePart] == value ||
+                        storedLinkValue[LinksConstants.TargetPart] == value)
+                        return 1;
+                    return 0;
+                }
+            }
+            if (restrictions.Length == 3)
+            {
+                var index = restrictions[LinksConstants.IndexPart];
                 var source = restrictions[LinksConstants.SourcePart];
                 var target = restrictions[LinksConstants.TargetPart];
 
-                if (source == LinksConstants.Any && target == LinksConstants.Any)
+                if (index == LinksConstants.Null)
                 {
-                    return Total;
+                    if (source == LinksConstants.Any && target == LinksConstants.Any)
+                    {
+                        return Total;
+                    }
+                    else if (source == LinksConstants.Any)
+                    {
+                        return _targetsTreeMethods.CalculateReferences(target);
+                    }
+                    else if (target == LinksConstants.Any)
+                    {
+                        return _sourcesTreeMethods.CalculateReferences(source);
+                    }
+                    else //if(source != Null && target != Null)
+                    {
+                        // Эквивалент Exists(source, target) => Count(0, source, target) > 0
+                        var link = _sourcesTreeMethods.Search(source, target);
+                        return link != LinksConstants.Null ? 1UL : 0UL;
+                    }
                 }
-                else if (source == LinksConstants.Any)
+                else
                 {
-                    return _targetsTreeMethods.CalculateReferences(target);
-                }
-                else if (target == LinksConstants.Any)
-                {
-                    return _sourcesTreeMethods.CalculateReferences(source);
-                }
-                else //if(source != Null && target != Null)
-                {
-                    // Эквивалент Exists(source, target) => Count(source, target) > 0
-                    var link = _sourcesTreeMethods.Search(source, target);
-                    return link != LinksConstants.Null ? 1UL : 0UL;
+                    if (!Exists(index))
+                        return 0;
+
+                    if (source == LinksConstants.Any && target == LinksConstants.Any)
+                        return 1;
+
+                    var storedLinkValue = GetLinkValue(index);
+
+                    if (source != LinksConstants.Any && target != LinksConstants.Any)
+                    {
+                        if (storedLinkValue[LinksConstants.SourcePart] == source &&
+                            storedLinkValue[LinksConstants.TargetPart] == target)
+                            return 1;
+                        return 0;
+                    }
+
+                    var value = default(ulong);
+                    if (source == LinksConstants.Any) value = target;
+                    if (target == LinksConstants.Any) value = source;
+
+                    if (storedLinkValue[LinksConstants.SourcePart] == value ||
+                        storedLinkValue[LinksConstants.TargetPart] == value)
+                        return 1;
+                    return 0;
                 }
             }
             throw new NotSupportedException("Другие размеры и способы ограничений не поддерживаются.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong CalculateLinkTotalReferences(ulong link)
-        {
-            return _sourcesTreeMethods.CalculateReferences(link) + _targetsTreeMethods.CalculateReferences(link);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Each(Func<ulong, bool> handler, params ulong[] valuesRestriction)
         {
+            var index = valuesRestriction[LinksConstants.IndexPart];
             var source = valuesRestriction[LinksConstants.SourcePart];
             var target = valuesRestriction[LinksConstants.TargetPart];
-            if (source == LinksConstants.Any && target == LinksConstants.Any)
+
+            if (index == LinksConstants.Null)
             {
-                // Этот блок используется в GetEnumerator, CopyTo, Clear
-                for (ulong link = 1; link <= _header->AllocatedLinks; link++)
-                    if (Exists(link))
+                if (source == LinksConstants.Any && target == LinksConstants.Any)
+                {
+                    // Этот блок используется в GetEnumerator, CopyTo, Clear
+                    for (ulong link = 1; link <= _header->AllocatedLinks; link++)
+                        if (Exists(link))
+                            if (handler(link) == LinksConstants.Break)
+                                return LinksConstants.Break;
+                }
+                else if (source == LinksConstants.Any)
+                {
+                    return _targetsTreeMethods.EachReference(target, handler);
+                }
+                else if (target == LinksConstants.Any)
+                {
+                    return _sourcesTreeMethods.EachReference(source, handler);
+                }
+                else //if(source != Null && target != Null)
+                {
+                    var link = _sourcesTreeMethods.Search(source, target);
+
+                    if (link != LinksConstants.Null)
                         if (handler(link) == LinksConstants.Break)
                             return LinksConstants.Break;
+                }
             }
-            else if (source == LinksConstants.Any)
+            else
             {
-                return _targetsTreeMethods.EachReference(target, handler);
-            }
-            else if (target == LinksConstants.Any)
-            {
-                return _sourcesTreeMethods.EachReference(source, handler);
-            }
-            else //if(source != Null && target != Null)
-            {
-                var link = _sourcesTreeMethods.Search(source, target);
+                if (!Exists(index))
+                    return LinksConstants.Continue;
 
-                if (link != LinksConstants.Null)
-                    if (handler(link) == LinksConstants.Break)
-                        return LinksConstants.Break;
+                if (source == LinksConstants.Any && target == LinksConstants.Any)
+                    return handler(index);
+
+                var storedLinkValue = GetLinkValue(index);
+
+                if (source != LinksConstants.Any && target != LinksConstants.Any)
+                {
+                    if (storedLinkValue[LinksConstants.SourcePart] == source &&
+                        storedLinkValue[LinksConstants.TargetPart] == target)
+                        return handler(index);
+                    return LinksConstants.Continue;
+                }
+
+                var value = default(ulong);
+                if (source == LinksConstants.Any) value = target;
+                if (target == LinksConstants.Any) value = source;
+
+                if (storedLinkValue[LinksConstants.SourcePart] == value ||
+                    storedLinkValue[LinksConstants.TargetPart] == value)
+                    return handler(index);
+                return LinksConstants.Continue;
             }
             return LinksConstants.Continue;
         }
 
-        public void SetLinkValue(ulong linkIndex, params ulong[] values)
+        /// <remarks>
+        /// TODO: Возможно можно перемещать значения, если указан индекс, но значение существует в другом месте (но не в менеджере памяти, а в логике Links)
+        /// </remarks>
+        public void SetLinkValue(params ulong[] values)
         {
+            var linkIndex = values[LinksConstants.IndexPart];
             var link = &_links[linkIndex];
 
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
@@ -191,9 +262,10 @@ namespace Platform.Data.Core.Pairs
 
         public ulong[] GetLinkValue(ulong linkIndex)
         {
-            var values = new ulong[2];
+            var values = new ulong[3];
             var link = &_links[linkIndex];
 
+            values[LinksConstants.IndexPart] = linkIndex;
             values[LinksConstants.SourcePart] = link->Source;
             values[LinksConstants.TargetPart] = link->Target;
 
@@ -204,7 +276,9 @@ namespace Platform.Data.Core.Pairs
         /// Выделяет следующую свободную связь и возвращает её индекс.
         /// </summary>
         /// <returns>Индекс свободной связи.</returns>
-        /// <remarks>TODO: Возможно нужно будет заполнение нулями, если внешнее API ими не заполняет пространство</remarks>
+        /// <remarks>
+        /// TODO: Возможно нужно будет заполнение нулями, если внешнее API ими не заполняет пространство
+        /// </remarks>
         public ulong AllocateLink()
         {
             var freeLink = _header->FirstFreeLink;
@@ -263,6 +337,9 @@ namespace Platform.Data.Core.Pairs
         /// Выполняет обновление указателей на массив связей и заголовок базы данных.
         /// </summary>
         /// <param name="memory">Объект для работы с файлом как виртуальным блоком памяти.</param>
+        /// <remarks>
+        /// TODO: Возможно это должно быть событием, вызываемым из IMemory, в том случае, если адрес реально поменялся
+        /// </remarks>
         private void UpdatePointers(IMemory memory)
         {
             _header = (LinksHeader*)memory.Pointer;
@@ -275,6 +352,12 @@ namespace Platform.Data.Core.Pairs
             _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
             _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
             _unusedLinksListMethods = new UnusedLinksListMethods(this, _header);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool Exists(ulong link)
+        {
+            return link != LinksConstants.Null && link <= _header->AllocatedLinks && !IsUnusedLink(link);
         }
 
         /// <summary>

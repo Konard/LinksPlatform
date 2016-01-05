@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Core.TreeMethods
+namespace Platform.Data.Core.Collections.Trees
 {
     public abstract unsafe class SizeBalancedTreeMethodsBase
     {

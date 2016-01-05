@@ -40,18 +40,22 @@
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BitString.cs" />
     <Compile Include="Cluster\ServerType.cs" />
     <Compile Include="Cluster\ServerUnique.cs" />
     <Compile Include="Cluster\Unique.cs" />
+    <Compile Include="Collections\BitString.cs" />
+    <Compile Include="Collections\Lists\CircularDoublyLinkedListMethods.cs" />
+    <Compile Include="Collections\Lists\DoublyLinkedListMethodsBase.cs" />
+    <Compile Include="Collections\Lists\OpenDoublyLinkedListMethods.cs" />
+    <Compile Include="Collections\Trees\SizeBalancedTreeMethods.cs" />
+    <Compile Include="Collections\Trees\SizeBalancedTreeMethods2.cs" />
+    <Compile Include="Collections\Trees\SizeBalancedTreeMethodsBase.cs" />
     <Compile Include="IUniLinks.cs" />
-    <Compile Include="ListMethods\CircularDoublyLinkedListMethods.cs" />
-    <Compile Include="ListMethods\OpenDoublyLinkedListMethods.cs" />
-    <Compile Include="ListMethods\DoublyLinkedListMethodsBase.cs" />
     <Compile Include="Node.cs" />
     <Compile Include="Elements\DefaultElements.cs" />
     <Compile Include="Elements\IElements.RW.cs" />
@@ -84,7 +88,6 @@
     <Compile Include="Sequences\StopableSequenceWalker.cs" />
     <Compile Include="Sequences\UnicodeMap.cs" />
     <Compile Include="SearchEngine.cs" />
-    <Compile Include="TreeMethods\SizeBalancedTreeMethodsBase.cs" />
     <Compile Include="Triggers\ICondition.cs" />
     <Compile Include="Triggers\IContext.cs" />
     <Compile Include="Triggers\ITrigger.cs" />
@@ -100,8 +103,6 @@
     <Compile Include="Triplets\NumberHelpers.cs" />
     <Compile Include="Triplets\SequenceHelpers.cs" />
     <Compile Include="Triplets\XmlGenerator.cs" />
-    <Compile Include="TreeMethods\SizeBalancedTreeMethods.cs" />
-    <Compile Include="TreeMethods\SizeBalancedTreeMethods2.cs" />
     <Compile Include="Walker\IPath.cs" />
     <Compile Include="Walker\Walker.cs" />
   </ItemGroup>

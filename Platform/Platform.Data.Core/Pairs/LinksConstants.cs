@@ -24,11 +24,14 @@
         /// <summary>Возвращает значение ulong, обозначающее связь-ссылку на саму связь.</summary>
         public const ulong Itself = 0;
 
+        /// <summary>Возвращает часть-индекс самой связи.</summary>
+        public const long IndexPart = 0;
+
         /// <summary>Возвращает индекс части, которая отвечает за ссылку на связь-начало.</summary>
-        public const long SourcePart = 0;
+        public const long SourcePart = 1;
 
         /// <summary>Возвращает индекс части, которая отвечает за ссылку на связь-конец.</summary>
-        public const long TargetPart = 1;
+        public const long TargetPart = 2;
 
         /// <summary>Возвращает минимально возможный индекс существующей связи.</summary>
         public const ulong MinPossibleIndex = 1;

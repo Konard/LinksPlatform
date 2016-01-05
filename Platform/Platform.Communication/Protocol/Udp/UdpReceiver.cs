@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using Platform.Helpers.Disposal;
 
-namespace Platform.Communication.Udp
+namespace Platform.Communication.Protocol.Udp
 {
     public delegate void MessageHandlerCallback(string message);
 

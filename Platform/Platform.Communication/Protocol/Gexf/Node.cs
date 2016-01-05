@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Globalization;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Platform.Communication.Protocol.Gexf
@@ -22,9 +23,10 @@ namespace Platform.Communication.Protocol.Gexf
 
         public static void WriteXml(XmlWriter writer, long id, string label)
         {
+            // <node id="0" label="..." />
             writer.WriteStartElement(ElementName);
 
-            writer.WriteAttributeString(IdAttributeName, id.ToString());
+            writer.WriteAttributeString(IdAttributeName, id.ToString(CultureInfo.InvariantCulture));
             writer.WriteAttributeString(LabelAttributeName, label);
 
             writer.WriteEndElement();

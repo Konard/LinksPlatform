@@ -1,24 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using System.Threading;
-using System.Threading.Tasks;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers.Collections;
 
 namespace Platform.Data.Core.Sequences
 {
+    /// <remarks>
+    /// TODO: Возможно будет лучше если алгоритм будет выполняться полностью изолированно от Links на этапе сжатия.
+    ///     А именно будет создаваться временный список пар необходимых для выполнения сжатия, в таком случае тип значения элемента массива может быть любым, как char так и ulong.
+    ///     Как только список/словарь пар был выявлен можно разом выполнить создание всех этих пар, а так же разом выполнить замену.
+    /// </remarks>
     public class Compressor
     {
-        private readonly Links _links;
-        private readonly Sequences _sequences;
+        private readonly Func<ulong, ulong, ulong> _createLink;
+        private readonly Func<ulong[], ulong> _createSequence; 
         private Link _maxPair;
-        private ulong _minFrequency;
+        private readonly ulong _minFrequency;
         private ulong _maxFrequency;
         private UnsafeDictionary<Link, ulong> _pairsFrequencies;
 
         /// <remarks>
-        /// Может стоит попробовать ref во всех методах
+        /// TODO: Может стоит попробовать ref во всех методах
         /// </remarks>
         public class LinkComparer : IEqualityComparer<Link>
         {
@@ -80,15 +83,19 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
-        public Compressor(Links links, Sequences sequences)
-            : this(links, sequences, 1)
+        public Compressor(Links links, Sequences sequences, ulong minFrequency = 1, bool threadSafe = true)
         {
-        }
+            if (threadSafe)
+            {
+                _createLink = links.Create;
+                _createSequence = sequences.CreateBalancedVariant;
+            }
+            else
+            {
+                _createLink = links.CreateCore;
+                _createSequence = sequences.CreateBalancedVariantCore;
+            }
 
-        public Compressor(Links links, Sequences sequences, ulong minFrequency)
-        {
-            _links = links;
-            _sequences = sequences;
             if (minFrequency == 0) minFrequency = 1;
             _minFrequency = minFrequency;
             ResetMaxPair();
@@ -140,7 +147,7 @@ namespace Platform.Data.Core.Sequences
                 return sequence;
 
             if (sequence.Length == 2)
-                return new[] { _links.Create(sequence[0], sequence[1]) };
+                return new[] { _createLink(sequence[0], sequence[1]) };
 
             if (_pairsFrequencies != null)
                 throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
@@ -187,7 +194,7 @@ namespace Platform.Data.Core.Sequences
             {
                 var maxPairSource = _maxPair.Source;
                 var maxPairTarget = _maxPair.Target;
-                var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+                var maxPairResult = _createLink(maxPairSource, maxPairTarget);
 
                 oldLength--;
                 var oldLengthMinusTwo = oldLength - 1;
@@ -237,7 +244,7 @@ namespace Platform.Data.Core.Sequences
         public ulong Compress(ulong[] sequence)
         {
             var precompressedSequence = Precompress(sequence);
-            return _sequences.CreateBalancedVariant(precompressedSequence);
+            return _createSequence(precompressedSequence);
         }
 
         private void ResetMaxPair()
@@ -273,14 +280,9 @@ namespace Platform.Data.Core.Sequences
             //for (int i = 0; i < entries.Length; i++)
             for (var i = entries.Length - 1; i >= 0; --i)
             {
-                if (entries[i].hashCode < 0) continue;
-
                 //var frequency = entries[i].value;
-                if (entries[i].value > _minFrequency)
+                if (entries[i].hashCode >= 0 && entries[i].value > _minFrequency)
                 {
-                    if (_maxFrequency > entries[i].value)
-                        continue;
-
                     if (_maxFrequency < entries[i].value)
                     {
                         _maxFrequency = entries[i].value;

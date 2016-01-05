@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Core
+namespace Platform.Data.Core.Collections
 {
     /// <remarks>
     ///     А что если хранить карту значений, где каждый бит будет означать присутствует ли блок в 64 бит в массиве значений.

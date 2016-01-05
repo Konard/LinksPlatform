@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Platform.Communication.Udp;
+using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Pairs;
 
 namespace Platform.Data.SlaveServer

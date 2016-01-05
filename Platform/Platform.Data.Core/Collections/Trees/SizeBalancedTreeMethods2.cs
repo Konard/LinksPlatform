@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.TreeMethods
+namespace Platform.Data.Core.Collections.Trees
 {
     /// <remarks>
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.

@@ -1,6 +1,4 @@
-﻿using Platform.Data.Core.Exceptions;
-
-namespace Platform.Data.Core.Pairs
+﻿namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
     /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.
@@ -27,7 +25,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Значение, определяющее является ли связь точкой полностью.</returns>
         public bool IsFullPoint(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return IsFullPointCore(link);
@@ -45,7 +43,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Значение, определяющее является ли связь точкой частично.</returns>
         public bool IsPartialPoint(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return IsFullPointCore(link);

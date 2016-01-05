@@ -8,6 +8,8 @@ namespace Platform.Sandbox
     {
         private static void Main(string[] args)
         {
+            DllImportTest.Test();
+
             //using (var crawler = new WebCrawlerInstance("crawled.links"))
             //{
             //    crawler.Start(new Uri("https://abotx.org/"));
@@ -15,7 +17,7 @@ namespace Platform.Sandbox
 
             //WebCrawler.TestSingle1();
 
-            CompressionExperiments.Test();
+            //CompressionExperiments.Test();
 
             return;
             

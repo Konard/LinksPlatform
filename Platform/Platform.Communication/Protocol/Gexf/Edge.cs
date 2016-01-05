@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System.Globalization;
+using System.Xml;
 using System.Xml.Serialization;
 
 namespace Platform.Communication.Protocol.Gexf
@@ -28,14 +29,16 @@ namespace Platform.Communication.Protocol.Gexf
             WriteXml(writer, Id, Source, Target, Label);
         }
 
-        public static void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label)
+        public static void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label = null)
         {
+            // <edge id="0" source="0" target="0" label="..." />
             writer.WriteStartElement(ElementName);
 
-            writer.WriteAttributeString(IdAttributeName, id.ToString());
-            writer.WriteAttributeString(SourceAttributeName, sourceNodeId.ToString());
-            writer.WriteAttributeString(TargetAttributeName, targetNodeId.ToString());
-            writer.WriteAttributeString(LabelAttributeName, label);
+            writer.WriteAttributeString(IdAttributeName, id.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString(SourceAttributeName, sourceNodeId.ToString(CultureInfo.InvariantCulture));
+            writer.WriteAttributeString(TargetAttributeName, targetNodeId.ToString(CultureInfo.InvariantCulture));
+            if (!string.IsNullOrWhiteSpace(label))
+                writer.WriteAttributeString(LabelAttributeName, label);
 
             writer.WriteEndElement();
         }

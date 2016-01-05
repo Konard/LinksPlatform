@@ -1,9 +1,9 @@
-﻿namespace Platform.Data.Core.ListMethods
+﻿namespace Platform.Data.Core.Collections.Lists
 {
     /// <remarks>
     /// Based on https://en.wikipedia.org/wiki/Doubly_linked_list
     /// </remarks>
-    public abstract class CircularDoublyLinkedListMethods : DoublyLinkedListMethodsBase<ulong>
+    public abstract class OpenDoublyLinkedListMethods : DoublyLinkedListMethodsBase<ulong>
     {
         public void AttachBefore(ulong baseElement, ulong newElement)
         {
@@ -12,10 +12,11 @@
             SetPrevious(newElement, baseElementPrevious);
             SetNext(newElement, baseElement);
 
-            if (baseElement == GetFirst())
+            if (baseElementPrevious == 0)
                 SetFirst(newElement);
+            else
+                SetNext(baseElementPrevious, newElement);
 
-            SetNext(baseElementPrevious, newElement);
             SetPrevious(baseElement, newElement);
 
             IncrementSize();
@@ -28,10 +29,11 @@
             SetPrevious(newElement, baseElement);
             SetNext(newElement, baseElementNext);
 
-            if (baseElement == GetLast())
+            if (baseElementNext == 0)
                 SetLast(newElement);
+            else
+                SetPrevious(baseElementNext, newElement);
 
-            SetPrevious(baseElementNext, newElement);
             SetNext(baseElement, newElement);
 
             IncrementSize();
@@ -44,8 +46,8 @@
             {
                 SetFirst(element);
                 SetLast(element);
-                SetPrevious(element, element);
-                SetNext(element, element);
+                SetPrevious(element, 0);
+                SetNext(element, 0);
 
                 IncrementSize();
             }
@@ -67,21 +69,15 @@
             var elementPrevious = GetPrevious(element);
             var elementNext = GetNext(element);
 
-            if (elementNext == element)
-            {
-                SetFirst(0);
-                SetLast(0);
-            }
+            if (elementPrevious == 0)
+                SetFirst(elementNext);
             else
-            {
                 SetNext(elementPrevious, elementNext);
-                SetPrevious(elementNext, elementPrevious);
 
-                if (element == GetFirst())
-                    SetFirst(elementNext);
-                if (element == GetLast())
-                    SetLast(elementPrevious);
-            }
+            if (elementNext == 0)
+                SetLast(elementPrevious);
+            else
+                SetPrevious(elementNext, elementPrevious);
 
             SetPrevious(element, 0);
             SetNext(element, 0);

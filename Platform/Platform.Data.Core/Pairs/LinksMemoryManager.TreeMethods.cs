@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.TreeMethods;
+using Platform.Data.Core.Collections.Trees;
 using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs

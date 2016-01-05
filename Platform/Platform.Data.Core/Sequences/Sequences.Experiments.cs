@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
@@ -20,7 +21,7 @@ namespace Platform.Data.Core.Sequences
         /// </remarks>
         public ulong[] CreateAllVariants2(ulong[] sequence)
         {
-            return _sync.ExecuteWriteOperation(() =>
+            return Sync.ExecuteWriteOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
                     return new ulong[0];
@@ -43,7 +44,7 @@ namespace Platform.Data.Core.Sequences
             if ((stopAt - startAt) == 0)
                 return new[] { sequence[startAt] };
             if ((stopAt - startAt) == 1)
-                return new[] { _links.Create(sequence[startAt], sequence[stopAt]) };
+                return new[] { _links.CreateCore(sequence[startAt], sequence[stopAt]) };
 
             var variants = new ulong[(ulong)MathHelpers.Catalan(stopAt - startAt)];
             var last = 0;
@@ -57,7 +58,7 @@ namespace Platform.Data.Core.Sequences
                 {
                     for (var j = 0; j < right.Length; j++)
                     {
-                        var variant = _links.Create(left[i], right[j]);
+                        var variant = _links.CreateCore(left[i], right[j]);
                         if (variant == LinksConstants.Null)
                             throw new NotImplementedException("Creation cancellation is not implemented.");
                         variants[last++] = variant;
@@ -70,7 +71,7 @@ namespace Platform.Data.Core.Sequences
 
         public List<ulong> CreateAllVariants1(params ulong[] sequence)
         {
-            return _sync.ExecuteWriteOperation(() =>
+            return Sync.ExecuteWriteOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
                     return new List<ulong>();
@@ -89,7 +90,7 @@ namespace Platform.Data.Core.Sequences
         {
             if (sequence.Length == 2)
             {
-                var link = _links.Create(sequence[0], sequence[1]);
+                var link = _links.CreateCore(sequence[0], sequence[1]);
                 if (link == LinksConstants.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
                 results.Add(link);
@@ -101,7 +102,7 @@ namespace Platform.Data.Core.Sequences
 
             for (var li = 0; li < innerSequenceLength; li++)
             {
-                var link = _links.Create(sequence[li], sequence[li + 1]);
+                var link = _links.CreateCore(sequence[li], sequence[li + 1]);
                 if (link == LinksConstants.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
 
@@ -124,7 +125,7 @@ namespace Platform.Data.Core.Sequences
             do
             {
                 if (sequence.Length == 2)
-                    return _links.Create(sequence[0], sequence[1]);
+                    return _links.CreateCore(sequence[0], sequence[1]);
 
                 var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
 
@@ -152,7 +153,7 @@ namespace Platform.Data.Core.Sequences
         {
             if (sequence.Length == 2)
             {
-                _links.Each(sequence[0], sequence[1], handler);
+                _links.EachCore(sequence[0], sequence[1], handler);
             }
             else
             {
@@ -168,7 +169,7 @@ namespace Platform.Data.Core.Sequences
                     var linkIndex = li;
                     ulong[] innerSequence = null;
 
-                    _links.Each(left, right, pair =>
+                    _links.EachCore(left, right, pair =>
                     {
                         if (innerSequence == null)
                         {
@@ -245,7 +246,7 @@ namespace Platform.Data.Core.Sequences
 
                 _links.Each(sequence[1], 0, pair =>
                 {
-                    var match = _links.Search(sequence[0], pair);
+                    var match = _links.SearchCore(sequence[0], pair);
                     if (match != 0)
                         handler(match);
                     return true;
@@ -256,7 +257,7 @@ namespace Platform.Data.Core.Sequences
 
                 _links.Each(0, sequence[0], pair =>
                 {
-                    var match = _links.Search(pair, sequence[1]);
+                    var match = _links.SearchCore(pair, sequence[1]);
                     if (match != 0)
                         handler(match);
                     return true;
@@ -299,11 +300,11 @@ namespace Platform.Data.Core.Sequences
         private void TryStepRightUp(Action<ulong> handler, ulong right, ulong stepFrom)
         {
             var upStep = stepFrom;
-            var firstSource = _links.GetTarget(upStep);
+            var firstSource = _links.GetTargetCore(upStep);
             while (firstSource != right && firstSource != upStep)
             {
                 upStep = firstSource;
-                firstSource = _links.GetSource(upStep);
+                firstSource = _links.GetSourceCore(upStep);
             }
 
             if (firstSource == right)
@@ -336,11 +337,11 @@ namespace Platform.Data.Core.Sequences
         private void TryStepLeftUp(Action<ulong> handler, ulong left, ulong stepFrom)
         {
             var upStep = stepFrom;
-            var firstTarget = _links.GetSource(upStep);
+            var firstTarget = _links.GetSourceCore(upStep);
             while (firstTarget != left && firstTarget != upStep)
             {
                 upStep = firstTarget;
-                firstTarget = _links.GetTarget(upStep);
+                firstTarget = _links.GetTargetCore(upStep);
             }
 
             if (firstTarget == left)
@@ -350,11 +351,11 @@ namespace Platform.Data.Core.Sequences
         private bool StartsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
-            var firstSource = _links.GetSource(upStep);
+            var firstSource = _links.GetSourceCore(upStep);
             while (firstSource != link && firstSource != upStep)
             {
                 upStep = firstSource;
-                firstSource = _links.GetSource(upStep);
+                firstSource = _links.GetSourceCore(upStep);
             }
             return firstSource == link;
         }
@@ -362,18 +363,18 @@ namespace Platform.Data.Core.Sequences
         private bool EndsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
-            var lastTarget = _links.GetTarget(upStep);
+            var lastTarget = _links.GetTargetCore(upStep);
             while (lastTarget != link && lastTarget != upStep)
             {
                 upStep = lastTarget;
-                lastTarget = _links.GetTarget(upStep);
+                lastTarget = _links.GetTargetCore(upStep);
             }
             return lastTarget == link;
         }
 
         public List<ulong> GetAllMatchingSequences0(params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var results = new List<ulong>();
 
@@ -390,7 +391,7 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = _links.Search(firstElement, sequence[1]);
+                        var pair = _links.SearchCore(firstElement, sequence[1]);
                         if (pair != LinksConstants.Null)
                             results.Add(pair);
                         return results;
@@ -445,7 +446,7 @@ namespace Platform.Data.Core.Sequences
 
         public HashSet<ulong> GetAllMatchingSequences1(params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var results = new HashSet<ulong>();
 
@@ -462,7 +463,7 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = _links.Search(firstElement, sequence[1]);
+                        var pair = _links.SearchCore(firstElement, sequence[1]);
                         if (pair != LinksConstants.Null)
                             results.Add(pair);
                         return results;
@@ -533,7 +534,7 @@ namespace Platform.Data.Core.Sequences
 
         public List<ulong> GetAllPartiallyMatchingSequences0(params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 if (sequence.Length > 0)
                 {
@@ -590,7 +591,7 @@ namespace Platform.Data.Core.Sequences
 
         public HashSet<ulong> GetAllPartiallyMatchingSequences1(params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 if (sequence.Length > 0)
                 {
@@ -612,7 +613,7 @@ namespace Platform.Data.Core.Sequences
 
         public bool GetAllPartiallyMatchingSequences2(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 if (sequence.Length > 0)
                 {
@@ -634,7 +635,7 @@ namespace Platform.Data.Core.Sequences
 
         public List<ulong> GetAllPartiallyMatchingSequences(params ulong[] sequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 if (sequence.Length > 0)
                 {
@@ -649,7 +650,7 @@ namespace Platform.Data.Core.Sequences
                     //}
                     //if (sequence.Length == 2)
                     //{
-                    //    //var pair = _links.Search(firstElement, sequence[1]);
+                    //    //var pair = _links.SearchCore(firstElement, sequence[1]);
                     //    //if (pair != Pairs.Links.Null)
                     //    //    results.Add(pair);
                     //    return results;
@@ -746,9 +747,12 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
+        /// <remarks>
+        /// TODO: Может потробоваться ограничение на уровень глубины рекурсии
+        /// </remarks>
         public HashSet<ulong> AllUsages(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var usages = new HashSet<ulong>();
                 AllUsagesCore(link, usages);
@@ -1010,7 +1014,7 @@ namespace Platform.Data.Core.Sequences
 
             if (left == right)
                 handler(left);
-            var pair = _links.Search(left, right);
+            var pair = _links.SearchCore(left, right);
             if (pair != LinksConstants.Null)
                 handler(pair);
 
@@ -1073,7 +1077,7 @@ namespace Platform.Data.Core.Sequences
         // Pattern Matching -> Key To Triggers
         public HashSet<ulong> MatchPattern(params ulong[] patternSequence)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 patternSequence = Simplify(patternSequence);
 
@@ -1106,7 +1110,7 @@ namespace Platform.Data.Core.Sequences
         // TODO: решить что делать с повторами (когда одни и те же элементы встречаются несколько раз в последовательности)
         public HashSet<ulong> GetAllConnections(params ulong[] linksToConnect)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var results = new HashSet<ulong>();
 
@@ -1131,7 +1135,7 @@ namespace Platform.Data.Core.Sequences
 
         public HashSet<ulong> GetAllConnections1(params ulong[] linksToConnect)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var results = new HashSet<ulong>();
 
@@ -1158,7 +1162,7 @@ namespace Platform.Data.Core.Sequences
 
         public HashSet<ulong> GetAllConnections2(params ulong[] linksToConnect)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 var results = new HashSet<ulong>();
 
@@ -1191,9 +1195,9 @@ namespace Platform.Data.Core.Sequences
 
         public List<ulong> GetAllConnections3(params ulong[] linksToConnect)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
-                var results = new BitString((long)_links.Count() + 1); // new BitArray((int)_links.Total + 1);
+                var results = new BitString((long)_links.CountCore() + 1); // new BitArray((int)_links.Total + 1);
 
                 if (linksToConnect.Length > 0)
                 {
@@ -1204,7 +1208,7 @@ namespace Platform.Data.Core.Sequences
 
                     for (var i = 1; i < linksToConnect.Length; i++)
                     {
-                        var next = new BitString((long)_links.Count() + 1); //new BitArray((int)_links.Total + 1);
+                        var next = new BitString((long)_links.CountCore() + 1); //new BitArray((int)_links.Total + 1);
                         var collector = new AllUsagesCollector2(_links, next);
                         collector.Collect(linksToConnect[i]);
 
@@ -1320,8 +1324,8 @@ namespace Platform.Data.Core.Sequences
 
         private void CollectMatchingSequences(ulong leftLink, int leftBound, ulong[] middleLinks, ulong rightLink, int rightBound, ref List<ulong> results)
         {
-            var leftLinkTotalReferers = _links.Count(leftLink);
-            var rightLinkTotalReferers = _links.Count(rightLink);
+            var leftLinkTotalReferers = _links.CountCore(leftLink);
+            var rightLinkTotalReferers = _links.CountCore(rightLink);
 
             if (leftLinkTotalReferers <= rightLinkTotalReferers)
             {

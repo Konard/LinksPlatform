@@ -304,8 +304,8 @@ namespace Platform.Tests.Data.Core
             var tempTransactionLogFilename = Path.GetTempFileName();
 
             const ulong itself = LinksConstants.Itself;
-            const Links.PathElement source = Links.PathElement.Source;
-            const Links.PathElement target = Links.PathElement.Target;
+            const long source = LinksConstants.SourcePart;
+            const long target = LinksConstants.TargetPart;
 
             using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
             using (var links = new Links(memoryManager, tempTransactionLogFilename))
@@ -313,8 +313,8 @@ namespace Platform.Tests.Data.Core
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
 
-                var r1 = links.Get(l1, source, target, source);
-                var r2 = links.Get(l2, l2, l2, l2);
+                var r1 = links.GetByKeys(l1, source, target, source);
+                var r2 = links.CheckPathExistance(l2, l2, l2, l2);
             }
 
             File.Delete(tempDatabaseFilename);

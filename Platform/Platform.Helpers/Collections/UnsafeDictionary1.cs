@@ -48,14 +48,11 @@
 using System.Collections.Generic;
 
 namespace Platform.Helpers.Collections1 {
-
-    using Platform.Helpers.Collections1;
     using System;
     using System.Collections;
     using System.Diagnostics;
     using System.Diagnostics.Contracts;
     using System.Runtime.Serialization;
-    using System.Security.Permissions;
 
     //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]

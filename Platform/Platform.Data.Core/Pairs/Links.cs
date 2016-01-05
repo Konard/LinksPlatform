@@ -13,7 +13,8 @@ namespace Platform.Data.Core.Pairs
     /// <summary>
     /// Представляет объект для работы с базой данных (файлом) в формате Links (массива взаимосвязей).
     /// </summary>
-    /// <remarks> 
+    /// <remarks>
+    /// TODO: Избавиться от анонимных функций передаваемых в ExecuteReadOperation и ExecureWriteOperation
     /// Возможные оптимизации:
     /// Объединение в одном поле Source и Target с уменьшением до 32 бит. 
     ///     + меньше объём БД
@@ -35,7 +36,7 @@ namespace Platform.Data.Core.Pairs
     {
         #region Structure
 
-        private readonly ISyncronization _sync = new SafeSynchronization();
+        public readonly ISyncronization Sync = new SafeSynchronization();
         private readonly ILinksMemoryManager<ulong> _memoryManager;
 
         #endregion
@@ -54,7 +55,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс начальной связи для указанной связи.</returns>
         public ulong GetSource(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return GetSourceCore(link);
@@ -77,7 +78,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс конечной связи для указанной связи.</returns>
         public ulong GetTarget(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return GetTargetCore(link);
@@ -100,7 +101,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Уникальную связь.</returns>
         public Link GetLink(ulong link)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(link);
                 return GetLinkCore(link);
@@ -110,6 +111,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Link GetLinkCore(ulong link)
         {
+            // TODO: Return Link with set Index field
             var values = _memoryManager.GetLinkValue(link);
             return new Link(values[LinksConstants.SourcePart], values[LinksConstants.TargetPart]);
         }
@@ -121,7 +123,13 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Значение, определяющее существует ли связь.</returns>
         public bool Exists(ulong link)
         {
-            return _sync.ExecuteReadOperation(() => _memoryManager.Exists(link));
+            return Sync.ExecuteReadOperation(() => ExistsCore(link));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool ExistsCore(ulong link)
+        {
+            return _memoryManager.Count(link) > 0;
         }
 
         /// <summary>
@@ -132,7 +140,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс искомой связи с указанными Source (началом) и Target (концом)</returns>
         public ulong Search(ulong source, ulong target)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkExists(source, "source");
                 EnsureLinkExists(target, "target");
@@ -141,7 +149,7 @@ namespace Platform.Data.Core.Pairs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong SearchCore(ulong source, ulong target)
+        public ulong SearchCore(ulong source, ulong target)
         {
             var searchResult = LinksConstants.Null;
 
@@ -149,18 +157,20 @@ namespace Platform.Data.Core.Pairs
             {
                 searchResult = link;
                 return LinksConstants.Continue;
-            }, source, target);
+            }, LinksConstants.Null, source, target);
 
             return searchResult;
         }
 
         public ulong Count(params ulong[] restrictions)
         {
-            return _sync.ExecuteReadOperation(() =>
-            {
-                this.EnsureEachLinkIsAnyOrExists(restrictions);
-                return _memoryManager.Count(restrictions);
-            });
+            return Sync.ExecuteReadOperation(() => CountCore(restrictions));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong CountCore(params ulong[] restrictions)
+        {
+            return _memoryManager.Count(restrictions);
         }
 
         /// <summary>
@@ -172,18 +182,18 @@ namespace Platform.Data.Core.Pairs
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         public bool Each(ulong source, ulong target, Func<ulong, bool> handler)
         {
-            return _sync.ExecuteReadOperation(() =>
+            return Sync.ExecuteReadOperation(() =>
             {
                 EnsureLinkIsAnyOrExists(source, "source");
                 EnsureLinkIsAnyOrExists(target, "target");
-                return _memoryManager.Each(handler, source, target);
+                return EachCore(source, target, handler);
             });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool EachCore(ulong source, ulong target, Func<ulong, bool> handler)
         {
-            return _memoryManager.Each(handler, source, target);
+            return _memoryManager.Each(handler, LinksConstants.Null, source, target);
         }
 
         /// <summary>
@@ -194,7 +204,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
         public ulong Create(ulong source, ulong target)
         {
-            return _sync.ExecuteWriteOperation(() =>
+            return Sync.ExecuteWriteOperation(() =>
             {
                 EnsureLinkIsItselfOrExists(source, "source");
                 EnsureLinkIsItselfOrExists(target, "target");
@@ -248,7 +258,7 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс обновлённой связи.</returns>
         public ulong Update(ulong source, ulong target, ulong newSource, ulong newTarget)
         {
-            return _sync.ExecuteWriteOperation(() =>
+            return Sync.ExecuteWriteOperation(() =>
             {
                 EnsureLinkExists(source, "source");
                 EnsureLinkExists(target, "target");
@@ -265,50 +275,55 @@ namespace Platform.Data.Core.Pairs
             });
         }
 
-        private ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
+        public ulong UpdateCore(ulong linkIndex, ulong newSource, ulong newTarget)
         {
             // TODO: Исправить баг с newSource и newTarget (случай когда они равны Itself)
             var newLink = SearchCore(newSource, newTarget);
+
             if (newLink == LinksConstants.Null) // Actual update
             {
                 var before = GetLinkCore(linkIndex);
 
                 _memoryManager.SetLinkValue(linkIndex, newSource == LinksConstants.Itself ? linkIndex : newSource,
-                                                       newTarget == LinksConstants.Itself ? linkIndex : newTarget);
+                    newTarget == LinksConstants.Itself ? linkIndex : newTarget);
 
                 CommitUpdate(before, GetLinkCore(linkIndex));
 
                 return linkIndex;
             }
-            else // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
+
+            // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
+            return ReplaceCore(linkIndex, newLink);
+        }
+
+        public ulong ReplaceCore(ulong linkIndex, ulong newLink)
+        {
+            var referencesAsSourceCount = _memoryManager.Count(LinksConstants.Null, linkIndex, LinksConstants.Any);
+            var referencesAsTargetCount = _memoryManager.Count(LinksConstants.Null, LinksConstants.Any, linkIndex);
+
+            var references = new ulong[referencesAsSourceCount + referencesAsTargetCount];
+
+            var referencesFiller = new ArrayFiller<ulong>(references);
+
+            _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, linkIndex, LinksConstants.Any);
+            _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, LinksConstants.Any, linkIndex);
+
+            for (ulong i = 0; i < referencesAsSourceCount; i++)
             {
-                var referencesAsSourceCount = _memoryManager.Count(linkIndex, LinksConstants.Any);
-                var referencesAsTargetCount = _memoryManager.Count(LinksConstants.Any, linkIndex);
-
-                var references = new ulong[referencesAsSourceCount + referencesAsTargetCount];
-
-                var referencesFiller = new ArrayFiller<ulong>(references);
-
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, linkIndex, LinksConstants.Any);
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Any, linkIndex);
-
-                for (ulong i = 0; i < referencesAsSourceCount; i++)
-                {
-                    var reference = references[i];
-                    if (reference == linkIndex) continue;
-                    UpdateCore(reference, newLink, GetTargetCore(reference));
-                }
-                for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
-                {
-                    var reference = references[i];
-                    if (reference == linkIndex) continue;
-                    UpdateCore(reference, GetSourceCore(reference), newLink);
-                }
-
-                DeleteCore(linkIndex);
-
-                return newLink;
+                var reference = references[i];
+                if (reference == linkIndex) continue;
+                UpdateCore(reference, newLink, GetTargetCore(reference));
             }
+            for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
+            {
+                var reference = references[i];
+                if (reference == linkIndex) continue;
+                UpdateCore(reference, GetSourceCore(reference), newLink);
+            }
+
+            DeleteCore(linkIndex);
+
+            return newLink;
         }
 
         /// <summary>Удаляет связь с указанными началом (Source) и концом (Target).</summary>
@@ -316,12 +331,11 @@ namespace Platform.Data.Core.Pairs
         /// <param name="target">Индекс связи, которая является концом удаляемой связи.</param>
         public void Delete(ulong source, ulong target)
         {
-            _sync.ExecuteWriteOperation(() =>
+            Sync.ExecuteWriteOperation(() =>
             {
                 var link = SearchCore(source, target);
-
-                if (link != LinksConstants.Null)
-                    DeleteCore(link);
+                EnsureLinkExists(link);
+                DeleteCore(link);
             });
         }
 
@@ -329,34 +343,35 @@ namespace Platform.Data.Core.Pairs
         /// <param name="link">Индекс удаляемой связи.</param>
         public void Delete(ulong link)
         {
-            _sync.ExecuteWriteOperation(() =>
+            Sync.ExecuteWriteOperation(() =>
             {
-                if (link != LinksConstants.Null && Exists(link))
-                    DeleteCore(link);
+                EnsureLinkExists(link);
+                DeleteCore(link);
             });
         }
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
         /// <remarks>Версия функции без дополнительных проверок для ускорения работы рекурсии.</remarks>
-        private void DeleteCore(ulong link)
+        public void DeleteCore(ulong link)
         {
-            if (_memoryManager.Exists(link))
+            if (_memoryManager.Count(link) > 0)
             {
                 var before = GetLinkCore(link);
 
                 _memoryManager.SetLinkValue(link, LinksConstants.Null, LinksConstants.Null);
 
+                // TODO: Заменить на _memoryManager.Count(LinksConstants.Null, link)
                 var referencesCount =
-                    _memoryManager.Count(link, LinksConstants.Null) +
-                    _memoryManager.Count(LinksConstants.Null, link);
+                    _memoryManager.Count(LinksConstants.Null, link, LinksConstants.Null) +
+                    _memoryManager.Count(LinksConstants.Null, LinksConstants.Null, link);
 
                 var references = new ulong[referencesCount];
 
                 var referencesFiller = new ArrayFiller<ulong>(references);
 
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, link, LinksConstants.Null);
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, link);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, link, LinksConstants.Null);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, LinksConstants.Null, LinksConstants.Null, link);
 
                 //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
 
@@ -372,28 +387,28 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnsureLinkExists(ulong link)
         {
-            if (!_memoryManager.Exists(link))
+            if (_memoryManager.Count(link) == 0)
                 throw new ArgumentLinkDoesNotExistsException<ulong>(link);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnsureLinkExists(ulong link, string argumentName)
         {
-            if (!_memoryManager.Exists(link))
+            if (_memoryManager.Count(link) == 0)
                 throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnsureLinkIsAnyOrExists(ulong link, string argumentName)
         {
-            if (link != LinksConstants.Any && !_memoryManager.Exists(link))
+            if (link != LinksConstants.Any && _memoryManager.Count(link) == 0)
                 throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void EnsureLinkIsItselfOrExists(ulong link, string argumentName)
         {
-            if (link != LinksConstants.Itself && !_memoryManager.Exists(link))
+            if (link != LinksConstants.Itself && _memoryManager.Count(link) == 0)
                 throw new ArgumentLinkDoesNotExistsException<ulong>(link, argumentName);
         }
 
