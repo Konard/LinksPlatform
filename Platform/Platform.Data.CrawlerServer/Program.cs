@@ -9,9 +9,10 @@ using System.Threading;
 using CsQuery.ExtensionMethods;
 using log4net;
 using log4net.Config;
-using Platform.Communication.Udp;
+using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers.Threading;
 
 namespace Platform.Data.CrawlerServer
 {
@@ -75,9 +76,7 @@ namespace Platform.Data.CrawlerServer
                                 Uri siteUri;
                                 if (Uri.TryCreate(message, UriKind.Absolute, out siteUri))
                                 {
-                                    var thread = new Thread(() => new Crawler(links, sequences, pageMarker).Start(siteUri));
-                                    thread.Start();
-                                    Threads.Add(thread);
+                                    Threads.Add(ThreadHelpers.StartNew(() => new Crawler(links, sequences, pageMarker).Start(siteUri)));
 
                                     sender.Send(string.Format("Сайт {0} добавлен в очередь на обработку.", siteUri));
 
@@ -111,7 +110,6 @@ namespace Platform.Data.CrawlerServer
 
                             Console.WriteLine("Ожидаем завершения процессов...");
 
-                            Threads.ToArray().ForEach(x => x.Join());
                             Threads.ToArray().ForEach(x => x.Join());
 
                             Console.WriteLine("Сервер остановлен.");
