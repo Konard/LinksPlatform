@@ -23,11 +23,6 @@ namespace Platform.Data.Core.Pairs
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected abstract ulong GetBasePartValue(ulong link);
 
-            /// <summary>
-            /// Подсчитывает и возвращает общее количество связей ссылающихся на связь с указанным индексом и "начинающихся" с этой связи (использующих её в качестве Source (начала)).
-            /// </summary>
-            /// <param name="link">Индекс связи.</param>
-            /// <returns>Общее количество связей, "начинающихся" с указанной связи.</returns>
             public ulong CalculateReferences(ulong link)
             {
                 var root = GetTreeRoot();
@@ -72,11 +67,6 @@ namespace Platform.Data.Core.Pairs
                 return total - totalRightIgnore - totalLeftIgnore;
             }
 
-            /// <summary>
-            /// Выполняет проход по всем связям, "начинающихся" с указанной связи. 
-            /// </summary>
-            /// <param name="source">Индекс связи-начала.</param>
-            /// <param name="handler">Функция-обработчик, выполняющая необходимое действие над каждой связью-ссылкой.</param>
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool EachReference(ulong source, Func<ulong, bool> handler)
             {
@@ -165,18 +155,6 @@ namespace Platform.Data.Core.Pairs
                        (Links[first].Source == Links[second].Source && Links[first].Target > Links[second].Target);
             }
 
-            private bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
-            {
-                return firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
-            }
-
-            private bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
-            {
-                return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
-            }
-
             protected override ulong GetTreeRoot()
             {
                 return Header->FirstAsSource;
@@ -212,6 +190,20 @@ namespace Platform.Data.Core.Pairs
                 }
 
                 return 0;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
+                ulong secondTarget)
+            {
+                return firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            private static bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
+                ulong secondTarget)
+            {
+                return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
             }
         }
 
