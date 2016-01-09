@@ -23,6 +23,35 @@ namespace Platform.Data.Core.Pairs
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected abstract ulong GetBasePartValue(ulong link);
 
+            public ulong this[ulong index]
+            {
+                get
+                {
+                    var root = GetTreeRoot();
+                    if (index >= GetSize(root))
+                        return 0;
+
+                    while (root != 0)
+                    {
+                        var left = *GetLeft(root);
+                        var leftSize = GetSizeOrZero(left);
+                        if (index < leftSize)
+                        {
+                            root = left;
+                            continue;
+                        }
+
+                        if (index == leftSize)
+                            return root;
+
+                        root = *GetRight(root);
+                        index -= (leftSize + 1);
+                    }
+                    return 0; // TODO: Impossible situation exception (only if tree structure broken)
+                }
+            }
+
+            // TODO: Return indices range instead of references count
             public ulong CalculateReferences(ulong link)
             {
                 var root = GetTreeRoot();
@@ -38,8 +67,7 @@ namespace Platform.Data.Core.Pairs
                         root = *GetRight(root);
                     else
                     {
-                        var rootRight = *GetRight(root);
-                        totalRightIgnore += (rootRight != 0 ? GetSize(rootRight) : 0) + 1;
+                        totalRightIgnore += GetRightSize(root) + 1;
 
                         root = *GetLeft(root);
                     }
@@ -57,8 +85,7 @@ namespace Platform.Data.Core.Pairs
                         root = *GetLeft(root);
                     else
                     {
-                        var rootLeft = *GetLeft(root);
-                        totalLeftIgnore += (rootLeft != 0 ? GetSize(rootLeft) : 0) + 1;
+                        totalLeftIgnore += GetLeftSize(root) + 1;
 
                         root = *GetRight(root);
                     }

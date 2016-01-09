@@ -24,13 +24,25 @@ namespace Platform.Data.Core.Collections.Trees
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void IncrementSize(ulong node)
         {
-            SetSize(node, GetSize(node) + 1);
+            SetSize(node, GetSize(node) + 1); // TODO: Can be replaced with *GetSize(node)++
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void DecrementSize(ulong node)
         {
-            SetSize(node, GetSize(node) - 1);
+            SetSize(node, GetSize(node) - 1); // TODO: Can be replaced with *GetSize(node)--
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected ulong GetLeftSize(ulong node)
+        {
+            return GetSizeOrZero(*GetLeft(node));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected ulong GetRightSize(ulong node)
+        {
+            return GetSizeOrZero(*GetRight(node));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -42,7 +54,7 @@ namespace Platform.Data.Core.Collections.Trees
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void FixSize(ulong node)
         {
-            SetSize(node, GetSizeOrZero(*GetLeft(node)) + GetSizeOrZero(*GetRight(node)) + 1);
+            SetSize(node, GetLeftSize(node) + GetRightSize(node) + 1);
         }
 
         protected void LeftRotate(ulong* root)
