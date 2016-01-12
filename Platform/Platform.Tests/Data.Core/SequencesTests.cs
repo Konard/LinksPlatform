@@ -49,6 +49,47 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempFilename);
         }
 
+        //[TestMethod]
+        //public void CUDTest()
+        //{
+        //    var tempFilename = Path.GetTempFileName();
+
+        //    const long sequenceLength = 8;
+
+        //    const ulong itself = LinksConstants.Itself;
+
+        //    using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+        //    using (var links = new Links(memoryManager))
+        //    {
+        //        var sequence = new ulong[sequenceLength];
+        //        for (var i = 0; i < sequenceLength; i++)
+        //            sequence[i] = links.Create(itself, itself);
+
+
+        //        SequencesOptions o = new SequencesOptions();
+
+        // TODO: Из числа в bool значения o.UseSequenceMarker = ((value & 1) != 0)
+        //        o.
+
+
+        //        var sequences = new Sequences(links);
+
+        //        var sw1 = Stopwatch.StartNew();
+        //        var results1 = sequences.CreateAllVariants1(sequence); sw1.Stop();
+
+        //        var sw2 = Stopwatch.StartNew();
+        //        var results2 = sequences.CreateAllVariants2(sequence); sw2.Stop();
+
+        //        Assert.IsTrue(results1.Count > results2.Length);
+        //        Assert.IsTrue(sw1.Elapsed > sw2.Elapsed);
+
+        //        for (var i = 0; i < sequenceLength; i++)
+        //            links.Delete(sequence[i]);
+        //    }
+
+        //    File.Delete(tempFilename);
+        //}
+
         [TestMethod]
         public void AllVariantsSearchTest()
         {
@@ -187,6 +228,9 @@ namespace Platform.Tests.Data.Core
                 //var sw3 = Stopwatch.StartNew();
                 //var searchResults3 = sequences.GetAllPartiallyMatchingSequences2(partialSequence); sw3.Stop();
 
+                var sw4 = Stopwatch.StartNew();
+                var searchResults4 = sequences.GetAllPartiallyMatchingSequences3(partialSequence); sw4.Stop();
+
                 //Global.Trash = searchResults3;
 
                 //var searchResults1Strings = searchResults1.Select(x => x + ": " + sequences.FormatSequence(x)).ToList();
@@ -197,6 +241,9 @@ namespace Platform.Tests.Data.Core
 
                 var intersection2 = createResults.Intersect(searchResults2).ToList();
                 Assert.IsTrue(intersection2.Count == createResults.Length);
+
+                var intersection4 = createResults.Intersect(searchResults4).ToList();
+                Assert.IsTrue(intersection4.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);

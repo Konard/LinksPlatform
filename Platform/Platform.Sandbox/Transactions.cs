@@ -56,7 +56,7 @@ namespace Platform.Sandbox
             OpenFile();
 
 
-            var item = new TransactionItem()
+            var item = new TransactionItem
             {
                 TransactionId = CurrentState.LastTransactionId,
                 DateTime = DateTime.UtcNow,

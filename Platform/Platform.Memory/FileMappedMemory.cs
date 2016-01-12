@@ -131,15 +131,19 @@ namespace Platform.Memory
                 throw new ArgumentOutOfRangeException("minimumReservedCapacity");
             }
 
-            _address = address;
+            _address = address.Trim('"');
             _reservedCapacity = minimumReservedCapacity;
             _usedCapacity = 0;
-
-            MemoryHelpers.AlignSizeToSystemPageSize(ref _reservedCapacity);
 
             // Изменение размера должно учитывать вариант "без использования файлов",
             // после этого вынести изменение размера из этого условия
             Resize(_address, ref _reservedCapacity, out _usedCapacity);
+
+            if (_reservedCapacity < minimumReservedCapacity)
+                _reservedCapacity = minimumReservedCapacity;
+
+            MemoryHelpers.AlignSizeToSystemPageSize(ref _reservedCapacity);
+
             MapFile();
         }
 

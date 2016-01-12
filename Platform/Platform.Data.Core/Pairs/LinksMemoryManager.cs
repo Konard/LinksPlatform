@@ -20,6 +20,8 @@ namespace Platform.Data.Core.Pairs
         /// </remarks>
         public static readonly int LinkSizeInBytes = sizeof(Link);
 
+        public static readonly long DefaultLinksSizeStep = LinkSizeInBytes * 1024 * 1024;
+
         private struct Link
         {
             public ulong Source;
@@ -63,6 +65,11 @@ namespace Platform.Data.Core.Pairs
         private ulong Total
         {
             get { return _header->AllocatedLinks - _header->FreeLinks; }
+        }
+
+        public LinksMemoryManager(string address)
+            : this(address, DefaultLinksSizeStep)
+        {
         }
 
         /// <summary>

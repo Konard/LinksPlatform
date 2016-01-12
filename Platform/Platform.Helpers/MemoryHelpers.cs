@@ -11,9 +11,8 @@ namespace Platform.Helpers
 
         public static void AlignSizeToSystemPageSize(ref long size)
         {
-            // TODO: Изучить почему это было важно
-            //if (size == 0)
-            //    size = SystemPageSize;
+            if (size == 0)
+                size = SystemPageSize;
             if (size%SystemPageSize != 0)
                 size = (size/SystemPageSize + 1)*SystemPageSize;
         }

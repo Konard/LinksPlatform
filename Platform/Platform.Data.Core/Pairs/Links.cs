@@ -43,6 +43,11 @@ namespace Platform.Data.Core.Pairs
 
         #region Links Logic
 
+        public Links(string address)
+            : this(new LinksMemoryManager(address))
+        {
+        }
+
         public Links(ILinksMemoryManager<ulong> memoryManager)
         {
             _memoryManager = memoryManager;

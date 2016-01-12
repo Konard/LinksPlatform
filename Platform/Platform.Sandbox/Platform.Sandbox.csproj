@@ -72,12 +72,14 @@
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Compilier.cs" />
     <Compile Include="CompressionExperiments.cs" />
     <Compile Include="DllImportTest.cs" />
     <Compile Include="FileReadWriteTest.cs" />
+    <Compile Include="IWikipediaStorage.cs" />
     <Compile Include="NetParser.cs" />
     <Compile Include="NetParserTest.cs" />
     <Compile Include="OperationsExperiments.cs" />
@@ -93,6 +95,8 @@
     <Compile Include="TreeStructureExperiments.cs" />
     <Compile Include="WebCrawler.cs" />
     <Compile Include="WebCrawlerInstance.cs" />
+    <Compile Include="WikipediaImporter.cs" />
+    <Compile Include="WikipediaLinksStorage.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config">
