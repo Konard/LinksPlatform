@@ -10,13 +10,13 @@
 
 Также существует как минимум два варианта структуры Связи:
 
-> ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png "Source-Target связь, нетипизированная")
-> ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png "Source-Target связь, нетипизированная")
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png" width="400" title="Связь Начало-Конец, нетипизированная" alt="Связь Начало-Конец, нетипизированная" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png" width="400" title="Связь Начало-Конец, нетипизированная" alt="Связь Начало-Конец, нетипизированная" />
 
 - Нетипизированная, простейшая (пока ещё), каждая связь содержит только Source (Начало, Подлежащее) и Target (Конец, Сказуемое, Дополнение).
 
-> ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png "Source-Linker-Target связь, типизированная")
-> ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png "Source-Linker-Target связь, типизированная")
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png" width="400" title="Связь Начало-Связка-Конец, типизированная" alt="Связь Начало-Связка-Конец, типизированная" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png" width="400" title="Связь Начало-Связка-Конец, типизированная" alt="Связь Начало-Связка-Конец, типизированная" />
 
 - Типизированная, с добавленным поле Linker (Глагол, Тип, Связка, Предикат, Сказуемое), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.
 

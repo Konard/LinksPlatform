@@ -13,11 +13,10 @@ There also at least two variants of Link structure:
 > <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png" width="400" title="Source-Target link, untyped" alt="Source-Target link, untyped" />
 > <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png" width="400" title="Source-Target link, untyped" alt="Source-Target link, untyped" />
 
-
 - Untyped, the simplest yet, each link contains only Source (Beginning, First, Left, Subject) and Target (Ending, Last, Right, Predicate, Object).
 
-> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
-> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png" width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png" width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
 
 - Typed, with added Linker definition ([verb](https://en.wikipedia.org/wiki/Verb), [action](https://en.wikipedia.org/wiki/Action_(philosophy)), [type](https://en.wikipedia.org/wiki/Type_system), [category](https://en.wikipedia.org/wiki/Category_theory), [predicate](https://en.wikipedia.org/wiki/Predicate), [transition](https://en.wikipedia.org/wiki/Transition_system), [algorithm](https://en.wikipedia.org/wiki/Algorithm)), so any additional info about type of connection between two links can be stored here.
 
