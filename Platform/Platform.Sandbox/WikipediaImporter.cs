@@ -1,8 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Platform.Data.Core.Pairs;
 
 namespace Platform.Sandbox
 {
@@ -26,69 +26,116 @@ namespace Platform.Sandbox
                 //    for (var i = 0; i < 500; i++)
                 //        lines[i] = rawReader.ReadLine();
                 //}
+                //using (var rawWriter = new StreamWriter(file.Trim('"')+".500.first"))
+                //{
+                //    for (var i = 0; i < 500; i++)
+                //        rawWriter.WriteLine(lines[i]);
+                //}
 
-                using (var reader = XmlReader.Create(file.Trim('"')))
-                    ReadElement(reader, token);
+                var name = file.Trim('"');
+
+                var document = _storage.CreateDocument(name);
+
+                using (var reader = XmlReader.Create(name))
+                    Read(reader, token, document);
             }, token);
         }
 
-        private void ReadElement(XmlReader reader, CancellationToken token, ulong parent = LinksConstants.Null)
+        private void Read(XmlReader reader, CancellationToken token, ulong parent)
         {
-            // TODO: Add element path to storage (http://stackoverflow.com/questions/31338885/getting-xpath-for-node-with-xmlreader)
-            // TODO: Namespaces/Namespace[1]/Text, Namespaces/Namespace[2]/Text (keep track of different elements with same name).
-            // TODO: Write to console current path.
+            var parents = new Stack<Tuple<ulong, string, int>>();
+            var elements = new Stack<string>();
+
+            string lastElementName = null;
+            var elementRepeatCount = 0;
+
             // TODO: If path was loaded previously, skip it.
 
-            if (token.IsCancellationRequested)
-                return;
-
-            if (reader.Read())
+            while (reader.Read())
             {
+                if (token.IsCancellationRequested)
+                    return;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if (token.IsCancellationRequested)
-                            return;
-
                         var elementName = reader.Name;
 
-                        Console.WriteLine("Starting element {0}...", elementName);
+                        if (lastElementName != elementName)
+                        {
+                            lastElementName = elementName;
+                            elementRepeatCount = 0;
+                        }
+                        else
+                            elementRepeatCount++;
 
-                        var element = _storage.CreateElement(name: elementName);
-                        if (parent != LinksConstants.Null)
+                        elementName = string.Format("{0}[{1}]", elementName, elementRepeatCount);
+
+                        if (!reader.IsEmptyElement)
+                        {
+                            elements.Push(elementName);
+
+#if DEBUG
+                            Console.WriteLine("{0} starting...",
+                                elements.Count <= 20 ? string.Join("/", elements.Reverse()) : elementName);
+#endif
+
+                            var element = _storage.CreateElement(name: elementName);
+
+                            parents.Push(new Tuple<ulong, string, int>(parent, lastElementName, elementRepeatCount));
                             _storage.AttachElementToParent(elementToAttach: element, parent: parent);
 
-                        do
+                            parent = element;
+                            lastElementName = null;
+                            elementRepeatCount = 0;
+                        }
+                        else
                         {
-                            ReadElement(reader, token, element);
-
-                            if (token.IsCancellationRequested)
-                                return;
-
-                        } while (reader.Name != elementName);
-
-                        Console.WriteLine("Element {0} finished.", elementName);
-                        break;
-
-                    case XmlNodeType.Text:
-                        if (token.IsCancellationRequested)
-                            return;
-
-                        Console.WriteLine("Starting text element...");
-
-                        var textElement = _storage.CreateTextElement(content: reader.Value);
-
-                        _storage.AttachElementToParent(textElement, parent);
-
-                        Console.WriteLine("Text element finished.");
+#if DEBUG
+                            Console.WriteLine("{0} finished.", elementName);
+#endif
+                        }
 
                         break;
 
                     case XmlNodeType.EndElement:
 
-                        Console.WriteLine("Current depth: {0}.", reader.Depth);
+#if DEBUG
+                        Console.WriteLine("{0} finished.",
+                            elements.Count <= 20 ? string.Join("/", elements.Reverse()) : elements.Peek());
+#else
+                        var topElement = elements.Peek();
+                        if (topElement.StartsWith("page"))
+                            Console.WriteLine(topElement);
+#endif
 
-                        return;
+                        elements.Pop();
+
+                        // Restoring scope
+                        var tuple = parents.Pop();
+
+                        parent = tuple.Item1;
+                        lastElementName = tuple.Item2;
+                        elementRepeatCount = tuple.Item3;
+
+                        break;
+
+                    case XmlNodeType.Text:
+#if DEBUG
+                        Console.WriteLine("Starting text element...");
+#endif
+
+                        var content = reader.Value;
+#if DEBUG
+                        Console.WriteLine("Content: {0}{1}", content.Truncate(50), content.Length >= 50 ? "..." : "");
+#endif
+                        var textElement = _storage.CreateTextElement(content: content);
+
+                        _storage.AttachElementToParent(textElement, parent);
+#if DEBUG
+                        Console.WriteLine("Text element finished.");
+#endif
+                        break;
                 }
             }
         }

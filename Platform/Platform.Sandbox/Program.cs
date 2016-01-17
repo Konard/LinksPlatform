@@ -4,6 +4,7 @@ using System.IO;
 using System.Threading;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers;
 
 namespace Platform.Sandbox
 {
@@ -36,15 +37,23 @@ namespace Platform.Sandbox
 
             ImportCancellationSource = new CancellationTokenSource();
 
-            using (var links = new Links(linksFile))
+            using (var memoryManager = new LinksMemoryManager(linksFile, LinksMemoryManager.DefaultLinksSizeStep * 16))
+            using (var links = new Links(memoryManager))
             {
                 UnicodeMap.InitNew(links);
-                var sequencesOptions = new SequencesOptions { UseCompression = true };
+                var sequencesOptions = new SequencesOptions { UseCompression = false };
                 var sequences = new Sequences(links, sequencesOptions);
                 var wikipediaStorage = new WikipediaLinksStorage(sequences);
                 var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
-                
-                wikipediaImporter.Import(wikipediaFile, ImportCancellationSource.Token).Wait();
+
+                try
+                {
+                    wikipediaImporter.Import(wikipediaFile, ImportCancellationSource.Token).Wait();
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToRecursiveString());
+                }
             }
 
             Console.WriteLine("It is safe to close now.");
@@ -56,8 +65,12 @@ namespace Platform.Sandbox
             if (ImportCancellationSource != null)
             {
                 e.Cancel = true;
-                ImportCancellationSource.Cancel();
-                Console.WriteLine("Stopping...");
+
+                if (!ImportCancellationSource.IsCancellationRequested)
+                {
+                    ImportCancellationSource.Cancel();
+                    Console.WriteLine("Stopping...");
+                }
             }
         }
 

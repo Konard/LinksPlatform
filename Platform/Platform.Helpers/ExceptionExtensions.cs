@@ -6,12 +6,20 @@ namespace Platform.Helpers
     public static class ExceptionExtensions
     {
         public const string ExceptionContentsSeparator = "---";
+        public const string ExceptionFailed = "Unable to format occured exception.";
 
         public static string ToRecursiveString(this Exception ex)
         {
-            var sb = new StringBuilder();
-            ToRecursiveStringCore(sb, ex, 0);
-            return sb.ToString();
+            try
+            {
+                var sb = new StringBuilder();
+                ToRecursiveStringCore(sb, ex, 0);
+                return sb.ToString();
+            }
+            catch
+            {
+                return ExceptionFailed;
+            }
         }
 
         private static void ToRecursiveStringCore(StringBuilder sb, Exception ex, int level)

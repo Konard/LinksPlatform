@@ -9,6 +9,7 @@ namespace Platform.Sandbox
         private readonly Links _links;
         private ulong _elementMarker;
         private ulong _textElementMarker;
+        private ulong _documentMarker;
 
         public WikipediaLinksStorage(Sequences sequences)
         {
@@ -26,7 +27,9 @@ namespace Platform.Sandbox
             _textElementMarker = CreateConstant(markerIndex++);
 
             // Reserve 100 more
-            for (var i = 0; i < 100; i++)
+            _documentMarker = CreateConstant(markerIndex++);
+            
+            for (var i = 0; i < 99; i++)
                 CreateConstant(markerIndex++);
         }
 
@@ -37,20 +40,27 @@ namespace Platform.Sandbox
             return markerIndex;
         }
 
+        public ulong CreateDocument(string name)
+        {
+            return Create(_documentMarker, name);
+        }
+
         public ulong CreateElement(string name)
         {
-            var nameLinks = UnicodeMap.FromStringToLinkArray(name);
-            var nameSequence = _sequences.Create(nameLinks);
-
-            return _links.Create(_elementMarker, nameSequence);
+            return Create(_elementMarker, name);
         }
 
         public ulong CreateTextElement(string content)
         {
+            return Create(_textElementMarker, content);
+        }
+
+        private ulong Create(ulong marker, string content)
+        {
             var contentLinks = UnicodeMap.FromStringToLinkArray(content);
             var contentSequence = _sequences.Create(contentLinks);
 
-            return _links.Create(_textElementMarker, contentSequence);
+            return _links.Create(marker, contentSequence);
         }
 
         public void AttachElementToParent(ulong elementToAttach, ulong parent)
