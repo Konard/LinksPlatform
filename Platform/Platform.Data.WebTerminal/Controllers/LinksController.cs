@@ -12,6 +12,14 @@ namespace Platform.Data.WebTerminal.Controllers
             if (id == 0) id = Net.Link;
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
+            return View("Index", model);
+        }
+
+        public ActionResult Infinite(long id = 0)
+        {
+            if (id == 0) id = Net.Link;
+            var link = Link.Restore(id);
+            var model = LinkModel.CreateLinkModel(link);
             return View("Infinite", model);
         }
     }
