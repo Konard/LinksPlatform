@@ -1,11 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
+using Platform.Helpers;
 
 namespace Platform.Sandbox
 {
+    /// <remarks>
+    /// TODO: Can be renamed to XMLImporter
+    /// TODO: Add support for XML arguments
+    /// </remarks>
     class WikipediaImporter
     {
         private readonly IWikipediaStorage<ulong> _storage;
@@ -21,33 +27,36 @@ namespace Platform.Sandbox
             {
                 //const int linesLength = 500;
                 //var lines = new string[linesLength];
-                //using (var rawReader = new StreamReader(file.Trim('"')))
+                //using (var rawReader = new StreamReader(file))
                 //{
                 //    for (var i = 0; i < 500; i++)
                 //        lines[i] = rawReader.ReadLine();
                 //}
-                //using (var rawWriter = new StreamWriter(file.Trim('"')+".500.first"))
+                //using (var rawWriter = new StreamWriter(file+".500.first"))
                 //{
                 //    for (var i = 0; i < 500; i++)
                 //        rawWriter.WriteLine(lines[i]);
                 //}
 
-                var name = file.Trim('"');
+                try
+                {
+                    var document = _storage.CreateDocument(file);
 
-                var document = _storage.CreateDocument(name);
+                    using (var reader = XmlReader.Create(file))
+                        Read(reader, token, new ElementContext(document));
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.ToRecursiveString());
+                }
 
-                using (var reader = XmlReader.Create(name))
-                    Read(reader, token, document);
             }, token);
         }
 
-        private void Read(XmlReader reader, CancellationToken token, ulong parent)
+        private void Read(XmlReader reader, CancellationToken token, ElementContext context)
         {
-            var parents = new Stack<Tuple<ulong, string, int>>();
-            var elements = new Stack<string>();
-
-            string lastElementName = null;
-            var elementRepeatCount = 0;
+            var parentContexts = new Stack<ElementContext>();
+            var elements = new Stack<string>(); // Path
 
             // TODO: If path was loaded previously, skip it.
 
@@ -61,82 +70,90 @@ namespace Platform.Sandbox
                     case XmlNodeType.Element:
                         var elementName = reader.Name;
 
-                        if (lastElementName != elementName)
-                        {
-                            lastElementName = elementName;
-                            elementRepeatCount = 0;
-                        }
-                        else
-                            elementRepeatCount++;
+                        context.IncrementChildNameCount(elementName);
 
-                        elementName = string.Format("{0}[{1}]", elementName, elementRepeatCount);
+                        elementName = string.Format("{0}[{1}]", elementName, context.ChildrenNamesCounts[elementName]);
 
                         if (!reader.IsEmptyElement)
                         {
                             elements.Push(elementName);
 
-#if DEBUG
-                            Console.WriteLine("{0} starting...",
-                                elements.Count <= 20 ? string.Join("/", elements.Reverse()) : elementName);
-#endif
+                            ConsoleHelpers.Debug("{0} starting...",
+                                elements.Count <= 20 ? ToXPath(elements) : elementName); // XPath
 
                             var element = _storage.CreateElement(name: elementName);
 
-                            parents.Push(new Tuple<ulong, string, int>(parent, lastElementName, elementRepeatCount));
-                            _storage.AttachElementToParent(elementToAttach: element, parent: parent);
+                            parentContexts.Push(context);
+                            _storage.AttachElementToParent(elementToAttach: element, parent: context.Parent);
 
-                            parent = element;
-                            lastElementName = null;
-                            elementRepeatCount = 0;
+                            context = new ElementContext(element);
                         }
                         else
                         {
-#if DEBUG
-                            Console.WriteLine("{0} finished.", elementName);
-#endif
+                            ConsoleHelpers.Debug("{0} finished.", elementName);
                         }
 
                         break;
 
                     case XmlNodeType.EndElement:
 
-#if DEBUG
-                        Console.WriteLine("{0} finished.",
-                            elements.Count <= 20 ? string.Join("/", elements.Reverse()) : elements.Peek());
-#else
-                        var topElement = elements.Peek();
-                        if (topElement.StartsWith("page"))
-                            Console.WriteLine(topElement);
-#endif
+                        ConsoleHelpers.Debug("{0} finished.",
+                            elements.Count <= 20 ? ToXPath(elements) : elements.Peek()); // XPath
 
-                        elements.Pop();
+                        var topElement = elements.Pop();
 
                         // Restoring scope
-                        var tuple = parents.Pop();
+                        context = parentContexts.Pop();
 
-                        parent = tuple.Item1;
-                        lastElementName = tuple.Item2;
-                        elementRepeatCount = tuple.Item3;
+                        if (topElement.StartsWith("page"))
+                        {
+                            if (context.ChildrenNamesCounts["page"] % 100 == 0)
+                                Console.WriteLine(topElement);
+                        }
 
                         break;
 
                     case XmlNodeType.Text:
-#if DEBUG
-                        Console.WriteLine("Starting text element...");
-#endif
+                        ConsoleHelpers.Debug("Starting text element...");
 
                         var content = reader.Value;
-#if DEBUG
-                        Console.WriteLine("Content: {0}{1}", content.Truncate(50), content.Length >= 50 ? "..." : "");
-#endif
+
+                        ConsoleHelpers.Debug("Content: {0}{1}", content.Truncate(50), content.Length >= 50 ? "..." : "");
+
                         var textElement = _storage.CreateTextElement(content: content);
 
-                        _storage.AttachElementToParent(textElement, parent);
-#if DEBUG
-                        Console.WriteLine("Text element finished.");
-#endif
+                        _storage.AttachElementToParent(textElement, context.Parent);
+
+                        ConsoleHelpers.Debug("Text element finished.");
+
                         break;
                 }
+            }
+        }
+
+        private string ToXPath(Stack<string> path)
+        {
+            return string.Join("/", path.Reverse());
+        }
+
+        private struct ElementContext
+        {
+            public readonly ulong Parent;
+            public readonly Dictionary<string, int> ChildrenNamesCounts;
+
+            public ElementContext(ulong parent)
+            {
+                Parent = parent;
+                ChildrenNamesCounts = new Dictionary<string, int>();
+            }
+
+            public void IncrementChildNameCount(string name)
+            {
+                int count;
+                if (ChildrenNamesCounts.TryGetValue(name, out count))
+                    ChildrenNamesCounts[name] = count + 1;
+                else
+                    ChildrenNamesCounts[name] = 0;
             }
         }
     }

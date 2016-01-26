@@ -83,6 +83,7 @@
     <Compile Include="Sequences\ISequences.cs" />
     <Compile Include="Sequences\Sequences.cs" />
     <Compile Include="Sequences\Sequences.Experiments.cs" />
+    <Compile Include="Sequences\SequencesExtensions.cs" />
     <Compile Include="Sequences\SequencesOptions.cs" />
     <Compile Include="Sequences\SequenceWalker.cs" />
     <Compile Include="Sequences\StopableSequenceWalker.cs" />

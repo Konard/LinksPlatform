@@ -131,7 +131,7 @@ namespace Platform.Memory
                 throw new ArgumentOutOfRangeException("minimumReservedCapacity");
             }
 
-            _address = address.Trim('"');
+            _address = address;
             _reservedCapacity = minimumReservedCapacity;
             _usedCapacity = 0;
 

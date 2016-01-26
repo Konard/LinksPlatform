@@ -57,10 +57,23 @@ namespace Platform.Sandbox
 
         private ulong Create(ulong marker, string content)
         {
-            var contentLinks = UnicodeMap.FromStringToLinkArray(content);
-            var contentSequence = _sequences.Create(contentLinks);
+            var contentSequence = CreateSequence1(content);
 
             return _links.Create(marker, contentSequence);
+        }
+
+        private ulong CreateSequence0(string @string)
+        {
+            var contentLinks = UnicodeMap.FromStringToLinkArray(@string);
+            var contentSequence = _sequences.Create(contentLinks);
+            return contentSequence;
+        }
+
+        private ulong CreateSequence1(string @string)
+        {
+            var contentLinksGroups = UnicodeMap.FromStringToLinkArrayGroups(@string);
+            var contentSequence = _sequences.Create(contentLinksGroups);
+            return contentSequence;
         }
 
         public void AttachElementToParent(ulong elementToAttach, ulong parent)

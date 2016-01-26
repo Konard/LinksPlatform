@@ -375,7 +375,8 @@ namespace Platform.Data.Core.Pairs
                 if (_binaryLogger != null)
                     _binaryLogger.Dispose();
 
-                FileHelpers.WriteFirst(_logAddress, _lastCommitedTransition);
+                if (!string.IsNullOrWhiteSpace(_logAddress))
+                    FileHelpers.WriteFirst(_logAddress, _lastCommitedTransition);
             }
             catch (Exception ex)
             {

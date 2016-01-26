@@ -1,82 +1,14 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Threading;
-using Platform.Data.Core.Pairs;
-using Platform.Data.Core.Sequences;
-using Platform.Helpers;
 
 namespace Platform.Sandbox
 {
     internal unsafe class Program
     {
-        private static CancellationTokenSource ImportCancellationSource = null;
-
         private static void Main(string[] args)
         {
-            Console.CancelKeyPress += OnCancelKeyPressed;
-
-            string linksFile, wikipediaFile;
-            if (args.Length >= 1)
-                linksFile = args[0];
-            else
-            {
-                Console.Write("Links file: ");
-                linksFile = Console.ReadLine();
-            }
-
-            if (args.Length >= 2)
-                wikipediaFile = args[1];
-            else
-            {
-                Console.Write("Wikipedia xml file: ");
-                wikipediaFile = Console.ReadLine();
-            }
-
-            Console.WriteLine("Press CTRL+C to stop.");
-
-            ImportCancellationSource = new CancellationTokenSource();
-
-            using (var memoryManager = new LinksMemoryManager(linksFile, LinksMemoryManager.DefaultLinksSizeStep * 16))
-            using (var links = new Links(memoryManager))
-            {
-                UnicodeMap.InitNew(links);
-                var sequencesOptions = new SequencesOptions { UseCompression = false };
-                var sequences = new Sequences(links, sequencesOptions);
-                var wikipediaStorage = new WikipediaLinksStorage(sequences);
-                var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
-
-                try
-                {
-                    wikipediaImporter.Import(wikipediaFile, ImportCancellationSource.Token).Wait();
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine(ex.ToRecursiveString());
-                }
-            }
-
-            Console.WriteLine("It is safe to close now.");
-            Console.ReadKey();
-        }
-
-        private static void OnCancelKeyPressed(object sender, ConsoleCancelEventArgs e)
-        {
-            if (ImportCancellationSource != null)
-            {
-                e.Cancel = true;
-
-                if (!ImportCancellationSource.IsCancellationRequested)
-                {
-                    ImportCancellationSource.Cancel();
-                    Console.WriteLine("Stopping...");
-                }
-            }
-        }
-
-
-        private static void Main2(string[] args)
-        {
+            new WikipediaImporterCLI().Run(args);
 
             //DllImportTest.Test();
 

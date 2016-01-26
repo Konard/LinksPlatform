@@ -46,6 +46,7 @@
     <Compile Include="Collections\UnsafeDictionary.cs" />
     <Compile Include="Collections\UnsafeDictionary1.cs" />
     <Compile Include="ConcurrentArrayPool.cs" />
+    <Compile Include="ConsoleHelpers.cs" />
     <Compile Include="Counter.cs" />
     <Compile Include="Disposal\DisposableValue.cs" />
     <Compile Include="DynamicExtensions.cs" />
