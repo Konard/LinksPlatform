@@ -52,6 +52,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="Data.Core\LinksTests.cs" />
+    <Compile Include="Data.Core\LinksTestScope.cs" />
     <Compile Include="Data.Core\SequencesTests.cs" />
     <Compile Include="Data.Core\BitStringTests.cs" />
     <Compile Include="Data.Core\LinksMemoryManagerTests.cs" />

@@ -348,6 +348,33 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempFilename);
         }
 
+        [TestMethod]
+        public void IndexTest()
+        {
+            const ulong itself = LinksConstants.Itself;
+
+            using (var scope = new LinksTestScope())
+            {
+                var links = scope.Links;
+
+                var e1 = links.Create(itself, itself);
+                var e2 = links.Create(itself, itself);
+
+                var sequence = new[]
+                {
+                    e1, e2, e1, e2 // mama / papa
+                };
+
+                var options = new SequencesOptions() { UseIndex = true };
+
+                var sequences = new Sequences(links);
+
+                Assert.IsFalse(sequences.Index(sequence));
+
+                Assert.IsTrue(sequences.Index(sequence));
+            }
+        }
+
         private static void InitBitString()
         {
             Global.Trash = new BitString(1);

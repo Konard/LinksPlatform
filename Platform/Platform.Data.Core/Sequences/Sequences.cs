@@ -168,6 +168,9 @@ namespace Platform.Data.Core.Sequences
 
         private ulong CreateCore(params ulong[] sequence)
         {
+            if (Options.UseIndex)
+                Index(sequence);
+
             if (Options.EnforceSingleSequenceVersionOnWrite)
                 return CompactCore(sequence);
 
@@ -182,6 +185,38 @@ namespace Platform.Data.Core.Sequences
                 Links.CreateCore(Options.SequenceMarkerLink, sequenceRoot);
 
             return sequenceRoot; // Возвращаем корень последовательности (т.е. сами элементы)
+        }
+
+        /// <summary>
+        /// Индексирует последовательность глобально, и возвращает значение,
+        /// определяющие была ли запрошенная последовательность проиндексирована ранее. 
+        /// </summary>
+        /// <param name="sequence">Последовательность для индексации.</param>
+        /// <returns>
+        /// True если последовательность уже была проиндексирована ранее и
+        /// False если последовательность была проиндексирована только что.
+        /// </returns>
+        public bool Index(ulong[] sequence)
+        {
+            var indexed = true;
+
+            var i = sequence.Length;
+            while (--i >= 1 && (indexed = Links.Search(sequence[i - 1], sequence[i]) != LinksConstants.Null));
+
+            for (; i >= 1; i--)
+                Links.Create(sequence[i - 1], sequence[i]);
+
+            return indexed;
+        }
+
+        public bool CheckIndex(ulong[] sequence)
+        {
+            var indexed = true;
+
+            var i = sequence.Length;
+            while (--i >= 1 && (indexed = Links.Search(sequence[i - 1], sequence[i]) != LinksConstants.Null)) ;
+
+            return indexed;
         }
 
         public ulong CreateBalancedVariant(params ulong[] sequence)
@@ -264,6 +299,9 @@ namespace Platform.Data.Core.Sequences
                 {
                     return Links.EachCore(sequence[0], sequence[1], handler);
                 }
+
+                if (Options.UseIndex && !CheckIndex(sequence))
+                    return false;
 
                 return EachCore(handler, sequence);
             });

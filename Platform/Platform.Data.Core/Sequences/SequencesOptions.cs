@@ -8,6 +8,7 @@ namespace Platform.Data.Core.Sequences
         public ulong SequenceMarkerLink;
         public bool UseCascadeUpdate;
         public bool UseCascadeDelete;
+        public bool UseIndex; // TODO: Update Index on sequence update/delete.
         public bool UseSequenceMarker;
         public bool UseCompression;
         public bool UseGarbageCollection;
