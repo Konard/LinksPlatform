@@ -180,6 +180,12 @@
     </ClCompile>
     <ClCompile Include="PersistentMemoryManagerTests.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Data.Kernel\Platform.Data.Kernel.vcxproj">
+      <Project>{6b34f379-3d89-4ec7-ba47-c1a1a7b4421c}</Project>
+      <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
