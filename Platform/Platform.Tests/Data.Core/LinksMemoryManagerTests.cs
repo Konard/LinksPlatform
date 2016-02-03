@@ -7,14 +7,12 @@ namespace Platform.Tests.Data.Core
     [TestClass]
     public class LinksMemoryManagerTests
     {
-        private static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
-
         [TestMethod]
         public void BasicMemoryTest()
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempFilename))
             {
                 var link = memoryManager.AllocateLink();
                 memoryManager.FreeLink(link);

@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Collections;
@@ -13,25 +12,21 @@ namespace Platform.Tests.Data.Core
     [TestClass]
     public class SequencesTests
     {
-        public static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
-
         [TestMethod]
         public void CreateAllVariantsTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 8;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var sw1 = Stopwatch.StartNew();
                 var results1 = sequences.CreateAllVariants1(sequence); sw1.Stop();
@@ -45,8 +40,6 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         //[TestMethod]
@@ -93,20 +86,18 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void AllVariantsSearchTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 8;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var createResults = sequences.CreateAllVariants2(sequence).Distinct().ToArray();
 
@@ -144,27 +135,23 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void BalancedVariantSearchTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 200;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var sw1 = Stopwatch.StartNew();
                 var balancedVariant = sequences.CreateBalancedVariant(sequence); sw1.Stop();
@@ -188,27 +175,23 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void AllPartialVariantsSearchTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 8;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
@@ -248,27 +231,23 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void BalancedPartialVariantsSearchTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 200;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var balancedVariant = sequences.CreateBalancedVariant(sequence);
 
@@ -289,22 +268,20 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void PatternMatchTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const ulong itself = LinksConstants.Itself;
             const ulong one = LinksConstants.Any;
             const ulong zeroOrMany = Sequences.ZeroOrMany;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var e1 = links.Create(itself, itself);
                 var e2 = links.Create(itself, itself);
 
@@ -312,8 +289,6 @@ namespace Platform.Tests.Data.Core
                 {
                     e1, e2, e1, e2 // mama / papa
                 };
-
-                var sequences = new Sequences(links);
 
                 var balancedVariant = sequences.CreateBalancedVariant(sequence);
 
@@ -344,8 +319,6 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequence.Length; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
@@ -353,9 +326,11 @@ namespace Platform.Tests.Data.Core
         {
             const ulong itself = LinksConstants.Itself;
 
-            using (var scope = new LinksTestScope())
+            using (var scope = new TempLinksTestScope(useSequences: true, 
+                sequencesOptions: new SequencesOptions { UseIndex = true }))
             {
                 var links = scope.Links;
+                var sequences = scope.Sequences;
 
                 var e1 = links.Create(itself, itself);
                 var e2 = links.Create(itself, itself);
@@ -364,10 +339,6 @@ namespace Platform.Tests.Data.Core
                 {
                     e1, e2, e1, e2 // mama / papa
                 };
-
-                var options = new SequencesOptions() { UseIndex = true };
-
-                var sequences = new Sequences(links);
 
                 Assert.IsFalse(sequences.Index(sequence));
 
@@ -383,13 +354,13 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void CompressionTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var e1 = links.Create(itself, itself);
                 var e2 = links.Create(itself, itself);
 
@@ -397,8 +368,6 @@ namespace Platform.Tests.Data.Core
                 {
                     e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
                 };
-
-                var sequences = new Sequences(links);
 
                 var compressor = new Compressor(links, sequences);
 
@@ -428,8 +397,6 @@ namespace Platform.Tests.Data.Core
                 Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
                 Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
@@ -437,20 +404,18 @@ namespace Platform.Tests.Data.Core
         {
             InitBitString();
 
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 5;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
@@ -492,8 +457,6 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
@@ -501,20 +464,18 @@ namespace Platform.Tests.Data.Core
         {
             InitBitString();
 
-            var tempFilename = Path.GetTempFileName();
-
             const long sequenceLength = 3;
 
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope(useSequences: true))
             {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create(itself, itself);
-
-                var sequences = new Sequences(links);
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
@@ -537,8 +498,6 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
-
-            File.Delete(tempFilename);
         }
     }
 }

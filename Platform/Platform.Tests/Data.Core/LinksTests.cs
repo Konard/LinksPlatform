@@ -14,21 +14,17 @@ namespace Platform.Tests.Data.Core
     {
         private const long Iterations = 10 * 1024;
 
-        private static readonly long DefaultLinksSizeStep = LinksMemoryManager.LinkSizeInBytes * 1024 * 1024;
-
         #region Concept
 
         [TestMethod]
         public void CascadeUpdateTest()
         {
-            var tempDatabaseFilename = Path.GetTempFileName();
-            var tempTransactionLogFilename = Path.GetTempFileName();
-
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager, tempTransactionLogFilename))
+            using (var scope = new TempLinksTestScope(useLog: true))
             {
+                var links = scope.Links;
+
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
 
@@ -42,53 +38,43 @@ namespace Platform.Tests.Data.Core
                 links.Delete(l2);
 
                 Global.Trash = links.Count();
+
+                links.Dispose(); // Close links to access log
+
+                Global.Trash = FileHelpers.ReadAll<Links.Transition>(scope.TempTransactionLogFilename);
             }
-
-            Global.Trash = FileHelpers
-                .ReadAll<Links.Transition>(tempTransactionLogFilename);
-
-            File.Delete(tempDatabaseFilename);
-            File.Delete(tempTransactionLogFilename);
         }
 
         [TestMethod]
         public void BasicTransactionLogTest()
         {
-            var tempDatabaseFilename = Path.GetTempFileName();
-            var tempTransactionLogFilename = Path.GetTempFileName();
-
             const ulong itself = LinksConstants.Itself;
 
-            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager, tempTransactionLogFilename))
+            using (var scope = new TempLinksTestScope(useLog: true))
             {
+                var links = scope.Links;
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
 
                 Global.Trash = links.Update(l2, l2, l1, l2);
 
                 links.Delete(l1);
+
+                links.Dispose(); // Close links to access log
+
+                Global.Trash = FileHelpers.ReadAll<Links.Transition>(scope.TempTransactionLogFilename);
             }
-
-            Global.Trash = FileHelpers
-                .ReadAll<Links.Transition>(tempTransactionLogFilename);
-
-            File.Delete(tempDatabaseFilename);
-            File.Delete(tempTransactionLogFilename);
         }
 
         [TestMethod]
         public void TransactionsTest()
         {
-            var tempDatabaseFilename = Path.GetTempFileName();
-            var tempTransactionLogFilename = Path.GetTempFileName();
-
+            // Auto Reverted (Because no commit at transaction)
             const ulong itself = LinksConstants.Itself;
 
-            // Auto Reverted (Because no commit at transaction)
-            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager, tempTransactionLogFilename))
+            using (var scope = new TempLinksTestScope(useLog: true))
             {
+                var links = scope.Links;
                 using (var transaction = links.BeginTransaction())
                 {
                     var l1 = links.Create(itself, itself);
@@ -102,17 +88,20 @@ namespace Platform.Tests.Data.Core
                 }
 
                 Global.Trash = links.Count();
+
+                links.Dispose();
+
+                Global.Trash = FileHelpers.ReadAll<Links.Transition>(scope.TempTransactionLogFilename);
             }
 
-            Global.Trash = FileHelpers
-                .ReadAll<Links.Transition>(tempTransactionLogFilename);
+            TempLinksTestScope lastScope = null;
 
             // User Code Error (Autoreverted), no data saved
             try
             {
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-                using (var links = new Links(memoryManager, tempTransactionLogFilename))
+                using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
+                    var links = scope.Links;
                     using (var transaction = links.BeginTransaction())
                     {
                         var l1 = links.Create(itself, itself);
@@ -123,7 +112,7 @@ namespace Platform.Tests.Data.Core
                         links.Create(l2, itself);
                         links.Create(l2, itself);
 
-                        Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
+                        Global.Trash = FileHelpers.ReadAll<Links.Transition>(scope.TempTransactionLogFilename);
 
                         l2 = links.Update(l2, l1);
 
@@ -139,10 +128,14 @@ namespace Platform.Tests.Data.Core
             }
             catch
             {
+                Assert.IsFalse(lastScope == null);
+
                 var transitions = FileHelpers
-                    .ReadAll<Links.Transition>(tempTransactionLogFilename);
+                    .ReadAll<Links.Transition>(lastScope.TempTransactionLogFilename);
 
                 Assert.IsTrue(transitions.Length == 1 && transitions[0].Before.IsNull() && transitions[0].After.IsNull());
+
+                lastScope.DeleteFiles();
             }
 
             // User Code Error (Autoreverted), some data saved
@@ -151,9 +144,9 @@ namespace Platform.Tests.Data.Core
                 ulong l1;
                 ulong l2;
 
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-                using (var links = new Links(memoryManager, tempTransactionLogFilename))
+                using (var scope = new TempLinksTestScope(useLog: true))
                 {
+                    var links = scope.Links;
                     l1 = links.Create(itself, itself);
                     l2 = links.Create(itself, itself);
 
@@ -161,13 +154,15 @@ namespace Platform.Tests.Data.Core
 
                     links.Create(l2, itself);
                     links.Create(l2, itself);
+
+                    links.Dispose();
+
+                    Global.Trash = FileHelpers.ReadAll<Links.Transition>(scope.TempTransactionLogFilename);
                 }
 
-                Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
-
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-                using (var links = new Links(memoryManager, tempTransactionLogFilename))
+                using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
+                    var links = scope.Links;
                     using (var transaction = links.BeginTransaction())
                     {
                         l2 = links.Update(l2, l1);
@@ -184,12 +179,19 @@ namespace Platform.Tests.Data.Core
             }
             catch
             {
+                Assert.IsFalse(lastScope == null);
+
                 Global.Trash = FileHelpers
-                    .ReadAll<Links.Transition>(tempTransactionLogFilename);
+                    .ReadAll<Links.Transition>(lastScope.TempTransactionLogFilename);
+
+                lastScope.DeleteFiles();
             }
 
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
             // Commit
-            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename))
             using (var links = new Links(memoryManager, tempTransactionLogFilename))
             {
                 using (var transaction = links.BeginTransaction())
@@ -207,8 +209,7 @@ namespace Platform.Tests.Data.Core
                 Global.Trash = links.Count();
             }
 
-            Global.Trash = FileHelpers
-                .ReadAll<Links.Transition>(tempTransactionLogFilename);
+            Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
 
             // Damage database
 
@@ -219,7 +220,7 @@ namespace Platform.Tests.Data.Core
             try
             {
                 // TODO: Fix
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename))
                 using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     Global.Trash = links.Count();
@@ -251,7 +252,7 @@ namespace Platform.Tests.Data.Core
                 ulong l1;
                 ulong l2;
 
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename))
                 using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     l1 = links.Create(itself, itself);
@@ -265,7 +266,7 @@ namespace Platform.Tests.Data.Core
 
                 Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
 
-                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
+                using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename))
                 using (var links = new Links(memoryManager, tempTransactionLogFilename))
                 {
                     using (var transaction = links.BeginTransaction())
@@ -300,25 +301,19 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void PathsTest()
         {
-            var tempDatabaseFilename = Path.GetTempFileName();
-            var tempTransactionLogFilename = Path.GetTempFileName();
-
             const ulong itself = LinksConstants.Itself;
             const long source = LinksConstants.SourcePart;
             const long target = LinksConstants.TargetPart;
 
-            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager, tempTransactionLogFilename))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 var l1 = links.Create(itself, itself);
                 var l2 = links.Create(itself, itself);
 
                 var r1 = links.GetByKeys(l1, source, target, source);
                 var r2 = links.CheckPathExistance(l2, l2, l2, l2);
             }
-
-            File.Delete(tempDatabaseFilename);
-            File.Delete(tempTransactionLogFilename);
         }
 
         #endregion
@@ -458,11 +453,9 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void GetSourceTest()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 Console.WriteLine("Testing GetSource function with {0} Iterations.", Iterations);
 
                 ulong counter = 0;
@@ -488,18 +481,14 @@ namespace Platform.Tests.Data.Core
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
                     Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void GetSourceInParallel()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 Console.WriteLine("Testing GetSource function with {0} Iterations in parallel.", Iterations);
 
                 long counter = 0;
@@ -526,18 +515,14 @@ namespace Platform.Tests.Data.Core
                     "{0} Iterations of GetSource function done in {1} ({2} Iterations per second), counter result: {3}",
                     Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void TestGetTarget()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 Console.WriteLine("Testing GetTarget function with {0} Iterations.", Iterations);
 
                 ulong counter = 0;
@@ -560,18 +545,14 @@ namespace Platform.Tests.Data.Core
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",
                     Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void TestGetTargetInParallel()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 Console.WriteLine("Testing GetTarget function with {0} Iterations in parallel.", Iterations);
 
                 long counter = 0;
@@ -597,8 +578,6 @@ namespace Platform.Tests.Data.Core
                     "{0} Iterations of GetTarget function done in {1} ({2} Iterations per second), counter result: {3}",
                     Iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
-
-            File.Delete(tempFilename);
         }
 
         // TODO: Заполнить базу данных перед тестом
@@ -640,11 +619,9 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public void TestRandomSearchAll()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 ulong counter = 0;
 
                 var maxLink = links.Count();
@@ -670,18 +647,14 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine("{0} Iterations of Random Search done in {1} ({2} Iterations per second), c: {3}",
                     iterations, elapsedTime, (long)iterationsPerSecond, counter);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public void TestEach()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 ulong counter = 0;
 
                 Console.WriteLine("Testing Each function.");
@@ -702,8 +675,6 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine("{0} Iterations of Each's handler function done in {1} ({2} links per second)",
                     counter, elapsedTime, (long)linksPerSecond);
             }
-
-            File.Delete(tempFilename);
         }
 
         /*
@@ -770,11 +741,9 @@ namespace Platform.Tests.Data.Core
         [TestMethod]
         public static void Create64BillionLinks()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 var linksBeforeTest = links.Count();
 
                 long linksToCreate = 64 * 1024 * 1024 / LinksMemoryManager.LinkSizeInBytes;
@@ -797,18 +766,14 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
                     (long)linksPerSecond);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public static void Create64BillionLinksInParallel()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 var linksBeforeTest = links.Count();
 
                 var sw = Stopwatch.StartNew();
@@ -827,18 +792,14 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine("{0} links created in {1} ({2} links per second)", linksCreated, elapsedTime,
                     (long)linksPerSecond);
             }
-
-            File.Delete(tempFilename);
         }
 
         [TestMethod]
         public static void TestDeletionOfAllLinks()
         {
-            var tempFilename = Path.GetTempFileName();
-
-            using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-            using (var links = new Links(memoryManager))
+            using (var scope = new TempLinksTestScope())
             {
+                var links = scope.Links;
                 var linksBeforeTest = links.Count();
 
                 Console.WriteLine("Deleting all links");
@@ -851,8 +812,6 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine("{0} links deleted in {1} ({2} links per second)", linksDeleted, elapsedTime,
                     (long)linksPerSecond);
             }
-
-            File.Delete(tempFilename);
         }
 
         #endregion
