@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Platform.Helpers</RootNamespace>
     <AssemblyName>Platform.Helpers</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -63,7 +63,6 @@
     <Compile Include="FileHelpers.cs" />
     <Compile Include="Global.cs" />
     <Compile Include="MathHelpers.cs" />
-    <Compile Include="MemoryHelpers.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RandomExtensions.cs" />
     <Compile Include="SerializationHelpers.cs" />

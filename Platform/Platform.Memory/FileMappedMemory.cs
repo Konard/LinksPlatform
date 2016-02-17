@@ -1,7 +1,6 @@
 ﻿using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using Platform.Helpers;
 using Platform.Helpers.Disposal;
 
 namespace Platform.Memory
@@ -67,26 +66,19 @@ namespace Platform.Memory
                 if (value < 0)
                     value = 0;
                 if (value < _usedCapacity)
-                    throw new Exception(
-                        string.Format(
-                            "Размер зарезервированной ёмкости блока памяти '{0}' не может быть меньше размера используемой ёмкости {1}.",
-                            _address, _usedCapacity));
+                    throw new Exception(string.Format("Размер зарезервированной ёмкости блока памяти '{0}' не может быть меньше размера используемой ёмкости {1}.", _address, _usedCapacity));
+
                 if (value != _reservedCapacity)
                 {
-                    MemoryHelpers.AlignSizeToSystemPageSize(ref value);
+                    UnmapFile();
 
-                    if (value != _reservedCapacity)
-                    {
-                        UnmapFile();
+                    ForceResize(_address, ref value);
 
-                        ForceResize(_address, ref value);
+                    // Может ли previousCapacity изменить фактический размер _usedCapacity?
 
-                        // Может ли previousCapacity изменить фактический размер _usedCapacity?
+                    _reservedCapacity = value;
 
-                        _reservedCapacity = value;
-
-                        MapFile();
-                    }
+                    MapFile();
                 }
             }
         }
@@ -112,10 +104,7 @@ namespace Platform.Memory
                 if (value < 0)
                     value = 0;
                 if (value > _reservedCapacity)
-                    throw new Exception(
-                        string.Format(
-                            "Размер используемой ёмкости блока памяти '{0}' не может быть больше размера зарезервированной ёмкости {1}.",
-                            _address, _reservedCapacity));
+                    throw new Exception(string.Format("Размер используемой ёмкости блока памяти '{0}' не может быть больше размера зарезервированной ёмкости {1}.", _address, _reservedCapacity));
                 _usedCapacity = value;
             }
         }
@@ -127,9 +116,7 @@ namespace Platform.Memory
         public FileMappedMemory(string address, long minimumReservedCapacity)
         {
             if (minimumReservedCapacity < 0)
-            {
                 throw new ArgumentOutOfRangeException("minimumReservedCapacity");
-            }
 
             _address = address;
             _reservedCapacity = minimumReservedCapacity;
@@ -141,8 +128,6 @@ namespace Platform.Memory
 
             if (_reservedCapacity < minimumReservedCapacity)
                 _reservedCapacity = minimumReservedCapacity;
-
-            MemoryHelpers.AlignSizeToSystemPageSize(ref _reservedCapacity);
 
             MapFile();
         }

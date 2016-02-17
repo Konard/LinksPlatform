@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Pairs;
@@ -111,12 +112,12 @@ namespace Platform.Data.Core.Sequences
 
             while (offset < sequence.Length)
             {
-                var currentCategory = char.GetUnicodeCategory(sequence[offset]);
+                var currentCategory = CharUnicodeInfo.GetUnicodeCategory(sequence[offset]);
 
                 var relativeLength = 1;
                 var absoluteLength = offset + relativeLength;
                 while (absoluteLength < sequence.Length &&
-                       currentCategory == char.GetUnicodeCategory(sequence[absoluteLength]))
+                       currentCategory == CharUnicodeInfo.GetUnicodeCategory(sequence[absoluteLength]))
                 {
                     relativeLength++;
                     absoluteLength++;
@@ -147,12 +148,12 @@ namespace Platform.Data.Core.Sequences
 
                 if (array[offset] <= LastCharLink)
                 {
-                    var currentCategory = char.GetUnicodeCategory(FromLinkToChar(array[offset]));
+                    var currentCategory = CharUnicodeInfo.GetUnicodeCategory(FromLinkToChar(array[offset]));
 
                     var absoluteLength = offset + relativeLength;
                     while (absoluteLength < array.Length &&
                            array[absoluteLength] <= LastCharLink &&
-                           currentCategory == char.GetUnicodeCategory(FromLinkToChar(array[absoluteLength])))
+                           currentCategory == CharUnicodeInfo.GetUnicodeCategory(FromLinkToChar(array[absoluteLength])))
                     {
                         relativeLength++;
                         absoluteLength++;

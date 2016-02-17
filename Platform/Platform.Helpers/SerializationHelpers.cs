@@ -6,7 +6,7 @@ using System.Xml.Serialization;
 
 namespace Platform.Helpers
 {
-    static public class SerializationHelpers
+    public static class SerializationHelpers
     {
         static readonly ConcurrentDictionary<Type, XmlSerializer> XmlSerializerCache = new ConcurrentDictionary<Type, XmlSerializer>();
 
@@ -15,14 +15,14 @@ namespace Platform.Helpers
             return XmlSerializerCache.GetOrAdd(typeof(T), type => new XmlSerializer(type));
         }
 
-        static public T DeserializeFromXml<T>(string xmlString)
+        public static T DeserializeFromXml<T>(string xmlString)
         {
             var serializer = GetOrAddXmlSerializer<T>();
             using (var reader = new StringReader(xmlString))
                 return (T)serializer.Deserialize(reader);
         }
 
-        static public void SerializeToFile<T>(string path, T obj)
+        public static void SerializeToFile<T>(string path, T obj)
         {
             var serializer = GetOrAddXmlSerializer<T>();
             using (var fileStream = File.Open(path, FileMode.Create))
@@ -32,7 +32,7 @@ namespace Platform.Helpers
             }
         }
 
-        static public string SerializeAsXmlString<T>(T obj)
+        public static string SerializeAsXmlString<T>(T obj)
         {
             var serializer = GetOrAddXmlSerializer<T>();
             var sb = new StringBuilder();

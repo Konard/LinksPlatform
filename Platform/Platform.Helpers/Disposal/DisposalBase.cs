@@ -13,7 +13,6 @@ namespace Platform.Helpers.Disposal
     public abstract class DisposalBase : IDisposal
     {
         private static readonly Process CurrentProcess = Process.GetCurrentProcess();
-        private static readonly AppDomain CurrentDomain = AppDomain.CurrentDomain;
 
         private bool _disposed;
 
@@ -23,7 +22,6 @@ namespace Platform.Helpers.Disposal
         {
             _disposed = false;
             CurrentProcess.Exited += OnProcessExit;
-            CurrentDomain.ProcessExit += OnProcessExit;
         }
 
         public void Dispose()
@@ -58,17 +56,12 @@ namespace Platform.Helpers.Disposal
                         {
                             DisposeCore(manual);
 
+                            _disposed = true;
+
                             if (CurrentProcess != null)
                                 CurrentProcess.Exited -= OnProcessExit;
                             //else
                             //    Process.GetCurrentProcess().Exited -= OnProcessExit;
-
-                            if (CurrentDomain != null)
-                                CurrentDomain.ProcessExit -= OnProcessExit;
-                            //else
-                            //  AppDomain.CurrentDomain.ProcessExit -= OnProcessExit;
-
-                            _disposed = true;
                         }
                         catch
                         {

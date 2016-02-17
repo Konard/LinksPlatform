@@ -25,7 +25,7 @@ namespace Platform.Data.Core.Sequences
         /// </remarks>
         public class LinkComparer : IEqualityComparer<Link>
         {
-            static public readonly LinkComparer Default = new LinkComparer();
+            public static readonly LinkComparer Default = new LinkComparer();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public bool Equals(Link x, Link y)

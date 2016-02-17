@@ -1,9 +1,4 @@
 ﻿using System;
-using System.Diagnostics.Contracts;
-using System.Runtime.CompilerServices;
-using System.Runtime.ConstrainedExecution;
-using System.Runtime.Serialization;
-using System.Threading;
 
 namespace Platform.Helpers.Collections
 {
@@ -89,26 +84,6 @@ namespace Platform.Helpers.Collections1
             187751, 225307, 270371, 324449, 389357, 467237, 560689, 672827, 807403, 968897, 1162687, 1395263,
             1674319, 2009191, 2411033, 2893249, 3471899, 4166287, 4999559, 5999471, 7199369};
 
-        // Used by Hashtable and Dictionary's SeralizationInfo .ctor's to store the SeralizationInfo
-        // object until OnDeserialization is called.
-        private static ConditionalWeakTable<object, SerializationInfo> s_SerializationInfoTable;
-
-        internal static ConditionalWeakTable<object, SerializationInfo> SerializationInfoTable
-        {
-            get
-            {
-                if (s_SerializationInfoTable == null)
-                {
-                    var newTable = new ConditionalWeakTable<object, SerializationInfo>();
-                    Interlocked.CompareExchange(ref s_SerializationInfoTable, newTable, null);
-                }
-
-                return s_SerializationInfoTable;
-            }
-
-        }
-
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         public static bool IsPrime(int candidate)
         {
             if ((candidate & 1) != 0)
@@ -124,12 +99,11 @@ namespace Platform.Helpers.Collections1
             return (candidate == 2);
         }
 
-        [ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
         public static int GetPrime(int min)
         {
             //if (min < 0)
             //    throw new ArgumentException(Environment.GetResourceString("Arg_HTCapacityOverflow"));
-            Contract.EndContractBlock();
+            //Contract.EndContractBlock();
 
             for (var i = 0; i < primes.Length; i++)
             {
@@ -161,7 +135,7 @@ namespace Platform.Helpers.Collections1
             // Note that this check works even when _items.Length overflowed thanks to the (uint) cast
             if ((uint)newSize > MaxPrimeArrayLength && MaxPrimeArrayLength > oldSize)
             {
-                Contract.Assert(MaxPrimeArrayLength == GetPrime(MaxPrimeArrayLength), "Invalid MaxPrimeArrayLength");
+                //Contract.Assert(MaxPrimeArrayLength == GetPrime(MaxPrimeArrayLength), "Invalid MaxPrimeArrayLength");
                 return MaxPrimeArrayLength;
             }
 

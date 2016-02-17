@@ -34,7 +34,7 @@ namespace Platform.Helpers
             if (File.Exists(path))
                 using (var reader = File.OpenRead(path))
                 {
-                    var elementSize = Marshal.SizeOf<T>();
+                    var elementSize = Marshal.SizeOf(typeof(T));
 
                     if (reader.Length % elementSize != 0)
                         throw new NotSupportedException(string.Format("File is not aligned to elements with size {0}.", elementSize));

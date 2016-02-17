@@ -62,20 +62,12 @@ namespace Platform.Memory
                     throw new ArgumentOutOfRangeException(string.Format("Размер зарезервированной ёмкости блока памяти не может быть меньше размера используемой ёмкости {0}.", _usedCapacity));
                 if (value < 0)
                     value = 0;
+
                 if (value != _reservedCapacity)
                 {
-                    // Решить нужно ли это в случае управляемой кучи
-                    MemoryHelpers.AlignSizeToSystemPageSize(ref value);
+                    _pointer = _pointer == null ? Alloc(value) : ReAlloc(_pointer, value);
 
-                    if (value != _reservedCapacity)
-                    {
-                        if (_pointer == null)
-                            _pointer = Alloc((ulong)value);
-                        else
-                            _pointer = ReAlloc(_pointer, (ulong)value);
-
-                        _reservedCapacity = value;
-                    }
+                    _reservedCapacity = value;
                 }
             }
         }
@@ -139,9 +131,9 @@ namespace Platform.Memory
 
         // Allocates a memory block of the given size. The allocated memory is
         // automatically initialized to zero.
-        public static void* Alloc(ulong size)
+        public static void* Alloc(long size)
         {
-            var result = Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr(size)).ToPointer();
+            var result = Kernel32.HeapAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new UIntPtr((ulong)size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }
@@ -175,11 +167,11 @@ namespace Platform.Memory
         // Re-allocates a memory block. If the reallocation request is for a
         // larger size, the additional region of memory is automatically
         // initialized to zero.
-        public static void* ReAlloc(void* block, ulong size)
+        public static void* ReAlloc(void* block, long size)
         {
             var result =
                 Kernel32.HeapReAlloc(CurrentProcessHeapHandle, Kernel32.HeapFlags.ZeroMemory, new IntPtr(block),
-                    new UIntPtr(size)).ToPointer();
+                    new UIntPtr((ulong)size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }

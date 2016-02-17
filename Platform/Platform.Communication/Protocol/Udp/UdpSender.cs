@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Disposal;
@@ -42,7 +43,7 @@ namespace Platform.Communication.Protocol.Udp
 
         protected override void DisposeCore(bool manual)
         {
-            _udp.Close();
+            ((IDisposable)_udp).Dispose();
         }
     }
 }

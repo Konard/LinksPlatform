@@ -368,7 +368,6 @@ namespace Platform.Data.Core.Pairs
                 {
                     _transitionsPusher = null;
                     pusher.Wait();
-                    pusher.Dispose();
                 }
                 if (_transitions != null)
                     PushTransitions();

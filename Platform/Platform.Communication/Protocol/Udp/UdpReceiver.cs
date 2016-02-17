@@ -68,8 +68,10 @@ namespace Platform.Communication.Protocol.Udp
                 _receiverRunning = false;
 
                 // Send Packet to itself to switch Receiver from Receiving.
-                _udp.Connect(IPAddress.Loopback, _listenPort);
-                _udp.Send(new byte[0], 0);
+                // TODO: Test new stopper
+                var loopback = new IPEndPoint(IPAddress.Loopback, _listenPort);
+                var stopper = new UdpClient();
+                stopper.SendAsync(new byte[0], 0, loopback).ContinueWith(x => ((IDisposable)stopper).Dispose());
 
                 _thread.Join();
                 _thread = null;
@@ -105,7 +107,7 @@ namespace Platform.Communication.Protocol.Udp
         protected override void DisposeCore(bool manual)
         {
             Stop();
-            _udp.Close();
+            ((IDisposable)_udp).Dispose();
         }
     }
 }

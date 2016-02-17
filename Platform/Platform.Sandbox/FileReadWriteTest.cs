@@ -124,7 +124,7 @@ namespace Platform.Sandbox
             {
                 var c = text[i];
 
-                var charCategory = char.GetUnicodeCategory(c);
+                var charCategory = CharUnicodeInfo.GetUnicodeCategory(c);
 
                 if (charCategory != currentUnicodeCategory)
                 {
