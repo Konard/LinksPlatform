@@ -1,0 +1,31 @@
+{
+  "version": "0.0.4-*",
+  "description": "LinksPlatform's Platform.Helpers Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "Helpers", "Utilities", "Extensions" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Helpers",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "frameworks": {
+    "net45": {
+      "frameworkAssemblies": {
+        "System.XML": "4.0.0.0",
+        "System.Xml.Serialization": "4.0.0.0"
+      }
+    },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Diagnostics.Process": "4.1.0-beta-23409",
+        "System.Console": "4.0.0-beta-23516",
+        "System.IO": "4.0.11-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
+        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
+        "System.Collections.Concurrent": "4.0.11-beta-23516",
+        "System.Reflection.Emit.ILGeneration": "4.0.1-beta-23516"
+      }
+    }
+  }
+}

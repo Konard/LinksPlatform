@@ -1,0 +1,28 @@
+{
+  "version": "0.0.4-*",
+  "description": "LinksPlatform's Platform.Memory Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "Memory Mapped Files" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Memory",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "frameworks": {
+    "net45": { },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Collections.Concurrent": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.IO": "4.0.11-beta-23516",
+        "System.IO.MemoryMappedFiles": "4.0.0-beta-23516"
+      }
+    }
+  },
+  "dependencies": {
+    "Platform.Helpers": "0.0.4-*",
+    "Platform.WindowsAPI": "0.0.4-*"
+  },
+  "compilationOptions": { "allowUnsafe": true }
+}

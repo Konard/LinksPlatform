@@ -11,14 +11,14 @@ using Platform.Helpers;
 
 namespace Platform.Data.MasterServer
 {
-    internal static class Program
+    public static class Program
     {
         private const string DefaultDatabaseFilename = "db.links";
 
         private static bool LinksServerRunning = true;
         private static UnicodeMap UnicodeMap;
 
-        private static void Main()
+        public static void Main(string[] args)
         {
             Console.CancelKeyPress += OnCancelKeyPressed;
 
@@ -66,12 +66,14 @@ namespace Platform.Data.MasterServer
                                 while (receiver.Available > 0)
                                     handleMessage(receiver.ReceiveString());
 
+#if NET45
                                 while (Console.KeyAvailable)
                                 {
                                     var info = Console.ReadKey(true);
                                     if (info.Key == ConsoleKey.Escape)
                                         LinksServerRunning = false;
                                 }
+#endif
 
                                 Thread.Sleep(1);
                             }

@@ -51,7 +51,6 @@ namespace Platform.Helpers.Collections1 {
     using System;
     using System.Collections;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
 
     //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
@@ -114,7 +113,7 @@ namespace Platform.Helpers.Collections1 {
 
         public KeyCollection Keys {
             get {
-                Contract.Ensures(Contract.Result<KeyCollection>() != null);
+                //Contract.Ensures(Contract.Result<KeyCollection>() != null);
                 if (keys == null) keys = new KeyCollection(this);
                 return keys;
             }
@@ -136,7 +135,7 @@ namespace Platform.Helpers.Collections1 {
 
         public ValueCollection Values {
             get {
-                Contract.Ensures(Contract.Result<ValueCollection>() != null);
+                //Contract.Ensures(Contract.Result<ValueCollection>() != null);
                 if (values == null) values = new ValueCollection(this);
                 return values;
             }
@@ -341,7 +340,7 @@ namespace Platform.Helpers.Collections1 {
         }
 
         private void Resize(int newSize, bool forceNewHashCodes) {
-            Contract.Assert(newSize >= entries.Length);
+            //Contract.Assert(newSize >= entries.Length);
             var newBuckets = new int[newSize];
             for (var i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
             var newEntries = new Entry[newSize];

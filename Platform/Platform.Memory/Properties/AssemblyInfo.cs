@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Platform.Memory")]
-[assembly: AssemblyCopyright("Copyright ©  2013")]
+[assembly: AssemblyCopyright("Konstantin Diachenko")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,7 +22,9 @@ using System.Runtime.InteropServices;
 
 // Следующий GUID служит для идентификации библиотеки типов, если этот проект будет видимым для COM
 
-[assembly: Guid("abb8924b-8bdd-4e9a-9976-f904f6ffa992")]
+[assembly: Guid("da0c0d80-9821-48ca-a498-c3bcf8a3db0e")]
+
+#if NET45
 
 // Сведения о версии сборки состоят из следующих четырех значений:
 //
@@ -35,5 +37,7 @@ using System.Runtime.InteropServices;
 // используя "*", как показано ниже:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.4.*")]
+[assembly: AssemblyFileVersion("0.0.4")]
+
+#endif

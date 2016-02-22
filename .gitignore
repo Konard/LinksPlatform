@@ -146,6 +146,8 @@ publish/
 !**/packages/build/
 # Uncomment if necessary however generally it will be regenerated when needed
 #!**/packages/repositories.config
+project.lock.json
+*.lock.json
 
 # Windows Azure Build Output
 csx/

@@ -5,11 +5,11 @@ using Platform.Data.Core.Pairs;
 
 namespace Platform.Data.SlaveServer
 {
-    internal class Program
+    public class Program
     {
         private static bool LinksServerStoped;
 
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             Console.CancelKeyPress += (sender, eventArgs) =>
             {

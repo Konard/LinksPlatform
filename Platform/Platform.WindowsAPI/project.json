@@ -1,0 +1,21 @@
+﻿{
+  "version": "0.0.4-*",
+  "description": "LinksPlatform's Platform.WindowsAPI Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "WinAPI", "Windows" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.WindowsAPI",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+
+  "frameworks": {
+    "net45": { },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
+      }
+    }
+  }
+}

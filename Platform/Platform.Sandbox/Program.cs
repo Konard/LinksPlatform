@@ -4,9 +4,9 @@ using System.IO;
 
 namespace Platform.Sandbox
 {
-    internal unsafe class Program
+    public unsafe class Program
     {
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
             new WikipediaImporterCLI().Run(args);
 
