@@ -2,7 +2,7 @@
   "version": "0.0.4-*",
   "description": "LinksPlatform's Platform.Memory Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "Memory Mapped Files" ],
+  "tags": [ "Memory Mapped Files", "Storage", "Memory" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Memory",
   "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
   "frameworks": {
