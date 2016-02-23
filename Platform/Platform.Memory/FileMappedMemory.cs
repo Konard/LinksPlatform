@@ -140,7 +140,7 @@ namespace Platform.Memory
 
         private void MapFile()
         {
-            _file = MemoryMappedFile.CreateFromFile(_address, FileMode.Open, Guid.NewGuid().ToString(),
+            _file = MemoryMappedFile.CreateFromFile(_address, FileMode.Open, null,
                 _reservedCapacity, MemoryMappedFileAccess.ReadWrite);
             _accessor = _file.CreateViewAccessor();
             _accessor.SafeMemoryMappedViewHandle.AcquirePointer(ref _pointer);

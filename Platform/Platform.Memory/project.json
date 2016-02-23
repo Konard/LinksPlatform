@@ -1,5 +1,5 @@
 {
-  "version": "0.0.4-*",
+  "version": "0.0.6-*",
   "description": "LinksPlatform's Platform.Memory Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Memory Mapped Files", "Storage", "Memory" ],
