@@ -1,0 +1,28 @@
+{
+  "version": "0.0.5-*",
+  "description": "LinksPlatform's Platform.Data.Core Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "LinksPlatform", "Link", "Triplet", "Pair", "Sequence" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.Core",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "frameworks": {
+    "net45": { },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Threading.Thread": "4.0.0-beta-23516",
+        "System.Collections.Concurrent": "4.0.11-beta-23516"
+      }
+    }
+  },
+  "dependencies": {
+    "Platform.Communication": "0.0.4-*",
+    "Platform.Helpers": "0.0.4-*",
+    "Platform.Memory": "0.0.6-*"
+  },
+  "compilationOptions": { "allowUnsafe": true }
+}

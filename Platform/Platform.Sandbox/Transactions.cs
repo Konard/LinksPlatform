@@ -41,8 +41,8 @@ namespace Platform.Sandbox
             public long FileSizeInTransactionItems;
         }
 
-        static readonly private long BasicTransactionsOffset = Marshal.SizeOf(typeof(TransactionsState));
-        static readonly private long TransactionItemSize = Marshal.SizeOf(typeof(TransactionItem));
+        private static readonly long BasicTransactionsOffset = Marshal.SizeOf(typeof(TransactionsState));
+        private static readonly long TransactionItemSize = Marshal.SizeOf(typeof(TransactionItem));
 
         private static long CurrentFileSizeInBytes;
         private static MemoryMappedFile Log;
@@ -56,7 +56,7 @@ namespace Platform.Sandbox
             OpenFile();
 
 
-            var item = new TransactionItem()
+            var item = new TransactionItem
             {
                 TransactionId = CurrentState.LastTransactionId,
                 DateTime = DateTime.UtcNow,
@@ -70,9 +70,13 @@ namespace Platform.Sandbox
 
             EnsureFileSize();
 
+#if NET45
+
             LogAccessor.Write(BasicTransactionsOffset, ref item);
 
             LogAccessor.Read(BasicTransactionsOffset, out item);
+
+#endif
 
 
             CloseFile();
@@ -97,7 +101,11 @@ namespace Platform.Sandbox
 
         static void LoadState()
         {
+#if NET45
+
             LogAccessor.Read(0, out CurrentState);
+
+#endif
             if (CurrentState.FileEndOffset == 0)
             {
                 CurrentState.FileEndOffset = BasicTransactionsOffset;
@@ -106,7 +114,9 @@ namespace Platform.Sandbox
 
         static void StoreState()
         {
+#if NET45
             LogAccessor.Write(0, ref CurrentState);
+#endif
         }
 
         static void EnsureFileSize()

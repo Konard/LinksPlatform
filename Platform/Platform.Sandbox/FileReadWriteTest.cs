@@ -16,7 +16,7 @@ namespace Platform.Sandbox
             //t.ThreadState == ThreadState.
 
 
-            var f = MemoryMappedFile.CreateFromFile("C:\file.txt");
+            var f = MemoryMappedFile.CreateFromFile(@"C:\file.txt");
 
             var a = f.CreateViewAccessor();
 
@@ -30,7 +30,7 @@ namespace Platform.Sandbox
             //f.SetAccessControl(
         }
 
-        public static void Run()
+        public static void Run(string[] args)
         {
             string readableFilename;
 
@@ -38,8 +38,7 @@ namespace Platform.Sandbox
             {
                 //Net.Recreate();
 
-                Console.Write("File to read: ");
-                readableFilename = Console.ReadLine().Trim('"');
+                readableFilename = ConsoleHelpers.GetOrReadArgument(0, "File to read", args);
 
                 if (!string.IsNullOrWhiteSpace(readableFilename))
                 {
@@ -125,7 +124,7 @@ namespace Platform.Sandbox
             {
                 var c = text[i];
 
-                var charCategory = char.GetUnicodeCategory(c);
+                var charCategory = CharUnicodeInfo.GetUnicodeCategory(c);
 
                 if (charCategory != currentUnicodeCategory)
                 {

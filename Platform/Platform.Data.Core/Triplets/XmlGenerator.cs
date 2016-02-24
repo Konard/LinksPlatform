@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Xml;
 using Platform.Communication.Protocol.Gexf;
@@ -21,13 +22,15 @@ namespace Platform.Data.Core.Triplets
 
         public static void ToFile(string path)
         {
-            using (var writer = XmlWriter.Create(path))
+            using (var file = File.OpenWrite(path))
+            using (var writer = XmlWriter.Create(file))
                 WriteXml(writer, CollectLinks());
         }
 
         public static void ToFile(string path, Func<Link, bool> filter)
         {
-            using (var writer = XmlWriter.Create(path))
+            using (var file = File.OpenWrite(path))
+            using (var writer = XmlWriter.Create(file))
                 WriteXml(writer, CollectLinks(filter));
         }
 

@@ -1,48 +1,58 @@
 ﻿using System;
+using System.Reflection;
+// ReSharper disable AssignmentInConditionalExpression
 
+// ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable StaticFieldInGenericType
 
 namespace Platform.Helpers
 {
     public class TypeHelpers<T>
     {
-        public static readonly Type Cached = typeof(T);
+        public static readonly Type Type;
+        public static readonly Type UnderlyingType;
 
+        public static readonly bool IsFloatPoint;
         public static readonly bool IsNumeric;
-        public static readonly bool CanBeNumeric;
         public static readonly bool IsSigned;
+        public static readonly bool CanBeNumeric;
 
-        public static bool IsValueType { get { return Cached.IsValueType; } }
-        public static bool IsSignedNumeric { get { return IsNumeric && IsSigned; } }
+        public static readonly bool IsValueType;
+        public static readonly bool IsNullable;
 
         static TypeHelpers()
         {
-            switch (Type.GetTypeCode(Cached))
-            {
-                case TypeCode.SByte:
-                case TypeCode.Int16:
-                case TypeCode.Int32:
-                case TypeCode.Int64:
-                case TypeCode.Decimal:
-                case TypeCode.Double:
-                case TypeCode.Single:
-                    IsSigned = true;
-                    IsNumeric = true;
-                    CanBeNumeric = true;
-                    break;
-                case TypeCode.Byte:
-                case TypeCode.UInt16:
-                case TypeCode.UInt32:
-                case TypeCode.UInt64:
-                    IsNumeric = true;
-                    CanBeNumeric = true;
-                    break;
-                case TypeCode.Boolean:
-                case TypeCode.Char:
-                case TypeCode.DateTime:
-                    CanBeNumeric = true;
-                    break;
-            }
+            Type = typeof(T);
+
+            if (IsNullable = Type.GetTypeInfo().IsGenericType && Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+                UnderlyingType = Nullable.GetUnderlyingType(Type);
+            else
+                UnderlyingType = Type;
+
+            IsValueType = Type.GetTypeInfo().IsValueType;
+
+            if (UnderlyingType == typeof(Decimal) ||
+                UnderlyingType == typeof(Double) ||
+                UnderlyingType == typeof(Single))
+                CanBeNumeric = IsNumeric = IsSigned = IsFloatPoint = true;
+
+            if (UnderlyingType == typeof(SByte) ||
+                UnderlyingType == typeof(Int16) ||
+                UnderlyingType == typeof(Int32) ||
+                UnderlyingType == typeof(Int64))
+                CanBeNumeric = IsNumeric = IsSigned = true;
+
+            if (UnderlyingType == typeof(Byte) ||
+                UnderlyingType == typeof(UInt16) ||
+                UnderlyingType == typeof(UInt32) ||
+                UnderlyingType == typeof(UInt64))
+                CanBeNumeric = IsNumeric = true;
+
+            if (UnderlyingType == typeof(Boolean) ||
+                UnderlyingType == typeof(Char) ||
+                UnderlyingType == typeof(DateTime) ||
+                UnderlyingType == typeof(TimeSpan))
+                CanBeNumeric = true;
         }
     }
 }

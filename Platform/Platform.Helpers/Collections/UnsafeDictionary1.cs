@@ -51,14 +51,11 @@ namespace Platform.Helpers.Collections1 {
     using System;
     using System.Collections;
     using System.Diagnostics;
-    using System.Diagnostics.Contracts;
-    using System.Runtime.Serialization;
 
     //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
-    [Serializable]
     [System.Runtime.InteropServices.ComVisible(false)]
-    public class UnsafeDictionary<TKey,TValue>: IDictionary<TKey,TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>, ISerializable, IDeserializationCallback  {
+    public class UnsafeDictionary<TKey,TValue>: IDictionary<TKey,TValue>, IDictionary, IReadOnlyDictionary<TKey, TValue>  {
     
         public struct Entry {
             public int hashCode;    // Lower 31 bits of hash code, -1 if unused
@@ -77,12 +74,6 @@ namespace Platform.Helpers.Collections1 {
         private KeyCollection keys;
         private ValueCollection values;
         private Object _syncRoot;
-        
-        // constants for serialization
-        private const String VersionName = "Version";
-        private const String HashSizeName = "HashSize";  // Must save buckets.Length
-        private const String KeyValuePairsName = "KeyValuePairs";
-        private const String ComparerName = "Comparer";
 
         public UnsafeDictionary(): this(0, null) {}
 
@@ -109,14 +100,6 @@ namespace Platform.Helpers.Collections1 {
                 Add(pair.Key, pair.Value);
             }
         }
-
-        protected UnsafeDictionary(SerializationInfo info, StreamingContext context)
-        {
-            //We can't do anything with the keys and values until the entire graph has been deserialized
-            //and we have a resonable estimate that GetHashCode is not going to fail.  For the time being,
-            //we'll just cache this.  The graph is not valid until OnDeserialization has been called.
-            HashHelpers.SerializationInfoTable.Add(this, info);
-        }
             
         public IEqualityComparer<TKey> Comparer {
             get {
@@ -130,7 +113,7 @@ namespace Platform.Helpers.Collections1 {
 
         public KeyCollection Keys {
             get {
-                Contract.Ensures(Contract.Result<KeyCollection>() != null);
+                //Contract.Ensures(Contract.Result<KeyCollection>() != null);
                 if (keys == null) keys = new KeyCollection(this);
                 return keys;
             }
@@ -152,7 +135,7 @@ namespace Platform.Helpers.Collections1 {
 
         public ValueCollection Values {
             get {
-                Contract.Ensures(Contract.Result<ValueCollection>() != null);
+                //Contract.Ensures(Contract.Result<ValueCollection>() != null);
                 if (values == null) values = new ValueCollection(this);
                 return values;
             }
@@ -267,27 +250,6 @@ namespace Platform.Helpers.Collections1 {
 
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator() {
             return new Enumerator(this, Enumerator.KeyValuePair);
-        }        
-
-        [System.Security.SecurityCritical]  // auto-generated_required
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context) {
-            //if (info==null) {
-            //    ThrowHelper.ThrowArgumentNullException(ExceptionArgument.info);
-            //}
-            info.AddValue(VersionName, version);
-
-#if FEATURE_RANDOMIZED_STRING_HASHING
-            info.AddValue(ComparerName, HashHelpers.GetEqualityComparerForSerialization(comparer), typeof(IEqualityComparer<TKey>));
-#else
-            info.AddValue(ComparerName, comparer, typeof(IEqualityComparer<TKey>));
-#endif
-
-            info.AddValue(HashSizeName, buckets == null ? 0 : buckets.Length); //This is the length of the bucket array.
-            if( buckets != null) {
-                var array = new KeyValuePair<TKey, TValue>[Count];
-                CopyTo(array, 0);
-                info.AddValue(KeyValuePairsName, array, typeof(KeyValuePair<TKey, TValue>[]));
-            }
         }
 
         private int FindEntry(TKey key) {
@@ -373,56 +335,12 @@ namespace Platform.Helpers.Collections1 {
 
         }
 
-        public virtual void OnDeserialization(Object sender) {
-            SerializationInfo siInfo;
-            HashHelpers.SerializationInfoTable.TryGetValue(this, out siInfo);
-            
-            if (siInfo==null) {
-                // It might be necessary to call OnDeserialization from a container if the container object also implements
-                // OnDeserialization. However, remoting will call OnDeserialization again.
-                // We can return immediately if this function is called twice. 
-                // Note we set remove the serialization info from the table at the end of this method.
-                return;
-            }            
-            
-            var realVersion = siInfo.GetInt32(VersionName);
-            var hashsize = siInfo.GetInt32(HashSizeName);
-            comparer   = (IEqualityComparer<TKey>)siInfo.GetValue(ComparerName, typeof(IEqualityComparer<TKey>));
-            
-            if( hashsize != 0) {
-                buckets = new int[hashsize];
-                for (var i = 0; i < buckets.Length; i++) buckets[i] = -1;
-                entries = new Entry[hashsize];
-                freeList = -1;
-
-                var array = (KeyValuePair<TKey, TValue>[]) 
-                    siInfo.GetValue(KeyValuePairsName, typeof(KeyValuePair<TKey, TValue>[]));
-
-                //if (array==null) {
-                //    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_MissingKeys);
-                //}
-
-                for (var i=0; i<array.Length; i++) {
-                    //if ( array[i].Key == null) {
-                    //    ThrowHelper.ThrowSerializationException(ExceptionResource.Serialization_NullKey);
-                    //}
-                    Insert(array[i].Key, array[i].Value, true);
-                }
-            }
-            else {
-                buckets = null;
-            }
-
-            version = realVersion;
-            HashHelpers.SerializationInfoTable.Remove(this);
-        }
-
         private void Resize() {
             Resize(HashHelpers.ExpandPrime(count), false);
         }
 
         private void Resize(int newSize, bool forceNewHashCodes) {
-            Contract.Assert(newSize >= entries.Length);
+            //Contract.Assert(newSize >= entries.Length);
             var newBuckets = new int[newSize];
             for (var i = 0; i < newBuckets.Length; i++) newBuckets[i] = -1;
             var newEntries = new Entry[newSize];
@@ -673,7 +591,6 @@ namespace Platform.Helpers.Collections1 {
             }
         }
 
-        [Serializable]
         public struct Enumerator: IEnumerator<KeyValuePair<TKey,TValue>>,
             IDictionaryEnumerator
         {
@@ -777,8 +694,7 @@ namespace Platform.Helpers.Collections1 {
         }
 
         //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryKeyCollectionDebugView<,>))]
-        [DebuggerDisplay("Count = {Count}")]        
-        [Serializable]
+        [DebuggerDisplay("Count = {Count}")]
         public sealed class KeyCollection: ICollection<TKey>, ICollection
         {
             private UnsafeDictionary<TKey,TValue> dictionary;
@@ -899,7 +815,6 @@ namespace Platform.Helpers.Collections1 {
                 get { return ((ICollection)dictionary).SyncRoot; }
             }
 
-            [Serializable]
             public struct Enumerator : IEnumerator<TKey>, System.Collections.IEnumerator
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;
@@ -965,7 +880,6 @@ namespace Platform.Helpers.Collections1 {
 
         //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
-        [Serializable]
         public sealed class ValueCollection: ICollection<TValue>, ICollection
         {
             private UnsafeDictionary<TKey,TValue> dictionary;
@@ -1085,7 +999,6 @@ namespace Platform.Helpers.Collections1 {
                 get { return ((ICollection)dictionary).SyncRoot; }
             }
 
-            [Serializable]
             public struct Enumerator : IEnumerator<TValue>, System.Collections.IEnumerator
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;

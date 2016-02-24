@@ -20,6 +20,8 @@ namespace Platform.Data.Core.Pairs
         /// </remarks>
         public static readonly int LinkSizeInBytes = sizeof(Link);
 
+        public static readonly long DefaultLinksSizeStep = LinkSizeInBytes * 1024 * 1024;
+
         private struct Link
         {
             public ulong Source;
@@ -63,6 +65,11 @@ namespace Platform.Data.Core.Pairs
         private ulong Total
         {
             get { return _header->AllocatedLinks - _header->FreeLinks; }
+        }
+
+        public LinksMemoryManager(string address)
+            : this(address, DefaultLinksSizeStep)
+        {
         }
 
         /// <summary>
@@ -241,6 +248,12 @@ namespace Platform.Data.Core.Pairs
             return LinksConstants.Continue;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public ulong Search(ulong source, ulong target)
+        {
+            return _sourcesTreeMethods.Search(source, target);
+        }
+
         /// <remarks>
         /// TODO: Возможно можно перемещать значения, если указан индекс, но значение существует в другом месте (но не в менеджере памяти, а в логике Links)
         /// </remarks>
@@ -270,6 +283,13 @@ namespace Platform.Data.Core.Pairs
             values[LinksConstants.TargetPart] = link->Target;
 
             return values;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Pairs.Link GetLinkValueStruct(ulong linkIndex)
+        {
+            var link = &_links[linkIndex];
+            return new Pairs.Link(linkIndex, link->Source, link->Target);
         }
 
         /// <summary>
@@ -374,9 +394,7 @@ namespace Platform.Data.Core.Pairs
 
         protected override void DisposeCore(bool manual)
         {
-            _links = null;
-            if (_memory != null)
-                _memory.Dispose();
+            if (_memory != null) _memory.Dispose();
         }
     }
 }

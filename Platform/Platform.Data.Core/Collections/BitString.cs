@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Collections
 {
@@ -15,7 +16,7 @@ namespace Platform.Data.Core.Collections
     ///     TODO: Compare what is faster to store BitSetsIn16Bits or to calculate it
     ///     TODO: Avoid int usage (replace to long)
     /// </remarks>
-    public sealed class BitString : ICloneable
+    public sealed class BitString
     {
         private static readonly byte[][] BitSetsIn16Bits;
         private long[] _array;
@@ -228,7 +229,7 @@ namespace Platform.Data.Core.Collections
             //_version++;
 
 #if DEBUG
-            Console.WriteLine("AND -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            ConsoleHelpers.Debug("AND -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -252,7 +253,7 @@ namespace Platform.Data.Core.Collections
             //_version++;
 
 #if DEBUG
-            Console.WriteLine("OR -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            ConsoleHelpers.Debug("OR -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -436,7 +437,7 @@ namespace Platform.Data.Core.Collections
                 }
             }
 #if DEBUG
-            Console.WriteLine("Get-Set-Indices: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+            ConsoleHelpers.Debug("Get-Set-Indices: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
 #endif
 
             return result;
@@ -473,7 +474,7 @@ namespace Platform.Data.Core.Collections
                     result.Add(bits4[j] + 48UL + (ulong)i * 64);
             }
 #if DEBUG
-            Console.WriteLine("Get-Set-Indices: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+            ConsoleHelpers.Debug("Get-Set-Indices: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
 #endif
 
             return result;
@@ -493,7 +494,7 @@ namespace Platform.Data.Core.Collections
                     var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
 
 #if DEBUG
-                    Console.WriteLine("Get-First-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+                    ConsoleHelpers.Debug("Get-First-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
 #endif
 
                     if (bits1.Length > 0)
@@ -526,7 +527,7 @@ namespace Platform.Data.Core.Collections
                     var bits4 = BitSetsIn16Bits[(int)((n >> 48) & 0xffffu)];
 
 #if DEBUG
-                    Console.WriteLine("Get-Last-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
+                    ConsoleHelpers.Debug("Get-Last-Set-Index: {0} ms. ({1} elements)", sw.Elapsed.TotalMilliseconds, _array.Length);
 #endif
 
                     if (bits4.Length > 0)
@@ -599,7 +600,7 @@ namespace Platform.Data.Core.Collections
 #if DEBUG
             if (sw.Elapsed.TotalMilliseconds > 0.1)
             {
-                Console.WriteLine("HCB -> Min: {0}, Max: {1}, Delta: {2}, Steps: {3}, Time: {4}", from, to, to - from, steps, sw.Elapsed.TotalMilliseconds);
+                ConsoleHelpers.Debug("HCB -> Min: {0}, Max: {1}, Delta: {2}, Steps: {3}, Time: {4}", from, to, to - from, steps, sw.Elapsed.TotalMilliseconds);
             }
 #endif
 

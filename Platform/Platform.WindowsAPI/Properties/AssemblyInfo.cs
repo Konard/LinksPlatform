@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Platform.WindowsAPI")]
-[assembly: AssemblyCopyright("Copyright ©  2015")]
+[assembly: AssemblyCopyright("Konstantin Diachenko")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,7 +22,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("b36bb98b-35dd-4162-9453-a8d6eb223969")]
+[assembly: Guid("b35bcc7d-3d44-404c-8252-14bdc5c5b36a")]
+
+#if NET45
 
 // Version information for an assembly consists of the following four values:
 //
@@ -35,5 +37,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.4.*")]
+[assembly: AssemblyFileVersion("0.0.4")]
+
+#endif

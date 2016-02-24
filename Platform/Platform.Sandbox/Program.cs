@@ -4,11 +4,13 @@ using System.IO;
 
 namespace Platform.Sandbox
 {
-    internal unsafe class Program
+    public unsafe class Program
     {
-        private static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            DllImportTest.Test();
+            new WikipediaImporterCLI().Run(args);
+
+            //DllImportTest.Test();
 
             //using (var crawler = new WebCrawlerInstance("crawled.links"))
             //{
@@ -20,7 +22,7 @@ namespace Platform.Sandbox
             //CompressionExperiments.Test();
 
             return;
-            
+
             //Sequences.TestSimplify();
             //WrongPointerTest();
             //UDPTest();

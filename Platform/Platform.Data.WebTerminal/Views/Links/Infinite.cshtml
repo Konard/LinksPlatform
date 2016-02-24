@@ -1,7 +1,7 @@
 ﻿@model Platform.Data.WebTerminal.Models.LinkModel
 @{
     Layout = null;
-    ViewBag.Title = TextHelpers.CapitalizeFirstLetter(Model.Link.ToString());
+    ViewBag.Title = Model.Link.ToString().CapitalizeFirstLetter();
 }
 
 <!DOCTYPE html>

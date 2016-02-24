@@ -6,11 +6,11 @@ using Platform.Helpers;
 
 namespace Platform.Data.ConsoleTerminal
 {
-    internal static class Program
+    public class Program
     {
         private static bool TerminalRunning = true;
 
-        private static void Main()
+        public static void Main(string[] args)
         {
             Console.CancelKeyPress += OnCancelKeyPressed;
 
@@ -25,7 +25,9 @@ namespace Platform.Data.ConsoleTerminal
 
                         while (TerminalRunning)
                         {
+#if DNX451
                             while (Console.KeyAvailable)
+#endif
                             {
                                 var line = Console.ReadLine();
                                 if (!string.IsNullOrWhiteSpace(line))

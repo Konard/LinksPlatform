@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using System.Runtime.Serialization;
-using System.Security.Permissions;
 using System.Threading;
 
 namespace Platform.Helpers.Collections
@@ -30,12 +28,6 @@ namespace Platform.Helpers.Collections
         private KeyCollection keys;
         private ValueCollection values;
         private Object _syncRoot;     
-
-        // constants for serialization
-        private const String VersionName = "Version";
-        private const String HashSizeName = "HashSize";  // Must save buckets.Length
-        private const String KeyValuePairsName = "KeyValuePairs";
-        private const String ComparerName = "Comparer";
 
         public UnsafeDictionary() : this(1000, null) { }
 
@@ -222,24 +214,6 @@ namespace Platform.Helpers.Collections
         IEnumerator<KeyValuePair<TKey, TValue>> IEnumerable<KeyValuePair<TKey, TValue>>.GetEnumerator()
         {
             return new Enumerator(this, Enumerator.KeyValuePair);
-        }
-
-        [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.SerializationFormatter)]
-        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            //if (info == null)
-            //{
-            //    throw new ArgumentNullException("info");
-            //}
-            info.AddValue(VersionName, version);
-            info.AddValue(ComparerName, comparer, typeof(IEqualityComparer<TKey>));
-            info.AddValue(HashSizeName, buckets == null ? 0 : buckets.Length); //This is the length of the bucket array.
-            if (buckets != null)
-            {
-                var array = new KeyValuePair<TKey, TValue>[Count];
-                CopyTo(array, 0);
-                info.AddValue(KeyValuePairsName, array, typeof(KeyValuePair<TKey, TValue>[]));
-            }
         }
 
         private int FindEntry(TKey key)
@@ -577,7 +551,7 @@ namespace Platform.Helpers.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void VerifyValueType(object value)
         {
-            //if ((value is TValue) || (value == null && !typeof(TValue).IsValueType))
+            //if ((value is TValue) || (value == null && !typeof(TValue).GetTypeInfo().IsValueType))
             //{
             //    return;
             //}
@@ -613,7 +587,6 @@ namespace Platform.Helpers.Collections
             //}
         }
 
-        [Serializable()]
         public struct Enumerator : IEnumerator<KeyValuePair<TKey, TValue>>,
             IDictionaryEnumerator
         {
@@ -743,7 +716,6 @@ namespace Platform.Helpers.Collections
         }
 
         [DebuggerDisplay("Count = {Count}")]
-        [Serializable()]
         public sealed class KeyCollection : ICollection<TKey>, ICollection
         {
             private UnsafeDictionary<TKey, TValue> dictionary;
@@ -894,7 +866,6 @@ namespace Platform.Helpers.Collections
                 get { return ((ICollection)dictionary).SyncRoot; }
             }
 
-            [Serializable()]
             public struct Enumerator : IEnumerator<TKey>
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;
@@ -972,7 +943,6 @@ namespace Platform.Helpers.Collections
         }
 
         [DebuggerDisplay("Count = {Count}")]
-        [Serializable()]
         public sealed class ValueCollection : ICollection<TValue>, ICollection
         {
             private UnsafeDictionary<TKey, TValue> dictionary;
@@ -1121,7 +1091,6 @@ namespace Platform.Helpers.Collections
                 get { return ((ICollection)dictionary).SyncRoot; }
             }
 
-            [Serializable()]
             public struct Enumerator : IEnumerator<TValue>
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;

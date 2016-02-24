@@ -89,7 +89,11 @@ int Func(void *p)
 
 #elif defined(WINDOWS)
 
+#pragma comment(lib, "Ws2_32.lib")
+
 #define _WIN32_WINNT 0x0501
+
+#include <stdio.h> // perror(), printf()
 
 #include <winsock2.h>
 #include <ws2tcpip.h>

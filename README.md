@@ -4,19 +4,19 @@
 
 [Graphical introduction](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning)
 
-Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf).
+Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf), [whitepaper](http://iacis.org/iis/2009/P2009_1301.pdf).
 
 This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams. So the Item or Point is a specific case of link, which references itself.
 
 There also at least two variants of Link structure:
 
-> ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png "Source-Target link, untyped")
-> ![Source-Target link, untyped](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png "Source-Target link, untyped")
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST.png" width="400" title="Source-Target link, untyped" alt="Source-Target link, untyped" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/ST-dots.png" width="400" title="Source-Target link, untyped" alt="Source-Target link, untyped" />
 
 - Untyped, the simplest yet, each link contains only Source (Beginning, First, Left, Subject) and Target (Ending, Last, Right, Predicate, Object).
 
-> ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png "Source-Linker-Target link, typed")
-> ![Source-Linker-Target link, typed](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png "Source-Linker-Target link, typed")
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT.png" width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
+> <img src="https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/SLT-dots.png" width="400" title="Source-Linker-Target link, typed" alt="Source-Linker-Target link, typed" />
 
 - Typed, with added Linker definition ([verb](https://en.wikipedia.org/wiki/Verb), [action](https://en.wikipedia.org/wiki/Action_(philosophy)), [type](https://en.wikipedia.org/wiki/Type_system), [category](https://en.wikipedia.org/wiki/Category_theory), [predicate](https://en.wikipedia.org/wiki/Predicate), [transition](https://en.wikipedia.org/wiki/Transition_system), [algorithm](https://en.wikipedia.org/wiki/Algorithm)), so any additional info about type of connection between two links can be stored here.
 

@@ -11,7 +11,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Platform.Data.Core</RootNamespace>
     <AssemblyName>Platform.Data.Core</AssemblyName>
-    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -57,6 +57,7 @@
     <Compile Include="Collections\Trees\SizeBalancedTreeMethodsBase.cs" />
     <Compile Include="IUniLinks.cs" />
     <Compile Include="Node.cs" />
+    <Compile Include="Node2.cs" />
     <Compile Include="Elements\DefaultElements.cs" />
     <Compile Include="Elements\IElements.RW.cs" />
     <Compile Include="Elements\IElements.Helpers.cs" />
@@ -83,6 +84,7 @@
     <Compile Include="Sequences\ISequences.cs" />
     <Compile Include="Sequences\Sequences.cs" />
     <Compile Include="Sequences\Sequences.Experiments.cs" />
+    <Compile Include="Sequences\SequencesExtensions.cs" />
     <Compile Include="Sequences\SequencesOptions.cs" />
     <Compile Include="Sequences\SequenceWalker.cs" />
     <Compile Include="Sequences\StopableSequenceWalker.cs" />

@@ -1,0 +1,27 @@
+{
+  "version": "0.0.4-*",
+  "description": "LinksPlatform's Platform.Tests Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "LinksPlatform", "Tests" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Tests",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "frameworks": {
+    "net45": {
+      "dependencies": {
+      }
+    },
+    "dotnet5.4": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516"
+      }
+    }
+  },
+  "dependencies": {
+    "Platform.Data.Core": "0.0.4-*",
+    "Platform.Helpers": "0.0.4-*"
+  }
+}

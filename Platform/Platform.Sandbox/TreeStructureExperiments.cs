@@ -97,7 +97,7 @@ namespace Platform.Sandbox
             {
                 if (IsRightThreaded(treeRoot))
                 {
-                    var node = new TreeNode()
+                    var node = new TreeNode
                     {
                         Left = treeRoot,
                         Right = treeRoot.Right,
@@ -139,7 +139,7 @@ namespace Platform.Sandbox
             {
                 if (IsLeftThreaded(treeRoot))
                 {
-                    var node = new TreeNode()
+                    var node = new TreeNode
                     {
                         Left = treeRoot.Left,
                         Right = treeRoot,
@@ -401,7 +401,7 @@ namespace Platform.Sandbox
 
             // Fill the tree
 
-            var treeRoot = new TreeNode()
+            var treeRoot = new TreeNode
             {
                 Size = 1,
                 Value = rnd.Next(1000)

@@ -1,0 +1,41 @@
+﻿{
+  "version": "0.0.4-*",
+  "description": "LinksPlatform's Platform.Sandbox Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "tags": [ "LinksPlatform", "Console", "Sandbox" ],
+  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Sandbox",
+  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "compilationOptions": {
+    "emitEntryPoint": true,
+    "allowUnsafe": true
+  },
+  "commands": {
+    "Platform.Sandbox": "Platform.Sandbox"
+  },
+  "frameworks": {
+    "dnx451": {
+      "frameworkAssemblies": {
+        "System.Net": "4.0.0.0",
+        "System.Net.Http": "4.0.0.0",
+        "System.Net.Http.WebRequest": "4.0.0.0"
+      }
+    },
+    "dnxcore50": {
+      "dependencies": {
+        "Microsoft.CSharp": "4.0.1-beta-23516",
+        "System.Collections": "4.0.11-beta-23516",
+        "System.Linq": "4.0.1-beta-23516",
+        "System.Runtime": "4.0.21-beta-23516",
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Console": "4.0.0-beta-23516",
+        "System.IO.FileSystem": "4.0.1-beta-23516",
+        "System.IO.MemoryMappedFiles": "4.0.0-beta-23516",
+        "System.Text.RegularExpressions": "4.0.11-beta-23516",
+        "System.Net.Http": "4.0.1-beta-23516"
+      }
+    }
+  },
+  "dependencies": {
+    "Platform.Data.Core": "0.0.4-*"
+  }
+}

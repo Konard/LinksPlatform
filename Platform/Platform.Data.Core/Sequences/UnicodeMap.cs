@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Pairs;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -40,9 +42,8 @@ namespace Platform.Data.Core.Sequences
             if (firstLink != FirstCharLink)
             {
                 _links.Delete(firstLink);
-#if DEBUG
-                Console.WriteLine("Assume UTF16 table already created.");
-#endif
+
+                ConsoleHelpers.Debug("Assume UTF16 table already created.");
             }
             else
             {
@@ -53,14 +54,11 @@ namespace Platform.Data.Core.Sequences
                     if (createdLink != i)
                         throw new Exception("Unable to initialize UTF 16 table.");
                 }
-#if DEBUG
-                Console.WriteLine("UTF16 table created and initialized.");
-#endif
+
+                ConsoleHelpers.Debug("UTF16 table created and initialized.");
             }
 
-#if DEBUG
-            Console.WriteLine("Total links count: {0}.", _links.Count());
-#endif
+            ConsoleHelpers.Debug("Total links count: {0}.", _links.Count());
         }
 
         // 0 - null link
@@ -114,12 +112,12 @@ namespace Platform.Data.Core.Sequences
 
             while (offset < sequence.Length)
             {
-                var currentCategory = char.GetUnicodeCategory(sequence[offset]);
+                var currentCategory = CharUnicodeInfo.GetUnicodeCategory(sequence[offset]);
 
                 var relativeLength = 1;
                 var absoluteLength = offset + relativeLength;
                 while (absoluteLength < sequence.Length &&
-                       currentCategory == char.GetUnicodeCategory(sequence[absoluteLength]))
+                       currentCategory == CharUnicodeInfo.GetUnicodeCategory(sequence[absoluteLength]))
                 {
                     relativeLength++;
                     absoluteLength++;
@@ -150,12 +148,12 @@ namespace Platform.Data.Core.Sequences
 
                 if (array[offset] <= LastCharLink)
                 {
-                    var currentCategory = char.GetUnicodeCategory(FromLinkToChar(array[offset]));
+                    var currentCategory = CharUnicodeInfo.GetUnicodeCategory(FromLinkToChar(array[offset]));
 
                     var absoluteLength = offset + relativeLength;
                     while (absoluteLength < array.Length &&
                            array[absoluteLength] <= LastCharLink &&
-                           currentCategory == char.GetUnicodeCategory(FromLinkToChar(array[absoluteLength])))
+                           currentCategory == CharUnicodeInfo.GetUnicodeCategory(FromLinkToChar(array[absoluteLength])))
                     {
                         relativeLength++;
                         absoluteLength++;

@@ -30,9 +30,8 @@ namespace Platform.Sandbox
         }
 
         public TextParser(string path, int bufferSize = DefaultBufferSize)
-            : this()
+            : this(File.OpenRead(path), bufferSize)
         {
-            _streamReader = new StreamReader(path, Encoding.UTF8, detectEncodingFromByteOrderMarks: true, bufferSize: bufferSize);
             _state.ParsedFromPath = path;
         }
 

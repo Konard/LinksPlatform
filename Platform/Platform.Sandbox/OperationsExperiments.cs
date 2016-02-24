@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NET45
+
+using System;
 using System.Collections.Generic;
 using System.Reflection.Emit;
 using Platform.Data.Core.Triplets;
@@ -831,3 +833,5 @@ namespace Platform.Sandbox
         }
     }
 }
+
+#endif

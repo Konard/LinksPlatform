@@ -1597,18 +1597,5 @@ namespace Platform.Sandbox
                 }
             }
         }
-
-        public static ulong CreateBalancedVariant(this Sequences sequences, List<ulong[]> groupedSequence)
-        {
-            var finalSequence = new ulong[groupedSequence.Count];
-
-            for (var i = 0; i < finalSequence.Length; i++)
-            {
-                var part = groupedSequence[i];
-                finalSequence[i] = part.Length == 1 ? part[0] : sequences.CreateBalancedVariant(part);
-            }
-
-            return sequences.CreateBalancedVariant(finalSequence);
-        }
     }
 }

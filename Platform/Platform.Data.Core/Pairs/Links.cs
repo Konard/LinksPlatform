@@ -43,6 +43,11 @@ namespace Platform.Data.Core.Pairs
 
         #region Links Logic
 
+        public Links(string address)
+            : this(new LinksMemoryManager(address))
+        {
+        }
+
         public Links(ILinksMemoryManager<ulong> memoryManager)
         {
             _memoryManager = memoryManager;
@@ -68,7 +73,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetSourceCore(ulong link)
         {
-            return _memoryManager.GetLinkValue(link)[LinksConstants.SourcePart];
+            return GetLinkCore(link).Source;
         }
 
         /// <summary>
@@ -91,7 +96,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong GetTargetCore(ulong link)
         {
-            return _memoryManager.GetLinkValue(link)[LinksConstants.TargetPart];
+            return GetLinkCore(link).Target;
         }
 
         /// <summary>
@@ -111,9 +116,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public Link GetLinkCore(ulong link)
         {
-            // TODO: Return Link with set Index field
-            var values = _memoryManager.GetLinkValue(link);
-            return new Link(values[LinksConstants.SourcePart], values[LinksConstants.TargetPart]);
+            return ((LinksMemoryManager)_memoryManager).GetLinkValueStruct(link);
         }
 
         /// <summary>
@@ -151,15 +154,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public ulong SearchCore(ulong source, ulong target)
         {
-            var searchResult = LinksConstants.Null;
-
-            _memoryManager.Each(link =>
-            {
-                searchResult = link;
-                return LinksConstants.Continue;
-            }, LinksConstants.Null, source, target);
-
-            return searchResult;
+            return ((LinksMemoryManager)_memoryManager).Search(source, target);
         }
 
         public ulong Count(params ulong[] restrictions)

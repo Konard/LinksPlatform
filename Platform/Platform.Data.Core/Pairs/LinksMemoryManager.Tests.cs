@@ -1,8 +1,9 @@
 ﻿using System;
+using System.IO;
 using System.Xml;
 using Platform.Communication.Protocol.Gexf;
 using Platform.Data.Core.Exceptions;
-
+using Platform.Helpers;
 using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Data.Core.Pairs
@@ -11,7 +12,8 @@ namespace Platform.Data.Core.Pairs
     {
         public void ExportSourcesTree(string outputFilename)
         {
-            using (var writer = XmlWriter.Create(outputFilename))
+            using (var file = File.OpenWrite(outputFilename))
+            using (var writer = XmlWriter.Create(file))
             {
                 // <?xml version="1.0" encoding="UTF-8"?>
                 writer.WriteStartDocument();
@@ -60,13 +62,14 @@ namespace Platform.Data.Core.Pairs
 
                 writer.WriteEndDocument();
 
-                Console.WriteLine("Head of Sources: {0}", _header->FirstAsSource);
+                ConsoleHelpers.Debug("Head of Sources: {0}", _header->FirstAsSource);
             }
         }
 
         public void ExportTargetsTree(string outputFilename)
         {
-            using (var writer = XmlWriter.Create(outputFilename))
+            using (var file = File.OpenWrite(outputFilename))
+            using (var writer = XmlWriter.Create(file))
             {
                 // <?xml version="1.0" encoding="UTF-8"?>
                 writer.WriteStartDocument();
@@ -115,13 +118,14 @@ namespace Platform.Data.Core.Pairs
 
                 writer.WriteEndDocument();
 
-                Console.WriteLine("Head of Targets: {0}", _header->FirstAsTarget);
+                ConsoleHelpers.Debug("Head of Targets: {0}", _header->FirstAsTarget);
             }
         }
 
         public void Export(string outputFilename)
         {
-            using (var writer = XmlWriter.Create(outputFilename))
+            using (var file = File.OpenWrite(outputFilename))
+            using (var writer = XmlWriter.Create(file))
             {
                 // <?xml version="1.0" encoding="UTF-8"?>
                 writer.WriteStartDocument();
@@ -163,7 +167,7 @@ namespace Platform.Data.Core.Pairs
 
                 writer.WriteEndDocument();
 
-                Console.WriteLine("Head of Sources: {0}", _header->FirstAsSource);
+                ConsoleHelpers.Debug("Head of Sources: {0}", _header->FirstAsSource);
             }
         }
 

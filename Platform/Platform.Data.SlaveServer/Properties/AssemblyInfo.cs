@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Platform.Data.SlaveServer")]
-[assembly: AssemblyCopyright("Copyright ©  2014")]
+[assembly: AssemblyCopyright("Konstantin Diachenko")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -22,7 +22,9 @@ using System.Runtime.InteropServices;
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
 
-[assembly: Guid("a2c20aed-b0a3-4e30-b798-01f9a613f05f")]
+[assembly: Guid("fa3829e4-d805-4ec4-9a81-0b55e3994907")]
+
+#if NET45
 
 // Version information for an assembly consists of the following four values:
 //
@@ -35,5 +37,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion("1.0.0.0")]
+[assembly: AssemblyVersion("0.0.4.*")]
+[assembly: AssemblyFileVersion("0.0.4")]
+
+#endif

@@ -1,4 +1,6 @@
-﻿using System;
+﻿#if NET45
+
+using System;
 using System.Diagnostics;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -68,3 +70,5 @@ namespace Platform.Sandbox
         }
     }
 }
+
+#endif
