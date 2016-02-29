@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading;
 using Platform.Helpers;
 using Platform.Helpers.Disposal;
 using Platform.WindowsAPI;

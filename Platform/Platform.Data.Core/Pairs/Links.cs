@@ -413,9 +413,11 @@ namespace Platform.Data.Core.Pairs
 
         protected override void DisposeCore(bool manual)
         {
-            DisposeTransitions();
-            var memoryManager = _memoryManager as IDisposable;
-            if (memoryManager != null) memoryManager.Dispose();
+            if (manual)
+            {
+                DisposeTransitions();
+                DisposalHelpers.TryDispose(_memoryManager);
+            }
         }
 
         #endregion

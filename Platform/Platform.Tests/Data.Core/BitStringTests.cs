@@ -1,14 +1,13 @@
 ﻿using System.Collections;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Collections;
 using Platform.Helpers;
+using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    [TestClass]
     public class BitStringTests
     {
-        [TestMethod]
+        [Fact]
         public void BitGetSetTest()
         {
             const int n = 250;
@@ -22,8 +21,8 @@ namespace Platform.Tests.Data.Core
                 array.Set(i, value);
                 str.Set(i, value);
 
-                Assert.IsTrue(array.Get(i) == value);
-                Assert.IsTrue(str.Get(i) == value);
+                Assert.True(array.Get(i) == value);
+                Assert.True(str.Get(i) == value);
             }
         }
     }

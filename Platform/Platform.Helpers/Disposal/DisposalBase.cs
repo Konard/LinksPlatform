@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Threading;
 
 namespace Platform.Helpers.Disposal
 {
@@ -14,13 +15,37 @@ namespace Platform.Helpers.Disposal
     {
         private static readonly Process CurrentProcess = Process.GetCurrentProcess();
 
-        private bool _disposed;
+        private int _disposed;
 
-        public bool Disposed { get { return _disposed; } }
+        public bool Disposed { get { return _disposed > 0; } }
+
+        protected virtual string ObjectName
+        {
+            get
+            {
+                return GetType().Name;
+            }
+        }
+
+        protected virtual bool AllowMultipleDisposeAttempts
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+        protected virtual bool AllowMultipleDisposeCalls
+        {
+            get
+            {
+                return false;
+            }
+        }
 
         protected DisposalBase()
         {
-            _disposed = false;
+            _disposed = 0;
             CurrentProcess.Exited += OnProcessExit;
         }
 
@@ -37,7 +62,7 @@ namespace Platform.Helpers.Disposal
 
         private void OnProcessExit(object sender, EventArgs e)
         {
-            Dispose(false);
+            Dispose(true);
             GC.SuppressFinalize(this);
         }
 
@@ -48,39 +73,44 @@ namespace Platform.Helpers.Disposal
 
         private void Dispose(bool manual)
         {
-            if (!_disposed)
-                lock (this)
-                    if (!_disposed)
+            var originalValue = Interlocked.CompareExchange(ref _disposed, 1, 0);
+
+            if (AllowMultipleDisposeAttempts || originalValue == 0)
+            {
+                try
+                {
+                    if (originalValue == 0)
                     {
-                        try
-                        {
-                            DisposeCore(manual);
-
-                            _disposed = true;
-
-                            if (CurrentProcess != null)
-                                CurrentProcess.Exited -= OnProcessExit;
-                            //else
-                            //    Process.GetCurrentProcess().Exited -= OnProcessExit;
-                        }
-                        catch
-                        {
-                            if (manual) throw;
-                            // else TODO: Log exception
-                        }
+                        if (CurrentProcess != null)
+                            CurrentProcess.Exited -= OnProcessExit;
+                        //else
+                        //    Process.GetCurrentProcess().Exited -= OnProcessExit;
                     }
+
+                    DisposeCore(manual);
+                }
+                catch
+                {
+                    if (!AllowMultipleDisposeAttempts && manual) throw;
+                    // else TODO: Log exception
+                }
+            }
+            else if (!AllowMultipleDisposeCalls && manual)
+            {
+                throw new ObjectDisposedException(ObjectName);
+            }
         }
 
         protected abstract void DisposeCore(bool manual);
 
         protected void EnsureNotDisposed(string objectName)
         {
-            if (_disposed) throw new ObjectDisposedException(objectName);
+            if (_disposed > 0) throw new ObjectDisposedException(objectName);
         }
 
         protected virtual void EnsureNotDisposed()
         {
-            EnsureNotDisposed(GetType().Name);
+            EnsureNotDisposed(ObjectName);
         }
     }
 }

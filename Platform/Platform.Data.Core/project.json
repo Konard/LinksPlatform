@@ -1,5 +1,5 @@
 {
-  "version": "0.0.5-*",
+  "version": "0.0.6-*",
   "description": "LinksPlatform's Platform.Data.Core Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "Link", "Triplet", "Pair", "Sequence" ],
@@ -20,9 +20,9 @@
     }
   },
   "dependencies": {
-    "Platform.Communication": "0.0.4-*",
-    "Platform.Helpers": "0.0.4-*",
-    "Platform.Memory": "0.0.6-*"
+    "Platform.Communication": "0.0.5-*",
+    "Platform.Helpers": "0.0.5-*",
+    "Platform.Memory": "0.0.7-*"
   },
   "compilationOptions": { "allowUnsafe": true }
 }

@@ -43,7 +43,8 @@ namespace Platform.Communication.Protocol.Udp
 
         protected override void DisposeCore(bool manual)
         {
-            ((IDisposable)_udp).Dispose();
+            if (manual)
+                DisposalHelpers.TryDispose(_udp);
         }
     }
 }

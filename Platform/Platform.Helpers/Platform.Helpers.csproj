@@ -50,6 +50,7 @@
     <Compile Include="ConsoleHelpers.cs" />
     <Compile Include="Counter.cs" />
     <Compile Include="Disposal\DisposableValue.cs" />
+    <Compile Include="Disposal\DisposalHelpers.cs" />
     <Compile Include="DynamicExtensions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILGeneratorExtensions.cs" />

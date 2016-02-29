@@ -392,9 +392,18 @@ namespace Platform.Data.Core.Pairs
                    || (_links[link].SizeAsSource == LinksConstants.Null && _links[link].Source != LinksConstants.Null);
         }
 
+        protected override bool AllowMultipleDisposeCalls
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         protected override void DisposeCore(bool manual)
         {
-            if (_memory != null) _memory.Dispose();
+            if (manual)
+                DisposalHelpers.TryDispose(_memory);
         }
     }
 }

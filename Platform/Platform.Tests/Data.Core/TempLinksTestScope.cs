@@ -28,7 +28,9 @@ namespace Platform.Tests.Data.Core
 
         protected override void DisposeCore(bool manual)
         {
-            Links.Dispose();
+            if (manual)
+                DisposalHelpers.TryDispose(Links);
+
             if (_deleteFiles)
                 DeleteFiles();
         }

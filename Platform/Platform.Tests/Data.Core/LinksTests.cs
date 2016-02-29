@@ -3,20 +3,19 @@ using System.Diagnostics;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
+using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    [TestClass]
     public class LinksTests
     {
         private const long Iterations = 10 * 1024;
 
         #region Concept
 
-        [TestMethod]
+        [Fact]
         public void CascadeUpdateTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -45,7 +44,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void BasicTransactionLogTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -66,7 +65,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TransactionsTest()
         {
             // Auto Reverted (Because no commit at transaction)
@@ -128,12 +127,12 @@ namespace Platform.Tests.Data.Core
             }
             catch
             {
-                Assert.IsFalse(lastScope == null);
+                Assert.False(lastScope == null);
 
                 var transitions = FileHelpers
                     .ReadAll<Links.Transition>(lastScope.TempTransactionLogFilename);
 
-                Assert.IsTrue(transitions.Length == 1 && transitions[0].Before.IsNull() && transitions[0].After.IsNull());
+                Assert.True(transitions.Length == 1 && transitions[0].Before.IsNull() && transitions[0].After.IsNull());
 
                 lastScope.DeleteFiles();
             }
@@ -179,13 +178,49 @@ namespace Platform.Tests.Data.Core
             }
             catch
             {
-                Assert.IsFalse(lastScope == null);
+                Assert.False(lastScope == null);
 
                 Global.Trash = FileHelpers
                     .ReadAll<Links.Transition>(lastScope.TempTransactionLogFilename);
 
                 lastScope.DeleteFiles();
             }
+        }
+
+        [Fact]
+        public void TransactionCommit()
+        {
+            const ulong itself = LinksConstants.Itself;
+
+            var tempDatabaseFilename = Path.GetTempFileName();
+            var tempTransactionLogFilename = Path.GetTempFileName();
+
+            // Commit
+            using (var memoryManager = new LinksMemoryManager(tempDatabaseFilename))
+            using (var links = new Links(memoryManager, tempTransactionLogFilename))
+            {
+                using (var transaction = links.BeginTransaction())
+                {
+                    var l1 = links.Create(itself, itself);
+                    var l2 = links.Create(itself, itself);
+
+                    Global.Trash = links.Update(l2, l2, l1, l2);
+
+                    links.Delete(l1);
+
+                    transaction.Commit();
+                }
+
+                Global.Trash = links.Count();
+            }
+
+            Global.Trash = FileHelpers.ReadAll<Links.Transition>(tempTransactionLogFilename);
+        }
+
+        [Fact]
+        public void TransactionDamage()
+        {
+            const ulong itself = LinksConstants.Itself;
 
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
@@ -228,7 +263,7 @@ namespace Platform.Tests.Data.Core
             }
             catch (NotSupportedException ex)
             {
-                Assert.IsTrue(ex.Message == "Database is damaged, autorecovery is not supported yet.");
+                Assert.True(ex.Message == "Database is damaged, autorecovery is not supported yet.");
             }
 
             Global.Trash = FileHelpers
@@ -238,7 +273,7 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempTransactionLogFilename);
         }
 
-        [TestMethod]
+        [Fact]
         public void Bug1Test()
         {
             var tempDatabaseFilename = Path.GetTempFileName();
@@ -298,7 +333,7 @@ namespace Platform.Tests.Data.Core
             throw new Exception();
         }
 
-        [TestMethod]
+        [Fact]
         public void PathsTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -450,7 +485,7 @@ namespace Platform.Tests.Data.Core
         }
          */
 
-        [TestMethod]
+        [Fact]
         public void GetSourceTest()
         {
             using (var scope = new TempLinksTestScope())
@@ -483,7 +518,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void GetSourceInParallel()
         {
             using (var scope = new TempLinksTestScope())
@@ -517,7 +552,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestGetTarget()
         {
             using (var scope = new TempLinksTestScope())
@@ -547,7 +582,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestGetTargetInParallel()
         {
             using (var scope = new TempLinksTestScope())
@@ -582,7 +617,7 @@ namespace Platform.Tests.Data.Core
 
         // TODO: Заполнить базу данных перед тестом
         /*
-        [TestMethod]
+        [Fact]
         public void TestRandomSearchFixed()
         {
             var tempFilename = Path.GetTempFileName();
@@ -616,7 +651,7 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempFilename);
         }*/
 
-        [TestMethod]
+        [Fact]
         public void TestRandomSearchAll()
         {
             using (var scope = new TempLinksTestScope())
@@ -649,7 +684,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void TestEach()
         {
             using (var scope = new TempLinksTestScope())
@@ -678,7 +713,7 @@ namespace Platform.Tests.Data.Core
         }
 
         /*
-        [TestMethod]
+        [Fact]
         public static void TestForeach()
         {
             var tempFilename = Path.GetTempFileName();
@@ -708,7 +743,7 @@ namespace Platform.Tests.Data.Core
         */
 
         /*
-        [TestMethod]
+        [Fact]
         public static void TestParallelForeach()
         {
             var tempFilename = Path.GetTempFileName();
@@ -738,7 +773,7 @@ namespace Platform.Tests.Data.Core
         }
         */
 
-        [TestMethod]
+        [Fact]
         public static void Create64BillionLinks()
         {
             using (var scope = new TempLinksTestScope())
@@ -768,7 +803,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public static void Create64BillionLinksInParallel()
         {
             using (var scope = new TempLinksTestScope())
@@ -794,7 +829,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public static void TestDeletionOfAllLinks()
         {
             using (var scope = new TempLinksTestScope())
