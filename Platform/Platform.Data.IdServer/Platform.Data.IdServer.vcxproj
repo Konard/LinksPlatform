@@ -22,6 +22,7 @@
     <ProjectGuid>{9402186F-6211-4C09-A5E6-DD3A57CCF04A}</ProjectGuid>
     <RootNamespace>PlatformDataIdServer</RootNamespace>
     <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <ResolveNuGetPackages>false</ResolveNuGetPackages>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
