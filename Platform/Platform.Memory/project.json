@@ -4,7 +4,17 @@
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Memory Mapped Files", "Storage", "Memory" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Memory",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
+  "compilationOptions": { "allowUnsafe": true },
+
+  "dependencies": {
+    "Platform.Helpers": "0.0.5-*",
+    "Platform.WindowsAPI": "0.0.4-*"
+  },
+
   "frameworks": {
     "net45": { },
     "dotnet5.4": {
@@ -19,10 +29,5 @@
         "System.IO.MemoryMappedFiles": "4.0.0-beta-23516"
       }
     }
-  },
-  "dependencies": {
-    "Platform.Helpers": "0.0.5-*",
-    "Platform.WindowsAPI": "0.0.4-*"
-  },
-  "compilationOptions": { "allowUnsafe": true }
+  }
 }

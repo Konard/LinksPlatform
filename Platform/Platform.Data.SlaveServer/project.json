@@ -4,13 +4,22 @@
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "UDP", "Server", "Console" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.SlaveServer",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
   "compilationOptions": {
     "emitEntryPoint": true
   },
   "commands": {
     "Platform.Data.SlaveServer": "Platform.Data.SlaveServer"
   },
+
+  "dependencies": {
+    "Platform.Communication": "0.0.4-*",
+    "Platform.Data.Core": "0.0.4-*"
+  },
+
   "frameworks": {
     "dnx451": { "System.Net": "4.0.0.0" },
     "dnxcore50": {
@@ -25,9 +34,5 @@
         "System.Net.Sockets": "4.0.10-beta-23109"
       }
     }
-  },
-  "dependencies": {
-    "Platform.Communication": "0.0.4-*",
-    "Platform.Data.Core": "0.0.4-*"
   }
 }

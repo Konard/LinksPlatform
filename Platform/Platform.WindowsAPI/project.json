@@ -4,7 +4,9 @@
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "WinAPI", "Windows" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.WindowsAPI",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
 
   "frameworks": {
     "net45": { },
