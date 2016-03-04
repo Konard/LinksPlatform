@@ -65,6 +65,26 @@
       <HintPath>..\packages\NReco.PhantomJS.1.0.2.0\lib\net40-Client\NReco.PhantomJS.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Platform.Communication, Version=0.0.5.34907, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Communication.0.0.5\lib\net45\Platform.Communication.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.Data.Core, Version=0.0.6.34908, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Data.Core.0.0.6\lib\net45\Platform.Data.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.Helpers, Version=0.0.5.34906, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Helpers.0.0.5\lib\net45\Platform.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.Memory, Version=0.0.7.34907, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Memory.0.0.7\lib\net45\Platform.Memory.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.WindowsAPI, Version=0.0.4.1294, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.WindowsAPI.0.0.4\lib\net45\Platform.WindowsAPI.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Portable.Licensing, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Portable.Licensing.1.1.0\lib\portable-net40+sl4+wp7+win8\Portable.Licensing.dll</HintPath>
       <Private>True</Private>
@@ -75,11 +95,13 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
     <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Crawler.cs" />
@@ -88,21 +110,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
-      <Project>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</Project>
-      <Name>Platform.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj">
-      <Project>{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}</Project>
-      <Name>Platform.Data.Core</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
-      <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
-      <Name>Platform.Helpers</Name>
-    </ProjectReference>
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\packages\PhantomJS.2.0.0\tools\phantomjs\phantomjs.exe">
