@@ -64,7 +64,19 @@
     <NoWin32Manifest>true</NoWin32Manifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Platform.Communication, Version=0.0.5.34907, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Communication.0.0.5\lib\net45\Platform.Communication.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Platform.Helpers, Version=0.0.5.34906, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Platform.Helpers.0.0.5\lib\net45\Platform.Helpers.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.XML" />
+    <Reference Include="System.Xml.Serialization" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Program.cs" />
@@ -72,16 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Platform.Communication\Platform.Communication.csproj">
-      <Project>{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}</Project>
-      <Name>Platform.Communication</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\Platform.Helpers\Platform.Helpers.csproj">
-      <Project>{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}</Project>
-      <Name>Platform.Helpers</Name>
-    </ProjectReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.5.1">
