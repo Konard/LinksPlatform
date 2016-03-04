@@ -1,10 +1,13 @@
 {
-  "version": "0.0.4-*",
+  "version": "0.0.5-*",
   "description": "LinksPlatform's Platform.Helpers Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Helpers", "Utilities", "Extensions" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Helpers",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
   "frameworks": {
     "net45": {
       "frameworkAssemblies": {

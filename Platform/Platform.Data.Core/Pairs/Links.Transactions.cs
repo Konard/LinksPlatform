@@ -191,12 +191,18 @@ namespace Platform.Data.Core.Pairs
 
             protected override void DisposeCore(bool manual)
             {
-                if (!_commited && !_reverted)
-                    Revert();
-                else
-                    _links.ResetCurrentTransation(); // !
+                if (manual)
+                {
+                    if (_links != null && !_links.Disposed)
+                    {
+                        if (!_commited && !_reverted)
+                            Revert();
+                        else
+                            _links.ResetCurrentTransation(); // !
+                    }
 
-                _lock.ExitWriteLock();
+                    _lock.ExitWriteLock();
+                }
             }
         }
 

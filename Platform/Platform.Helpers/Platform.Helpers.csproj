@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
+    <ResolveNuGetPackages>false</ResolveNuGetPackages>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -49,6 +50,7 @@
     <Compile Include="ConsoleHelpers.cs" />
     <Compile Include="Counter.cs" />
     <Compile Include="Disposal\DisposableValue.cs" />
+    <Compile Include="Disposal\DisposalHelpers.cs" />
     <Compile Include="DynamicExtensions.cs" />
     <Compile Include="ExceptionExtensions.cs" />
     <Compile Include="ILGeneratorExtensions.cs" />
@@ -76,7 +78,6 @@
     <Compile Include="UniqueTimestamp.cs" />
     <Compile Include="UniqueTimestampFactory.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

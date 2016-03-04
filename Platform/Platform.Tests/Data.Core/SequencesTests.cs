@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Linq;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
+using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    [TestClass]
     public class SequencesTests
     {
-        [TestMethod]
+        [Fact]
         public void CreateAllVariantsTest()
         {
             const long sequenceLength = 8;
@@ -34,15 +33,15 @@ namespace Platform.Tests.Data.Core
                 var sw2 = Stopwatch.StartNew();
                 var results2 = sequences.CreateAllVariants2(sequence); sw2.Stop();
 
-                Assert.IsTrue(results1.Count > results2.Length);
-                Assert.IsTrue(sw1.Elapsed > sw2.Elapsed);
+                Assert.True(results1.Count > results2.Length);
+                Assert.True(sw1.Elapsed > sw2.Elapsed);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        //[TestMethod]
+        //[Fact]
         //public void CUDTest()
         //{
         //    var tempFilename = Path.GetTempFileName();
@@ -73,8 +72,8 @@ namespace Platform.Tests.Data.Core
         //        var sw2 = Stopwatch.StartNew();
         //        var results2 = sequences.CreateAllVariants2(sequence); sw2.Stop();
 
-        //        Assert.IsTrue(results1.Count > results2.Length);
-        //        Assert.IsTrue(sw1.Elapsed > sw2.Elapsed);
+        //        Assert.True(results1.Count > results2.Length);
+        //        Assert.True(sw1.Elapsed > sw2.Elapsed);
 
         //        for (var i = 0; i < sequenceLength; i++)
         //            links.Delete(sequence[i]);
@@ -83,7 +82,7 @@ namespace Platform.Tests.Data.Core
         //    File.Delete(tempFilename);
         //}
 
-        [TestMethod]
+        [Fact]
         public void AllVariantsSearchTest()
         {
             const long sequenceLength = 8;
@@ -117,27 +116,27 @@ namespace Platform.Tests.Data.Core
                 var searchResults3 = sequences.Each(sequence); sw3.Stop();
 
                 var intersection0 = createResults.Intersect(searchResults0).ToList();
-                Assert.IsTrue(intersection0.Count == searchResults0.Count);
-                Assert.IsTrue(intersection0.Count == createResults.Length);
+                Assert.True(intersection0.Count == searchResults0.Count);
+                Assert.True(intersection0.Count == createResults.Length);
 
                 var intersection1 = createResults.Intersect(searchResults1).ToList();
-                Assert.IsTrue(intersection1.Count == searchResults1.Count);
-                Assert.IsTrue(intersection1.Count == createResults.Length);
+                Assert.True(intersection1.Count == searchResults1.Count);
+                Assert.True(intersection1.Count == createResults.Length);
 
                 var intersection2 = createResults.Intersect(searchResults2).ToList();
-                Assert.IsTrue(intersection2.Count == searchResults2.Count);
-                Assert.IsTrue(intersection2.Count == createResults.Length);
+                Assert.True(intersection2.Count == searchResults2.Count);
+                Assert.True(intersection2.Count == createResults.Length);
 
                 var intersection3 = createResults.Intersect(searchResults3).ToList();
-                Assert.IsTrue(intersection3.Count == searchResults3.Count);
-                Assert.IsTrue(intersection3.Count == createResults.Length);
+                Assert.True(intersection3.Count == searchResults3.Count);
+                Assert.True(intersection3.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void BalancedVariantSearchTest()
         {
             const long sequenceLength = 200;
@@ -166,18 +165,18 @@ namespace Platform.Tests.Data.Core
                 //var sw4 = Stopwatch.StartNew();
                 //var searchResults4 = sequences.Each(sequence); sw4.Stop();
 
-                Assert.IsTrue(searchResults2.Count == 1 && balancedVariant == searchResults2[0]);
+                Assert.True(searchResults2.Count == 1 && balancedVariant == searchResults2[0]);
 
-                Assert.IsTrue(searchResults3.Count == 1 && balancedVariant == searchResults3.First());
+                Assert.True(searchResults3.Count == 1 && balancedVariant == searchResults3.First());
 
-                //Assert.IsTrue(sw1.Elapsed < sw2.Elapsed);
+                //Assert.True(sw1.Elapsed < sw2.Elapsed);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void AllPartialVariantsSearchTest()
         {
             const long sequenceLength = 8;
@@ -200,7 +199,7 @@ namespace Platform.Tests.Data.Core
 
                 var partialSequence = new ulong[sequenceLength - 2];
 
-                Array.Copy(sequence, 1, partialSequence, 0, sequenceLength - 2);
+                Array.Copy(sequence, 1, partialSequence, 0, (int)sequenceLength - 2);
 
                 var sw1 = Stopwatch.StartNew();
                 var searchResults1 = sequences.GetAllPartiallyMatchingSequences0(partialSequence); sw1.Stop();
@@ -220,20 +219,20 @@ namespace Platform.Tests.Data.Core
                 //Global.Trash = searchResults1Strings;
 
                 var intersection1 = createResults.Intersect(searchResults1).ToList();
-                Assert.IsTrue(intersection1.Count == createResults.Length);
+                Assert.True(intersection1.Count == createResults.Length);
 
                 var intersection2 = createResults.Intersect(searchResults2).ToList();
-                Assert.IsTrue(intersection2.Count == createResults.Length);
+                Assert.True(intersection2.Count == createResults.Length);
 
                 var intersection4 = createResults.Intersect(searchResults4).ToList();
-                Assert.IsTrue(intersection4.Count == createResults.Length);
+                Assert.True(intersection4.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void BalancedPartialVariantsSearchTest()
         {
             const long sequenceLength = 200;
@@ -253,7 +252,7 @@ namespace Platform.Tests.Data.Core
 
                 var partialSequence = new ulong[sequenceLength - 2];
 
-                Array.Copy(sequence, 1, partialSequence, 0, sequenceLength - 2);
+                Array.Copy(sequence, 1, partialSequence, 0, (int)sequenceLength - 2);
 
                 var sw1 = Stopwatch.StartNew();
                 var searchResults1 = sequences.GetAllPartiallyMatchingSequences0(partialSequence); sw1.Stop();
@@ -261,16 +260,16 @@ namespace Platform.Tests.Data.Core
                 var sw2 = Stopwatch.StartNew();
                 var searchResults2 = sequences.GetAllPartiallyMatchingSequences1(partialSequence); sw2.Stop();
 
-                Assert.IsTrue(searchResults1.Count == 1 && balancedVariant == searchResults1[0]);
+                Assert.True(searchResults1.Count == 1 && balancedVariant == searchResults1[0]);
 
-                Assert.IsTrue(searchResults2.Count == 1 && balancedVariant == searchResults2.First());
+                Assert.True(searchResults2.Count == 1 && balancedVariant == searchResults2.First());
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void PatternMatchTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -301,27 +300,27 @@ namespace Platform.Tests.Data.Core
 
                 var matchedSequences1 = sequences.MatchPattern(e2, e1, zeroOrMany);
 
-                Assert.IsTrue(matchedSequences1.Count == 0);
+                Assert.True(matchedSequences1.Count == 0);
 
                 var matchedSequences2 = sequences.MatchPattern(zeroOrMany, e2, e1);
 
-                Assert.IsTrue(matchedSequences2.Count == 0);
+                Assert.True(matchedSequences2.Count == 0);
 
                 var matchedSequences3 = sequences.MatchPattern(e1, zeroOrMany, e1);
 
-                Assert.IsTrue(matchedSequences3.Count == 0);
+                Assert.True(matchedSequences3.Count == 0);
 
                 var matchedSequences4 = sequences.MatchPattern(e1, zeroOrMany, e2);
 
-                Assert.IsTrue(matchedSequences4.Contains(pair));
-                Assert.IsTrue(matchedSequences4.Contains(balancedVariant));
+                Assert.True(matchedSequences4.Contains(pair));
+                Assert.True(matchedSequences4.Contains(balancedVariant));
 
                 for (var i = 0; i < sequence.Length; i++)
                     links.Delete(sequence[i]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void IndexTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -340,9 +339,9 @@ namespace Platform.Tests.Data.Core
                     e1, e2, e1, e2 // mama / papa
                 };
 
-                Assert.IsFalse(sequences.Index(sequence));
+                Assert.False(sequences.Index(sequence));
 
-                Assert.IsTrue(sequences.Index(sequence));
+                Assert.True(sequences.Index(sequence));
             }
         }
 
@@ -351,7 +350,7 @@ namespace Platform.Tests.Data.Core
             Global.Trash = new BitString(1);
         }
 
-        [TestMethod]
+        [Fact]
         public void CompressionTest()
         {
             const ulong itself = LinksConstants.Itself;
@@ -378,28 +377,28 @@ namespace Platform.Tests.Data.Core
                 // 3: [1,2]     (1->2) pair
                 // 4: [1,2,1,2] (3->3) pair
 
-                Assert.IsTrue(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
-                Assert.IsTrue(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
-                Assert.IsTrue(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
-                Assert.IsTrue(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
+                Assert.True(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
+                Assert.True(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
+                Assert.True(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
+                Assert.True(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
 
                 const long source = LinksConstants.SourcePart;
                 const long target = LinksConstants.TargetPart;
 
-                Assert.IsTrue(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
-                Assert.IsTrue(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
-                Assert.IsTrue(links.GetByKeys(compressedVariant, target, source) == sequence[2]);
-                Assert.IsTrue(links.GetByKeys(compressedVariant, target, target) == sequence[3]);
+                Assert.True(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
+                Assert.True(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
+                Assert.True(links.GetByKeys(compressedVariant, target, source) == sequence[2]);
+                Assert.True(links.GetByKeys(compressedVariant, target, target) == sequence[3]);
 
                 // 4 - length of sequence
-                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 0) == sequence[0]);
-                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
-                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
-                Assert.IsTrue(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 0) == sequence[0]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void AllPossibleConnectionsTest()
         {
             InitBitString();
@@ -439,19 +438,19 @@ namespace Platform.Tests.Data.Core
                     Global.Trash = searchResults4;
 
                     var intersection1 = createResults.Intersect(searchResults1).ToList();
-                    Assert.IsTrue(intersection1.Count == createResults.Length);
+                    Assert.True(intersection1.Count == createResults.Length);
 
                     var intersection2 = reverseResults.Intersect(searchResults1).ToList();
-                    Assert.IsTrue(intersection2.Count == reverseResults.Length);
+                    Assert.True(intersection2.Count == reverseResults.Length);
 
                     var intersection0 = searchResults1.Intersect(searchResults2).ToList();
-                    Assert.IsTrue(intersection0.Count == searchResults2.Count);
+                    Assert.True(intersection0.Count == searchResults2.Count);
 
                     var intersection3 = searchResults2.Intersect(searchResults3).ToList();
-                    Assert.IsTrue(intersection3.Count == searchResults3.Count);
+                    Assert.True(intersection3.Count == searchResults3.Count);
 
                     var intersection4 = searchResults3.Intersect(searchResults4).ToList();
-                    Assert.IsTrue(intersection4.Count == searchResults4.Count);
+                    Assert.True(intersection4.Count == searchResults4.Count);
                 }
 
                 for (var i = 0; i < sequenceLength; i++)
@@ -459,7 +458,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        [TestMethod]
+        [Fact]
         public void CalculateAllUsagesTest()
         {
             InitBitString();
@@ -492,7 +491,7 @@ namespace Platform.Tests.Data.Core
                     sequences.CalculateAllUsages2(linksTotalUsages2);
 
                     var intersection1 = linksTotalUsages1.Intersect(linksTotalUsages2).ToList();
-                    Assert.IsTrue(intersection1.Count == linksTotalUsages2.Length);
+                    Assert.True(intersection1.Count == linksTotalUsages2.Length);
                 }
 
                 for (var i = 0; i < sequenceLength; i++)

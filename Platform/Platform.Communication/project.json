@@ -1,10 +1,16 @@
 ﻿{
-  "version": "0.0.4-*",
+  "version": "0.0.5-*",
   "description": "LinksPlatform's Platform.Communication Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Communication", "Protocols", "Gexf", "Udp", "UdpSender", "UdpReceiver" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Communication",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
+  "dependencies": {
+    "Platform.Helpers": "0.0.5-*"
+  },
 
   "frameworks": {
     "net45": {
@@ -26,8 +32,5 @@
         "System.Net.Sockets": "4.0.10-beta-23109"
       }
     }
-  },
-  "dependencies": {
-    "Platform.Helpers": "0.0.4-*"
   }
 }

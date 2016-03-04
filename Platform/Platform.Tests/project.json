@@ -1,27 +1,38 @@
 {
-  "version": "0.0.4-*",
+  "version": "0.0.7-*",
   "description": "LinksPlatform's Platform.Tests Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "Tests" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Tests",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
+  "tooling": {
+    "defaultNamespace": "Platform.Tests"
+  },
+  "commands": {
+    "test": "xunit.runner.dnx -parallel all"
+  },
+
+  "dependencies": {
+    "xunit": "2.1.0",
+    "xunit.runner.dnx": "2.1.0-rc1-build204",
+    "Platform.Data.Core": "0.0.6-*",
+    "Platform.Helpers": "0.0.5-*"
+  },
+
   "frameworks": {
-    "net45": {
-      "dependencies": {
-      }
-    },
-    "dotnet5.4": {
+    "dnx451": { },
+    "dnxcore50": {
       "dependencies": {
         "Microsoft.CSharp": "4.0.1-beta-23516",
         "System.Collections": "4.0.11-beta-23516",
         "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516"
+        "System.Threading": "4.0.11-beta-23516",
+        "System.Threading.Tasks.Parallel": "4.0.1-beta-23516"
       }
     }
-  },
-  "dependencies": {
-    "Platform.Data.Core": "0.0.4-*",
-    "Platform.Helpers": "0.0.4-*"
   }
 }

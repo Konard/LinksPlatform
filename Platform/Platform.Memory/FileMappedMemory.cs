@@ -148,21 +148,15 @@ namespace Platform.Memory
 
         private void UnmapFile()
         {
-            if (_pointer != null && _accessor != null)
-            {
-                _accessor.SafeMemoryMappedViewHandle.ReleasePointer();
-                _pointer = null;
-            }
+            _pointer = null;
+
             if (_accessor != null)
             {
-                _accessor.Dispose();
-                _accessor = null;
+                _accessor.SafeMemoryMappedViewHandle.ReleasePointer();
+                DisposalHelpers.TryDispose(ref _accessor);
             }
-            if (_file != null)
-            {
-                _file.Dispose();
-                _file = null;
-            }
+
+            DisposalHelpers.TryDispose(ref _file);
         }
 
         #endregion
@@ -205,8 +199,11 @@ namespace Platform.Memory
 
         protected override void DisposeCore(bool manual)
         {
-            UnmapFile();
-            ForceResize(_address, ref _usedCapacity);
+            if (manual)
+            {
+                UnmapFile();
+                ForceResize(_address, ref _usedCapacity);
+            }
         }
 
         protected override void EnsureNotDisposed()

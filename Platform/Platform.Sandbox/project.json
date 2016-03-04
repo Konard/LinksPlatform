@@ -4,14 +4,23 @@
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "Console", "Sandbox" ],
   "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Sandbox",
-  "licenseUrl": "https://github.com/Konard/LinksPlatform/blob/master/LICENSE",
+  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+  "requireLicenseAcceptance": true,
+
   "compilationOptions": {
     "emitEntryPoint": true,
     "allowUnsafe": true
   },
+
   "commands": {
     "Platform.Sandbox": "Platform.Sandbox"
   },
+
+  "dependencies": {
+    "Platform.Data.Core": "0.0.4-*"
+  },
+
   "frameworks": {
     "dnx451": {
       "frameworkAssemblies": {
@@ -34,8 +43,5 @@
         "System.Net.Http": "4.0.1-beta-23516"
       }
     }
-  },
-  "dependencies": {
-    "Platform.Data.Core": "0.0.4-*"
   }
 }

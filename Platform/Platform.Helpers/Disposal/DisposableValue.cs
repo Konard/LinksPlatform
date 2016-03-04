@@ -21,7 +21,10 @@ namespace Platform.Helpers.Disposal
 
         protected override void DisposeCore(bool manual)
         {
-            _dispose(Value);
+            if (manual)
+            {
+                _dispose(Value);
+            }
         }
     }
 }

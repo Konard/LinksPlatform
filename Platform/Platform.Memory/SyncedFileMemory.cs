@@ -30,7 +30,8 @@ namespace Platform.Memory
 
         protected override void DisposeCore(bool manual)
         {
-            _file.Dispose();
+            if (manual)
+                DisposalHelpers.TryDispose(_file);
         }
     }
 }

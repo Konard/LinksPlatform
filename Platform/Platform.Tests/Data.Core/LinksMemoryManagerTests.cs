@@ -1,13 +1,12 @@
 ﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Platform.Data.Core.Pairs;
+using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    [TestClass]
     public class LinksMemoryManagerTests
     {
-        [TestMethod]
+        [Fact]
         public void BasicMemoryTest()
         {
             var tempFilename = Path.GetTempFileName();

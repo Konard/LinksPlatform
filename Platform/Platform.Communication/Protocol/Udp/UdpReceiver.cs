@@ -106,8 +106,11 @@ namespace Platform.Communication.Protocol.Udp
 
         protected override void DisposeCore(bool manual)
         {
-            Stop();
-            ((IDisposable)_udp).Dispose();
+            if (manual)
+            {
+                Stop();
+                DisposalHelpers.TryDispose(_udp);
+            }
         }
     }
 }
