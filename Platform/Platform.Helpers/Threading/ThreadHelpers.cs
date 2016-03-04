@@ -101,5 +101,6 @@ namespace Platform.Helpers.Threading
 #endif
             thread.Start();
             return thread;
+        }
     }
 }
