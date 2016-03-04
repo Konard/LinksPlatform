@@ -60,5 +60,46 @@ namespace Platform.Helpers.Threading
             action();
 #endif
         }
+
+        public static Thread StartNew<T>(T param, Action<object> action)
+        {
+#if DEBUG
+            var thread = new Thread(obj =>
+            {
+                try
+                {
+                    action(obj);
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Log exception
+                }
+            });
+#else
+            var thread = new Thread(new ParameterizedThreadStart(action));
+#endif
+            thread.Start(param);
+            return thread;
+        }
+
+        public static Thread StartNew(Action action)
+        {
+#if DEBUG
+            var thread = new Thread(() =>
+            {
+                try
+                {
+                    action();
+                }
+                catch (Exception ex)
+                {
+                    // TODO: Log exception
+                }
+            });
+#else
+            var thread = new Thread(new ThreadStart(action));
+#endif
+            thread.Start();
+            return thread;
     }
 }
