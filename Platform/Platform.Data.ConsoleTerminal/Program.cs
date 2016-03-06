@@ -25,7 +25,9 @@ namespace Platform.Data.ConsoleTerminal
 
                         while (TerminalRunning)
                         {
+#if NET451
                             while (Console.KeyAvailable)
+#endif
                             {
                                 var line = Console.ReadLine();
                                 if (!string.IsNullOrWhiteSpace(line))
