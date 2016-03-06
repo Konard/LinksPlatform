@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Threading;
 
 #if NET45
 using System.Threading;
@@ -61,6 +60,7 @@ namespace Platform.Helpers.Threading
 #endif
         }
 
+#if NET45
         public static Thread StartNew<T>(T param, Action<object> action)
         {
 #if DEBUG
@@ -102,5 +102,6 @@ namespace Platform.Helpers.Threading
             thread.Start();
             return thread;
         }
+#endif
     }
 }
