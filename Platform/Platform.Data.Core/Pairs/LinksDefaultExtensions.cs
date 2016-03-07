@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Text;
 using Platform.Data.Core.Exceptions;
+using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
-    public static class LinksExtensions
+    public static class LinksDefaultExtensions
     {
         public static ulong RunRandomCreations(this Links links, long amountOfCreations)
         {
@@ -115,6 +117,58 @@ namespace Platform.Data.Core.Pairs
                 if (sequence[i] == LinksConstants.Any) return true;
 
             return false;
+        }
+
+        public static void UseUnicode(this Links links)
+        {
+            new UnicodeMap(links).Init();
+        }
+
+        public static string FormatStructure(this Links links, ulong linkIndex, Func<Link, bool> isElement, bool renderIndex = false, StringBuilder sb = null)
+        {
+            if (sb == null)
+                sb = new StringBuilder();
+
+            if (linkIndex != LinksConstants.Null)
+            {
+                var link = links.GetLink(linkIndex);
+
+                sb.Append('(');
+
+                if (renderIndex)
+                {
+                    sb.Append(link.Index);
+                    sb.Append(':');
+                }
+
+                if (link.Source == link.Index)
+                    sb.Append(link.Index);
+                else
+                {
+                    var source = links.GetLink(link.Source);
+                    if (isElement(source))
+                        sb.Append(source.Index);
+                    else
+                        links.FormatStructure(source.Index, isElement, renderIndex, sb);
+                }
+
+                sb.Append(' ');
+
+                if (link.Target == link.Index)
+                    sb.Append(link.Index);
+                else
+                {
+                    var target = links.GetLink(link.Target);
+                    if (isElement(target))
+                        sb.Append(target.Index);
+                    else
+                        links.FormatStructure(target.Index, isElement, renderIndex, sb);
+
+                    sb.Append(')');
+                }
+            }
+
+            return sb.ToString();
         }
     }
 }

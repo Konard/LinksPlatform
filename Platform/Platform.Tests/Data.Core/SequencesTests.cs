@@ -350,6 +350,62 @@ namespace Platform.Tests.Data.Core
             Global.Trash = new BitString(1);
         }
 
+        /// <summary>Imported from https://raw.githubusercontent.com/wiki/Konard/LinksPlatform/%D0%9E-%D1%82%D0%BE%D0%BC%2C-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D1%91-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D0%BB%D0%BE%D1%81%D1%8C.md</summary>
+        private static readonly string ExampleText =
+            @"([english version](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning))
+
+Обозначение пустоты, какое оно? Темнота ли это? Там где отсутствие света, отсутствие фотонов (носителей света)? Или это то, что полностью отражает свет? Пустой белый лист бумаги? Там где есть место для нового начала? Разве пустота это не характеристика пространства? Пространство это то, что можно чем-то наполнить?
+
+[![чёрное пространство, белое пространство](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/1.png ""чёрное пространство, белое пространство"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/1.png)
+
+Что может быть минимальным рисунком, образом, графикой? Может быть это точка? Это ли простейшая форма? Но есть ли у точки размер? Цвет? Масса? Координаты? Время существования?
+
+[![чёрное пространство, чёрная точка](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/2.png ""чёрное пространство, чёрная точка"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/2.png)
+
+А что если повторить? Сделать копию? Создать дубликат? Из одного сделать два? Может это быть так? Инверсия? Отражение? Сумма?
+
+[![белая точка, чёрная точка](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/3.png ""белая точка, чёрная точка"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/3.png)
+
+А что если мы вообразим движение? Нужно ли время? Каким самым коротким будет путь? Что будет если этот путь зафиксировать? Запомнить след? Как две точки становятся линией? Чертой? Гранью? Разделителем? Единицей?
+
+[![две белые точки, чёрная вертикальная линия](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/4.png ""две белые точки, чёрная вертикальная линия"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/4.png)
+
+Можно ли замкнуть движение? Может ли это быть кругом? Можно ли замкнуть время? Или остаётся только спираль? Но что если замкнуть предел? Создать ограничение, разделение? Получится замкнутая область? Полностью отделённая от всего остального? Но что это всё остальное? Что можно делить? В каком направлении? Ничего или всё? Пустота или полнота? Начало или конец? Или может быть это единица и ноль? Дуальность? Противоположность? А что будет с кругом если у него нет размера? Будет ли круг точкой? Точка состоящая из точек?
+
+[![белая вертикальная линия, чёрный круг](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/5.png ""белая вертикальная линия, чёрный круг"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/5.png)
+
+Как ещё можно использовать грань, черту, линию? А что если она может что-то соединять, может тогда её нужно повернуть? Почему то, что перпендикулярно вертикальному горизонтально? Горизонт? Инвертирует ли это смысл? Что такое смысл? Из чего состоит смысл? Существует ли элементарная единица смысла?
+
+[![белый круг, чёрная горизонтальная линия](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/6.png ""белый круг, чёрная горизонтальная линия"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/6.png)
+
+Соединять, допустим, а какой смысл в этом есть ещё? Что если помимо смысла ""соединить, связать"", есть ещё и смысл направления ""от начала к концу""? От предка к потомку? От родителя к ребёнку? От общего к частному?
+
+[![белая горизонтальная линия, чёрная горизонтальная стрелка](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/7.png ""белая горизонтальная линия, чёрная горизонтальная стрелка"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/7.png)
+
+Шаг назад. Возьмём опять отделённую область, которая лишь та же замкнутая линия, что ещё она может представлять собой? Объект? Но в чём его суть? Разве не в том, что у него есть граница, разделяющая внутреннее и внешнее? Допустим связь, стрелка, линия соединяет два объекта, как бы это выглядело?
+
+[![белая связь, чёрная направленная связь](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/8.png ""белая связь, чёрная направленная связь"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/8.png)
+
+Допустим у нас есть смысл ""связать"" и смысл ""направления"", много ли это нам даёт? Много ли вариантов интерпретации? А что если уточнить, каким именно образом выполнена связь? Что если можно задать ей чёткий, конкретный смысл? Что это будет? Тип? Глагол? Связка? Действие? Трансформация? Переход из состояния в состояние? Или всё это и есть объект, суть которого в его конечном состоянии, если конечно конец определён направлением?
+
+[![белая обычная и направленная связи, чёрная типизированная связь](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/9.png ""белая обычная и направленная связи, чёрная типизированная связь"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/9.png)
+
+А что если всё это время, мы смотрели на суть как бы снаружи? Можно ли взглянуть на это изнутри? Что будет внутри объектов? Объекты ли это? Или это связи? Может ли эта структура описать сама себя? Но что тогда получится, разве это не рекурсия? Может это фрактал?
+
+[![белая обычная и направленная связи с рекурсивной внутренней структурой, чёрная типизированная связь с рекурсивной внутренней структурой](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/10.png ""белая обычная и направленная связи с рекурсивной внутренней структурой, чёрная типизированная связь с рекурсивной внутренней структурой"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/10.png)
+
+На один уровень внутрь (вниз)? Или на один уровень во вне (вверх)? Или это можно назвать шагом рекурсии или фрактала?
+
+[![белая обычная и направленная связи с двойной рекурсивной внутренней структурой, чёрная типизированная связь с двойной рекурсивной внутренней структурой](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/11.png ""белая обычная и направленная связи с двойной рекурсивной внутренней структурой, чёрная типизированная связь с двойной рекурсивной внутренней структурой"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/11.png)
+
+Последовательность? Массив? Список? Множество? Объект? Таблица? Элементы? Цвета? Символы? Буквы? Слово? Цифры? Число? Алфавит? Дерево? Сеть? Граф? Гиперграф?
+
+[![белая обычная и направленная связи со структурой из 8 цветных элементов последовательности, чёрная типизированная связь со структурой из 8 цветных элементов последовательности](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/12.png ""белая обычная и направленная связи со структурой из 8 цветных элементов последовательности, чёрная типизированная связь со структурой из 8 цветных элементов последовательности"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/12.png)
+
+...
+
+[![анимация](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif ""анимация"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif)";
+
         [Fact]
         public void CompressionTest()
         {
@@ -395,6 +451,103 @@ namespace Platform.Tests.Data.Core
                 Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
                 Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
                 Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
+            }
+        }
+
+        [Fact]
+        public void GlobalCompressionTest()
+        {
+            const ulong itself = LinksConstants.Itself;
+
+            using (var scope = new TempLinksTestScope(useSequences: true))
+            {
+                var links = scope.Links;
+                var sequences = scope.Sequences;
+
+                var e1 = links.Create(itself, itself);
+                var e2 = links.Create(itself, itself);
+
+                var sequence = new[]
+                {
+                    e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
+                };
+
+                sequences.Index(sequence);
+
+                var compressor = new Compressor(links, sequences);
+
+                var compressedVariant = compressor.CompressGlobal(sequence);
+
+                // 1: [1]       (1->1) point
+                // 2: [2]       (2->2) point
+                // 3: [1,2]     (1->2) pair
+                // 4: [1,2,1,2] (3->3) pair
+
+                Assert.True(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
+                Assert.True(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
+                Assert.True(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
+                Assert.True(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
+
+                const long source = LinksConstants.SourcePart;
+                const long target = LinksConstants.TargetPart;
+
+                Assert.True(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
+                Assert.True(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
+                Assert.True(links.GetByKeys(compressedVariant, target, source) == sequence[2]);
+                Assert.True(links.GetByKeys(compressedVariant, target, target) == sequence[3]);
+
+                // 4 - length of sequence
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 0) == sequence[0]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
+                Assert.True(links.GetSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
+            }
+        }
+
+        [Fact]
+        public void CompressionEfficiencyTest()
+        {
+            var strings = ExampleText.Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
+            var totalCharacters = arrays.Select(x => x.Length).Sum();
+
+            using (var scope1 = new TempLinksTestScope(useSequences: true))
+            using (var scope2 = new TempLinksTestScope(useSequences: true))
+            {
+                scope1.Links.UseUnicode();
+                scope2.Links.UseUnicode();
+
+                var compressor1 = new Compressor(scope1.Links, scope1.Sequences);
+                var compressor2 = new Compressor(scope2.Links, scope2.Sequences);
+
+                for (int i = 0; i < arrays.Length; i++)
+                {
+                    scope1.Sequences.Index(arrays[i]);
+                    scope2.Sequences.Index(arrays[i]);
+                }
+
+                for (int i = 0; i < arrays.Length; i++)
+                {
+                    var sequence1 = compressor1.Compress(arrays[i]);
+
+                    var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
+
+                    var sequence2 = compressor2.CompressGlobal(arrays[i]);
+
+                    var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
+
+                    var structure1 = scope1.Links.FormatStructure(sequence1, link => link.IsPartialPoint());
+                    var structure2 = scope2.Links.FormatStructure(sequence2, link => link.IsPartialPoint());
+
+                    if (sequence1 != LinksConstants.Null && sequence2 != LinksConstants.Null && arrays[i].Length > 3)
+                        Assert.False(structure1 == structure2);
+
+                    Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
+                }
+
+                Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+
+                Assert.True(scope2.Links.Count() < scope1.Links.Count());
             }
         }
 

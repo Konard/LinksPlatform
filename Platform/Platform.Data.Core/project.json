@@ -1,5 +1,5 @@
 {
-  "version": "0.0.6-*",
+  "version": "0.0.7-*",
   "description": "LinksPlatform's Platform.Data.Core Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "Link", "Triplet", "Pair", "Sequence" ],

@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using System.Xml;
 using Platform.Communication.Protocol.Gexf;
 using Platform.Data.Core.Exceptions;

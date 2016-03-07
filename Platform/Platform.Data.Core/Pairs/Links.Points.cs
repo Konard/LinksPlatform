@@ -35,7 +35,7 @@
         public bool IsFullPointCore(ulong link)
         {
             var values = _memoryManager.GetLinkValue(link);
-            return values[LinksConstants.SourcePart] == link && values[LinksConstants.TargetPart] == link;
+            return Point<ulong>.IsFullPoint(values);
         }
 
         /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
@@ -57,7 +57,7 @@
         public bool IsPartialPointCore(ulong link)
         {
             var values = _memoryManager.GetLinkValue(link);
-            return values[LinksConstants.SourcePart] == link || values[LinksConstants.TargetPart] == link;
+            return Point<ulong>.IsPartialPoint(values);
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7-*",
+  "version": "0.0.8-*",
   "description": "LinksPlatform's Platform.Tests Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "LinksPlatform", "Tests" ],
@@ -18,7 +18,7 @@
   "dependencies": {
     "xunit": "2.1.0",
     "xunit.runner.dnx": "2.1.0-rc1-build204",
-    "Platform.Data.Core": "0.0.6-*",
+    "Platform.Data.Core": "0.0.7-*",
     "Platform.Helpers": "0.0.5-*"
   },
 

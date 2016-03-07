@@ -145,7 +145,7 @@ namespace Platform.Data.Core.Pairs
         {
             if (array == null) throw new ArgumentNullException("array");
             if (arrayIndex < 0) throw new ArgumentOutOfRangeException("arrayIndex");
-            if (arrayIndex + Length >= array.Length) throw new ArgumentException();
+            if (arrayIndex + Length > array.Length) throw new ArgumentException();
 
             array[arrayIndex++] = Index;
             array[arrayIndex++] = Source;

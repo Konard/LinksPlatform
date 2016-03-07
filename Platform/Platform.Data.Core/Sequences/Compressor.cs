@@ -14,7 +14,8 @@ namespace Platform.Data.Core.Sequences
     public class Compressor
     {
         private readonly Func<ulong, ulong, ulong> _createLink;
-        private readonly Func<ulong[], ulong> _createSequence; 
+        private readonly Func<ulong[], ulong> _createSequence;
+        private readonly Func<ulong, ulong, UnsafeDictionary<Link, ulong>, ulong> _calculateFrequency;
         private Link _maxPair;
         private readonly ulong _minFrequency;
         private ulong _maxFrequency;
@@ -85,16 +86,56 @@ namespace Platform.Data.Core.Sequences
 
         public Compressor(Links links, Sequences sequences, ulong minFrequency = 1, bool threadSafe = true)
         {
+            Func<ulong, Link> getLink;
+            Func<ulong[], ulong> count;
+
             if (threadSafe)
             {
+                getLink = links.GetLink;
+                count = links.Count;
                 _createLink = links.Create;
                 _createSequence = sequences.CreateBalancedVariant;
+
             }
             else
             {
+                getLink = links.GetLinkCore;
+                count = links.CountCore;
                 _createLink = links.CreateCore;
                 _createSequence = sequences.CreateBalancedVariantCore;
             }
+
+            _calculateFrequency = (s, t, cache) =>
+            {
+                ulong frequency = 0;
+                if (!cache.TryGetValue(new Link(s, t), out frequency))
+                {
+                    var sourceLink = getLink(s);
+                    ulong sourceFrequency;
+                    if (sourceLink.IsPartialPoint())
+                        sourceFrequency = count(new[] { LinksConstants.Null, s });
+                    else
+                        sourceFrequency = _calculateFrequency(sourceLink.Source, sourceLink.Target, cache);
+
+                    var targetLink = getLink(t);
+                    ulong targetFrequency;
+                    if (targetLink.IsPartialPoint())
+                        targetFrequency = count(new[] { LinksConstants.Null, t });
+                    else
+                        targetFrequency = _calculateFrequency(targetLink.Source, targetLink.Target, cache);
+
+                    frequency = sourceFrequency + targetFrequency;
+                    if (frequency - sourceFrequency != targetFrequency)
+                        frequency = ulong.MaxValue;
+
+                    var link = _createLink(s, t);
+                    var pair = new Link(link, s, t);
+
+                    cache.Add(pair, frequency);
+                }
+                return frequency;
+            };
+
 
             if (minFrequency == 0) minFrequency = 1;
             _minFrequency = minFrequency;
@@ -326,5 +367,58 @@ namespace Platform.Data.Core.Sequences
         //        }
         //    });
         //}
+
+        public ulong CompressGlobal(ulong[] sequence)
+        {
+            var precompressedSequence = PrecompressGlobal(sequence);
+            return _createSequence(precompressedSequence);
+        }
+
+        public ulong[] PrecompressGlobal(ulong[] sequence)
+        {
+            if (sequence.IsNullOrEmpty())
+                return null;
+
+            if (sequence.Length == 1)
+                return sequence;
+
+            if (sequence.Length == 2)
+                return new[] { _createLink(sequence[0], sequence[1]) };
+
+            if (_pairsFrequencies != null)
+                throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
+
+            _pairsFrequencies = new UnsafeDictionary<Link, ulong>(4096, LinkComparer.Default);
+
+            for (var i = 1; i < sequence.Length; i++)
+            {
+                var source = sequence[i - 1];
+                var target = sequence[i];
+
+                var link = _createLink(source, target);
+                var pair = new Link(link, sequence[i - 1], sequence[i]);
+                UpdateMaxPair(pair, _calculateFrequency(source, target, _pairsFrequencies));
+            }
+
+            if (_maxFrequency > _minFrequency)
+            {
+                // Can be faster if source sequence allowed to be changed
+                var copy = new ulong[sequence.Length];
+                Array.Copy(sequence, copy, sequence.Length);
+
+                var newLength = ReplacePairs(copy);
+
+                var final = new ulong[newLength];
+                Array.Copy(copy, final, newLength);
+
+                _pairsFrequencies = null;
+
+                return final;
+            }
+
+            _pairsFrequencies = null;
+
+            return sequence;
+        }
     }
 }
