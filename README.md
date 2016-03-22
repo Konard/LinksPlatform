@@ -20,7 +20,7 @@ There also at least two variants of Link structure:
 
 - Typed, with added Linker ([verb](https://en.wikipedia.org/wiki/Verb), [action](https://en.wikipedia.org/wiki/Action_(philosophy)), [type](https://en.wikipedia.org/wiki/Type_system), [category](https://en.wikipedia.org/wiki/Category_theory), [predicate](https://en.wikipedia.org/wiki/Predicate), [transition](https://en.wikipedia.org/wiki/Transition_system), [algorithm](https://en.wikipedia.org/wiki/Algorithm)), so any additional info about type of connection between two links can be stored here.
 
-Links Platform is a system, that combine simple associative memory storage (Links) and transformation execution engine (Triggers). That provides an ability to program that system dynamically, due to fact that all algorithms treated as data inside the storage. Such algorithms can also change themselves in real time based on input from the environment. Idea behind Links Platform is a model of high level associative memory effects of human mind.
+Links Platform is a system, that combine simple associative memory storage (Links) and transformation execution engine (Triggers). There is an ability to program that system dynamically, due to fact that all algorithms treated as data inside the storage. Such algorithms can also change themselves in real time based on input from the environment. Idea behind Links Platform is a model of high level associative memory effects of human mind.
 
 ## Road map
 [![Road Map, Status](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/RoadMap-status.png "Road Map, Status")](https://github.com/Konard/LinksPlatform/milestones)
