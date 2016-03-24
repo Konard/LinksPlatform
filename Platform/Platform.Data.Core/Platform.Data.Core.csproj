@@ -67,6 +67,7 @@
     <Compile Include="Pairs\ILink.cs" />
     <Compile Include="Pairs\ILinksMemoryManager.cs" />
     <Compile Include="Pairs\Link.cs" />
+    <Compile Include="Pairs\LinkDefaultExtensions.cs" />
     <Compile Include="Pairs\Links2.cs" />
     <Compile Include="Pairs\ILinks.cs" />
     <Compile Include="Pairs\Links.cs" />
@@ -75,11 +76,12 @@
     <Compile Include="Pairs\Links.Points.cs" />
     <Compile Include="Pairs\Links.Transactions.cs" />
     <Compile Include="Pairs\LinksConstants.cs" />
-    <Compile Include="Pairs\LinksExtensions.cs" />
+    <Compile Include="Pairs\LinksDefaultExtensions.cs" />
     <Compile Include="Pairs\LinksMemoryManager.cs" />
     <Compile Include="Pairs\LinksMemoryManager.ListMethods.cs" />
     <Compile Include="Pairs\LinksMemoryManager.Tests.cs" />
     <Compile Include="Pairs\LinksMemoryManager.TreeMethods.cs" />
+    <Compile Include="Point.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Sequences\Compressor.cs" />
     <Compile Include="Sequences\ISequences.cs" />
