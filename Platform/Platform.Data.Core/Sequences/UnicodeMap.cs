@@ -95,6 +95,20 @@ namespace Platform.Data.Core.Sequences
             return sb.ToString();
         }
 
+        public static ulong[] FromCharsToLinkArray(char[] chars)
+        {
+            return FromCharsToLinkArray(chars, chars.Length);
+        }
+
+        public static ulong[] FromCharsToLinkArray(char[] chars, int count)
+        {
+            // char array to ulong array
+            var linksSequence = new ulong[count];
+            for (var i = 0; i < count; i++)
+                linksSequence[i] = FromCharToLink(chars[i]);
+            return linksSequence;
+        }
+
         public static ulong[] FromStringToLinkArray(string sequence)
         {
             // char array to ulong array

@@ -8,16 +8,10 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            new WikipediaImporterCLI().Run(args);
+            new FileIndexerCLI().Run(args);
+            //new WikipediaImporterCLI().Run(args);
 
             //DllImportTest.Test();
-
-            //using (var crawler = new WebCrawlerInstance("crawled.links"))
-            //{
-            //    crawler.Start(new Uri("https://abotx.org/"));
-            //}
-
-            //WebCrawler.TestSingle1();
 
             //CompressionExperiments.Test();
 

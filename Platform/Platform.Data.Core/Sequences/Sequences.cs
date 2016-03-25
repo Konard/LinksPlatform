@@ -209,6 +209,26 @@ namespace Platform.Data.Core.Sequences
             return indexed;
         }
 
+        public bool BulkIndex(ulong[] sequence)
+        {
+            var indexed = true;
+
+            var i = sequence.Length;
+
+            Sync.ExecuteReadOperation(() =>
+            {
+                while (--i >= 1 && (indexed = Links.SearchCore(sequence[i - 1], sequence[i]) != LinksConstants.Null)) ;
+            });
+
+            Sync.ExecuteWriteOperation(() =>
+            {
+                for (; i >= 1; i--)
+                    Links.CreateCore(sequence[i - 1], sequence[i]);
+            });
+
+            return indexed;
+        }
+
         public bool CheckIndex(ulong[] sequence)
         {
             var indexed = true;
