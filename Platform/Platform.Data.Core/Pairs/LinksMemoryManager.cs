@@ -48,7 +48,7 @@ namespace Platform.Data.Core.Pairs
 
         private readonly long _memoryReservationStep;
 
-        private readonly IMemory _memory;
+        private readonly IResizableDirectMemory _memory;
         private LinksHeader* _header;
         private Link* _links;
 
@@ -76,11 +76,21 @@ namespace Platform.Data.Core.Pairs
         /// Создаёт экземпляр базы данных Links в файле по указанному адресу, с указанным минимальным шагом расширения базы данных.
         /// </summary>
         /// <param name="address">Полный пусть к файлу базы данных.</param>
-        /// <param name="size">Минимальный шаг расширения базы данных в байтах.</param>
-        public LinksMemoryManager(string address, long size)
+        /// <param name="memoryReservationStep">Минимальный шаг расширения базы данных в байтах.</param>
+        public LinksMemoryManager(string address, long memoryReservationStep)
+            : this(new FileMappedResizableDirectMemory(address, memoryReservationStep), memoryReservationStep)
         {
-            _memoryReservationStep = size;
-            _memory = new FileMappedMemory(address, _memoryReservationStep);
+        }
+
+        public LinksMemoryManager(IResizableDirectMemory memory)
+            : this(memory, DefaultLinksSizeStep)
+        {
+        }
+
+        public LinksMemoryManager(IResizableDirectMemory memory, long memoryReservationStep)
+        {
+            _memory = memory;
+            _memoryReservationStep = memoryReservationStep;
 
             UpdatePointers(_memory);
 
@@ -360,7 +370,7 @@ namespace Platform.Data.Core.Pairs
         /// <remarks>
         /// TODO: Возможно это должно быть событием, вызываемым из IMemory, в том случае, если адрес реально поменялся
         /// </remarks>
-        private void UpdatePointers(IMemory memory)
+        private void UpdatePointers(IResizableDirectMemory memory)
         {
             _header = (LinksHeader*)memory.Pointer;
 

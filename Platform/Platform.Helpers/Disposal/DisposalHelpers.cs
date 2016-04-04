@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platform.Helpers.Disposal
 {
+    /// <remarks>
+    /// TODO: Should TryDispose method catch and ignore exceptions?
+    /// </remarks>
     public static class DisposalHelpers
     {
         public static bool TryDispose<T>(ref T @object)
@@ -38,8 +37,7 @@ namespace Platform.Helpers.Disposal
         public static bool TryDispose<T>(T @object)
             where T : class
         {
-            var objectCopy = @object;
-            return TryDispose(ref objectCopy);
+            return TryDispose(ref @object);
         }
     }
 }

@@ -1,5 +1,5 @@
 {
-  "version": "0.0.7-*",
+  "version": "0.0.8-*",
   "description": "LinksPlatform's Platform.Memory Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Memory Mapped Files", "Storage", "Memory" ],
@@ -11,8 +11,8 @@
   "compilationOptions": { "allowUnsafe": true },
 
   "dependencies": {
-    "Platform.Helpers": "0.0.5-*",
-    "Platform.WindowsAPI": "0.0.4-*"
+    "Platform.Helpers": "0.0.7-*",
+    "Platform.WindowsAPI": "0.0.5-*"
   },
 
   "frameworks": {

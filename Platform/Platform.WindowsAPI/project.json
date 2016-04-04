@@ -1,5 +1,5 @@
 ﻿{
-  "version": "0.0.4-*",
+  "version": "0.0.5-*",
   "description": "LinksPlatform's Platform.WindowsAPI Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "WinAPI", "Windows" ],
@@ -7,6 +7,8 @@
   "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
   "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
   "requireLicenseAcceptance": true,
+
+  "compilationOptions": { "allowUnsafe": true },
 
   "frameworks": {
     "net45": { },

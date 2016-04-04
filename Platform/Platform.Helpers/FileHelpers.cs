@@ -67,5 +67,17 @@ namespace Platform.Helpers
         {
             return File.Open(path, FileMode.Append, FileAccess.Write);
         }
+
+        public static long GetSize(string path)
+        {
+            return File.Exists(path) ? new FileInfo(path).Length : 0;
+        }
+
+        public static void SetSize(string path, long size)
+        {
+            using (var fileStream = File.Open(path, FileMode.OpenOrCreate))
+                if (fileStream.Length != size)
+                    fileStream.SetLength(size);
+        }
     }
 }

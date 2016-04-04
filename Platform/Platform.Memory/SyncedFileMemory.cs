@@ -1,16 +1,30 @@
 ﻿using System.IO;
+using System.Runtime.InteropServices;
+using Platform.Helpers;
 using Platform.Helpers.Disposal;
 
 namespace Platform.Memory
 {
-    public unsafe class SyncedFileMemory : DisposalBase
+    /// <remarks>
+    /// Ideas for immediate memory (pushed to disk on each operation)
+    /// </remarks>
+    internal unsafe class SyncedFileMemory<TElement> : DisposalBase, IMemory
+        where TElement : struct
     {
+        private static readonly long ElementSize = Marshal.SizeOf(typeof(TElement));
         private readonly FileStream _file;
+
+        public long Size
+        {
+            get { return _file.Length; }
+        }
 
         public SyncedFileMemory(string filename)
         {
             _file = File.Open(filename, FileMode.OpenOrCreate, FileAccess.ReadWrite);
         }
+
+        #region Direct Memory Transformations Wrappers
 
         public void* Read(long size)
         {
@@ -19,14 +33,53 @@ namespace Platform.Memory
 
         public void Write(void* data, long size)
         {
+            
         }
 
-        /*public void Push<T>(T value)
-            where T : struct
+        // Copy
+        public void Move(void* source, void* target, long size)
         {
-            var bytes = BitConverterHelpers.GetBytes(value);
-            _file.Write(bytes, 0, bytes.Length);
-        }*/
+            // It is possible to check if pointer inside this memory block:
+            //if (source > Pointer && (Pointer + Size) <= (source + size))
+            //{
+            //    ...
+            //}
+            //if (target > Pointer && (Pointer + Size) <= (target + size))
+            //{
+            //    ...
+            //}
+
+            // Such method can be used to trigger events:
+            // TriggerRead();
+            // TriggerWrite();
+        }
+
+        #endregion
+
+        #region Access Through Structure (TElement)
+
+        // Append
+        public void Push(TElement value)
+        {
+            _file.Seek(0, SeekOrigin.End);
+            _file.Write(value);
+        }
+
+        public TElement this[int index]
+        {
+            get
+            {
+                _file.Seek(ElementSize * index, SeekOrigin.Begin);
+                return _file.ReadOrDefault<TElement>();
+            }
+            set
+            {
+                _file.Seek(ElementSize * index, SeekOrigin.Begin);
+                _file.Write(value);
+            }
+        }
+
+        #endregion
 
         protected override void DisposeCore(bool manual)
         {

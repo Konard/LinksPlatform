@@ -12,8 +12,8 @@
 
   "dependencies": {
     "Platform.Communication": "0.0.5-*",
-    "Platform.Helpers": "0.0.5-*",
-    "Platform.Memory": "0.0.7-*"
+    "Platform.Helpers": "0.0.7-*",
+    "Platform.Memory": "0.0.8-*"
   },
 
   "frameworks": {

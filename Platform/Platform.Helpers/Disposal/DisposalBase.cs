@@ -51,19 +51,20 @@ namespace Platform.Helpers.Disposal
 
         public void Dispose()
         {
-            Dispose(true);
             GC.SuppressFinalize(this);
+            Dispose(true);
         }
 
         public void Destruct()
         {
-            Dispose(false);
+            if (!Disposed)
+                Dispose(false);
         }
 
         private void OnProcessExit(object sender, EventArgs e)
         {
-            Dispose(true);
             GC.SuppressFinalize(this);
+            Destruct();
         }
 
         ~DisposalBase()
@@ -91,7 +92,7 @@ namespace Platform.Helpers.Disposal
                 }
                 catch
                 {
-                    if (!AllowMultipleDisposeAttempts && manual) throw;
+                    if (!AllowMultipleDisposeAttempts || manual) throw;
                     // else TODO: Log exception
                 }
             }

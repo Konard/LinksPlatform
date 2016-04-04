@@ -6,8 +6,10 @@ namespace Platform.WindowsAPI
     /// <remarks>
     /// TODO: Определить, нужно ли обязательно указывать расширение для библиотеки (например, ".dll").
     /// </remarks>
-    public static class Kernel32
+    public static unsafe class Kernel32
     {
+        private static readonly IntPtr CurrentProcessHeapHandle = GetProcessHeap();
+
         #region Virtual Memory
 
         #region Enumerations
@@ -159,16 +161,64 @@ namespace Platform.WindowsAPI
         [DllImport("kernel32", SetLastError = false)]
         public static extern IntPtr HeapAlloc(IntPtr heapHandle, HeapFlags flags, UIntPtr sizeInBytes);
 
+        /// <summary>
+        /// Allocates a memory block of the given size. 
+        /// The allocated memory is automatically initialized to zero.
+        /// </summary>
+        /// <param name="size">Size of a memory block.</param>
+        /// <returns>Pointer to a memory block.</returns>
+        public static void* HeapAlloc(long size)
+        {
+            var result = HeapAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new UIntPtr((ulong)size)).ToPointer();
+            if (result == null) throw new OutOfMemoryException();
+            return result;
+        }
+
         [DllImport("kernel32", SetLastError = true)]
         public static extern bool HeapFree(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress);
 
+        /// <summary>
+        /// Frees a memory block.
+        /// </summary>
+        /// <param name="block">Pointer to a memory block to be freed.</param>
+        public static void HeapFree(void* block)
+        {
+            if (!HeapFree(CurrentProcessHeapHandle, 0, new IntPtr(block)))
+                throw new InvalidOperationException();
+        }
+
         // TODO: Узнать, как проверять конкретное значение SetLastError
         [DllImport("kernel32")]
-        public static extern IntPtr HeapReAlloc(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress,
-            UIntPtr sizeInBytes);
+        public static extern IntPtr HeapReAlloc(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress, UIntPtr sizeInBytes);
+
+        /// <summary>
+        /// Re-allocates a memory block. If the reallocation request is for a
+        /// larger size, the additional region of memory is automatically initialized to zero.
+        /// </summary>
+        /// <param name="block">Pointer to a memory block.</param>
+        /// <param name="size">Size (bytes) of a memory block.</param>
+        /// <returns>Pointer to a new memory block location.</returns>
+        public static void* HeapReAlloc(void* block, long size)
+        {
+            var pointer = HeapReAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new IntPtr(block), new UIntPtr((ulong)size)).ToPointer();
+            if (pointer == null) throw new OutOfMemoryException();
+            return pointer;
+        }
 
         [DllImport("kernel32")]
         public static extern UIntPtr HeapSize(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress);
+
+        /// <summary>
+        /// Returns the size of a memory block.
+        /// </summary>
+        /// <param name="block">Pointer to a memory block.</param>
+        /// <returns>Size of a memory block.</returns>
+        public static long HeapSize(void* block)
+        {
+            var size = (long)HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
+            if (size < 0) throw new InvalidOperationException();
+            return size;
+        }
 
         #endregion
 
@@ -180,6 +230,18 @@ namespace Platform.WindowsAPI
         // TODO: Узнать когда нужно явно определять EntryPoint, нужно ли это в других ситуациях?
         [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
         public static extern void CopyMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
+
+        /// <summary>
+        /// Copies data of a memory block with a given size from source address to destination address.
+        /// The source and destination blocks are permitted to overlap.
+        /// </summary>
+        /// <param name="destination">Pointer to destination where a memory block will be copied.</param>
+        /// <param name="source">Pointer to a source memory block.</param>
+        /// <param name="size">Size of a memory block.</param>
+        public static void CopyMemory(void* destination, void* source, int size)
+        {
+            CopyMemory(new IntPtr(destination), new IntPtr(source), new UIntPtr((uint)size));
+        }
 
         [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
         public static extern void MoveMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
