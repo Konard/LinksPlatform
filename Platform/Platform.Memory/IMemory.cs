@@ -1,9 +1,9 @@
-namespace Platform.Memory
+п»їnamespace Platform.Memory
 {
     public interface IMemory
     {
         /// <summary>
-        /// Возвращает размер блока памяти.
+        /// Р’РѕР·РІСЂР°С‰Р°РµС‚ СЂР°Р·РјРµСЂ Р±Р»РѕРєР° РїР°РјСЏС‚Рё.
         /// </summary>
         long Size { get; }
     }
