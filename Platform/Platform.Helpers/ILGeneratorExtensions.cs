@@ -14,13 +14,9 @@ namespace Platform.Helpers
         public static void EmitCall(this ILGenerator il, MethodInfo method)
         {
             if (method.IsFinal || !method.IsVirtual)
-            {
                 il.EmitCall(OpCodes.Call, method, null);
-            }
             else
-            {
                 il.EmitCall(OpCodes.Callvirt, method, null);
-            }
         }
 
         public static void EmitLiteralLoad(this ILGenerator il, int value)

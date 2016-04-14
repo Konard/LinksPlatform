@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.WindowsAPI;
+using System.Runtime.InteropServices;
 
 namespace Platform.Memory
 {
@@ -8,7 +8,7 @@ namespace Platform.Memory
     /// </summary>
     /// <remarks>
     /// TODO: Реализовать вариант с Virtual Memory
-    /// TODO: После использования WinApi подумать над реализацией под Mono
+    /// TODO: Test on Unix
     /// </remarks>
     public unsafe class HeapResizableDirectMemory : ResizableDirectMemoryBase
     {
@@ -30,7 +30,10 @@ namespace Platform.Memory
 
         protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
         {
-            Pointer = Pointer == null ? Kernel32.HeapAlloc(newReservedCapacity) : Kernel32.HeapReAlloc(Pointer, newReservedCapacity);
+            // 
+            Pointer = Pointer == null
+                ? Marshal.AllocHGlobal(new IntPtr(newReservedCapacity)).ToPointer()
+                : Marshal.ReAllocHGlobal(new IntPtr(Pointer), new IntPtr(newReservedCapacity)).ToPointer();
         }
 
         #endregion
@@ -39,7 +42,7 @@ namespace Platform.Memory
 
         protected override void DisposePointer(void* pointer, long size)
         {
-            Kernel32.HeapFree(pointer);
+            Marshal.FreeHGlobal(new IntPtr(pointer));
         }
 
         protected override void EnsureNotDisposed()

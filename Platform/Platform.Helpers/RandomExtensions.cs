@@ -4,17 +4,7 @@ namespace Platform.Helpers
 {
     public static class RandomExtensions
     {
-        public static ulong NextUInt64(this Random rnd)
-        {
-            return rnd.NextUInt64(UInt64.MaxValue);
-        }
-
-        public static ulong NextUInt64(this Random rnd, ulong maxValue)
-        {
-            return rnd.NextUInt64(UInt64.MinValue, maxValue);
-        }
-
-        public static ulong NextUInt64(this Random rnd, ulong minValue, ulong maxValue)
+        public static ulong NextUInt64(this Random rnd, ulong minValue = ulong.MinValue, ulong maxValue = ulong.MaxValue)
         {
             if (minValue >= maxValue)
                 return minValue;

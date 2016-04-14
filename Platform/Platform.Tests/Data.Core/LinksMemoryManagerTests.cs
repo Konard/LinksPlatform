@@ -5,31 +5,31 @@ using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    public class LinksMemoryManagerTests
+    public static class LinksMemoryManagerTests
     {
         [Fact]
-        public void BasicMemoryTest()
+        public static void BasicFileMappedMemoryTest()
         {
             var tempFilename = Path.GetTempFileName();
 
             using (var memoryManager = new LinksMemoryManager(tempFilename))
-            {
-                var link = memoryManager.AllocateLink();
-                memoryManager.FreeLink(link);
-            }
+                memoryManager.TestBasicMemoryOperations();
 
             File.Delete(tempFilename);
         }
 
         [Fact]
-        public void HeapMemorySupportTest()
+        public static void BasicHeapMemoryTest()
         {
             using (var memory = new HeapResizableDirectMemory(LinksMemoryManager.DefaultLinksSizeStep))
             using (var memoryManager = new LinksMemoryManager(memory, LinksMemoryManager.DefaultLinksSizeStep))
-            {
-                var link = memoryManager.AllocateLink();
-                memoryManager.FreeLink(link);
-            }
+                memoryManager.TestBasicMemoryOperations();
+        }
+
+        private static void TestBasicMemoryOperations(this ILinksMemoryManager<ulong> memoryManager)
+        {
+            var link = memoryManager.AllocateLink();
+            memoryManager.FreeLink(link);
         }
     }
 }

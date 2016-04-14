@@ -17,31 +17,22 @@ namespace Platform.Helpers
 
         public static T DeserializeFromXml<T>(string xmlString)
         {
-            var serializer = GetOrAddXmlSerializer<T>();
             using (var reader = new StringReader(xmlString))
-                return (T)serializer.Deserialize(reader);
+                return (T)GetOrAddXmlSerializer<T>().Deserialize(reader);
         }
 
         public static void SerializeToFile<T>(string path, T obj)
         {
-            var serializer = GetOrAddXmlSerializer<T>();
             using (var fileStream = File.Open(path, FileMode.Create))
-            {
-                serializer.Serialize(fileStream, obj);
-                fileStream.Flush();
-            }
+                GetOrAddXmlSerializer<T>().Serialize(fileStream, obj);
         }
 
         public static string SerializeAsXmlString<T>(T obj)
         {
-            var serializer = GetOrAddXmlSerializer<T>();
             var sb = new StringBuilder();
             using (var writer = new StringWriter(sb))
-            {
-                serializer.Serialize(writer, obj);
-                writer.Flush();
-                return sb.ToString();
-            }
+                GetOrAddXmlSerializer<T>().Serialize(writer, obj);
+            return sb.ToString();
         }
     }
 }
