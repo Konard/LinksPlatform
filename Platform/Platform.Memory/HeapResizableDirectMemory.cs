@@ -8,7 +8,6 @@ namespace Platform.Memory
     /// </summary>
     /// <remarks>
     /// TODO: Реализовать вариант с Virtual Memory
-    /// TODO: Test on Unix
     /// </remarks>
     public unsafe class HeapResizableDirectMemory : ResizableDirectMemoryBase
     {
@@ -30,7 +29,6 @@ namespace Platform.Memory
 
         protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
         {
-            // 
             Pointer = Pointer == null
                 ? Marshal.AllocHGlobal(new IntPtr(newReservedCapacity)).ToPointer()
                 : Marshal.ReAllocHGlobal(new IntPtr(Pointer), new IntPtr(newReservedCapacity)).ToPointer();

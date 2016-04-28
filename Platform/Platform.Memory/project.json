@@ -1,5 +1,5 @@
 {
-  "version": "0.0.9-*",
+  "version": "0.0.10-*",
   "description": "LinksPlatform's Platform.Memory Class Library",
   "authors": [ "Konstantin Diachenko" ],
   "tags": [ "Memory Mapped Files", "Storage", "Memory" ],
@@ -18,12 +18,7 @@
     "net45": { },
     "dotnet5.4": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Collections.Concurrent": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
         "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
         "System.IO": "4.0.11-beta-23516",
         "System.IO.MemoryMappedFiles": "4.0.0-beta-23516"
       }
