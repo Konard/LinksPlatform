@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Cluster
 {
-    public static class ServerUnique
+    internal static class ServerUnique
     {
         private static ServerType CurrentServerType = ServerType.Slave;
         private static int CurrentServerId = 0;

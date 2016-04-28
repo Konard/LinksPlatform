@@ -1,6 +1,6 @@
 ﻿namespace Platform.Data.Core.Cluster
 {
-    public enum ServerType
+    internal enum ServerType
     {
         Master,
         Slave

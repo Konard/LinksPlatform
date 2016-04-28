@@ -12,7 +12,7 @@ namespace Platform.Data.Core.Cluster
     /// гарантированную последовательность (вариант Blockchain или вариант 
     /// проверки на согласованность данных)
     /// </remarks>
-    public struct Unique : IEquatable<Unique>
+    internal struct Unique : IEquatable<Unique>
     {
         private const string DateFormat = "yyyy.MM.dd hh:mm:ss.fffffff";
 
