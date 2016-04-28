@@ -14,8 +14,7 @@
     "net45": { },
     "dotnet5.4": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516"
+        "Microsoft.CSharp": "4.0.1-beta-23516"
       }
     }
   }
