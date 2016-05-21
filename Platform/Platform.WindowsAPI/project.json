@@ -1,20 +1,29 @@
 ﻿{
-  "version": "0.0.5-*",
+  "version": "0.1.0-*",
+  "title": "Platform.WindowsAPI",
   "description": "LinksPlatform's Platform.WindowsAPI Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "WinAPI", "Windows" ],
-  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.WindowsAPI",
-  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-  "requireLicenseAcceptance": true,
 
-  "compilationOptions": { "allowUnsafe": true },
+  "packOptions": {
+    "tags": [ "WinAPI", "WinAPI Enums/Constants", "Windows", "Kernel32", "Heap", "Virtual Memory", "Alloc", "Realloc", "Free", "Copy", "Move" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.WindowsAPI",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
+
+  "buildOptions": { "allowUnsafe": true },
 
   "frameworks": {
     "net45": { },
-    "dotnet5.4": {
+    "netstandard1.1": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516"
+        "Microsoft.CSharp": "4.0.1-rc2-24027",
+        "System.Runtime.InteropServices": "4.1.0-rc2-24027"
       }
     }
   }

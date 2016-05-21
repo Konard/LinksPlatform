@@ -24,7 +24,7 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("b35bcc7d-3d44-404c-8252-14bdc5c5b36a")]
 
-#if NET45
+#if NET45_COMPATIBILITY
 
 // Version information for an assembly consists of the following four values:
 //
@@ -37,7 +37,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.0.4.*")]
-[assembly: AssemblyFileVersion("0.0.4")]
+[assembly: AssemblyVersion("0.1.0.*")]
+[assembly: AssemblyFileVersion("0.1.0")]
 
 #endif

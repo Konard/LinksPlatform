@@ -3,12 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace Platform.WindowsAPI
 {
-    /// <remarks>
-    /// TODO: Определить, нужно ли обязательно указывать расширение для библиотеки (например, ".dll").
-    /// </remarks>
     public static unsafe class Kernel32
     {
-        private static readonly IntPtr CurrentProcessHeapHandle = GetProcessHeap();
+        private const string Kernel32LibraryName = "kernel32";
+        private static readonly IntPtr CurrentProcessHeapHandle = GetProcessHeapOrFail();
 
         #region Virtual Memory
 
@@ -93,18 +91,39 @@ namespace Platform.WindowsAPI
 
         #region Methods
 
-        [DllImport("kernel32.dll", SetLastError = true)]
-        public static extern IntPtr VirtualAlloc(IntPtr blockAddress, UIntPtr sizeInBytes,
-            MemoryAllocationType allocationType, MemoryProtection protection);
+        [DllImport(Kernel32LibraryName, SetLastError = true)]
+        public static extern IntPtr VirtualAlloc(IntPtr blockAddress, UIntPtr sizeInBytes, MemoryAllocationType allocationType, MemoryProtection protection);
 
-        public static IntPtr VirtualAlloc(UIntPtr sizeInBytes, MemoryAllocationType allocationType,
-            MemoryProtection protection)
+        /// <summary>
+        /// Reserves, commits, or changes the state of a region of pages in the virtual address space of the calling process.
+        /// Memory allocated by this function is automatically initialized to zero.
+        /// </summary>
+        /// <param name="sizeInBytes">The size of the region, in bytes</param>
+        /// <param name="allocationType">The type of memory allocation.</param>
+        /// <param name="protection">The memory protection for the region of pages to be allocated.</param>
+        /// <returns>The base address of the allocated region of pages.</returns>
+        public static void* VirtualAlloc(ulong sizeInBytes, MemoryAllocationType allocationType, MemoryProtection protection)
         {
-            return VirtualAlloc(IntPtr.Zero, sizeInBytes, allocationType, protection);
+            var pointer = VirtualAlloc(IntPtr.Zero, new UIntPtr(sizeInBytes), allocationType, protection).ToPointer();
+            if (pointer == null)
+                throw new InvalidOperationException(Marshal.GetLastWin32Error().ToString());
+            return pointer;
         }
 
-        [DllImport("kernel32.dll", SetLastError = true)]
+        [DllImport(Kernel32LibraryName, SetLastError = true)]
         public static extern bool VirtualFree(IntPtr blockAddress, UIntPtr sizeInBytes, MemoryFreeType freeType);
+
+        /// <summary>
+        /// Releases, decommits, or releases and decommits a region of pages within the virtual address space of the calling process.
+        /// </summary>
+        /// <param name="block">A pointer to the base address of the region of pages to be freed.</param>
+        /// <param name="sizeInBytes">The size of the region of memory to be freed, in bytes.</param>
+        /// <param name="freeType">The type of free operation.</param>
+        public static void VirtualFree(void* block, ulong sizeInBytes, MemoryFreeType freeType)
+        {
+            if (!VirtualFree(new IntPtr(block), new UIntPtr(sizeInBytes), freeType))
+                throw new InvalidOperationException(Marshal.GetLastWin32Error().ToString());
+        }
 
         #endregion
 
@@ -117,6 +136,9 @@ namespace Platform.WindowsAPI
         [Flags]
         public enum HeapFlags : uint
         {
+            NoFlags
+                = 0x00000000,
+
             NoSerialize
                 = 0x00000001,
 
@@ -155,69 +177,74 @@ namespace Platform.WindowsAPI
 
         #region Methods
 
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32LibraryName, SetLastError = true)]
         public static extern IntPtr GetProcessHeap();
 
-        [DllImport("kernel32", SetLastError = false)]
+        public static IntPtr GetProcessHeapOrFail()
+        {
+            var pointer = GetProcessHeap();
+            if (pointer == IntPtr.Zero)
+                throw new InvalidOperationException(Marshal.GetLastWin32Error().ToString());
+            return pointer;
+        }
+
+        [DllImport(Kernel32LibraryName)]
         public static extern IntPtr HeapAlloc(IntPtr heapHandle, HeapFlags flags, UIntPtr sizeInBytes);
 
         /// <summary>
-        /// Allocates a memory block of the given size. 
+        /// Allocates a memory block of given size. 
         /// The allocated memory is automatically initialized to zero.
         /// </summary>
-        /// <param name="size">Size of a memory block.</param>
-        /// <returns>Pointer to a memory block.</returns>
-        public static void* HeapAlloc(long size)
+        /// <param name="size">The size of a memory block.</param>
+        /// <returns>The pointer to a memory block.</returns>
+        public static void* HeapAlloc(ulong size)
         {
-            var result = HeapAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new UIntPtr((ulong)size)).ToPointer();
+            var result = HeapAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new UIntPtr(size)).ToPointer();
             if (result == null) throw new OutOfMemoryException();
             return result;
         }
 
-        [DllImport("kernel32", SetLastError = true)]
+        [DllImport(Kernel32LibraryName, SetLastError = true)]
         public static extern bool HeapFree(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress);
 
         /// <summary>
         /// Frees a memory block.
         /// </summary>
-        /// <param name="block">Pointer to a memory block to be freed.</param>
+        /// <param name="block">The pointer to a memory block to be freed.</param>
         public static void HeapFree(void* block)
         {
-            if (!HeapFree(CurrentProcessHeapHandle, 0, new IntPtr(block)))
-                throw new InvalidOperationException();
+            if (!HeapFree(CurrentProcessHeapHandle, HeapFlags.NoFlags, new IntPtr(block)))
+                throw new InvalidOperationException(Marshal.GetLastWin32Error().ToString());
         }
 
-        // TODO: Узнать, как проверять конкретное значение SetLastError
-        [DllImport("kernel32")]
+        [DllImport(Kernel32LibraryName)]
         public static extern IntPtr HeapReAlloc(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress, UIntPtr sizeInBytes);
 
         /// <summary>
         /// Re-allocates a memory block. If the reallocation request is for a
         /// larger size, the additional region of memory is automatically initialized to zero.
         /// </summary>
-        /// <param name="block">Pointer to a memory block.</param>
-        /// <param name="size">Size (bytes) of a memory block.</param>
-        /// <returns>Pointer to a new memory block location.</returns>
-        public static void* HeapReAlloc(void* block, long size)
+        /// <param name="block">The pointer to a memory block.</param>
+        /// <param name="size">The size (bytes) of a memory block.</param>
+        /// <returns>The pointer to a new memory block location.</returns>
+        public static void* HeapReAlloc(void* block, ulong size)
         {
-            var pointer = HeapReAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new IntPtr(block), new UIntPtr((ulong)size)).ToPointer();
+            var pointer = HeapReAlloc(CurrentProcessHeapHandle, HeapFlags.ZeroMemory, new IntPtr(block), new UIntPtr(size)).ToPointer();
             if (pointer == null) throw new OutOfMemoryException();
             return pointer;
         }
 
-        [DllImport("kernel32")]
+        [DllImport(Kernel32LibraryName)]
         public static extern UIntPtr HeapSize(IntPtr heapHandle, HeapFlags flags, IntPtr blockAddress);
 
         /// <summary>
         /// Returns the size of a memory block.
         /// </summary>
-        /// <param name="block">Pointer to a memory block.</param>
-        /// <returns>Size of a memory block.</returns>
-        public static long HeapSize(void* block)
+        /// <param name="block">The pointer to a memory block.</param>
+        /// <returns>The size of a memory block.</returns>
+        public static ulong HeapSize(void* block)
         {
-            var size = (long)HeapSize(CurrentProcessHeapHandle, 0, new IntPtr(block)).ToUInt32();
-            if (size < 0) throw new InvalidOperationException();
-            return size;
+            return HeapSize(CurrentProcessHeapHandle, HeapFlags.NoFlags, new IntPtr(block)).ToUInt64();
         }
 
         #endregion
@@ -226,25 +253,34 @@ namespace Platform.WindowsAPI
 
         #region Memory Tools
 
-        // TODO: Возможно RtlCopyMemory
-        // TODO: Узнать когда нужно явно определять EntryPoint, нужно ли это в других ситуациях?
-        [DllImport("kernel32.dll", EntryPoint = "CopyMemory", SetLastError = false)]
+        [DllImport(Kernel32LibraryName, EntryPoint = "RtlCopyMemory")]
         public static extern void CopyMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
 
         /// <summary>
         /// Copies data of a memory block with a given size from source address to destination address.
         /// The source and destination blocks are permitted to overlap.
         /// </summary>
-        /// <param name="destination">Pointer to destination where a memory block will be copied.</param>
-        /// <param name="source">Pointer to a source memory block.</param>
-        /// <param name="size">Size of a memory block.</param>
-        public static void CopyMemory(void* destination, void* source, int size)
+        /// <param name="destination">The pointer to destination where a memory block will be copied.</param>
+        /// <param name="source">The pointer to a source memory block.</param>
+        /// <param name="size">The size of a memory block.</param>
+        public static void CopyMemory(void* destination, void* source, ulong size)
         {
-            CopyMemory(new IntPtr(destination), new IntPtr(source), new UIntPtr((uint)size));
+            CopyMemory(new IntPtr(destination), new IntPtr(source), new UIntPtr(size));
         }
 
-        [DllImport("kernel32.dll", EntryPoint = "RtlMoveMemory", SetLastError = false)]
+        [DllImport(Kernel32LibraryName, EntryPoint = "RtlMoveMemory")]
         public static extern void MoveMemory(IntPtr destinationAddress, IntPtr sourceAddress, UIntPtr sizeInBytes);
+
+        /// <summary>
+        /// Moves a block of memory from one location to another.
+        /// </summary>
+        /// <param name="destination">The pointer to destination where a memory block will be moved.</param>
+        /// <param name="source">The pointer to a source memory block.</param>
+        /// <param name="size">The size of a memory block.</param>
+        public static void MoveMemory(void* destination, void* source, ulong size)
+        {
+            MoveMemory(new IntPtr(destination), new IntPtr(source), new UIntPtr(size));
+        }
 
         #endregion
     }
