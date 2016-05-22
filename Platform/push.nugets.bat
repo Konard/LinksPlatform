@@ -1,24 +1,48 @@
-cd artifacts\bin\Platform.WindowsAPI\Release
-nuget push Platform.WindowsAPI.*.nupkg
-nuget push Platform.WindowsAPI.*.symbols.nupkg
-cd ..\..\..\..
-cd artifacts\bin\Platform.Helpers\Release
-nuget push Platform.Helpers.*.nupkg
-nuget push Platform.Helpers.*.symbols.nupkg
-cd ..\..\..\..
-cd artifacts\bin\Platform.Memory\Release
-nuget push Platform.Memory.*.nupkg
-nuget push Platform.Memory.*.symbols.nupkg
-cd ..\..\..\..
-cd artifacts\bin\Platform.Communication\Release
-nuget push Platform.Communication.*.nupkg
-nuget push Platform.Communication.*.symbols.nupkg
-cd ..\..\..\..
-cd artifacts\bin\Platform.Data.Core\Release
-nuget push Platform.Data.Core.*.nupkg
-nuget push Platform.Data.Core.*.symbols.nupkg
-cd ..\..\..\..
-cd artifacts\bin\Platform.Tests\Release
-nuget push Platform.Tests.*.nupkg
-nuget push Platform.Tests.*.symbols.nupkg
-cd ..\..\..\..
+cd Platform.WindowsAPI
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
+cd Platform.Helpers
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
+cd Platform.Memory
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
+cd Platform.Communication
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
+cd Platform.Data.Core
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
+cd Platform.Tests
+dotnet pack -c Release
+cd bin\Release
+nuget push *.symbols.nupkg
+del *.symbols.nupkg
+nuget push *.nupkg
+del *.nupkg
+cd ..\..\..
