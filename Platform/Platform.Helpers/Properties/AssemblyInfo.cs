@@ -5,14 +5,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 
-[assembly: AssemblyTitle("Platform.Helpers")]
-[assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("Platform.Helpers")]
-[assembly: AssemblyCopyright("Konstantin Diachenko")]
 [assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
+
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -24,7 +21,12 @@ using System.Runtime.InteropServices;
 
 [assembly: Guid("70af2122-82e4-43d1-9eeb-99c4e6fa5a49")]
 
-#if NET45
+#if NET45_COMPATIBILITY
+
+[assembly: AssemblyTitle("Platform.Helpers")]
+[assembly: AssemblyDescription("")]
+[assembly: AssemblyCopyright("Konstantin Diachenko")]
+[assembly: AssemblyCulture("")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -37,7 +39,7 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 
-[assembly: AssemblyVersion("0.0.5.*")]
-[assembly: AssemblyFileVersion("0.0.5")]
+[assembly: AssemblyVersion("0.1.0.*")]
+[assembly: AssemblyFileVersion("0.1.0")]
 
 #endif
