@@ -3,6 +3,7 @@
   "title": "Platform.WindowsAPI",
   "description": "LinksPlatform's Platform.WindowsAPI Class Library",
   "authors": [ "Konstantin Diachenko" ],
+  "copyright": "Konstantin Diachenko",
 
   "packOptions": {
     "tags": [ "WinAPI", "WinAPI Enums/Constants", "Windows", "Kernel32", "Heap", "Virtual Memory", "Alloc", "Realloc", "Free", "Copy", "Move" ],
@@ -16,7 +17,9 @@
     }
   },
 
-  "buildOptions": { "allowUnsafe": true },
+  "buildOptions": {
+    "allowUnsafe": true
+  },
 
   "frameworks": {
     "net45": { },

@@ -1,33 +1,33 @@
 {
-  "version": "0.0.7-*",
+  "version": "0.1.0-*",
+  "title": "Platform.Data.Core",
   "description": "LinksPlatform's Platform.Data.Core Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "LinksPlatform", "Link", "Triplet", "Pair", "Sequence" ],
-  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.Core",
-  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-  "requireLicenseAcceptance": true,
+  "copyright": "Konstantin Diachenko",
 
-  "compilationOptions": { "allowUnsafe": true },
+  "packOptions": {
+    "tags": [ "LinksPlatform", "Link", "Triplet", "Pair", "Sequence" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.Core",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
+
+  "buildOptions": {
+    "allowUnsafe": true
+  },
 
   "dependencies": {
-    "Platform.Communication": "0.0.5-*",
-    "Platform.Helpers": "0.0.7-*",
-    "Platform.Memory": "0.0.8-*"
+    "Platform.Communication": "0.1.0-*",
+    "Platform.Memory": "0.1.0-*"
   },
 
   "frameworks": {
     "net45": { },
-    "dotnet5.4": {
-      "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Threading.Thread": "4.0.0-beta-23516",
-        "System.Collections.Concurrent": "4.0.11-beta-23516"
-      }
-    }
+    "netstandard1.5": { }
   }
 }

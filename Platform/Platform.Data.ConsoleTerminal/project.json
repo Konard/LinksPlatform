@@ -1,38 +1,38 @@
 {
-  "version": "0.0.4-*",
+  "version": "0.1.0-*",
+  "title": "Platform.ConsoleTerminal",
   "description": "LinksPlatform's Platform.Data.ConsoleTerminal Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "LinksPlatform", "UDP", "Client", "Terminal", "Console" ],
-  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.ConsoleTerminal",
-  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-  "requireLicenseAcceptance": true,
+  "copyright": "Konstantin Diachenko",
 
-  "compilationOptions": {
+  "packOptions": {
+    "tags": [ "LinksPlatform", "UDP", "Client", "Terminal", "Console" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.ConsoleTerminal",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
+
+  "buildOptions": {
     "emitEntryPoint": true
   },
 
-  "commands": {
-    "Platform.Data.ConsoleTerminal": "Platform.Data.ConsoleTerminal"
-  },
-
   "dependencies": {
-    "Platform.Communication": "0.0.4-*",
-    "Platform.Helpers": "0.0.4-*"
+    "Platform.Communication": "0.1.0-*"
   },
 
   "frameworks": {
-    "dnx451": { },
-    "dnxcore50": {
+    "net45": { },
+    "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Console": "4.0.0-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Net.Primitives": "4.0.11-beta-23516",
-        "System.Net.Sockets": "4.0.10-beta-23109"
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-*"
+        }
       }
     }
   }

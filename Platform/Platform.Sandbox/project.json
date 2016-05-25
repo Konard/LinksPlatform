@@ -1,46 +1,43 @@
 ﻿{
-  "version": "0.0.4-*",
+  "version": "0.1.0-*",
+  "title": "Platform.Sandbox",
   "description": "LinksPlatform's Platform.Sandbox Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "LinksPlatform", "Console", "Sandbox" ],
-  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Sandbox",
-  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-  "requireLicenseAcceptance": true,
+  "copyright": "Konstantin Diachenko",
 
-  "compilationOptions": {
+  "packOptions": {
+    "tags": [ "LinksPlatform", "Console", "Sandbox" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Sandbox",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
+
+  "buildOptions": {
     "emitEntryPoint": true,
     "allowUnsafe": true
   },
 
-  "commands": {
-    "Platform.Sandbox": "Platform.Sandbox"
-  },
-
   "dependencies": {
-    "Platform.Data.Core": "0.0.4-*"
+    "Platform.Data.Core": "0.1.0-*"
   },
 
   "frameworks": {
-    "dnx451": {
+    "net45": {
       "frameworkAssemblies": {
-        "System.Net": "4.0.0.0",
-        "System.Net.Http": "4.0.0.0",
-        "System.Net.Http.WebRequest": "4.0.0.0"
+        "System.Net.Http": "4.0.0.0"
       }
     },
-    "dnxcore50": {
+    "netcoreapp1.0": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Console": "4.0.0-beta-23516",
-        "System.IO.FileSystem": "4.0.1-beta-23516",
-        "System.IO.MemoryMappedFiles": "4.0.0-beta-23516",
-        "System.Text.RegularExpressions": "4.0.11-beta-23516",
-        "System.Net.Http": "4.0.1-beta-23516"
+        "Microsoft.NETCore.App": {
+          "type": "platform",
+          "version": "1.0.0-rc2-*"
+        }
       }
     }
   }

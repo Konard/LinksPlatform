@@ -1,35 +1,31 @@
 ﻿{
-  "version": "0.0.5-*",
+  "version": "0.1.0-*",
+  "title": "Platform.Communication",
   "description": "LinksPlatform's Platform.Communication Class Library",
   "authors": [ "Konstantin Diachenko" ],
-  "tags": [ "Communication", "Protocols", "Gexf", "Udp", "UdpSender", "UdpReceiver" ],
-  "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Communication",
-  "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-  "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-  "requireLicenseAcceptance": true,
+  "copyright": "Konstantin Diachenko",
+
+  "packOptions": {
+    "tags": [ "Communication", "Protocols", "Gexf", "Udp", "UdpSender", "UdpReceiver" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Communication",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
 
   "dependencies": {
-    "Platform.Helpers": "0.0.5-*"
+    "Platform.Helpers": "0.1.0-*"
   },
 
   "frameworks": {
-    "net45": {
-      "frameworkAssemblies": {
-        "System.Net": "4.0.0.0",
-        "System.XML": "4.0.0.0",
-        "System.Xml.Serialization": "4.0.0.0"
-      }
-    },
-    "dotnet5.4": {
+    "net45": { },
+    "netstandard1.5": {
       "dependencies": {
-        "Microsoft.CSharp": "4.0.1-beta-23516",
-        "System.Collections": "4.0.11-beta-23516",
-        "System.Linq": "4.0.1-beta-23516",
-        "System.Runtime": "4.0.21-beta-23516",
-        "System.Threading": "4.0.11-beta-23516",
-        "System.Threading.Thread": "4.0.0-beta-23516",
-        "System.Xml.XmlSerializer": "4.0.11-beta-23516",
-        "System.Net.Sockets": "4.0.10-beta-23109"
+        "System.Threading.Thread": "4.0.0-rc2-24027"
       }
     }
   }
