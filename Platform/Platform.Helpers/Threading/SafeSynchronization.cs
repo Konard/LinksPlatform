@@ -6,13 +6,9 @@ namespace Platform.Helpers.Threading
     /// <summary>
     /// TODO: Сравнить что производительнее использовать анонимную функцию или using (создание объекта + dispose)
     /// </summary>
-    public class SafeSynchronization : ISyncronization
+    public class SafeSynchronization : ISynchronization
     {
-#if DEBUG
-        private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion);
-#else
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
-#endif
 
         public void ExecuteReadOperation(Action action)
         {
@@ -24,8 +20,6 @@ namespace Platform.Helpers.Threading
 #if DEBUG
             catch (Exception ex)
             {
-                // TODO: Log exception
-
                 throw ex;
             }
 #endif
@@ -45,8 +39,6 @@ namespace Platform.Helpers.Threading
 #if DEBUG
             catch (Exception ex)
             {
-                // TODO: Log exception
-
                 throw ex;
             }
 #endif
@@ -66,8 +58,6 @@ namespace Platform.Helpers.Threading
 #if DEBUG
             catch (Exception ex)
             {
-                // TODO: Log exception
-
                 throw ex;
             }
 #endif
@@ -87,8 +77,6 @@ namespace Platform.Helpers.Threading
 #if DEBUG
             catch (Exception ex)
             {
-                // TODO: Log exception
-
                 throw ex;
             }
 #endif

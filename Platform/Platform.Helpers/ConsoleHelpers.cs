@@ -33,10 +33,7 @@ namespace Platform.Helpers
             return importCancellationSource;
         }
 
-        public static string GetOrReadArgument(int index, params string[] args)
-        {
-            return GetOrReadArgument(index, string.Format("{0} argument", index + 1));
-        }
+        public static string GetOrReadArgument(int index, params string[] args) => GetOrReadArgument(index, $"{index + 1} argument");
 
         public static string GetOrReadArgument(int index, string readMessage, params string[] args)
         {
@@ -46,7 +43,7 @@ namespace Platform.Helpers
                 result = args[index];
             else
             {
-                Console.Write("{0}: ", readMessage);
+                Console.Write($"{readMessage}: ");
                 result = Console.ReadLine();
             }
 
@@ -54,11 +51,14 @@ namespace Platform.Helpers
         }
 
         [Conditional("DEBUG")]
-        public static void Debug(string format, params object[] args)
-        {
-#if DEBUG
-            Console.WriteLine(format, args);
-#endif
-        }
+        public static void Debug(string format, params object[] args) => Console.WriteLine(format, args);
+
+        [Conditional("DEBUG")]
+        public static void EnableIgnoredExceptionsAutoPrint() => Global.IgnoredException += OnIgnoredException;
+
+        [Conditional("DEBUG")]
+        public static void DisableIgnoredExceptionsAutoPrint() => Global.IgnoredException -= OnIgnoredException;
+
+        private static void OnIgnoredException(object sender, Exception e) => Console.WriteLine(e.ToRecursiveString());
     }
 }

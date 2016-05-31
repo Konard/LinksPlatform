@@ -2,8 +2,6 @@
 
 #if NET45
 using System.Threading;
-
-#pragma warning disable CS0168 // The variable 'ex' is declared but never used
 #endif
 
 namespace Platform.Helpers.Threading
@@ -20,9 +18,9 @@ namespace Platform.Helpers.Threading
                 {
                     action(obj);
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    // TODO: Log exception
+                    Global.OnIgnoredException(exception);
                 }
             }, maxStackSize);
 #else
@@ -45,9 +43,9 @@ namespace Platform.Helpers.Threading
                 {
                     action();
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    // TODO: Log exception
+                    Global.OnIgnoredException(exception);
                 }
             }, maxStackSize);
 #else
@@ -70,9 +68,9 @@ namespace Platform.Helpers.Threading
                 {
                     action(obj);
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    // TODO: Log exception
+                    Global.OnIgnoredException(exception);
                 }
             });
 #else
@@ -91,9 +89,9 @@ namespace Platform.Helpers.Threading
                 {
                     action();
                 }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    // TODO: Log exception
+                    Global.OnIgnoredException(exception);
                 }
             });
 #else

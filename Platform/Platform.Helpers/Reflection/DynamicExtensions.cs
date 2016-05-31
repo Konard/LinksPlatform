@@ -1,10 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Dynamic;
-#if DOTNET5_4
 using System.Reflection;
-#endif
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Reflection
 {
     public static class DynamicExtensions
     {

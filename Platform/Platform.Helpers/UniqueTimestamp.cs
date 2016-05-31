@@ -22,9 +22,6 @@ namespace Platform.Helpers
             Ticks = ticks;
         }
 
-        public override string ToString()
-        {
-            return new DateTime((long)Ticks).ToString(Format);
-        }
+        public override string ToString() => new DateTime((long)Ticks).ToString(Format);
     }
 }

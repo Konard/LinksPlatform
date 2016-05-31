@@ -1,4 +1,6 @@
-﻿namespace Platform.Helpers
+﻿using System.Runtime.CompilerServices;
+
+namespace Platform.Helpers
 {
     /// <remarks>
     /// Resizable array (FileMappedMemory) for values cache may be used. or cached oeis.org
@@ -57,10 +59,8 @@
             return position;
         }
 
-        public static bool IsPowerOfTwo(ulong x)
-        {
-            return (x & (x - 1)) == 0;
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPowerOfTwo(ulong x) => (x & (x - 1)) == 0;
 
         public static long CountBits(long x)
         {

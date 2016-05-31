@@ -1,6 +1,6 @@
 ﻿using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Collections
 {
     public class ArrayFiller<TElement>
     {

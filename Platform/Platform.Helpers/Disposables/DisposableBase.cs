@@ -2,7 +2,7 @@
 using System.Diagnostics;
 using System.Threading;
 
-namespace Platform.Helpers.Disposal
+namespace Platform.Helpers.Disposables
 {
     /// <summary>
     /// Представляет базовый класс реализующий основную логику необходимую для повышения вероятности корректного высвобождения памяти.
@@ -11,39 +11,21 @@ namespace Platform.Helpers.Disposal
     /// <remarks>
     /// TODO: Попробовать реализовать компилируемый автоматический вариант DisposeCore (находить все типы IDisposable, IDisposal и автоматически вычищать их).
     /// </remarks>
-    public abstract class DisposalBase : IDisposal
+    public abstract class DisposableBase : IDisposable
     {
         private static readonly Process CurrentProcess = Process.GetCurrentProcess();
 
         private int _disposed;
 
-        public bool Disposed { get { return _disposed > 0; } }
+        public bool IsDisposed => _disposed > 0;
 
-        protected virtual string ObjectName
-        {
-            get
-            {
-                return GetType().Name;
-            }
-        }
+        protected virtual string ObjectName => GetType().Name;
 
-        protected virtual bool AllowMultipleDisposeAttempts
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected virtual bool AllowMultipleDisposeAttempts => false;
 
-        protected virtual bool AllowMultipleDisposeCalls
-        {
-            get
-            {
-                return false;
-            }
-        }
+        protected virtual bool AllowMultipleDisposeCalls => false;
 
-        protected DisposalBase()
+        protected DisposableBase()
         {
             _disposed = 0;
             CurrentProcess.Exited += OnProcessExit;
@@ -57,7 +39,7 @@ namespace Platform.Helpers.Disposal
 
         public void Destruct()
         {
-            if (!Disposed)
+            if (!IsDisposed)
                 Dispose(false);
         }
 
@@ -67,7 +49,7 @@ namespace Platform.Helpers.Disposal
             Destruct();
         }
 
-        ~DisposalBase()
+        ~DisposableBase()
         {
             Destruct();
         }
@@ -90,10 +72,10 @@ namespace Platform.Helpers.Disposal
 
                     DisposeCore(manual);
                 }
-                catch
+                catch(Exception exception)
                 {
                     if (!AllowMultipleDisposeAttempts || manual) throw;
-                    // else TODO: Log exception
+                    else Global.OnIgnoredException(exception);
                 }
             }
             else if (!AllowMultipleDisposeCalls && manual)
@@ -106,7 +88,8 @@ namespace Platform.Helpers.Disposal
 
         protected void EnsureNotDisposed(string objectName)
         {
-            if (_disposed > 0) throw new ObjectDisposedException(objectName);
+            if (_disposed > 0)
+                throw new ObjectDisposedException(objectName);
         }
 
         protected virtual void EnsureNotDisposed()

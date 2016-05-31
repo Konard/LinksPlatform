@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Reflection;
+
 // ReSharper disable AssignmentInConditionalExpression
 
 // ReSharper disable BuiltInTypeReferenceStyle
 // ReSharper disable StaticFieldInGenericType
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Reflection
 {
-    public class TypeHelpers<T>
+    public class CachedTypeInfo<T>
     {
         public static readonly Type Type;
         public static readonly Type UnderlyingType;
@@ -17,19 +17,16 @@ namespace Platform.Helpers
         public static readonly bool IsSigned;
         public static readonly bool CanBeNumeric;
 
-        public static readonly bool IsValueType;
         public static readonly bool IsNullable;
 
-        static TypeHelpers()
+        static CachedTypeInfo()
         {
             Type = typeof(T);
 
-            if (IsNullable = Type.GetTypeInfo().IsGenericType && Type.GetGenericTypeDefinition() == typeof(Nullable<>))
+            if (IsNullable = Type.IsNullable())
                 UnderlyingType = Nullable.GetUnderlyingType(Type);
             else
                 UnderlyingType = Type;
-
-            IsValueType = Type.GetTypeInfo().IsValueType;
 
             if (UnderlyingType == typeof(Decimal) ||
                 UnderlyingType == typeof(Double) ||

@@ -5,7 +5,7 @@ namespace Platform.Helpers
     /// <summary>
     /// Представляет фабрику по созданию уникальных отметок времени.
     /// </summary>
-    public class UniqueTimestampFactory
+    public class UniqueTimestampFactory : IFactory<UniqueTimestamp>
     {
         private UniqueTimestamp _lastTimestamp;
 

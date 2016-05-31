@@ -1,14 +1,14 @@
 ﻿using System.IO;
 using System.Runtime.InteropServices;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.IO
 {
     public static class StreamExtensions
     {
         public static void Write<T>(this Stream stream, T value)
             where T : struct
         {
-            var bytes = BitConverterHelpers.GetBytes(value);
+            var bytes = To.Bytes(value);
             stream.Write(bytes, 0, bytes.Length);
         }
 
@@ -18,7 +18,7 @@ namespace Platform.Helpers
             var size = Marshal.SizeOf(typeof(T));
             var buffer = new byte[size];
             var read = stream.Read(buffer, 0, size);
-            return read < size ? default(T) : BitConverterHelpers.ToStructure<T>(buffer);
+            return read < size ? default(T) : To.Structure<T>(buffer);
         }
 
         public static T[] ReadAll<T>(this Stream stream)
@@ -32,7 +32,7 @@ namespace Platform.Helpers
             for (var i = 0; i < elementsLength; i++)
             {
                 stream.Read(buffer, 0, size);
-                elements[i] = BitConverterHelpers.ToStructure<T>(buffer);
+                elements[i] = To.Structure<T>(buffer);
             }
 
             return elements;

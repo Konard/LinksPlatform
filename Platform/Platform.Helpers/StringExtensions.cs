@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 
 namespace Platform.Helpers
 {
@@ -8,12 +9,9 @@ namespace Platform.Helpers
         {
             if (string.IsNullOrWhiteSpace(str))
                 return str;
-            return str.Substring(0, 1).ToUpper() + str.Substring(1, str.Length - 1);
+            return new StringBuilder().Append(char.ToUpper(str[0])).Append(str.Substring(1, str.Length - 1)).ToString();
         }
 
-        public static string Truncate(this string str, int maxLength)
-        {
-            return str.Substring(0, Math.Min(str.Length, maxLength));
-        }
+        public static string Truncate(this string str, int maxLength) => str.Substring(0, Math.Min(str.Length, maxLength));
     }
 }

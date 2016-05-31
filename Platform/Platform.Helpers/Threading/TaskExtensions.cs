@@ -1,12 +1,11 @@
-﻿using System.Threading.Tasks;
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace Platform.Helpers.Threading
 {
     public static class TaskExtensions
     {
-        public static T AwaitResult<T>(this Task<T> task)
-        {
-            return task.GetAwaiter().GetResult();
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T AwaitResult<T>(this Task<T> task) => task.GetAwaiter().GetResult();
     }
 }

@@ -8,30 +8,36 @@ namespace Platform.Helpers
 {
     public static class SerializationHelpers
     {
-        static readonly ConcurrentDictionary<Type, XmlSerializer> XmlSerializerCache = new ConcurrentDictionary<Type, XmlSerializer>();
+        private static readonly ConcurrentDictionary<Type, XmlSerializer> XmlSerializerCache = new ConcurrentDictionary<Type, XmlSerializer>();
 
-        static XmlSerializer GetOrAddXmlSerializer<T>()
+        public static XmlSerializer GetCachedXmlSerializer<T>()
         {
             return XmlSerializerCache.GetOrAdd(typeof(T), type => new XmlSerializer(type));
         }
 
-        public static T DeserializeFromXml<T>(string xmlString)
+        public static T DeserializeFromXmlFile<T>(string path)
+        {
+            using (var reader = File.OpenRead(path))
+                return (T)GetCachedXmlSerializer<T>().Deserialize(reader);
+        }
+
+        public static T DeserializeFromXmlString<T>(string xmlString)
         {
             using (var reader = new StringReader(xmlString))
-                return (T)GetOrAddXmlSerializer<T>().Deserialize(reader);
+                return (T)GetCachedXmlSerializer<T>().Deserialize(reader);
         }
 
-        public static void SerializeToFile<T>(string path, T obj)
+        public static void SerializeToXmlFile<T>(T obj, string path)
         {
-            using (var fileStream = File.Open(path, FileMode.Create))
-                GetOrAddXmlSerializer<T>().Serialize(fileStream, obj);
+            using (var fileStream = File.OpenWrite(path))
+                GetCachedXmlSerializer<T>().Serialize(fileStream, obj);
         }
 
-        public static string SerializeAsXmlString<T>(T obj)
+        public static string SerializeToXmlString<T>(T obj)
         {
             var sb = new StringBuilder();
             using (var writer = new StringWriter(sb))
-                GetOrAddXmlSerializer<T>().Serialize(writer, obj);
+                GetCachedXmlSerializer<T>().Serialize(writer, obj);
             return sb.ToString();
         }
     }

@@ -5,7 +5,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Threading;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Optimizations
 {
     public class UnsafeDictionary<TKey, TValue> : IDictionary<TKey, TValue>, IDictionary
     {
@@ -716,7 +716,7 @@ namespace Platform.Helpers.Collections
         }
 
         [DebuggerDisplay("Count = {Count}")]
-        public sealed class KeyCollection : ICollection<TKey>, ICollection
+        public class KeyCollection : ICollection<TKey>, ICollection
         {
             private UnsafeDictionary<TKey, TValue> dictionary;
 
@@ -943,7 +943,7 @@ namespace Platform.Helpers.Collections
         }
 
         [DebuggerDisplay("Count = {Count}")]
-        public sealed class ValueCollection : ICollection<TValue>, ICollection
+        public class ValueCollection : ICollection<TValue>, ICollection
         {
             private UnsafeDictionary<TKey, TValue> dictionary;
 

@@ -45,13 +45,12 @@
 **       silverlight. 
 ===========================================================*/
 
+using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics;
 
-namespace Platform.Helpers.Collections1 {
-    using System;
-    using System.Collections;
-    using System.Diagnostics;
-
+namespace Platform.Helpers.Collections.Optimizations.X {
     //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryDebugView<,>))]
     [DebuggerDisplay("Count = {Count}")]
     [System.Runtime.InteropServices.ComVisible(false)]
@@ -695,7 +694,7 @@ namespace Platform.Helpers.Collections1 {
 
         //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryKeyCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
-        public sealed class KeyCollection: ICollection<TKey>, ICollection
+        public class KeyCollection: ICollection<TKey>, ICollection
         {
             private UnsafeDictionary<TKey,TValue> dictionary;
 
@@ -880,7 +879,7 @@ namespace Platform.Helpers.Collections1 {
 
         //[DebuggerTypeProxy(typeof(Mscorlib_DictionaryValueCollectionDebugView<,>))]
         [DebuggerDisplay("Count = {Count}")]
-        public sealed class ValueCollection: ICollection<TValue>, ICollection
+        public class ValueCollection: ICollection<TValue>, ICollection
         {
             private UnsafeDictionary<TKey,TValue> dictionary;
 

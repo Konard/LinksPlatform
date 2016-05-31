@@ -2,15 +2,15 @@
 
 namespace Platform.Helpers
 {
+    /// <remarks>
+    /// Must be class, not struct (in order to persist access to Count field value).
+    /// </remarks>
     public class Counter
     {
         public ulong Count;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Increment()
-        {
-            Count++;
-        }
+        public void Increment() => Count++;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IncrementAndReturnTrue()

@@ -1,4 +1,6 @@
-﻿namespace Platform.Helpers
+﻿using System;
+
+namespace Platform.Helpers
 {
     public static class Global
     {
@@ -10,6 +12,12 @@
         /// таким образом мы обманываем компилятор. Такое может быть полезно при
         /// реализации тестов на производительность.
         /// </summary>
-        public static object Trash = new object();
+        public static object Trash = Default<object>.Instance;
+
+        public static Scope Scope = new Scope(autoInclude: true, autoExplore: true);
+
+        public static event EventHandler<Exception> IgnoredException = (sender, exception) => { }; // TODO: Change default handler later
+
+        public static void OnIgnoredException(Exception exception) => IgnoredException.Invoke(null, exception);
     }
 }
