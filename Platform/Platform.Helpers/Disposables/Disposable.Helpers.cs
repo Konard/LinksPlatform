@@ -45,6 +45,11 @@ namespace Platform.Helpers.Disposables
         {
             return TryDispose(ref @object);
         }
+
+        public static void DisposeIfPossible<T>(T @object)
+        {
+            TryDispose(ref @object);
+        }
     }
 
     public partial class Disposable<T>
