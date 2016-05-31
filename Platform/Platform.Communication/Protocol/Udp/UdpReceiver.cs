@@ -3,7 +3,8 @@ using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Threading;
-using Platform.Helpers.Disposal;
+using Platform.Helpers;
+using Platform.Helpers.Disposables;
 
 namespace Platform.Communication.Protocol.Udp
 {
@@ -15,7 +16,7 @@ namespace Platform.Communication.Protocol.Udp
     /// <remarks>
     /// TODO: Попробовать ThreadPool / Tasks
     /// </remarks>
-    public class UdpReceiver : DisposalBase
+    public class UdpReceiver : DisposableBase
     {
         private const int DefaultPort = 15000;
 
@@ -25,7 +26,7 @@ namespace Platform.Communication.Protocol.Udp
         private readonly UdpClient _udp;
         private readonly MessageHandlerCallback _messageHandler;
 
-        public bool Available { get { return _udp.Available > 0; } }
+        public bool Available => _udp.Available > 0;
 
         public UdpReceiver(int listenPort, bool autoStart, MessageHandlerCallback messageHandler)
         {
@@ -70,8 +71,7 @@ namespace Platform.Communication.Protocol.Udp
                 // Send Packet to itself to switch Receiver from Receiving.
                 // TODO: Test new stopper
                 var loopback = new IPEndPoint(IPAddress.Loopback, _listenPort);
-                var stopper = new UdpClient();
-                stopper.SendAsync(new byte[0], 0, loopback).ContinueWith(x => ((IDisposable)stopper).Dispose());
+                new UdpClient().SendAsync(new byte[0], 0, loopback).ContinueWith(Disposable.DisposeIfPossible);
 
                 _thread.Join();
                 _thread = null;
@@ -79,16 +79,10 @@ namespace Platform.Communication.Protocol.Udp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public string Receive()
-        {
-            return _udp.ReceiveString();
-        }
+        public string Receive() => _udp.ReceiveString();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void ReceiveAndHandle()
-        {
-            _messageHandler(Receive());
-        }
+        public void ReceiveAndHandle() => _messageHandler(Receive());
 
         // Функция извлекающая пришедшие сообщения
         // и работающая в отдельном потоке.
@@ -97,9 +91,9 @@ namespace Platform.Communication.Protocol.Udp
             while (_receiverRunning)
             {
                 try { ReceiveAndHandle(); }
-                catch (Exception ex)
+                catch (Exception exception)
                 {
-                    // TODO: Log Exception
+                    Global.OnIgnoredException(exception);
                 }
             }
         }
@@ -109,7 +103,7 @@ namespace Platform.Communication.Protocol.Udp
             if (manual)
             {
                 Stop();
-                DisposalHelpers.TryDispose(_udp);
+                Disposable.TryDispose(_udp);
             }
         }
     }

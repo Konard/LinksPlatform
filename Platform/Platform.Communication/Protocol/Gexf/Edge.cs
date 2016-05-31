@@ -24,10 +24,7 @@ namespace Platform.Communication.Protocol.Gexf
         [XmlAttribute(AttributeName = LabelAttributeName)]
         public string Label { get; set; }
 
-        public void WriteXml(XmlWriter writer)
-        {
-            WriteXml(writer, Id, Source, Target, Label);
-        }
+        public void WriteXml(XmlWriter writer) => WriteXml(writer, Id, Source, Target, Label);
 
         public static void WriteXml(XmlWriter writer, long id, long sourceNodeId, long targetNodeId, string label = null)
         {

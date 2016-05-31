@@ -1,15 +1,14 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Disposal;
+using Platform.Helpers.Disposables;
 
 namespace Platform.Communication.Protocol.Udp
 {
     /// <summary>
     /// Представляет отправителя сообщений по протоколу UDP.
     /// </summary>
-    public class UdpSender : DisposalBase
+    public class UdpSender : DisposableBase
     {
         private readonly UdpClient _udp;
         private readonly IPEndPoint _ipendpoint;
@@ -36,15 +35,12 @@ namespace Platform.Communication.Protocol.Udp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int Send(string message)
-        {
-            return _udp.SendString(_ipendpoint, message);
-        }
+        public int Send(string message) => _udp.SendString(_ipendpoint, message);
 
         protected override void DisposeCore(bool manual)
         {
             if (manual)
-                DisposalHelpers.TryDispose(_udp);
+                Disposable.TryDispose(_udp);
         }
     }
 }

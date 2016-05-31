@@ -2,13 +2,14 @@
 using System.Net.Sockets;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Helpers;
 using Platform.Helpers.Threading;
 
 namespace Platform.Communication.Protocol.Udp
 {
     public static class UdpClientExtensions
     {
-        private static readonly Encoding DefaultEncoding = Encoding.GetEncoding(0);
+        private static readonly Encoding DefaultEncoding = Singleton.Get(() => Encoding.GetEncoding(0));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static int SendString(this UdpClient udp, IPEndPoint ipEndPoint, string message)
