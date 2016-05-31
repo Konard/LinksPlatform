@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Runtime.InteropServices;
+using Platform.Helpers;
 
 namespace Platform.Memory
 {
     /// <summary>
-    /// Represents a memory block allocated inside Windows Heap.
+    /// Represents a memory block allocated in Heap.
+    /// Представляет блок памяти, выделенный в "куче".
     /// </summary>
     /// <remarks>
     /// TODO: Реализовать вариант с Virtual Memory
@@ -15,38 +17,36 @@ namespace Platform.Memory
 
         public HeapResizableDirectMemory(long minimumReservedCapacity)
         {
-            if (minimumReservedCapacity < 0)
-                throw new ArgumentOutOfRangeException("minimumReservedCapacity");
+            if (minimumReservedCapacity < MinimumCapacity)
+                minimumReservedCapacity = MinimumCapacity;
 
             ReservedCapacity = minimumReservedCapacity;
             UsedCapacity = 0;
         }
 
         public HeapResizableDirectMemory()
-            : this(0)
+            : this(MinimumCapacity)
         {
         }
 
         protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
         {
-            Pointer = Pointer == null
-                ? Marshal.AllocHGlobal(new IntPtr(newReservedCapacity)).ToPointer()
-                : Marshal.ReAllocHGlobal(new IntPtr(Pointer), new IntPtr(newReservedCapacity)).ToPointer();
+            if (Pointer == null)
+            {
+                Pointer = Marshal.AllocHGlobal(new IntPtr(newReservedCapacity)).ToPointer();
+
+                MemoryHelpers.ZeroMemory(Pointer, newReservedCapacity);
+            }
+            else Pointer = Marshal.ReAllocHGlobal(new IntPtr(Pointer), new IntPtr(newReservedCapacity)).ToPointer();
         }
 
         #endregion
 
         #region DisposalBase
 
-        protected override void DisposePointer(void* pointer, long size)
-        {
-            Marshal.FreeHGlobal(new IntPtr(pointer));
-        }
+        protected override void DisposePointer(void* pointer, long size) => Marshal.FreeHGlobal(new IntPtr(pointer));
 
-        protected override void EnsureNotDisposed()
-        {
-            EnsureNotDisposed("Heap stored memory block");
-        }
+        protected override void EnsureNotDisposed() => EnsureNotDisposed("Heap stored memory block");
 
         #endregion
     }

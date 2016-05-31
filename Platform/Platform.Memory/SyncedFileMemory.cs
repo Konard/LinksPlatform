@@ -1,23 +1,20 @@
 ﻿using System.IO;
 using System.Runtime.InteropServices;
-using Platform.Helpers;
-using Platform.Helpers.Disposal;
+using Platform.Helpers.Disposables;
+using Platform.Helpers.IO;
 
 namespace Platform.Memory
 {
     /// <remarks>
     /// Ideas for immediate memory (pushed to disk on each operation)
     /// </remarks>
-    internal unsafe class SyncedFileMemory<TElement> : DisposalBase, IMemory
+    internal unsafe class SyncedFileMemory<TElement> : DisposableBase, IMemory
         where TElement : struct
     {
         private static readonly long ElementSize = Marshal.SizeOf(typeof(TElement));
         private readonly FileStream _file;
 
-        public long Size
-        {
-            get { return _file.Length; }
-        }
+        public long Size => _file.Length;
 
         public SyncedFileMemory(string filename)
         {
@@ -84,7 +81,7 @@ namespace Platform.Memory
         protected override void DisposeCore(bool manual)
         {
             if (manual)
-                DisposalHelpers.TryDispose(_file);
+                Disposable.TryDispose(_file);
         }
     }
 }
