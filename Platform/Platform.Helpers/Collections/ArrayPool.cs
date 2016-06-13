@@ -24,14 +24,14 @@ namespace Platform.Helpers.Collections
     {
         private readonly ConcurrentDictionary<int, ConcurrentStack<T[]>> _pool = new ConcurrentDictionary<int, ConcurrentStack<T[]>>();
 
-        public readonly T[] Empty = new T[0];
+        public static readonly T[] Empty = new T[0];
 
-        public Disposable<T[]> AllocateDisposable(int size)
+        public Disposable<T[]> AllocateDisposable(long size)
         {
             return Disposable<T[]>.Create(Allocate(size), Free);
         }
 
-        public Disposable<T[]> Resize(Disposable<T[]> source, Integer size)
+        public Disposable<T[]> Resize(Disposable<T[]> source, long size)
         {
             var destination = AllocateDisposable(size);
             var sourceArray = source.Object;
@@ -42,27 +42,20 @@ namespace Platform.Helpers.Collections
 
         public virtual void Clear() => _pool.Clear();
 
-        public virtual T[] Allocate(Integer size)
+        public virtual T[] Allocate(long size)
         {
-            Ensure.ArgumentPositive(size, nameof(size));
-            if (size == 0) return Empty;
-            EnsureLessOrEqualToInt32MaxValue(size);
-
-            return _pool.GetOrDefault(size)?.PopOrDefault() ?? new T[size];
+            Ensure.ArgumentInRange(size, new Range<long>(0, int.MaxValue));
+            if (size == 0)
+                return Empty;
+            return _pool.GetOrDefault((int)size)?.PopOrDefault() ?? new T[size];
         }
 
         public virtual void Free(T[] array)
         {
             Ensure.ArgumentNotNull(array, nameof(array));
-            if (array.Length == 0) return;
-
+            if (array.Length == 0)
+                return;
             _pool.GetOrAdd(array.Length, size => new ConcurrentStack<T[]>()).Push(array);
-        }
-
-        private static void EnsureLessOrEqualToInt32MaxValue(Integer size)
-        {
-            if (size.Value > int.MaxValue)
-                throw new ArgumentOutOfRangeException(nameof(size), "Array size is bigger than int.MaxValue");
         }
     }
 }

@@ -26,10 +26,32 @@ namespace Platform.Helpers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ArgumentPositive(int argument, string argumentName)
+        public static void ArgumentZeroOrPositive(long argument, string argumentName)
         {
             if (argument < 0)
                 throw new ArgumentOutOfRangeException(argumentName, "Must be positive.");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgumentInRange<T>(T argument, Range<T> range)
+            where T : IComparable<T>
+        {
+            ArgumentInRange(argument, null, range);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void ArgumentInRange<T>(T argument, string argumentName, Range<T> range)
+            where T : IComparable<T>
+        {
+            if (!range.ContainsValue(argument))
+                throw new ArgumentOutOfRangeException(argumentName, $"{argument} is out of range {range}.");
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void NotDisposed(Disposables.IDisposable disposable, string objectName)
+        {
+            if (disposable.IsDisposed)
+                throw new ObjectDisposedException(objectName);
         }
     }
 }

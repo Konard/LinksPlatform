@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace Platform.Helpers.Disposables
@@ -86,15 +87,10 @@ namespace Platform.Helpers.Disposables
 
         protected abstract void DisposeCore(bool manual);
 
-        protected void EnsureNotDisposed(string objectName)
-        {
-            if (_disposed > 0)
-                throw new ObjectDisposedException(objectName);
-        }
-
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void EnsureNotDisposed()
         {
-            EnsureNotDisposed(ObjectName);
+            Ensure.NotDisposed(this, ObjectName);
         }
     }
 }

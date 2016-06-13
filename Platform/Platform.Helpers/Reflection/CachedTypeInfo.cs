@@ -12,6 +12,9 @@ namespace Platform.Helpers.Reflection
         public static readonly Type Type;
         public static readonly Type UnderlyingType;
 
+        public static readonly Type SignedVersion;
+        public static readonly Type UnsignedVersion;
+
         public static readonly bool IsFloatPoint;
         public static readonly bool IsNumeric;
         public static readonly bool IsSigned;
@@ -50,6 +53,44 @@ namespace Platform.Helpers.Reflection
                 UnderlyingType == typeof(DateTime) ||
                 UnderlyingType == typeof(TimeSpan))
                 CanBeNumeric = true;
+
+
+            if (IsSigned)
+            {
+                SignedVersion = UnderlyingType;
+                UnsignedVersion = GetUnsignedFor(UnderlyingType);
+            }
+            else
+            {
+                SignedVersion = GetSignedFor(UnderlyingType);
+                UnsignedVersion = UnderlyingType;
+            }
+        }
+
+        private static Type GetUnsignedFor(Type signedType)
+        {
+            if (signedType == typeof(SByte))
+                return typeof(Byte);
+            if (signedType == typeof(Int16))
+                return typeof(UInt16);
+            if (signedType == typeof(Int32))
+                return typeof(UInt32);
+            if (signedType == typeof(Int64))
+                return typeof(UInt64);
+            return null;
+        }
+
+        private static Type GetSignedFor(Type unsignedType)
+        {
+            if (unsignedType == typeof(Byte))
+                return typeof(SByte);
+            if (unsignedType == typeof(UInt16))
+                return typeof(Int16);
+            if (unsignedType == typeof(UInt32))
+                return typeof(Int32);
+            if (unsignedType == typeof(UInt64))
+                return typeof(Int64);
+            return null;
         }
     }
 }

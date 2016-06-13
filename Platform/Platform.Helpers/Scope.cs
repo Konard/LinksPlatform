@@ -4,6 +4,7 @@ using System.Reflection;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Disposables;
 using Platform.Helpers.Reflection;
+using System.Linq;
 
 namespace Platform.Helpers
 {
@@ -62,14 +63,16 @@ namespace Platform.Helpers
 
         public void Include(object @object)
         {
+            if (@object == null)
+                return;
+
             if (_includes.Add(@object))
             {
                 var type = @object as Type;
-                if (type != null)
-                {
-                    type.GetInterfaces().ForEach(Include);
-                    Include(type.GetBaseType());
-                }
+                if (type == null)
+                    return;
+                type.GetInterfaces().ForEach(Include);
+                Include(type.GetBaseType());
             }
         }
 
@@ -85,14 +88,14 @@ namespace Platform.Helpers
         public T Use<T>()
         {
             if (_excludes.Contains(typeof(T)))
-                throw new Exception($"Type {typeof(T).FullName} is excluded and cannot be used.");
+                throw new Exception($"Type {typeof(T).Name} is excluded and cannot be used.");
 
             if (_autoInclude)
                 Include<T>();
 
             T resolved;
             if (!TryResolve(out resolved))
-                throw new Exception($"Dependency of type {typeof(T).FullName} cannot be resolved.");
+                throw new Exception($"Dependency of type {typeof(T).Name} cannot be resolved.");
 
             if (!_autoInclude)
                 Include<T>();
@@ -155,9 +158,18 @@ namespace Platform.Helpers
 
                 var type = include as Type;
 
-                if (type != null && requiredType.IsAssignableFrom(type))
-                    resultConstructors.AddRange(GetValidConstructors(type));
-                else if (requiredType.IsInstanceOfType(include))
+                if (type != null )
+                {
+                    if(requiredType.IsAssignableFrom(type))
+                        resultConstructors.AddRange(GetValidConstructors(type));
+                    else if (type.GetTypeInfo().IsGenericTypeDefinition && requiredType.GetTypeInfo().IsGenericType && type.GetInterfaces().Any(x => x.Name == requiredType.Name))
+                    {
+                        var genericType = type.MakeGenericType(requiredType.GenericTypeArguments);
+                        if (requiredType.IsAssignableFrom(genericType))
+                            resultConstructors.AddRange(GetValidConstructors(genericType));
+                    }
+                }
+                else if (requiredType.IsInstanceOfType(include) || requiredType.IsAssignableFrom(include.GetType()))
                     resultInstances.Add(include);
             }
 

@@ -14,7 +14,7 @@ namespace Platform.Helpers.Reflection
         /// </remarks>
         public static Type[] GetLoadableTypes(this Assembly assembly)
         {
-            if (assembly == null) throw new ArgumentNullException("assembly");
+            if (assembly == null) throw new ArgumentNullException(nameof(assembly));
             try
             {
                 return assembly.GetTypes();
