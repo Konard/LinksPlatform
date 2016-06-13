@@ -53,7 +53,7 @@ namespace Platform.Memory
 
         private void MapFile(long capacity)
         {
-            if (Pointer != null)
+            if (Pointer != IntPtr.Zero)
                 return;
 
             _file = MemoryMappedFile.CreateFromFile(Address, FileMode.Open, null, capacity, MemoryMappedFileAccess.ReadWrite);
@@ -61,18 +61,18 @@ namespace Platform.Memory
             byte* pointer = null;
             _accessor.SafeMemoryMappedViewHandle.AcquirePointer(ref pointer);
 
-            Pointer = pointer;
+            Pointer = new IntPtr(pointer);
         }
 
         private void UnmapFile()
         {
             if (UnmapFile(Pointer))
-                Pointer = null;
+                Pointer = IntPtr.Zero;
         }
 
-        private bool UnmapFile(void* pointer)
+        private bool UnmapFile(IntPtr pointer)
         {
-            if (pointer == null)
+            if (pointer == IntPtr.Zero)
                 return false;
 
             if (_accessor != null)
@@ -89,13 +89,13 @@ namespace Platform.Memory
 
         #region DisposalBase
 
-        protected override void DisposePointer(void* pointer, long size)
+        protected override void DisposePointer(IntPtr pointer, long size)
         {
             if (UnmapFile(pointer))
                 FileHelpers.SetSize(Address, size);
         }
 
-        protected override void EnsureNotDisposed() => EnsureNotDisposed($"File stored memory block '{Address}'.");
+        protected override string ObjectName => $"File stored memory block '{Address}'.";
 
         #endregion
     }

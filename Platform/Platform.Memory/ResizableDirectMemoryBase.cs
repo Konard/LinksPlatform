@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Threading;
+using Platform.Helpers;
 using Platform.Helpers.Disposables;
 
 namespace Platform.Memory
 {
-    public abstract unsafe class ResizableDirectMemoryBase : DisposableBase, IResizableDirectMemory
+    public abstract class ResizableDirectMemoryBase : DisposableBase, IResizableDirectMemory
     {
         public const long MinimumCapacity = 4096;
 
@@ -16,22 +17,30 @@ namespace Platform.Memory
         /// Gets the size (bytes) of this memory block.
         /// </summary>
         /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
-        public long Size => UsedCapacity;
+        public long Size
+        {
+            get
+            {
+                EnsureNotDisposed();
+                return UsedCapacity;
+            }
+        }
 
         /// <summary>
         /// Gets the pointer to the beginning of this memory block.
         /// </summary>
         /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
-        public void* Pointer
+        public IntPtr Pointer
         {
             get
             {
                 EnsureNotDisposed();
-                return _pointer.ToPointer();
+                return _pointer;
             }
             protected set
             {
-                _pointer = new IntPtr(value);
+                EnsureNotDisposed();
+                _pointer = value;
             }
         }
 
@@ -43,6 +52,7 @@ namespace Platform.Memory
         /// Cannot be less than the used capacity of thie memory block.
         /// </remarks>
         /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Attempted to set the reserved capacity to a value that is less than the used capacity.</exception>
         public long ReservedCapacity
         {
             get
@@ -53,13 +63,7 @@ namespace Platform.Memory
             set
             {
                 EnsureNotDisposed();
-                if (value < 0)
-                    value = 0;
-                if (value < _usedCapacity)
-                {
-                    var message = $"The reserved capacity {value} cannot be less than used capacity {_usedCapacity}.";
-                    throw new ArgumentOutOfRangeException(message);
-                }
+                Ensure.ArgumentInRange(value, new Range<long>(_usedCapacity, long.MaxValue));
                 if (value != _reservedCapacity)
                 {
                     OnReservedCapacityChanged(_reservedCapacity, value);
@@ -87,14 +91,7 @@ namespace Platform.Memory
             set
             {
                 EnsureNotDisposed();
-                if (value < 0)
-                    value = 0;
-                if (value > _reservedCapacity)
-                {
-                    // TODO: Use internationalization (aka Resources for message format).
-                    var message = $"The used capacity {value} cannot be greater than the reserved capacity {_reservedCapacity}.";
-                    throw new ArgumentOutOfRangeException(message);
-                }
+                Ensure.ArgumentInRange(value, new Range<long>(0, _reservedCapacity));
                 _usedCapacity = value;
             }
         }
@@ -105,11 +102,11 @@ namespace Platform.Memory
 
         protected override void DisposeCore(bool manual)
         {
-            var pointer = Interlocked.Exchange(ref _pointer, IntPtr.Zero).ToPointer();
-            if (pointer != null)
+            var pointer = Interlocked.Exchange(ref _pointer, IntPtr.Zero);
+            if (pointer != IntPtr.Zero)
                 DisposePointer(pointer, _usedCapacity);
         }
 
-        protected abstract void DisposePointer(void* pointer, long size);
+        protected abstract void DisposePointer(IntPtr pointer, long size);
     }
 }

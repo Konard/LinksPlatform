@@ -31,22 +31,22 @@ namespace Platform.Memory
 
         protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
         {
-            if (Pointer == null)
+            if (Pointer == IntPtr.Zero)
             {
-                Pointer = Marshal.AllocHGlobal(new IntPtr(newReservedCapacity)).ToPointer();
+                Pointer = Marshal.AllocHGlobal(new IntPtr(newReservedCapacity));
 
-                MemoryHelpers.ZeroMemory(Pointer, newReservedCapacity);
+                MemoryHelpers.ZeroMemory(Pointer.ToPointer(), newReservedCapacity);
             }
-            else Pointer = Marshal.ReAllocHGlobal(new IntPtr(Pointer), new IntPtr(newReservedCapacity)).ToPointer();
+            else Pointer = Marshal.ReAllocHGlobal(Pointer, new IntPtr(newReservedCapacity));
         }
 
         #endregion
 
         #region DisposalBase
 
-        protected override void DisposePointer(void* pointer, long size) => Marshal.FreeHGlobal(new IntPtr(pointer));
+        protected override void DisposePointer(IntPtr pointer, long size) => Marshal.FreeHGlobal(pointer);
 
-        protected override void EnsureNotDisposed() => EnsureNotDisposed("Heap stored memory block");
+        protected override string ObjectName => "Heap stored memory block";
 
         #endregion
     }
