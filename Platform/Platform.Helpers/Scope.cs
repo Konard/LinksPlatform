@@ -17,6 +17,8 @@ namespace Platform.Helpers
         private readonly HashSet<object> _excludes = new HashSet<object>();
         private readonly HashSet<object> _includes = new HashSet<object>();
 
+        private readonly HashSet<object> _blocked = new HashSet<object>();
+
         private readonly Dictionary<Type, object> _resolutions = new Dictionary<Type, object>();
 
         public Scope()
@@ -139,54 +141,64 @@ namespace Platform.Helpers
         {
             resolved = null;
 
-            if (_excludes.Contains(requiredType))
+            if (!_blocked.Add(requiredType))
                 return false;
 
-            if (_resolutions.TryGetValue(requiredType, out resolved))
-                return true;
-
-            if (_autoExplore)
-                IncludeAssemblyOfType(requiredType);
-
-            var resultInstances = new List<object>();
-            var resultConstructors = new List<ConstructorInfo>();
-
-            foreach (var include in _includes)
+            try
             {
-                if (_excludes.Contains(include))
-                    continue;
-
-                var type = include as Type;
-
-                if (type != null )
-                {
-                    if(requiredType.IsAssignableFrom(type))
-                        resultConstructors.AddRange(GetValidConstructors(type));
-                    else if (type.GetTypeInfo().IsGenericTypeDefinition && requiredType.GetTypeInfo().IsGenericType && type.GetInterfaces().Any(x => x.Name == requiredType.Name))
-                    {
-                        var genericType = type.MakeGenericType(requiredType.GenericTypeArguments);
-                        if (requiredType.IsAssignableFrom(genericType))
-                            resultConstructors.AddRange(GetValidConstructors(genericType));
-                    }
-                }
-                else if (requiredType.IsInstanceOfType(include) || requiredType.IsAssignableFrom(include.GetType()))
-                    resultInstances.Add(include);
-            }
-
-            if (resultInstances.Count == 0 && resultConstructors.Count == 0)
-                return false;
-            else if (resultInstances.Count > 0)
-                resolved = resultInstances[0];
-            else //if (resultConstructors.Count > 0)
-            {
-                SortConstructors(resultConstructors);
-
-                if (!TryResolveInstance(resultConstructors, out resolved))
+                if (_excludes.Contains(requiredType))
                     return false;
-            }
 
-            _resolutions.Add(requiredType, resolved);
-            return true;
+                if (_resolutions.TryGetValue(requiredType, out resolved))
+                    return true;
+
+                if (_autoExplore)
+                    IncludeAssemblyOfType(requiredType);
+
+                var resultInstances = new List<object>();
+                var resultConstructors = new List<ConstructorInfo>();
+
+                foreach (var include in _includes)
+                {
+                    if (_excludes.Contains(include))
+                        continue;
+
+                    var type = include as Type;
+
+                    if (type != null)
+                    {
+                        if (requiredType.IsAssignableFrom(type))
+                            resultConstructors.AddRange(GetValidConstructors(type));
+                        else if (type.GetTypeInfo().IsGenericTypeDefinition && requiredType.GetTypeInfo().IsGenericType && type.GetInterfaces().Any(x => x.Name == requiredType.Name))
+                        {
+                            var genericType = type.MakeGenericType(requiredType.GenericTypeArguments);
+                            if (requiredType.IsAssignableFrom(genericType))
+                                resultConstructors.AddRange(GetValidConstructors(genericType));
+                        }
+                    }
+                    else if (requiredType.IsInstanceOfType(include) || requiredType.IsAssignableFrom(include.GetType()))
+                        resultInstances.Add(include);
+                }
+
+                if (resultInstances.Count == 0 && resultConstructors.Count == 0)
+                    return false;
+                else if (resultInstances.Count > 0)
+                    resolved = resultInstances[0];
+                else //if (resultConstructors.Count > 0)
+                {
+                    SortConstructors(resultConstructors);
+
+                    if (!TryResolveInstance(resultConstructors, out resolved))
+                        return false;
+                }
+
+                _resolutions.Add(requiredType, resolved);
+                return true;
+            }
+            finally
+            {
+                _blocked.Remove(requiredType);
+            }
         }
 
         protected virtual void SortConstructors(List<ConstructorInfo> resultConstructors)
