@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
+using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.Optimizations;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -13,30 +15,29 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public class Compressor
     {
+        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+
         private readonly Func<ulong, ulong, ulong> _createLink;
         private readonly Func<ulong[], ulong> _createSequence;
-        private readonly Func<ulong, ulong, UnsafeDictionary<Link, ulong>, ulong> _calculateFrequency;
-        private Link _maxPair;
+        private readonly Func<ulong, ulong, UnsafeDictionary<UInt64Link, ulong>, ulong> _calculateFrequency;
+        private UInt64Link _maxPair;
         private readonly ulong _minFrequency;
         private ulong _maxFrequency;
-        private UnsafeDictionary<Link, ulong> _pairsFrequencies;
+        private UnsafeDictionary<UInt64Link, ulong> _pairsFrequencies;
 
         /// <remarks>
         /// TODO: Может стоит попробовать ref во всех методах
         /// </remarks>
-        public class LinkComparer : IEqualityComparer<Link>
+        public class LinkComparer : IEqualityComparer<UInt64Link>
         {
             public static readonly LinkComparer Default = new LinkComparer();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(Link x, Link y)
-            {
-                return x.Source == y.Source &&
-                       x.Target == y.Target;
-            }
+            public bool Equals(UInt64Link x, UInt64Link y) => x.Source == y.Source &&
+                                                              x.Target == y.Target;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(Link obj)
+            public int GetHashCode(UInt64Link obj)
             {
                 unchecked // Overflow is fine, just wrap
                 {
@@ -84,43 +85,43 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
-        public Compressor(Links links, Sequences sequences, ulong minFrequency = 1, bool threadSafe = true)
+        public Compressor(SynchronizedLinks<ulong> links, Sequences sequences, ulong minFrequency = 1, bool threadSafe = true)
         {
-            Func<ulong, Link> getLink;
+            Func<ulong, UInt64Link> getLink;
             Func<ulong[], ulong> count;
 
             if (threadSafe)
             {
-                getLink = links.GetLink;
+                getLink = link => new UInt64Link(links.GetLink(link));
                 count = links.Count;
-                _createLink = links.Create;
+                _createLink = links.CreateAndUpdate;
                 _createSequence = sequences.CreateBalancedVariant;
 
             }
             else
             {
-                getLink = links.GetLinkCore;
-                count = links.CountCore;
-                _createLink = links.CreateCore;
+                getLink = ((UInt64Links)links.Unsync).GetLinkStruct;
+                count = links.Unsync.Count;
+                _createLink = links.Unsync.CreateAndUpdate;
                 _createSequence = sequences.CreateBalancedVariantCore;
             }
 
             _calculateFrequency = (s, t, cache) =>
             {
-                ulong frequency = 0;
-                if (!cache.TryGetValue(new Link(s, t), out frequency))
+                ulong frequency;
+                if (!cache.TryGetValue(new UInt64Link(s, t), out frequency))
                 {
                     var sourceLink = getLink(s);
                     ulong sourceFrequency;
                     if (sourceLink.IsPartialPoint())
-                        sourceFrequency = count(new[] { LinksConstants.Null, s });
+                        sourceFrequency = count(new[] { Constants.Any, s });
                     else
                         sourceFrequency = _calculateFrequency(sourceLink.Source, sourceLink.Target, cache);
 
                     var targetLink = getLink(t);
                     ulong targetFrequency;
                     if (targetLink.IsPartialPoint())
-                        targetFrequency = count(new[] { LinksConstants.Null, t });
+                        targetFrequency = count(new[] { Constants.Any, t });
                     else
                         targetFrequency = _calculateFrequency(targetLink.Source, targetLink.Target, cache);
 
@@ -129,7 +130,7 @@ namespace Platform.Data.Core.Sequences
                         frequency = ulong.MaxValue;
 
                     var link = _createLink(s, t);
-                    var pair = new Link(link, s, t);
+                    var pair = new UInt64Link(link, s, t);
 
                     cache.Add(pair, frequency);
                 }
@@ -143,7 +144,7 @@ namespace Platform.Data.Core.Sequences
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong IncrementFrequency(Link pair)
+        private ulong IncrementFrequency(UInt64Link pair)
         {
             ulong frequency;
             if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -160,7 +161,7 @@ namespace Platform.Data.Core.Sequences
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DecrementFrequency(Link pair)
+        private void DecrementFrequency(UInt64Link pair)
         {
             ulong frequency;
             if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -193,11 +194,11 @@ namespace Platform.Data.Core.Sequences
             if (_pairsFrequencies != null)
                 throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
 
-            _pairsFrequencies = new UnsafeDictionary<Link, ulong>(4096, LinkComparer.Default);
+            _pairsFrequencies = new UnsafeDictionary<UInt64Link, ulong>(4096, LinkComparer.Default);
 
             for (var i = 1; i < sequence.Length; i++)
             {
-                var pair = new Link(sequence[i - 1], sequence[i]);
+                var pair = new UInt64Link(sequence[i - 1], sequence[i]);
                 UpdateMaxPair(pair, IncrementFrequency(pair));
             }
 
@@ -249,14 +250,14 @@ namespace Platform.Data.Core.Sequences
                         if (r > 0)
                         {
                             var previous = copy[w - 1];
-                            DecrementFrequency(new Link(previous, maxPairSource));
-                            IncrementFrequency(new Link(previous, maxPairResult));
+                            DecrementFrequency(new UInt64Link(previous, maxPairSource));
+                            IncrementFrequency(new UInt64Link(previous, maxPairResult));
                         }
                         if (r < oldLengthMinusTwo)
                         {
                             var next = copy[r + 2];
-                            DecrementFrequency(new Link(maxPairTarget, next));
-                            IncrementFrequency(new Link(maxPairResult, next));
+                            DecrementFrequency(new UInt64Link(maxPairTarget, next));
+                            IncrementFrequency(new UInt64Link(maxPairResult, next));
                         }
 
                         copy[w++] = maxPairResult;
@@ -282,20 +283,16 @@ namespace Platform.Data.Core.Sequences
             return newLength;
         }
 
-        public ulong Compress(ulong[] sequence)
-        {
-            var precompressedSequence = Precompress(sequence);
-            return _createSequence(precompressedSequence);
-        }
+        public ulong Compress(ulong[] sequence) => _createSequence(Precompress(sequence));
 
         private void ResetMaxPair()
         {
-            _maxPair = Link.Null;
+            _maxPair = UInt64Link.Null;
             _maxFrequency = 1;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(Link pair, ulong frequency)
+        private void UpdateMaxPair(UInt64Link pair, ulong frequency)
         {
             if (frequency > _minFrequency)
             {
@@ -368,11 +365,7 @@ namespace Platform.Data.Core.Sequences
         //    });
         //}
 
-        public ulong CompressGlobal(ulong[] sequence)
-        {
-            var precompressedSequence = PrecompressGlobal(sequence);
-            return _createSequence(precompressedSequence);
-        }
+        public ulong CompressGlobal(ulong[] sequence) => _createSequence(PrecompressGlobal(sequence));
 
         public ulong[] PrecompressGlobal(ulong[] sequence)
         {
@@ -388,7 +381,7 @@ namespace Platform.Data.Core.Sequences
             if (_pairsFrequencies != null)
                 throw new InvalidOperationException("Only one sequence at a time can be precompresed using single compressor.");
 
-            _pairsFrequencies = new UnsafeDictionary<Link, ulong>(4096, LinkComparer.Default);
+            _pairsFrequencies = new UnsafeDictionary<UInt64Link, ulong>(4096, LinkComparer.Default);
 
             for (var i = 1; i < sequence.Length; i++)
             {
@@ -396,7 +389,7 @@ namespace Platform.Data.Core.Sequences
                 var target = sequence[i];
 
                 var link = _createLink(source, target);
-                var pair = new Link(link, sequence[i - 1], sequence[i]);
+                var pair = new UInt64Link(link, sequence[i - 1], sequence[i]);
                 UpdateMaxPair(pair, _calculateFrequency(source, target, _pairsFrequencies));
             }
 

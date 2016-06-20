@@ -1,4 +1,5 @@
 ﻿using System;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Collections.Trees
 {
@@ -6,54 +7,54 @@ namespace Platform.Data.Core.Collections.Trees
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.
     /// Также имеет смысл разобраться почему не работает версия с идеальной балансировкой.
     /// </remarks>
-    public abstract unsafe class SizeBalancedTreeMethods : SizeBalancedTreeMethodsBase
+    public abstract class SizeBalancedTreeMethods<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
-        public void AddUnsafe(ulong node, ulong* root)
+        public void AddUnsafe(TElement node, IntPtr root)
         {
-            if (*root == 0)
+            if (EqualToZero(root.GetValue<TElement>()))
             {
-                SetSize(node, 1);
+                SetSize(node, GetOne());
 
-                *root = node;
+                root.SetValue(node);
 
                 return;
             }
 
             while (true)
             {
-                var left = GetLeft(*root);
-                var leftSize = GetSizeOrZero(*left);
-                var right = GetRight(*root);
-                var rightSize = GetSizeOrZero(*right);
+                var left = GetLeft(root.GetValue<TElement>());
+                var leftSize = GetSizeOrZero(left.GetValue<TElement>());
+                var right = GetRight(root.GetValue<TElement>());
+                var rightSize = GetSizeOrZero(right.GetValue<TElement>());
 
-                if (FirstIsToTheLeftOfSecond(node, *root)) // node.Key < root.Key
+                if (FirstIsToTheLeftOfSecond(node, root.GetValue<TElement>())) // node.Key < root.Key
                 {
-                    if (*left == 0)
+                    if (EqualToZero(left.GetValue<TElement>()))
                     {
-                        IncrementSize(*root);
+                        IncrementSize(root.GetValue<TElement>());
 
-                        SetSize(node, 1);
+                        SetSize(node, GetOne());
 
-                        *left = node;
+                        left.SetValue(node);
 
                         break;
                     }
-                    if (FirstIsToTheRightOfSecond(node, *left)) // node.Key > left.Key
+                    if (FirstIsToTheRightOfSecond(node, left.GetValue<TElement>())) // node.Key > left.Key
                     {
-                        var leftRight = *GetRight(*left);
+                        var leftRight = GetRight(left.GetValue<TElement>()).GetValue<TElement>();
                         var leftRightSize = GetSizeOrZero(leftRight);
-                        if (leftRightSize + 1 > rightSize)
+                        if (GreaterThan(Increment(leftRightSize), rightSize))
                         {
-                            if (leftRightSize == 0 && rightSize == 0)
+                            if (EqualToZero(leftRightSize) && EqualToZero(rightSize))
                             {
-                                SetLeft(node, *left);
-                                SetRight(node, *root);
-                                SetSize(node, GetSize(*left) + 2); // 2 - размер ветки *root (right) и самого node
+                                SetLeft(node, left.GetValue<TElement>());
+                                SetRight(node, root.GetValue<TElement>());
+                                SetSize(node, Add(GetSize(left.GetValue<TElement>()), GetTwo())); // 2 - размер ветки *root (right) и самого node
 
-                                SetLeft(*root, 0);
-                                SetSize(*root, 1);
+                                SetLeft(root.GetValue<TElement>(), GetZero());
+                                SetSize(root.GetValue<TElement>(), GetOne());
 
-                                *root = node;
+                                root.SetValue(node);
 
                                 break;
                             }
@@ -62,22 +63,22 @@ namespace Platform.Data.Core.Collections.Trees
                         }
                         else
                         {
-                            IncrementSize(*root);
+                            IncrementSize(root.GetValue<TElement>());
 
                             root = left;
                         }
                     }
                     else // node.Key < left.Key
                     {
-                        var leftLeft = *GetLeft(*left);
+                        var leftLeft = GetLeft(left.GetValue<TElement>()).GetValue<TElement>();
                         var leftLeftSize = GetSizeOrZero(leftLeft);
-                        if (leftLeftSize + 1 > rightSize)
+                        if (GreaterThan(Increment(leftLeftSize), rightSize))
                         {
                             RightRotate(root);
                         }
                         else
                         {
-                            IncrementSize(*root);
+                            IncrementSize(root.GetValue<TElement>());
 
                             root = left;
                         }
@@ -85,47 +86,47 @@ namespace Platform.Data.Core.Collections.Trees
                 }
                 else // node.Key > root.Key
                 {
-                    if (*right == 0)
+                    if (EqualToZero(right.GetValue<TElement>()))
                     {
-                        IncrementSize(*root);
+                        IncrementSize(root.GetValue<TElement>());
 
-                        SetSize(node, 1);
+                        SetSize(node, GetOne());
 
-                        *right = node;
+                        right.SetValue(node);
 
                         break;
                     }
-                    if (FirstIsToTheRightOfSecond(node, *right)) // node.Key > right.Key
+                    if (FirstIsToTheRightOfSecond(node, right.GetValue<TElement>())) // node.Key > right.Key
                     {
-                        var rightRight = *GetRight(*right);
+                        var rightRight = GetRight(right.GetValue<TElement>()).GetValue<TElement>();
                         var rightRightSize = GetSizeOrZero(rightRight);
-                        if (rightRightSize + 1 > leftSize)
+                        if (GreaterThan(Increment(rightRightSize), leftSize))
                         {
                             LeftRotate(root);
                         }
                         else
                         {
-                            IncrementSize(*root);
+                            IncrementSize(root.GetValue<TElement>());
 
                             root = right;
                         }
                     }
                     else // node.Key < right.Key
                     {
-                        var rightLeft = *GetLeft(*right);
+                        var rightLeft = GetLeft(right.GetValue<TElement>()).GetValue<TElement>();
                         var rightLeftSize = GetSizeOrZero(rightLeft);
-                        if (rightLeftSize + 1 > leftSize)
+                        if (GreaterThan(Increment(rightLeftSize), leftSize))
                         {
-                            if (rightLeftSize == 0 && leftSize == 0)
+                            if (EqualToZero(rightLeftSize) && EqualToZero(leftSize))
                             {
-                                SetLeft(node, *root);
-                                SetRight(node, *right);
-                                SetSize(node, GetSize(*right) + 2); // 2 - размер ветки *root (left) и самого node
+                                SetLeft(node, root.GetValue<TElement>());
+                                SetRight(node, right.GetValue<TElement>());
+                                SetSize(node, Add(GetSize(right.GetValue<TElement>()), GetTwo())); // 2 - размер ветки *root (left) и самого node
 
-                                SetRight(*root, 0);
-                                SetSize(*root, 1);
+                                SetRight(root.GetValue<TElement>(), GetZero());
+                                SetSize(root.GetValue<TElement>(), GetOne());
 
-                                *root = node;
+                                root.SetValue(node);
 
                                 break;
                             }
@@ -134,7 +135,7 @@ namespace Platform.Data.Core.Collections.Trees
                         }
                         else
                         {
-                            IncrementSize(*root);
+                            IncrementSize(root.GetValue<TElement>());
 
                             root = right;
                         }
@@ -143,118 +144,118 @@ namespace Platform.Data.Core.Collections.Trees
             }
         }
 
-        public void RemoveUnsafe(ulong node, ulong* root)
+        public void RemoveUnsafe(TElement node, IntPtr root)
         {
-            if (*root == 0)
-                throw new Exception(string.Format("Элемент с {0} не содержится в дереве.", node));
+            if (EqualToZero(root.GetValue<TElement>()))
+                throw new Exception($"Элемент с {node} не содержится в дереве.");
 
             RemoveUnsafeCore(node, root);
         }
 
-        private void RemoveUnsafeCore(ulong node, ulong* root)
+        private void RemoveUnsafeCore(TElement node, IntPtr root)
         {
             while (true)
             {
-                var left = GetLeft(*root);
-                var leftSize = GetSizeOrZero(*left);
-                var right = GetRight(*root);
-                var rightSize = GetSizeOrZero(*right);
+                var left = GetLeft(root.GetValue<TElement>());
+                var leftSize = GetSizeOrZero(left.GetValue<TElement>());
+                var right = GetRight(root.GetValue<TElement>());
+                var rightSize = GetSizeOrZero(right.GetValue<TElement>());
 
-                if (FirstIsToTheLeftOfSecond(node, *root)) // node.Key < root.Key
+                if (FirstIsToTheLeftOfSecond(node, root.GetValue<TElement>())) // node.Key < root.Key
                 {
-                    if (*left == 0)
-                        throw new Exception(string.Format("Элемент {0} не содержится в дереве.", node));
+                    if (EqualToZero (left.GetValue<TElement>()))
+                        throw new Exception($"Элемент {node} не содержится в дереве.");
 
-                    var rightLeft = *GetLeft(*right);
+                    var rightLeft = GetLeft(right.GetValue<TElement>()).GetValue<TElement>();
                     var rightLeftSize = GetSizeOrZero(rightLeft);
-                    var rightRight = *GetRight(*right);
+                    var rightRight = GetRight(right.GetValue<TElement>()).GetValue<TElement>();
                     var rightRightSize = GetSizeOrZero(rightRight);
 
-                    if (rightRightSize > (leftSize - 1))
+                    if (GreaterThan(rightRightSize, Decrement(leftSize)))
                     {
                         LeftRotate(root);
                     }
-                    else if (rightLeftSize > (leftSize - 1))
+                    else if (GreaterThan(rightLeftSize,Decrement(leftSize)))
                     {
                         RightRotate(right);
                         LeftRotate(root);
                     }
                     else
                     {
-                        DecrementSize(*root);
+                        DecrementSize(root.GetValue<TElement>());
 
                         root = left;
                     }
                 }
-                else if (FirstIsToTheRightOfSecond(node, *root)) // node.Key > root.Key
+                else if (FirstIsToTheRightOfSecond(node, root.GetValue<TElement>())) // node.Key > root.Key
                 {
-                    if (*right == 0)
-                        throw new Exception(string.Format("Элемент {0} не содержится в дереве.", node));
+                    if (EqualToZero (right.GetValue<TElement>() ))
+                        throw new Exception($"Элемент {node} не содержится в дереве.");
 
-                    var leftLeft = *GetLeft(*left);
+                    var leftLeft = GetLeft(left.GetValue<TElement>()).GetValue<TElement>();
                     var leftLeftSize = GetSizeOrZero(leftLeft);
-                    var leftRight = *GetRight(*left);
+                    var leftRight = GetRight(left.GetValue<TElement>()).GetValue<TElement>();
                     var leftRightSize = GetSizeOrZero(leftRight);
 
-                    if (leftLeftSize > (rightSize - 1))
+                    if (GreaterThan(leftLeftSize,Decrement(rightSize)))
                     {
                         RightRotate(root);
                     }
-                    else if (leftRightSize > (rightSize - 1))
+                    else if (GreaterThan(leftRightSize,Decrement(rightSize)))
                     {
                         LeftRotate(left);
                         RightRotate(root);
                     }
                     else
                     {
-                        DecrementSize(*root);
+                        DecrementSize(root.GetValue<TElement>());
 
                         root = right;
                     }
                 }
                 else // key == root.Key;
                 {
-                    if (leftSize > 0 && rightSize > 0)
+                    if (GreaterThanZero(leftSize) && GreaterThanZero(rightSize))
                     {
-                        if (leftSize > rightSize)
+                        if (GreaterThan(leftSize, rightSize))
                         {
-                            var replacement = *left;
-                            while (*GetRight(replacement) != 0)
-                                replacement = *GetRight(replacement);
+                            var replacement = left.GetValue<TElement>();
+                            while (!EqualToZero(GetRight(replacement).GetValue<TElement>()))
+                                replacement = GetRight(replacement).GetValue<TElement>();
 
                             RemoveUnsafeCore(replacement, left);
 
-                            SetLeft(replacement, *left);
-                            SetRight(replacement, *right);
+                            SetLeft(replacement, left.GetValue<TElement>());
+                            SetRight(replacement, right.GetValue<TElement>());
                             FixSize(replacement);
 
-                            *root = replacement;
+                            root.SetValue(replacement);
                         }
                         else
                         {
-                            var replacement = *right;
-                            while (*GetLeft(replacement) != 0)
-                                replacement = *GetLeft(replacement);
+                            var replacement = right.GetValue<TElement>();
+                            while (!EqualToZero(GetLeft(replacement).GetValue<TElement>()))
+                                replacement = GetLeft(replacement).GetValue<TElement>();
 
                             RemoveUnsafeCore(replacement, right);
 
-                            SetLeft(replacement, *left);
-                            SetRight(replacement, *right);
+                            SetLeft(replacement, left.GetValue<TElement>());
+                            SetRight(replacement, right.GetValue<TElement>());
                             FixSize(replacement);
 
-                            *root = replacement;
+                            root.SetValue(replacement);
                         }
                     }
-                    else if (leftSize > 0)
-                        *root = *left;
-                    else if (rightSize > 0)
-                        *root = *right;
+                    else if (GreaterThanZero(leftSize))
+                        root.SetValue(left.GetValue<TElement>());
+                    else if (GreaterThanZero(rightSize))
+                        root.SetValue(right.GetValue<TElement>());
                     else
-                        *root = 0;
+                        root.SetValue(GetZero());
 
-                    SetLeft(node, 0);
-                    SetRight(node, 0);
-                    SetSize(node, 0);
+                    SetLeft(node, GetZero());
+                    SetRight(node, GetZero());
+                    SetSize(node, GetZero());
 
                     break;
                 }

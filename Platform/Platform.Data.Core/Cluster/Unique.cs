@@ -41,10 +41,7 @@ namespace Platform.Data.Core.Cluster
             return new Unique(time, seed);
         }
 
-        public static Unique Create(ulong source, ulong target)
-        {
-            return new Unique(source, target);
-        }
+        public static Unique Create(ulong source, ulong target) => new Unique(source, target);
 
         public override int GetHashCode()
         {
@@ -54,25 +51,13 @@ namespace Platform.Data.Core.Cluster
             return hash;
         }
 
-        public bool IsNull()
-        {
-            return Time == 0 && Seed == 0;
-        }
+        public bool IsNull() => Time == 0 && Seed == 0;
 
-        public override bool Equals(object other)
-        {
-            return other is Unique && Equals((Unique) other);
-        }
+        public override bool Equals(object other) => other is Unique && Equals((Unique) other);
 
-        public bool Equals(Unique other)
-        {
-            return Time == other.Time &&
-                   Seed == other.Seed;
-        }
+        public bool Equals(Unique other) => Time == other.Time &&
+                                            Seed == other.Seed;
 
-        public override string ToString()
-        {
-            return string.Format("[{0},{1}]", new DateTime((long) Time).ToString(DateFormat), Seed);
-        }
+        public override string ToString() => $"[{new DateTime((long) Time).ToString(DateFormat)},{Seed}]";
     }
 }

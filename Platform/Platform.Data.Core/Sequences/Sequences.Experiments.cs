@@ -39,12 +39,12 @@ namespace Platform.Data.Core.Sequences
         {
 #if DEBUG
             if ((stopAt - startAt) < 0)
-                throw new ArgumentOutOfRangeException("startAt", "startAt должен быть меньше или равен stopAt");
+                throw new ArgumentOutOfRangeException(nameof(startAt), "startAt должен быть меньше или равен stopAt");
 #endif
             if ((stopAt - startAt) == 0)
                 return new[] { sequence[startAt] };
             if ((stopAt - startAt) == 1)
-                return new[] { Links.CreateCore(sequence[startAt], sequence[stopAt]) };
+                return new[] { Links.Unsync.CreateAndUpdate(sequence[startAt], sequence[stopAt]) };
 
             var variants = new ulong[(ulong)MathHelpers.Catalan(stopAt - startAt)];
             var last = 0;
@@ -58,8 +58,8 @@ namespace Platform.Data.Core.Sequences
                 {
                     for (var j = 0; j < right.Length; j++)
                     {
-                        var variant = Links.CreateCore(left[i], right[j]);
-                        if (variant == LinksConstants.Null)
+                        var variant = Links.Unsync.CreateAndUpdate(left[i], right[j]);
+                        if (variant == Constants.Null)
                             throw new NotImplementedException("Creation cancellation is not implemented.");
                         variants[last++] = variant;
                     }
@@ -76,7 +76,7 @@ namespace Platform.Data.Core.Sequences
                 if (sequence.IsNullOrEmpty())
                     return new List<ulong>();
 
-                Links.EnsureEachLinkExists(sequence);
+                Links.Unsync.EnsureEachLinkExists(sequence);
 
                 if (sequence.Length == 1)
                     return new List<ulong> { sequence[0] };
@@ -90,8 +90,8 @@ namespace Platform.Data.Core.Sequences
         {
             if (sequence.Length == 2)
             {
-                var link = Links.CreateCore(sequence[0], sequence[1]);
-                if (link == LinksConstants.Null)
+                var link = Links.Unsync.CreateAndUpdate(sequence[0], sequence[1]);
+                if (link == Constants.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
                 results.Add(link);
                 return results;
@@ -102,8 +102,8 @@ namespace Platform.Data.Core.Sequences
 
             for (var li = 0; li < innerSequenceLength; li++)
             {
-                var link = Links.CreateCore(sequence[li], sequence[li + 1]);
-                if (link == LinksConstants.Null)
+                var link = Links.Unsync.CreateAndUpdate(sequence[li], sequence[li + 1]);
+                if (link == Constants.Null)
                     throw new NotImplementedException("Creation cancellation is not implemented.");
 
                 for (var isi = 0; isi < li; isi++)
@@ -125,12 +125,12 @@ namespace Platform.Data.Core.Sequences
             do
             {
                 if (sequence.Length == 2)
-                    return Links.CreateCore(sequence[0], sequence[1]);
+                    return Links.Unsync.CreateAndUpdate(sequence[0], sequence[1]);
 
                 var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
 
                 for (var i = 0; i < sequence.Length; i += 2)
-                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Links.CreateCore(sequence[i], sequence[i + 1]);
+                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Links.Unsync.CreateAndUpdate(sequence[i], sequence[i + 1]);
 
                 sequence = innerSequence;
             } while (true);
@@ -140,7 +140,7 @@ namespace Platform.Data.Core.Sequences
         {
             var visitedLinks = new HashSet<ulong>(); // Заменить на bitstring
 
-            EachCore1(link =>
+            Each1(link =>
             {
                 if (!visitedLinks.Contains(link)) visitedLinks.Add(link); // изучить почему случаются повторы
                 return true;
@@ -149,11 +149,11 @@ namespace Platform.Data.Core.Sequences
             return visitedLinks;
         }
 
-        private void EachCore1(Func<ulong, bool> handler, params ulong[] sequence)
+        private void Each1(Func<ulong, bool> handler, params ulong[] sequence)
         {
             if (sequence.Length == 2)
             {
-                Links.EachCore(sequence[0], sequence[1], handler);
+                Links.Unsync.Each(sequence[0], sequence[1], handler);
             }
             else
             {
@@ -169,7 +169,7 @@ namespace Platform.Data.Core.Sequences
                     var linkIndex = li;
                     ulong[] innerSequence = null;
 
-                    Links.EachCore(left, right, pair =>
+                    Links.Unsync.Each(left, right, pair =>
                     {
                         if (innerSequence == null)
                         {
@@ -184,9 +184,9 @@ namespace Platform.Data.Core.Sequences
 
                         innerSequence[linkIndex] = pair;
 
-                        EachCore1(handler, innerSequence);
+                        Each1(handler, innerSequence);
 
-                        return LinksConstants.Continue;
+                        return Constants.Continue;
                     });
                 }
             }
@@ -235,7 +235,7 @@ namespace Platform.Data.Core.Sequences
                 if (link > 0)
                     handler(link);
                 else
-                    Links.Each(0, 0, handler);
+                    Links.Each(Constants.Any, Constants.Any, handler);
             }
             else if (sequence.Length == 2)
             {
@@ -244,10 +244,10 @@ namespace Platform.Data.Core.Sequences
                 //  o_|      x_o ... 
                 // x_|        |___|
 
-                Links.Each(sequence[1], 0, pair =>
+                Links.Each(sequence[1], Constants.Any, pair =>
                 {
-                    var match = Links.SearchCore(sequence[0], pair);
-                    if (match != 0)
+                    var match = Links.SearchOrDefault(sequence[0], pair);
+                    if (match != Constants.Null)
                         handler(match);
                     return true;
                 });
@@ -255,9 +255,9 @@ namespace Platform.Data.Core.Sequences
                 // |_x      ... x_o
                 //  |_o      |___|
 
-                Links.Each(0, sequence[0], pair =>
+                Links.Each(Constants.Any, sequence[0], pair =>
                 {
-                    var match = Links.SearchCore(pair, sequence[1]);
+                    var match = Links.SearchOrDefault(pair, sequence[1]);
                     if (match != 0)
                         handler(match);
                     return true;
@@ -277,7 +277,7 @@ namespace Platform.Data.Core.Sequences
 
         private void PartialStepRight(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.EachCore(0, left, pair =>
+            Links.Unsync.Each(Constants.Any, left, pair =>
             {
                 StepRight(handler, pair, right);
 
@@ -290,7 +290,7 @@ namespace Platform.Data.Core.Sequences
 
         private void StepRight(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.EachCore(left, 0, rightStep =>
+            Links.Unsync.Each(left, Constants.Any, rightStep =>
             {
                 TryStepRightUp(handler, right, rightStep);
                 return true;
@@ -300,11 +300,11 @@ namespace Platform.Data.Core.Sequences
         private void TryStepRightUp(Action<ulong> handler, ulong right, ulong stepFrom)
         {
             var upStep = stepFrom;
-            var firstSource = Links.GetTargetCore(upStep);
+            var firstSource = Links.Unsync.GetTarget(upStep);
             while (firstSource != right && firstSource != upStep)
             {
                 upStep = firstSource;
-                firstSource = Links.GetSourceCore(upStep);
+                firstSource = Links.Unsync.GetSource(upStep);
             }
 
             if (firstSource == right)
@@ -314,7 +314,7 @@ namespace Platform.Data.Core.Sequences
         // TODO: Test
         private void PartialStepLeft(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.EachCore(right, 0, pair =>
+            Links.Unsync.Each(right, Constants.Any, pair =>
             {
                 StepLeft(handler, left, pair);
 
@@ -327,7 +327,7 @@ namespace Platform.Data.Core.Sequences
 
         private void StepLeft(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.EachCore(0, right, leftStep =>
+            Links.Unsync.Each(Constants.Any, right, leftStep =>
             {
                 TryStepLeftUp(handler, left, leftStep);
                 return true;
@@ -337,11 +337,11 @@ namespace Platform.Data.Core.Sequences
         private void TryStepLeftUp(Action<ulong> handler, ulong left, ulong stepFrom)
         {
             var upStep = stepFrom;
-            var firstTarget = Links.GetSourceCore(upStep);
+            var firstTarget = Links.Unsync.GetSource(upStep);
             while (firstTarget != left && firstTarget != upStep)
             {
                 upStep = firstTarget;
-                firstTarget = Links.GetTargetCore(upStep);
+                firstTarget = Links.Unsync.GetTarget(upStep);
             }
 
             if (firstTarget == left)
@@ -351,11 +351,11 @@ namespace Platform.Data.Core.Sequences
         private bool StartsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
-            var firstSource = Links.GetSourceCore(upStep);
+            var firstSource = Links.Unsync.GetSource(upStep);
             while (firstSource != link && firstSource != upStep)
             {
                 upStep = firstSource;
-                firstSource = Links.GetSourceCore(upStep);
+                firstSource = Links.Unsync.GetSource(upStep);
             }
             return firstSource == link;
         }
@@ -363,11 +363,11 @@ namespace Platform.Data.Core.Sequences
         private bool EndsWith(ulong sequence, ulong link)
         {
             var upStep = sequence;
-            var lastTarget = Links.GetTargetCore(upStep);
+            var lastTarget = Links.Unsync.GetTarget(upStep);
             while (lastTarget != link && lastTarget != upStep)
             {
                 upStep = lastTarget;
-                lastTarget = Links.GetTargetCore(upStep);
+                lastTarget = Links.Unsync.GetTarget(upStep);
             }
             return lastTarget == link;
         }
@@ -391,8 +391,8 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = Links.SearchCore(firstElement, sequence[1]);
-                        if (pair != LinksConstants.Null)
+                        var pair = Links.SearchOrDefault(firstElement, sequence[1]);
+                        if (pair != Constants.Null)
                             results.Add(pair);
                         return results;
                     }
@@ -403,8 +403,8 @@ namespace Platform.Data.Core.Sequences
                     {
                         var filterPosition = 0;
 
-                        StopableSequenceWalker.WalkRight(result, Links.GetSourceCore, Links.GetTargetCore,
-                            x => linksInSequence.Contains(x) || Links.GetTargetCore(x) == x, x =>
+                        StopableSequenceWalker.WalkRight(result, Links.Unsync.GetSource, Links.Unsync.GetTarget,
+                            x => linksInSequence.Contains(x) || Links.Unsync.GetTarget(x) == x, x =>
                             {
                                 if (filterPosition == sequence.Length)
                                 {
@@ -463,8 +463,8 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = Links.SearchCore(firstElement, sequence[1]);
-                        if (pair != LinksConstants.Null)
+                        var pair = Links.SearchOrDefault(firstElement, sequence[1]);
+                        if (pair != Constants.Null)
                             results.Add(pair);
                         return results;
                     }
@@ -505,8 +505,8 @@ namespace Platform.Data.Core.Sequences
 
             if (Links.Exists(sequenceLink))
             {
-                StopableSequenceWalker.WalkRight(sequenceLink, Links.GetSourceCore, Links.GetTargetCore,
-                    x => linksInSequence.Contains(x) || Links.GetTargetCore(x) == x, element =>
+                StopableSequenceWalker.WalkRight(sequenceLink, Links.Unsync.GetSource, Links.Unsync.GetTarget,
+                    x => linksInSequence.Contains(x) || Links.Unsync.GetTarget(x) == x, element =>
                     {
                         if (insertComma && visitedElements > 0)
                             sb.Append(',');
@@ -553,8 +553,8 @@ namespace Platform.Data.Core.Sequences
                     {
                         var filterPosition = -1;
 
-                        StopableSequenceWalker.WalkRight(result, Links.GetSourceCore, Links.GetTargetCore,
-                            x => linksInSequence.Contains(x) || Links.GetTargetCore(x) == x, x =>
+                        StopableSequenceWalker.WalkRight(result, Links.Unsync.GetSource, Links.Unsync.GetTarget,
+                            x => linksInSequence.Contains(x) || Links.Unsync.GetTarget(x) == x, x =>
                             {
                                 if (filterPosition == (sequence.Length - 1))
                                     return false;
@@ -676,8 +676,8 @@ namespace Platform.Data.Core.Sequences
                     var firstResults = new HashSet<ulong>();
                     var lastResults = new HashSet<ulong>();
 
-                    var first = sequence.First(x => x != LinksConstants.Any);
-                    var last = sequence.Last(x => x != LinksConstants.Any);
+                    var first = sequence.First(x => x != Constants.Any);
+                    var last = sequence.Last(x => x != Constants.Any);
 
                     AllUsagesCore(first, firstResults);
                     AllUsagesCore(last, lastResults);
@@ -833,8 +833,8 @@ namespace Platform.Data.Core.Sequences
                 if (usages.Add(pair)) AllUsagesCore(pair, usages);
                 return true;
             };
-            Links.EachCore(link, 0, handler);
-            Links.EachCore(0, link, handler);
+            Links.Unsync.Each(link, Constants.Any, handler);
+            Links.Unsync.Each(Constants.Any, link, handler);
         }
 
         private bool AllUsagesCore1(ulong link, HashSet<ulong> usages, Func<ulong, bool> outerHandler)
@@ -851,8 +851,8 @@ namespace Platform.Data.Core.Sequences
                 }
                 return true;
             };
-            return Links.EachCore(link, 0, handler)
-                && Links.EachCore(0, link, handler);
+            return Links.Unsync.Each(link, Constants.Any, handler)
+                && Links.Unsync.Each(Constants.Any, link, handler);
         }
 
         public void CalculateAllUsages(ulong[] totals)
@@ -869,10 +869,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCalculator
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly ulong[] _totals;
 
-            public AllUsagesCalculator(Links links, ulong[] totals)
+            public AllUsagesCalculator(SynchronizedLinks<ulong> links, ulong[] totals)
             {
                 _links = links;
                 _totals = totals;
@@ -880,7 +880,7 @@ namespace Platform.Data.Core.Sequences
 
             public void Calculate()
             {
-                _links.Each(0, 0, CalculateCore);
+                _links.Each(Constants.Any, Constants.Any, CalculateCore);
             }
 
             private bool CalculateCore(ulong link)
@@ -899,8 +899,8 @@ namespace Platform.Data.Core.Sequences
                         return true;
                     };
 
-                    _links.EachCore(link, 0, linkCalculator);
-                    _links.EachCore(0, link, linkCalculator);
+                    _links.Unsync.Each(link, Constants.Any, linkCalculator);
+                    _links.Unsync.Each(Constants.Any, link, linkCalculator);
 
                     _totals[link] = total;
                 }
@@ -910,10 +910,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCalculator2
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly ulong[] _totals;
 
-            public AllUsagesCalculator2(Links links, ulong[] totals)
+            public AllUsagesCalculator2(SynchronizedLinks<ulong> links, ulong[] totals)
             {
                 _links = links;
                 _totals = totals;
@@ -921,14 +921,14 @@ namespace Platform.Data.Core.Sequences
 
             public void Calculate()
             {
-                _links.Each(0, 0, CalculateCore);
+                _links.Each(Constants.Any, Constants.Any, CalculateCore);
             }
 
             private bool IsElement(ulong link)
             {
                 //_linksInSequence.Contains(link) || 
 
-                return _links.GetTargetCore(link) == link || _links.GetSourceCore(link) == link;
+                return _links.Unsync.GetTarget(link) == link || _links.Unsync.GetSource(link) == link;
             }
 
             private bool CalculateCore(ulong link)
@@ -937,8 +937,8 @@ namespace Platform.Data.Core.Sequences
 
                 // Основано на SequenceWalker.WalkLeft
 
-                Func<ulong, ulong> getSource = _links.GetSourceCore;
-                Func<ulong, ulong> getTarget = _links.GetTargetCore;
+                Func<ulong, ulong> getSource = _links.Unsync.GetSource;
+                Func<ulong, ulong> getTarget = _links.Unsync.GetTarget;
                 Func<ulong, bool> isElement = IsElement;
                 Action<ulong> visitLeaf = (parent) =>
                 {
@@ -993,10 +993,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCollector
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly HashSet<ulong> _usages;
 
-            public AllUsagesCollector(Links links, HashSet<ulong> usages)
+            public AllUsagesCollector(SynchronizedLinks<ulong> links, HashSet<ulong> usages)
             {
                 _links = links;
                 _usages = usages;
@@ -1006,8 +1006,8 @@ namespace Platform.Data.Core.Sequences
             {
                 if (_usages.Add(link))
                 {
-                    _links.EachCore(link, 0, Collect);
-                    _links.EachCore(0, link, Collect);
+                    _links.Unsync.Each(link, Constants.Any, Collect);
+                    _links.Unsync.Each(Constants.Any, link, Collect);
                 }
                 return true;
             }
@@ -1015,10 +1015,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCollector2
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly BitString _usages;
 
-            public AllUsagesCollector2(Links links, BitString usages)
+            public AllUsagesCollector2(SynchronizedLinks<ulong> links, BitString usages)
             {
                 _links = links;
                 _usages = usages;
@@ -1030,8 +1030,8 @@ namespace Platform.Data.Core.Sequences
                 {
                     _usages.SetCore((long)link);
 
-                    _links.EachCore(link, 0, Collect);
-                    _links.EachCore(0, link, Collect);
+                    _links.Unsync.Each(link, Constants.Any, Collect);
+                    _links.Unsync.Each(Constants.Any, link, Collect);
                 }
                 return true;
             }
@@ -1039,12 +1039,12 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesIntersectingCollector
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly HashSet<ulong> _intersectWith;
             private readonly HashSet<ulong> _usages;
             private readonly HashSet<ulong> _enter;
 
-            public AllUsagesIntersectingCollector(Links links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
+            public AllUsagesIntersectingCollector(SynchronizedLinks<ulong> links, HashSet<ulong> intersectWith, HashSet<ulong> usages)
             {
                 _links = links;
                 _intersectWith = intersectWith;
@@ -1059,8 +1059,8 @@ namespace Platform.Data.Core.Sequences
                     if (_intersectWith.Contains(link))
                         _usages.Add(link);
 
-                    _links.EachCore(link, 0, Collect);
-                    _links.EachCore(0, link, Collect);
+                    _links.Unsync.Each(link, Constants.Any, Collect);
+                    _links.Unsync.Each(Constants.Any, link, Collect);
                 }
                 return true;
             }
@@ -1078,8 +1078,8 @@ namespace Platform.Data.Core.Sequences
 
             if (left == right)
                 handler(left);
-            var pair = Links.SearchCore(left, right);
-            if (pair != LinksConstants.Null)
+            var pair = Links.Unsync.SearchOrDefault(left, right);
+            if (pair != Constants.Null)
                 handler(pair);
 
             // Inner
@@ -1127,15 +1127,15 @@ namespace Platform.Data.Core.Sequences
             return GetAllPartiallyMatchingSequencesCore(sequence, matchings, startAt + 1); // ??
         }
 
-        private static void EnsureEachLinkIsAnyOrZeroOrManyOrExists(Links links, params ulong[] sequence)
+        private static void EnsureEachLinkIsAnyOrZeroOrManyOrExists(SynchronizedLinks<ulong> links, params ulong[] sequence)
         {
             if (sequence == null)
                 return;
 
             for (var i = 0; i < sequence.Length; i++)
-                if (sequence[i] != LinksConstants.Null && sequence[i] != ZeroOrMany && !links.Exists(sequence[i]))
+                if (sequence[i] != Constants.Any && sequence[i] != ZeroOrMany && !links.Exists(sequence[i]))
                     throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
-                        string.Format("patternSequence[{0}]", i));
+                                                                        $"patternSequence[{i}]");
         }
 
         // Pattern Matching -> Key To Triggers
@@ -1151,7 +1151,7 @@ namespace Platform.Data.Core.Sequences
 
                     var uniqueSequenceElements = new HashSet<ulong>();
                     for (var i = 0; i < patternSequence.Length; i++)
-                        if (patternSequence[i] != LinksConstants.Null && patternSequence[i] != ZeroOrMany)
+                        if (patternSequence[i] != Constants.Any && patternSequence[i] != ZeroOrMany)
                             uniqueSequenceElements.Add(patternSequence[i]);
 
                     var results = new HashSet<ulong>();
@@ -1261,7 +1261,7 @@ namespace Platform.Data.Core.Sequences
         {
             return Sync.ExecuteReadOperation(() =>
             {
-                var results = new BitString((long)Links.CountCore() + 1); // new BitArray((int)_links.Total + 1);
+                var results = new BitString((long)Links.Unsync.Count() + 1); // new BitArray((int)_links.Total + 1);
 
                 if (linksToConnect.Length > 0)
                 {
@@ -1272,7 +1272,7 @@ namespace Platform.Data.Core.Sequences
 
                     for (var i = 1; i < linksToConnect.Length; i++)
                     {
-                        var next = new BitString((long)Links.CountCore() + 1); //new BitArray((int)_links.Total + 1);
+                        var next = new BitString((long)Links.Unsync.Count() + 1); //new BitArray((int)_links.Total + 1);
                         var collector = new AllUsagesCollector2(Links, next);
                         collector.Collect(linksToConnect[i]);
 
@@ -1388,8 +1388,8 @@ namespace Platform.Data.Core.Sequences
 
         private void CollectMatchingSequences(ulong leftLink, int leftBound, ulong[] middleLinks, ulong rightLink, int rightBound, ref List<ulong> results)
         {
-            var leftLinkTotalReferers = Links.CountCore(leftLink);
-            var rightLinkTotalReferers = Links.CountCore(rightLink);
+            var leftLinkTotalReferers = Links.Unsync.Count(leftLink);
+            var rightLinkTotalReferers = Links.Unsync.Count(rightLink);
 
             if (leftLinkTotalReferers <= rightLinkTotalReferers)
             {
@@ -1456,7 +1456,7 @@ namespace Platform.Data.Core.Sequences
 
             TryStepRight(startLink, rightLink, result, 0);
 
-            Links.Each(0, startLink, couple =>
+            Links.Each(Constants.Any, startLink, couple =>
             {
                 if (couple != startLink)
                     if (TryStepRight(couple, rightLink, result, 2))
@@ -1475,7 +1475,7 @@ namespace Platform.Data.Core.Sequences
         {
             var added = 0;
 
-            Links.Each(startLink, 0, couple =>
+            Links.Each(startLink, Constants.Any, couple =>
             {
                 if (couple != startLink)
                 {
@@ -1506,7 +1506,7 @@ namespace Platform.Data.Core.Sequences
 
             TryStepLeft(startLink, leftLink, result, 0);
 
-            Links.Each(startLink, 0, couple =>
+            Links.Each(startLink, Constants.Any, couple =>
             {
                 if (couple != startLink)
                     if (TryStepLeft(couple, leftLink, result, 2))
@@ -1525,7 +1525,7 @@ namespace Platform.Data.Core.Sequences
         {
             var added = 0;
 
-            Links.Each(0, startLink, couple =>
+            Links.Each(Constants.Any, startLink, couple =>
             {
                 if (couple != startLink)
                 {
@@ -1586,7 +1586,7 @@ namespace Platform.Data.Core.Sequences
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != LinksConstants.Null && x != ZeroOrMany));
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Constants.Any && x != ZeroOrMany));
                 _results = results;
 
                 _pattern = CreateDetailedPattern();
@@ -1594,7 +1594,7 @@ namespace Platform.Data.Core.Sequences
 
             protected override bool IsElement(ulong link)
             {
-                return _linksInSequence.Contains(link) || Links.GetTargetCore(link) == link || Links.GetSourceCore(link) == link;
+                return _linksInSequence.Contains(link) || Links.Unsync.GetTarget(link) == link || Links.Unsync.GetSource(link) == link;
             }
 
             public bool PatternMatch(LinkIndex sequenceToMatch)
@@ -1617,7 +1617,7 @@ namespace Platform.Data.Core.Sequences
                 {
                     if (patternBlock.Type == PatternBlockType.Undefined)
                     {
-                        if (_patternSequence[i] == LinksConstants.Any)
+                        if (_patternSequence[i] == Constants.Any)
                         {
                             patternBlock.Type = PatternBlockType.Gap;
                             patternBlock.Start = 1;
@@ -1638,7 +1638,7 @@ namespace Platform.Data.Core.Sequences
                     }
                     else if (patternBlock.Type == PatternBlockType.Elements)
                     {
-                        if (_patternSequence[i] == LinksConstants.Any)
+                        if (_patternSequence[i] == Constants.Any)
                         {
                             pattern.Add(patternBlock);
 
@@ -1667,7 +1667,7 @@ namespace Platform.Data.Core.Sequences
                     }
                     else // patternBlock.Type == PatternBlockType.Gap
                     {
-                        if (_patternSequence[i] == LinksConstants.Any)
+                        if (_patternSequence[i] == Constants.Any)
                         {
                             patternBlock.Start++;
 

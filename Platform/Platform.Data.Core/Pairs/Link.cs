@@ -1,53 +1,56 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
     /// <summary>
     /// Структура описывающая уникальную связь.
-    /// TODO: Возможно Index тоже должен быть частью этой структуры, можно попробовать реализовать IList[ulong], тогда структура сможет восприниматься как массив значений связи
     /// </summary>
-    public struct Link : IEquatable<Link>, IList<ulong>
+    public struct Link<T> : IEquatable<Link<T>>, IList<T>
     {
         private const int Length = 3;
 
-        public readonly ulong Index;
-        public readonly ulong Source;
-        public readonly ulong Target;
+        public readonly T Index;
+        public readonly T Source;
+        public readonly T Target;
 
-        public static readonly Link Null = new Link();
+        public static readonly Link<T> Null = new Link<T>();
 
-        public Link(params ulong[] values)
+        private static readonly LinksConstants<bool, T, int> Constants = Default<LinksConstants<bool, T, int>>.Instance;
+
+        public Link(params T[] values)
         {
-            Index = values.Length > LinksConstants.IndexPart ? values[LinksConstants.IndexPart] : LinksConstants.Null;
-            Source = values.Length > LinksConstants.SourcePart ? values[LinksConstants.SourcePart] : LinksConstants.Any;
-            Target = values.Length > LinksConstants.TargetPart ? values[LinksConstants.TargetPart] : LinksConstants.Any;
+            Index = values.Length > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
+            Source = values.Length > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
+            Target = values.Length > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
         }
 
-        public Link(ulong index, ulong source, ulong target)
+        public Link(IList<T> values)
+        {
+            Index = values.Count > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
+            Source = values.Count > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
+            Target = values.Count > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
+        }
+
+        public Link(T index, T source, T target)
         {
             Index = index;
             Source = source;
             Target = target;
         }
 
-        public Link(ulong source, ulong target)
-            : this(LinksConstants.Null, source, target)
+        public Link(T source, T target)
+            : this(Constants.Null, source, target)
         {
             Source = source;
             Target = target;
         }
 
-        public static Link Create(ulong source, ulong target)
-        {
-            return new Link(source, target);
-        }
+        public static Link<T> Create(T source, T target) => new Link<T>(source, target);
 
-        public static Link Create(ILink link)
-        {
-            return new Link((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
-        }
+        public static Link<T> Create(IAttachedLink link) => new Link<T>((Integer<T>)(Integer)link.Source.GetHashCode(), (Integer<T>)(Integer)link.Target.GetHashCode());
 
         public override int GetHashCode()
         {
@@ -58,93 +61,54 @@ namespace Platform.Data.Core.Pairs
             return hash;
         }
 
-        public bool IsNull()
-        {
-            return Index == LinksConstants.Null && Source == LinksConstants.Any && Target == LinksConstants.Any;
-        }
+        public bool IsNull() => Equals(Index, Constants.Null) && Equals(Source, Constants.Null) && Equals(Target, Constants.Null);
 
-        public override bool Equals(object other)
-        {
-            return other is Link && Equals((Link)other);
-        }
+        public override bool Equals(object other) => other is Link<T> && Equals((Link<T>)other);
 
-        public bool Equals(Link other)
-        {
-            return Index == other.Index &&
-                   Source == other.Source &&
-                   Target == other.Target;
-        }
+        public bool Equals(Link<T> other) => Equals(Index, other.Index) &&
+                                             Equals(Source, other.Source) &&
+                                             Equals(Target, other.Target);
 
-        public static string ToString(ILink link)
-        {
-            return ToString((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
-        }
+        public static string ToString(IAttachedLink link) => ToString((Integer<T>)(Integer)link.Source.GetHashCode(), (Integer<T>)(Integer)link.Target.GetHashCode());
 
-        public static string ToString(ulong index, ulong source, ulong target)
-        {
-            return string.Format("({0}: {1}->{2})", index, source, target);
-        }
+        public static string ToString(T index, T source, T target) => $"({index}: {source}->{target})";
 
-        public static string ToString(ulong source, ulong target)
-        {
-            return string.Format("({0}->{1})", source, target);
-        }
+        public static string ToString(T source, T target) => $"({source}->{target})";
 
-        public static implicit operator ulong[](Link link)
-        {
-            return link.ToArray();
-        }
+        public static implicit operator T[] (Link<T> link) => link.ToArray();
 
-        public static implicit operator Link(ulong[] linkArray)
-        {
-            return new Link(linkArray);
-        }
+        public static implicit operator Link<T>(T[] linkArray) => new Link<T>(linkArray);
 
         #region IList
 
-        public override string ToString()
-        {
-            return Index == LinksConstants.Null ? ToString(Source, Target) : ToString(Index, Source, Target);
-        }
+        public override string ToString() => Equals(Index, Constants.Null) ? ToString(Source, Target) : ToString(Index, Source, Target);
 
-        public ulong[] ToArray()
+        public T[] ToArray()
         {
-            var array = new ulong[Length];
+            var array = new T[Length];
             CopyTo(array, 0);
             return array;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IEnumerator<ulong> GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
             yield return Index;
             yield return Source;
             yield return Target;
         }
 
-        public void Add(ulong item)
-        {
-            throw new NotSupportedException();
-        }
+        public void Add(T item) => Throw.NotSupportedException();
 
-        public void Clear()
-        {
-            throw new NotSupportedException();
-        }
+        public void Clear() => Throw.NotSupportedException();
 
-        public bool Contains(ulong item)
-        {
-            return IndexOf(item) > 0;
-        }
+        public bool Contains(T item) => IndexOf(item) > 0;
 
-        public void CopyTo(ulong[] array, int arrayIndex)
+        public void CopyTo(T[] array, int arrayIndex)
         {
-            if (array == null) throw new ArgumentNullException("array");
-            if (arrayIndex < 0) throw new ArgumentOutOfRangeException("arrayIndex");
+            if (array == null) throw new ArgumentNullException(nameof(array));
+            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
             if (arrayIndex + Length > array.Length) throw new ArgumentException();
 
             array[arrayIndex++] = Index;
@@ -152,47 +116,34 @@ namespace Platform.Data.Core.Pairs
             array[arrayIndex] = Target;
         }
 
-        public bool Remove(ulong item)
-        {
-            throw new NotSupportedException();
-        }
+        public bool Remove(T item) => Throw.NotSupportedExceptionAndReturn<bool>();
 
-        public int Count { get { return Length; } }
-        public bool IsReadOnly { get { return true; } }
+        public int Count => Length;
+        public bool IsReadOnly => true;
 
-        public int IndexOf(ulong item)
+        public int IndexOf(T item)
         {
-            if (Index == item) return (int)LinksConstants.IndexPart;
-            if (Source == item) return (int)LinksConstants.SourcePart;
-            if (Target == item) return (int)LinksConstants.TargetPart;
+            if (Equals(Index, item)) return Constants.IndexPart;
+            if (Equals(Source, item)) return Constants.SourcePart;
+            if (Equals(Target, item)) return Constants.TargetPart;
             return -1;
         }
 
-        public void Insert(int index, ulong item)
-        {
-            throw new NotSupportedException();
-        }
+        public void Insert(int index, T item) => Throw.NotSupportedException();
 
-        public void RemoveAt(int index)
-        {
-            throw new NotSupportedException();
-        }
+        public void RemoveAt(int index) => Throw.NotSupportedException();
 
-        public ulong this[int index]
+        public T this[int index]
         {
             get
             {
-                switch (index)
-                {
-                    case (int)LinksConstants.IndexPart:
-                        return Index;
-                    case (int)LinksConstants.SourcePart:
-                        return Source;
-                    case (int)LinksConstants.TargetPart:
-                        return Target;
-                    default:
-                        throw new ArgumentOutOfRangeException("index");
-                }
+                if (index == Constants.IndexPart)
+                    return Index;
+                if (index == Constants.SourcePart)
+                    return Source;
+                if (index == Constants.TargetPart)
+                    return Target;
+                throw new ArgumentOutOfRangeException(nameof(index));
             }
             set { throw new NotSupportedException(); }
         }

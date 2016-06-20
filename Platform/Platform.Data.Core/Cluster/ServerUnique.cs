@@ -1,4 +1,5 @@
 ﻿using System;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Cluster
 {
@@ -24,7 +25,7 @@ namespace Platform.Data.Core.Cluster
         public static ulong CreateSeed(ServerType serverType, int serverId, uint itemId)
         {
             if (serverId <= 0)
-                throw new ArgumentOutOfRangeException("serverId", "Invalid Server Id.");
+                throw new ArgumentOutOfRangeException(nameof(serverId), "Invalid Server Id.");
 
             ulong seed = 0;
 
@@ -37,24 +38,12 @@ namespace Platform.Data.Core.Cluster
             return seed;
         }
 
-        public static void ExtractSeed(ulong seed, out ServerType serverType, out int serverId, out ulong itemId)
-        {
-            throw new NotImplementedException();
-        }
+        public static void ExtractSeed(ulong seed, out ServerType serverType, out int serverId, out ulong itemId) { throw new NotImplementedException(); }
 
-        public static Unique CreateUnique()
-        {
-            throw new NotImplementedException();
-        }
+        public static Unique CreateUnique() => Throw.NotImplementedExceptionAndReturn<Unique>();
 
-        public static void SetServerType(ServerType serverType)
-        {
-            CurrentServerType = serverType;
-        }
+        public static void SetServerType(ServerType serverType) => CurrentServerType = serverType;
 
-        public static void SetCurrentServerId(int serverId)
-        {
-            CurrentServerId = serverId;
-        }
+        public static void SetCurrentServerId(int serverId) => CurrentServerId = serverId;
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Platform.Data.Core.Walker
 {
-    public abstract class Walker<TMethod, TMilestone>
+    internal abstract class Walker<TMethod, TMilestone>
     {
-        public IPath<TMethod, TMilestone> Path { get; private set; }
+        public IPath<TMethod, TMilestone> Path { get; }
         public bool IsWalking { get; private set; }
 
         protected Walker(IPath<TMethod, TMilestone> path)
@@ -36,10 +36,7 @@ namespace Platform.Data.Core.Walker
             Path.Step(method, milestone);
         }
 
-        public void Stop()
-        {
-            IsWalking = false;
-        }
+        public void Stop() => IsWalking = false;
 
         protected abstract TMilestone Move(TMethod method);
 

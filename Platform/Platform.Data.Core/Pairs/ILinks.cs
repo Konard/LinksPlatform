@@ -1,83 +1,39 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Platform.Data.Core.Pairs
 {
     /// <summary>
-    /// Представляет интерфейс для работы с базой данных в формате Links (хранилища взаимосвязей).
+    /// Представляет интерфейс для работы с данными в формате Links (хранилища взаимосвязей).
     /// </summary>
-    /// <remarks>
-    /// Регионы Read & Write можно выделить в отдельные интерфейсы.
-    /// </remarks>
     public interface ILinks<TLink>
     {
+        #region Constants
+
+        /// <summary>
+        /// Возвращает набор констант, который необходим для эффективной коммуникации с методами этого интерфейса.
+        /// Эти константы не меняются с момента создания точки доступа к хранилищу.
+        /// </summary>
+        ILinksCombinedConstants<bool, TLink, int> Constants { get; }
+
+        #endregion
+
         #region Read
-
-        /// <summary>
-        /// Возвращает индекс начальной (Source) связи для указанной связи.
-        /// </summary>
-        /// <param name="link">Индекс связи.</param>
-        /// <returns>Индекс начальной связи для указанной связи.</returns>
-        /// <remarks>
-        /// TODO: Возможна замена на (TLink[] GetLink(TLink link))[1];
-        /// </remarks>
-        TLink GetSource(TLink link);
-
-        /// <summary>
-        /// Возвращает индекс конечной (Target) связи для указанной связи.
-        /// </summary>
-        /// <param name="link">Индекс связи.</param>
-        /// <returns>Индекс конечной связи для указанной связи.</returns>
-        /// <remarks>
-        /// TODO: Возможна замена на (TLink[] GetLink(TLink link))[2];
-        /// </remarks>
-        TLink GetTarget(TLink link);
-
-        /// <summary>
-        /// Возвращает уникальную связь для указанного индекса.
-        /// </summary>
-        /// <param name="link">Индекс связи.</param>
-        /// <returns>Уникальную связь.</returns>
-        /// <remarks>
-        /// TODO: Заменить на TLink[] GetLink(TLink link); (в последствии возможна замена и через Each).
-        /// </remarks>
-        Link GetLink(TLink link);
-
-        /// <summary>
-        /// Возвращает значение, определяющее существует ли связь с указанным индексом в базе данных.
-        /// </summary>
-        /// <param name="link">Индекс проверяемой на существование связи.</param>
-        /// <returns>Значение, определяющее существует ли связь.</returns>
-        /// <remarks>
-        /// TODO: Возможна замена через Count/Each.
-        /// </remarks>
-        bool Exists(TLink link);
 
         /// <summary>
         /// Подсчитывает и возвращает общее число связей находящихся в хранилище, соответствующих указанным ограничениям.
         /// </summary>
         /// <param name="restrictions">Ограничения на содержимое связей.</param>
         /// <returns>Общее число связей находящихся в хранилище, соответствующих указанным ограничениям.</returns>
-        ulong Count(params TLink[] restrictions);
+        TLink Count(params TLink[] restrictions);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
         /// </summary>
-        /// <param name="source">Значение, определяющее соответствующие шаблону связи. (0 - любое начало, 1..∞ конкретное начало)</param>
-        /// <param name="target">Значение, определяющее соответствующие шаблону связи. (0 - любое конец, 1..∞ конкретный конец)</param>
         /// <param name="handler">Обработчик каждой подходящей связи.</param>
+        /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
-        bool Each(TLink source, TLink target, Func<TLink, bool> handler);
-
-        /// <summary>
-        /// Выполняет поиск связи с указанными Source (началом) и Target (концом)
-        /// </summary>
-        /// <param name="source">Индекс связи, которая является началом для искомой связи.</param>
-        /// <param name="target">Индекс связи, которая является концом для искомой связи.</param>
-        /// <returns>Индекс искомой связи с указанными Source (началом) и Target (концом)</returns>
-        /// <remarks>
-        /// TODO: Возможна замена через Each.
-        /// </remarks>
-        TLink Search(TLink source, TLink target);
+        bool Each(Func<IList<TLink>, bool> handler, IList<TLink> restrictions);
 
         #endregion
 
@@ -86,25 +42,23 @@ namespace Platform.Data.Core.Pairs
         /// <summary>
         /// Создаёт связь (если она не существовала), либо возвращает индекс существующей связи с указанными Source (началом) и Target (концом).
         /// </summary>
-        /// <param name="source">Индекс связи, которая является началом на создаваемой связи.</param>
-        /// <param name="target">Индекс связи, которая является концом для создаваемой связи.</param>
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
-        TLink Create(TLink source, TLink target);
+        TLink Create(); // TODO: Возможно всегда нужно принимать restrictions, возможно и возвращать связь нужно целиком.
 
         /// <summary>
         /// Обновляет связь с указанными началом (Source) и концом (Target)
         /// на связь с указанными началом (NewSource) и концом (NewTarget).
         /// </summary>
-        /// <param name="source">Индекс связи, которая является началом обновляемой связи.</param>
-        /// <param name="target">Индекс связи, которая является концом обновляемой связи.</param>
-        /// <param name="newSource">Индекс связи, которая является началом связи, на которую выполняется обновление.</param>
-        /// <param name="newTarget">Индекс связи, которая является концом связи, на которую выполняется обновление.</param>
+        /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Itself - требование установить ссылку на себя, 1..∞ конкретный адрес другой связи.</param>
         /// <returns>Индекс обновлённой связи.</returns>
-        TLink Update(TLink source, TLink target, TLink newSource, TLink newTarget);
+        TLink Update(IList<TLink> restrictions); // TODO: Возможно и возвращать связь нужно целиком.
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
-        void Delete(TLink link);
+        void Delete(TLink link); // TODO: Возможно всегда нужно принимать restrictions, a так же возвращать удалённую связь, если удаление было реально выполнено, и Null, если нет.
+
+        // TODO: Если учесть последние TODO, тогда все функции Create, Update, Delete будут иметь один и тот же интерфейс - IList<TLink> Method(IList<TLink> restrictions);, что может быть удобно для "Create|Update|Delete" транзакционности, !! но нужна ли такая транзакционность? Ведь всё что нужно записывать в транзакцию это изменение с чего в во что. Создание это index, 0, 0 -> index, X, Y (и начало отслеживания связи). Удаление это всегда index, X, Y -> index, 0, 0 (и прекращение отслеживания связи). Обновление - аналогично, но состояние отслеживания не меняется.
+        // TODO: Хотя пожалуй, выдавать дополнительное значение в виде True/False вряд ли допустимо для Delete. Тогда создание это 0,0,0 -> I,S,T и т.п.
 
         #endregion
     }

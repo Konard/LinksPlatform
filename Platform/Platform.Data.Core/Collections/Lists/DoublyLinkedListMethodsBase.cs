@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Collections.Lists
 {
-    public abstract class DoublyLinkedListMethodsBase<TElement>
+    public abstract class DoublyLinkedListMethodsBase<TElement> : GenericCollectionMethodsBase<TElement>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract TElement GetFirst();
@@ -13,7 +13,7 @@ namespace Platform.Data.Core.Collections.Lists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract TElement GetNext(TElement element);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong GetSize();
+        protected abstract TElement GetSize();
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void SetFirst(TElement element);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -23,18 +23,12 @@ namespace Platform.Data.Core.Collections.Lists
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract void SetNext(TElement element, TElement next);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetSize(ulong size);
+        protected abstract void SetSize(TElement size);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void IncrementSize()
-        {
-            SetSize(GetSize() + 1);
-        }
+        protected void IncrementSize() => SetSize(Increment(GetSize()));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void DecrementSize()
-        {
-            SetSize(GetSize() - 1);
-        }
+        protected void DecrementSize() => SetSize(Decrement(GetSize()));
     }
 }

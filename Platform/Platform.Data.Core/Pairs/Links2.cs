@@ -1,7 +1,8 @@
-﻿using System;
+﻿/*using System;
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Data.Core.Exceptions;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
@@ -14,6 +15,8 @@ namespace Platform.Data.Core.Pairs
     /// </remarks>
     public class Links2 : ILinks<ILink>
     {
+        private static readonly LinksConstants LinksConstants = Default<LinksConstants>.Instance;
+
         public Links2()
         {
             _links = new HashSet<ILink>();
@@ -117,7 +120,7 @@ namespace Platform.Data.Core.Pairs
             return SearchCore(source, target);
         }
 
-        public Pairs.Link GetLink(ILink link)
+        public IList<ILink> GetLink(ILink link)
         {
             return Pairs.Link.Create(link);
         }
@@ -249,4 +252,4 @@ namespace Platform.Data.Core.Pairs
 
         #endregion
     }
-}
+}*/

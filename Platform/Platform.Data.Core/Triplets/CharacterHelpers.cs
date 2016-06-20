@@ -11,17 +11,17 @@ namespace Platform.Data.Core.Triplets
             CyrillicAlphabet
         }
 
-        const char FirstLowerСaseLatinLetter = 'a';
-        const char LastLowerСaseLatinLetter = 'z';
-        const char FirstUpperСaseLatinLetter = 'A';
-        const char LastUpperСaseLatinLetter = 'Z';
+        private const char FirstLowerСaseLatinLetter = 'a';
+        private const char LastLowerСaseLatinLetter = 'z';
+        private const char FirstUpperСaseLatinLetter = 'A';
+        private const char LastUpperСaseLatinLetter = 'Z';
 
-        const char FirstLowerCaseCyrillicLetter = 'а';
-        const char LastLowerCaseCyrillicLetter = 'я';
-        const char FirstUpperCaseCyrillicLetter = 'А';
-        const char LastUpperCaseCyrillicLetter = 'Я';
-        const char YoLowerCaseCyrillicLetter = 'ё';
-        const char YoUpperCaseCyrillicLetter = 'Ё';
+        private const char FirstLowerCaseCyrillicLetter = 'а';
+        private const char LastLowerCaseCyrillicLetter = 'я';
+        private const char FirstUpperCaseCyrillicLetter = 'А';
+        private const char LastUpperCaseCyrillicLetter = 'Я';
+        private const char YoLowerCaseCyrillicLetter = 'ё';
+        private const char YoUpperCaseCyrillicLetter = 'Ё';
 
         private static Link[] CharactersToLinks;
         private static Dictionary<Link, char> LinksToCharacters;
@@ -43,10 +43,7 @@ namespace Platform.Data.Core.Triplets
             RegisterExistingCharacters();
         }
 
-        private static void RegisterExistingCharacters()
-        {
-            Net.Character.WalkThroughReferersBySource(referer => RegisterExistingCharacter(referer));
-        }
+        private static void RegisterExistingCharacters() => Net.Character.WalkThroughReferersAsSource(referer => RegisterExistingCharacter(referer));
 
         private static void RegisterExistingCharacter(Link character)
         {
@@ -63,10 +60,7 @@ namespace Platform.Data.Core.Triplets
             }
         }
 
-        public static void Recreate()
-        {
-            Create();
-        }
+        public static void Recreate() => Create();
 
         private static void CreateLatinAlphabet()
         {
@@ -149,20 +143,16 @@ namespace Platform.Data.Core.Triplets
                     var upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
 
                     if (lowerCaseCharacter != upperCaseCharacter)
-                    {
                         lettersLinks[i].SetName("{" + upperCaseCharacter + " " + lowerCaseCharacter + "}");
-                    }
                     else
-                    {
                         lettersLinks[i].SetName("{" + lowerCaseCharacter + "}");
-                    }
                 }
             }
         }
 
         private static void RegisterExistingLetter(Link letter)
         {
-            letter.WalkThroughReferersBySource(referer =>
+            letter.WalkThroughReferersAsSource(referer =>
                 {
                     if (referer.Linker == Net.Has)
                     {
@@ -192,9 +182,7 @@ namespace Platform.Data.Core.Triplets
             const int firstLetterIndex = 0;
 
             for (var i = firstLetterIndex; i < letters.Length; i++)
-            {
                 letters[i] = Net.CreateThing();
-            }
 
             var lastLetterIndex = letters.Length - 1;
 
@@ -203,9 +191,7 @@ namespace Platform.Data.Core.Triplets
 
             const int secondLetterIndex = firstLetterIndex + 1;
             for (var i = secondLetterIndex; i < lastLetterIndex; i++)
-            {
                 Link.Update(ref letters[i], letterOfAlphabet, Net.ThatIsBetween, letters[i - 1] & letters[i + 1]);
-            }
 
             Link.Update(ref alphabet, Net.Alphabet, Net.ThatConsistsOf, LinkConverter.FromList(letters));
         }
@@ -234,23 +220,14 @@ namespace Platform.Data.Core.Triplets
             }
         }
 
-        private static Link CreateSimpleCharacterLink(char character)
-        {
-            return Link.Create(Net.Character, Net.ThatHas, Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(character)));
-        }
+        private static Link CreateSimpleCharacterLink(char character) => Link.Create(Net.Character, Net.ThatHas, Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(character)));
 
-        private static bool IsLetterOfLatinAlphabet(char character)
-        {
-            return (character >= FirstLowerСaseLatinLetter && character <= LastLowerСaseLatinLetter)
-                || (character >= FirstUpperСaseLatinLetter && character <= LastUpperСaseLatinLetter);
-        }
+        private static bool IsLetterOfLatinAlphabet(char character) => (character >= FirstLowerСaseLatinLetter && character <= LastLowerСaseLatinLetter)
+                                                                    || (character >= FirstUpperСaseLatinLetter && character <= LastUpperСaseLatinLetter);
 
-        private static bool IsLetterOfCyrillicAlphabet(char character)
-        {
-            return (character >= FirstLowerCaseCyrillicLetter && character <= LastLowerCaseCyrillicLetter)
-                || (character >= FirstUpperCaseCyrillicLetter && character <= LastUpperCaseCyrillicLetter)
-                || character == YoLowerCaseCyrillicLetter || character == YoUpperCaseCyrillicLetter;
-        }
+        private static bool IsLetterOfCyrillicAlphabet(char character) => (character >= FirstLowerCaseCyrillicLetter && character <= LastLowerCaseCyrillicLetter)
+                                                                       || (character >= FirstUpperCaseCyrillicLetter && character <= LastUpperCaseCyrillicLetter)
+                                                                       || character == YoLowerCaseCyrillicLetter || character == YoUpperCaseCyrillicLetter;
 
         public static Link FromChar(char character)
         {
@@ -275,22 +252,17 @@ namespace Platform.Data.Core.Triplets
                 }
             }
             else
-            {
                 return CharactersToLinks[character];
-            }
         }
 
         public static char ToChar(Link link)
         {
             char @char;
             if (!LinksToCharacters.TryGetValue(link, out @char))
-                throw new ArgumentOutOfRangeException("link", "Указанная связь не являяется символом.");
+                throw new ArgumentOutOfRangeException(nameof(link), "Указанная связь не являяется символом.");
             return @char;
         }
 
-        public static bool IsChar(Link link)
-        {
-            return link != null && LinksToCharacters.ContainsKey(link);
-        }
+        public static bool IsChar(Link link) => link != null && LinksToCharacters.ContainsKey(link);
     }
 }

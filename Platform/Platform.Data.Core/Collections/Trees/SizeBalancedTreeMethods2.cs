@@ -1,4 +1,5 @@
 ﻿using System;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Collections.Trees
 {
@@ -6,164 +7,165 @@ namespace Platform.Data.Core.Collections.Trees
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.
     /// Также имеет смысл разобраться почему не работает версия с идеальной балансировкой.
     /// </remarks>
-    public abstract unsafe class SizeBalancedTreeMethods2 : SizeBalancedTreeMethodsBase
+    public abstract class SizeBalancedTreeMethods2<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
-        private void Insert(ulong* root, ulong newNode)
+        private void Insert(IntPtr root, TElement newNode)
         {
-            if (*root == 0)
+            if (ValueEqualToZero(root))
             {
-                *root = newNode;
-                SetSize(*root, GetSize(*root) + 1);
+                root.SetValue(newNode);
+                IncrementSize(root.GetValue<TElement>());
             }
             else
             {
-                SetSize(*root, GetSize(*root) + 1);
+                IncrementSize(root.GetValue<TElement>());
 
-                if (FirstIsToTheLeftOfSecond(newNode, *root))
+                if (FirstIsToTheLeftOfSecond(newNode, root.GetValue<TElement>()))
                 {
-                    Insert(GetLeft(*root), newNode);
+                    Insert(GetLeft(root.GetValue<TElement>()), newNode);
                     LeftMaintain(root);
                 }
                 else
                 {
-                    Insert(GetRight(*root), newNode);
+                    Insert(GetRight(root.GetValue<TElement>()), newNode);
                     RightMaintain(root);
                 }
             }
         }
 
-        private void Detach(ulong* root, ulong nodeToDetach)
+        private void Detach(IntPtr root, TElement nodeToDetach)
         {
-            if (*root == 0)
+            if (ValueEqualToZero(root))
                 return;
 
             var currentNode = root;
-            ulong* parent = null; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */
-            ulong replacementNode = 0;
+            var parent = IntPtr.Zero; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */
+            var replacementNode = GetZero();
 
-            while (*currentNode != nodeToDetach)
+            while (!Equals(currentNode.GetValue<TElement>(), nodeToDetach))
             {
-                SetSize(*currentNode, GetSize(*currentNode) - 1);
-                if (FirstIsToTheLeftOfSecond(nodeToDetach, *currentNode))
+                SetSize(currentNode.GetValue<TElement>(), Decrement(GetSize(currentNode.GetValue<TElement>())));
+                if (FirstIsToTheLeftOfSecond(nodeToDetach, currentNode.GetValue<TElement>()))
                 {
                     parent = currentNode;
-                    currentNode = GetLeft(*currentNode);
+                    currentNode = GetLeft(currentNode.GetValue<TElement>());
                 }
-                else if (FirstIsToTheRightOfSecond(nodeToDetach, *currentNode))
+                else if (FirstIsToTheRightOfSecond(nodeToDetach, currentNode.GetValue<TElement>()))
                 {
                     parent = currentNode;
-                    currentNode = GetRight(*currentNode);
+                    currentNode = GetRight(currentNode.GetValue<TElement>());
                 }
-
-                /* Проблемная ситуация не обрабатывается специально - её не должно происходить */
+                else
+                    throw new Exception("Duplicate link found in the tree.");
             }
 
-            if ((*GetLeft(nodeToDetach) != 0) && (*GetRight(nodeToDetach) != 0))
+            if (!ValueEqualToZero(GetLeft(nodeToDetach)) && !ValueEqualToZero(GetRight(nodeToDetach)))
             {
-                var minNode = *GetRight(nodeToDetach);
-                while (*GetLeft(minNode) != 0) minNode = *GetLeft(minNode); /* Передвигаемся до минимума */
+                var minNode = GetRight(nodeToDetach).GetValue<TElement>();
+                while (!ValueEqualToZero(GetLeft(minNode)))
+                    minNode = GetLeft(minNode).GetValue<TElement>(); /* Передвигаемся до минимума */
 
                 Detach(GetRight(nodeToDetach), minNode);
 
-                SetLeft(minNode, *GetLeft(nodeToDetach));
-                if (*GetRight(nodeToDetach) != 0)
+                SetLeft(minNode, GetLeft(nodeToDetach).GetValue<TElement>());
+                if (!ValueEqualToZero(GetRight(nodeToDetach)))
                 {
-                    SetRight(minNode, *GetRight(nodeToDetach));
-                    SetSize(minNode, GetSize(*GetLeft(nodeToDetach)) + GetSize(*GetRight(nodeToDetach)) + 1);
+                    SetRight(minNode, GetRight(nodeToDetach).GetValue<TElement>());
+                    SetSize(minNode, Increment(Add(GetSize(GetLeft(nodeToDetach).GetValue<TElement>()), GetSize(GetRight(nodeToDetach).GetValue<TElement>()))));
                 }
                 else
-                    SetSize(minNode, GetSize(*GetLeft(nodeToDetach)) + 1);
+                    SetSize(minNode, Increment(GetSize(GetLeft(nodeToDetach).GetValue<TElement>())));
 
                 replacementNode = minNode;
             }
-            else if (*GetLeft(nodeToDetach) != 0)
-                replacementNode = *GetLeft(nodeToDetach);
-            else if (*GetRight(nodeToDetach) != 0)
-                replacementNode = *GetRight(nodeToDetach);
+            else if (!ValueEqualToZero(GetLeft(nodeToDetach)))
+                replacementNode = GetLeft(nodeToDetach).GetValue<TElement>();
+            else if (!ValueEqualToZero(GetRight(nodeToDetach)))
+                replacementNode = GetRight(nodeToDetach).GetValue<TElement>();
 
-            if (parent == null)
-                *root = replacementNode;
-            else if (*GetLeft(*parent) == nodeToDetach)
-                SetLeft(*parent, replacementNode);
-            else if (*GetRight(*parent) == nodeToDetach)
-                SetRight(*parent, replacementNode);
+            if (parent == IntPtr.Zero)
+                root.SetValue(replacementNode);
+            else if (Equals(GetLeft(parent.GetValue<TElement>()).GetValue<TElement>(), nodeToDetach))
+                SetLeft(parent.GetValue<TElement>(), replacementNode);
+            else if (Equals(GetRight(parent.GetValue<TElement>()).GetValue<TElement>(), nodeToDetach))
+                SetRight(parent.GetValue<TElement>(), replacementNode);
 
-            SetSize(nodeToDetach, 0);
-            SetLeft(nodeToDetach, 0);
-            SetRight(nodeToDetach, 0);
+            SetSize(nodeToDetach, GetZero());
+            SetLeft(nodeToDetach, GetZero());
+            SetRight(nodeToDetach, GetZero());
         }
 
-        private void LeftMaintain(ulong* root)
+        private void LeftMaintain(IntPtr root)
         {
-            if (*root != 0)
+            if (!ValueEqualToZero(root))
             {
-                var rootLeftNode = GetLeft(*root);
-                if (*rootLeftNode != 0)
+                var rootLeftNode = GetLeft(root.GetValue<TElement>());
+                if (!ValueEqualToZero(rootLeftNode))
                 {
-                    var rootRightNode = GetRight(*root);
-                    var rootLeftNodeLeftNode = GetLeft(*rootLeftNode);
-                    if ((*rootLeftNodeLeftNode != 0 && *rootLeftNodeLeftNode != 0) &&
-                        (*rootRightNode == 0 || GetSize(*rootLeftNodeLeftNode) > GetSize(*rootRightNode)))
+                    var rootRightNode = GetRight(root.GetValue<TElement>());
+                    var rootLeftNodeLeftNode = GetLeft(rootLeftNode.GetValue<TElement>());
+                    if (!ValueEqualToZero(rootLeftNodeLeftNode) &&
+                        (ValueEqualToZero(rootRightNode) || GreaterThan(GetSize(rootLeftNodeLeftNode.GetValue<TElement>()), GetSize(rootRightNode.GetValue<TElement>()))))
                         RightRotate(root);
                     else
                     {
-                        var rootLeftNodeRightNode = GetRight(*rootLeftNode);
-                        if ((*rootLeftNodeRightNode != 0 && *rootLeftNodeRightNode != 0) &&
-                            (*rootRightNode == 0 || GetSize(*rootLeftNodeRightNode) > GetSize(*rootRightNode)))
+                        var rootLeftNodeRightNode = GetRight(rootLeftNode.GetValue<TElement>());
+                        if (!ValueEqualToZero(rootLeftNodeRightNode) &&
+                            (ValueEqualToZero(rootRightNode) || GreaterThan(GetSize(rootLeftNodeRightNode.GetValue<TElement>()), GetSize(rootRightNode.GetValue<TElement>()))))
                         {
-                            LeftRotate(GetLeft(*root));
+                            LeftRotate(GetLeft(root.GetValue<TElement>()));
                             RightRotate(root);
                         }
                         else
                             return;
                     }
-                    LeftMaintain(GetLeft(*root));
-                    RightMaintain(GetRight(*root));
+                    LeftMaintain(GetLeft(root.GetValue<TElement>()));
+                    RightMaintain(GetRight(root.GetValue<TElement>()));
                     LeftMaintain(root);
                     RightMaintain(root);
                 }
             }
         }
 
-        private void RightMaintain(ulong* root)
+        private void RightMaintain(IntPtr root)
         {
-            if (*root != 0)
+            if (!ValueEqualToZero(root))
             {
-                var rootRightNode = GetRight(*root);
-                if (*rootRightNode != 0)
+                var rootRightNode = GetRight(root.GetValue<TElement>());
+                if (!ValueEqualToZero(rootRightNode))
                 {
-                    var rootLeftNode = GetLeft(*root);
-                    var rootRightNodeRightNode = GetRight(*rootRightNode);
-                    if (*rootRightNodeRightNode != 0 &&
-                        (*rootLeftNode == 0 || GetSize(*rootRightNodeRightNode) > GetSize(*rootLeftNode)))
+                    var rootLeftNode = GetLeft(root.GetValue<TElement>());
+                    var rootRightNodeRightNode = GetRight(rootRightNode.GetValue<TElement>());
+                    if (!ValueEqualToZero(rootRightNodeRightNode) &&
+                        (ValueEqualToZero(rootLeftNode) || GreaterThan(GetSize(rootRightNodeRightNode.GetValue<TElement>()), GetSize(rootLeftNode.GetValue<TElement>()))))
                         LeftRotate(root);
                     else
                     {
-                        var rootRightNodeLeftNode = GetLeft(*rootRightNode);
-                        if (*rootRightNodeLeftNode != 0 &&
-                            (*rootLeftNode == 0 || GetSize(*rootRightNodeLeftNode) > GetSize(*rootLeftNode)))
+                        var rootRightNodeLeftNode = GetLeft(rootRightNode.GetValue<TElement>());
+                        if (!ValueEqualToZero(rootRightNodeLeftNode) &&
+                            (ValueEqualToZero(rootLeftNode) || GreaterThan(GetSize(rootRightNodeLeftNode.GetValue<TElement>()), GetSize(rootLeftNode.GetValue<TElement>()))))
                         {
-                            RightRotate(GetRight(*root));
+                            RightRotate(GetRight(root.GetValue<TElement>()));
                             LeftRotate(root);
                         }
                         else
                             return;
                     }
-                    LeftMaintain(GetLeft(*root));
-                    RightMaintain(GetRight(*root));
+                    LeftMaintain(GetLeft(root.GetValue<TElement>()));
+                    RightMaintain(GetRight(root.GetValue<TElement>()));
                     LeftMaintain(root);
                     RightMaintain(root);
                 }
             }
         }
 
-        public void AddUnsafe(ulong node, ulong* root)
+        public void AddUnsafe(TElement node, IntPtr root)
         {
-            if (*root == 0)
+            if (ValueEqualToZero(root))
             {
-                SetSize(node, 1);
+                SetSize(node, GetOne());
 
-                *root = node;
+                root.SetValue(node);
 
                 return;
             }
@@ -171,10 +173,10 @@ namespace Platform.Data.Core.Collections.Trees
             Insert(root, node);
         }
 
-        public void RemoveUnsafe(ulong node, ulong* root)
+        public void RemoveUnsafe(TElement node, IntPtr root)
         {
-            if (*root == 0)
-                throw new Exception(string.Format("Элемент с {0} не содержится в дереве.", node));
+            if (ValueEqualToZero(root))
+                throw new Exception($"Элемент с {node} не содержится в дереве.");
 
             Detach(root, node);
         }

@@ -11,7 +11,7 @@
     /// <param name="left">Левый элемент-продолжение.</param>
     /// <param name="right">Правый элемент-продолжение.</param>
     /// <returns>True - чтение продолжается, False - чтение прервано.</returns>
-    public delegate bool ElementReader<in TElement>(TElement element, TElement value, TElement left, TElement right);
+    internal delegate bool ElementReader<in TElement>(TElement element, TElement value, TElement left, TElement right);
 
     /// <summary>
     /// Представляет интерфейс для работы с базой данных (хранилищем)
@@ -19,7 +19,7 @@
     /// </summary>
     /// <typeparam name="TElement">Тип индекса (идентификатора/адреса) элемента.</typeparam>
     /// <remarks>Здесь располагается методы соотствующие шаблону Read-Write (RW).</remarks>
-    public partial interface IElements<TElement>
+    internal partial interface IElements<TElement>
     {
         /// <summary>
         /// Создаёт элемент (если он ещё не существует), либо возвращает индекс существующего элемента

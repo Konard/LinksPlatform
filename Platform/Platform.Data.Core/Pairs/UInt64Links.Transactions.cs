@@ -8,13 +8,14 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 using Platform.Helpers;
-using Platform.Helpers.Disposal;
+using Platform.Helpers.Disposables;
+using Platform.Helpers.IO;
 
 #if LinksTransactions
 
 namespace Platform.Data.Core.Pairs
 {
-    public partial class Links
+    public partial class UInt64Links
     {
         /// <remarks>
         /// Альтернативные варианты хранения трансформации (элемента транзакции):
@@ -86,13 +87,13 @@ namespace Platform.Data.Core.Pairs
 
             public ulong TransactionId;
             // TODO: Возможно точнее будет хранить не только Source и Target, но и Index
-            public Link Before;
-            public Link After;
+            public UInt64Link Before;
+            public UInt64Link After;
             public UniqueTimestamp Timestamp;
 
             public override string ToString()
             {
-                return string.Format("{0} {1}: {2} => {3}", Timestamp, TransactionId, Before, After);
+                return $"{Timestamp} {TransactionId}: {Before} => {After}";
             }
         }
 
@@ -125,17 +126,17 @@ namespace Platform.Data.Core.Pairs
         ///        будут записаны в лог.
         /// 
         /// </remarks>
-        public class Transaction : DisposalBase
+        public class Transaction : DisposableBase
         {
-            private static readonly ConcurrentDictionary<Links, ReaderWriterLockSlim> TransactionLocks = new ConcurrentDictionary<Links, ReaderWriterLockSlim>();
+            private static readonly ConcurrentDictionary<UInt64Links, ReaderWriterLockSlim> TransactionLocks = new ConcurrentDictionary<UInt64Links, ReaderWriterLockSlim>();
 
             private readonly ConcurrentQueue<Transition> _transitions;
-            private readonly Links _links;
+            private readonly UInt64Links _links;
             private readonly ReaderWriterLockSlim _lock;
             private bool _commited;
             private bool _reverted;
 
-            public Transaction(Links links)
+            public Transaction(UInt64Links links)
             {
                 _lock = TransactionLocks.GetOrAdd(links, x => new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion));
                 _lock.EnterWriteLock(); // Самый простой случай: разрешать только 1 транзакцию базу данных
@@ -193,7 +194,7 @@ namespace Platform.Data.Core.Pairs
             {
                 if (manual)
                 {
-                    if (_links != null && !_links.Disposed)
+                    if (_links != null && !_links.IsDisposed)
                     {
                         if (!_commited && !_reverted)
                             Revert();
@@ -219,7 +220,7 @@ namespace Platform.Data.Core.Pairs
         private bool _ignoreTransitions;
 
         // TODO: Переосмыслить как включать/выключать транзакции
-        public Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
+        public UInt64Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
             : this(memoryManager)
         {
             if (!string.IsNullOrWhiteSpace(logAddress))
@@ -261,19 +262,19 @@ namespace Platform.Data.Core.Pairs
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitCreation(Link after)
+        private void CommitCreation(UInt64Link after)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, After = after });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitUpdate(Link before, Link after)
+        private void CommitUpdate(UInt64Link before, UInt64Link after)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before, After = after });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitDeletion(Link before)
+        private void CommitDeletion(UInt64Link before)
         {
             CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before });
         }
@@ -297,10 +298,10 @@ namespace Platform.Data.Core.Pairs
 
                 EnsureSelfReferencingLinkIsRestored(source, target);
 
-                Create(source, target);
+                this.CreateAndUpdate(source, target);
             }
             else if (transition.Before.IsNull()) // Revert Creation with Deletion
-                Delete(transition.After.Source, transition.After.Target);
+                this.DeleteOrNothing(transition.After.Source, transition.After.Target);
             else // Revert Update
             {
                 var beforeSource = transition.Before.Source;
@@ -308,7 +309,8 @@ namespace Platform.Data.Core.Pairs
 
                 EnsureSelfReferencingLinkIsRestored(beforeSource, beforeTarget);
 
-                Update(transition.After.Source, transition.After.Target, beforeSource, beforeTarget);
+                // TODO: Проверить корректно ли это теперь работает
+                this.UpdateOrCreateOrGet(transition.After.Source, transition.After.Target, beforeSource, beforeTarget);
             }
         }
 
@@ -317,17 +319,17 @@ namespace Platform.Data.Core.Pairs
             // Возможно эту логику нужно перенисти в функцию Create
             if (_memoryManager.Count(source) == 0 && _memoryManager.Count(target) == 0 && source == target)
             {
-                if (Create(LinksConstants.Itself, LinksConstants.Itself) != source)
+                if (Create() != source)
                     throw new Exception("Невозможно восстановить связь");
             }
             else if (_memoryManager.Count(target) == 0)
             {
-                if (Create(source, LinksConstants.Itself) != target)
+                if (this.CreateAndUpdate(source, Constants.Itself) != target)
                     throw new Exception("Невозможно восстановить связь");
             }
             else if (_memoryManager.Count(source) == 0)
             {
-                if (Create(LinksConstants.Itself, target) != source)
+                if (this.CreateAndUpdate(Constants.Itself, target) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
         }
@@ -358,7 +360,7 @@ namespace Platform.Data.Core.Pairs
 
         private void TransitionsPusher()
         {
-            while (!Disposed && _transitionsPusher != null)
+            while (!IsDisposed && _transitionsPusher != null)
             {
                 Thread.Sleep(DefaultPushDelay);
                 PushTransitions();

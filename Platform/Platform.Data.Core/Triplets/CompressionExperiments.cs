@@ -154,7 +154,7 @@ namespace Platform.Data.Core.Triplets
         //    }
         //}
 
-        public static int CompressionsCount = 0;
+        public static int CompressionsCount;
 
         public static Link CombinedJoin(ref Link first, ref Link second)
         {
@@ -378,7 +378,7 @@ namespace Platform.Data.Core.Triplets
                 //
                 // <-
 
-                second.WalkThroughReferersBySource(couple =>
+                second.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 1 && couple.ReferersBySourceCount == 0)
                     {
@@ -410,7 +410,7 @@ namespace Platform.Data.Core.Triplets
                 //
                 // ->
 
-                first.WalkThroughReferersBySource(couple =>
+                first.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
                     {
@@ -437,7 +437,7 @@ namespace Platform.Data.Core.Triplets
                 //
                 //   <-
 
-                second.WalkThroughReferersByTarget(couple =>
+                second.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
                     {
@@ -463,7 +463,7 @@ namespace Platform.Data.Core.Triplets
                 //
                 //   ->
 
-                first.WalkThroughReferersByTarget((couple) =>
+                first.WalkThroughReferersAsTarget((couple) =>
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 0 && couple.ReferersBySourceCount == 1)
                     {

@@ -1,92 +1,80 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System;
+using System.Runtime.CompilerServices;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Collections.Trees
 {
-    public abstract unsafe class SizeBalancedTreeMethodsBase
+    public abstract class SizeBalancedTreeMethodsBase<TElement> : GenericCollectionMethodsBase<TElement>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong* GetLeft(ulong node);
+        protected abstract IntPtr GetLeft(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong* GetRight(ulong node);
+        protected abstract IntPtr GetRight(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract ulong GetSize(ulong node);
+        protected abstract TElement GetSize(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetLeft(ulong node, ulong left);
+        protected abstract void SetLeft(TElement node, TElement left);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetRight(ulong node, ulong right);
+        protected abstract void SetRight(TElement node, TElement right);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract void SetSize(ulong node, ulong size);
+        protected abstract void SetSize(TElement node, TElement size);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract bool FirstIsToTheLeftOfSecond(ulong first, ulong second);
+        protected abstract bool FirstIsToTheLeftOfSecond(TElement first, TElement second);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract bool FirstIsToTheRightOfSecond(ulong first, ulong second);
+        protected abstract bool FirstIsToTheRightOfSecond(TElement first, TElement second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void IncrementSize(ulong node)
+        protected void IncrementSize(TElement node) => SetSize(node, Increment(GetSize(node)));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void DecrementSize(TElement node) => SetSize(node, Decrement(GetSize(node)));
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TElement GetLeftSize(TElement node) => GetSizeOrZero(GetLeft(node).GetValue<TElement>());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TElement GetRightSize(TElement node) => GetSizeOrZero(GetRight(node).GetValue<TElement>());
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TElement GetSizeOrZero(TElement node) => EqualToZero(node) ? GetZero() : GetSize(node);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void FixSize(TElement node) => SetSize(node, Increment(Add(GetLeftSize(node), GetRightSize(node))));
+
+        protected void LeftRotate(IntPtr root)
         {
-            SetSize(node, GetSize(node) + 1); // TODO: Can be replaced with *GetSize(node)++
+            var rootValue = root.GetValue<TElement>();
+            var right = GetRight(rootValue).GetValue<TElement>();
+            if (EqualToZero(right))
+                return;
+            SetRight(rootValue, GetLeft(right).GetValue<TElement>());
+            SetLeft(right, rootValue);
+            SetSize(right, GetSize(rootValue));
+            FixSize(rootValue);
+            root.SetValue(right);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void DecrementSize(ulong node)
+        protected void RightRotate(IntPtr root)
         {
-            SetSize(node, GetSize(node) - 1); // TODO: Can be replaced with *GetSize(node)--
+            var rootValue = root.GetValue<TElement>();
+            var left = GetLeft(rootValue).GetValue<TElement>();
+            if (EqualToZero(left))
+                return;
+            SetLeft(rootValue, GetRight(left).GetValue<TElement>());
+            SetRight(left, rootValue);
+            SetSize(left, GetSize(rootValue));
+            FixSize(rootValue);
+            root.SetValue(left);
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ulong GetLeftSize(ulong node)
+        public bool Contains(TElement node, TElement root)
         {
-            return GetSizeOrZero(*GetLeft(node));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ulong GetRightSize(ulong node)
-        {
-            return GetSizeOrZero(*GetRight(node));
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected ulong GetSizeOrZero(ulong node)
-        {
-            return node == 0 ? 0 : GetSize(node);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected void FixSize(ulong node)
-        {
-            SetSize(node, GetLeftSize(node) + GetRightSize(node) + 1);
-        }
-
-        protected void LeftRotate(ulong* root)
-        {
-            var right = *GetRight(*root);
-            if (right == 0) return;
-            SetRight(*root, *GetLeft(right));
-            SetLeft(right, *root);
-            SetSize(right, GetSize(*root));
-            FixSize(*root);
-            *root = right;
-        }
-
-        protected void RightRotate(ulong* root)
-        {
-            var left = *GetLeft(*root);
-            if (left == 0) return;
-            SetLeft(*root, *GetRight(left));
-            SetRight(left, *root);
-            SetSize(left, GetSize(*root));
-            FixSize(*root);
-            *root = left;
-        }
-
-        public bool Contains(ulong node, ulong root)
-        {
-            while (root != 0)
+            while (!EqualToZero(root))
             {
                 if (FirstIsToTheLeftOfSecond(node, root)) // node.Key < root.Key
-                    root = *GetLeft(root);
+                    root = GetLeft(root).GetValue<TElement>();
                 else if (FirstIsToTheRightOfSecond(node, root)) // node.Key > root.Key
-                    root = *GetRight(root);
+                    root = GetRight(root).GetValue<TElement>();
                 else // node.Key == root.Key
                     return true;
             }

@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 
+// ReSharper disable ForCanBeConvertedToForeach
+
 namespace Platform.Data.Core
 {
     // Concept:
@@ -24,13 +26,11 @@ namespace Platform.Data.Core
     // Эта структура совместима с Links, и может быть представлена через связи. Но ближе всего к последоватеностям.
     // Наивный подход, а именно связи: (51 50) (50 52) (52 50) (50 51) (51 52) не всегда будет функционировать корректно.
     // ((((51 50) 52) 50) 51) 52) будет точнее.
-
-    // Узнать почему нужен IComparable
     public class Node
     {
-        private Dictionary<IComparable, Node> _childNodes;
+        private Dictionary<object, Node> _childNodes;
 
-        public Node(Node parent, IComparable key, object value, bool createNullChildren)
+        public Node(Node parent, object key, object value, bool createNullChildren)
         {
             Parent = parent;
             Key = key;
@@ -38,38 +38,29 @@ namespace Platform.Data.Core
             CreateNullChildren = createNullChildren;
         }
 
-        public Node(IComparable key, object value, bool createNullChildren)
+        public Node(object key, object value, bool createNullChildren)
             : this(null, key, value, createNullChildren)
         {
         }
 
-        public Node(IComparable key, object value)
+        public Node(object key, object value)
             : this(null, key, value, false)
         {
         }
 
-        public Node(IComparable key)
+        public Node(object key)
             : this(null, key, null, false)
         {
         }
 
-        public IComparable Key { get; set; }
+        public object Key { get; set; }
         public object Value { get; set; }
-        public bool CreateNullChildren { get; private set; }
+        public bool CreateNullChildren { get; }
         public Node Parent { get; private set; }
 
-        public Dictionary<IComparable, Node> ChildNodes
-        {
-            get
-            {
-                if (_childNodes == null)
-                    _childNodes = new Dictionary<IComparable, Node>();
-                return _childNodes;
-            }
-            private set { _childNodes = value; }
-        }
+        public Dictionary<object, Node> ChildNodes => _childNodes ?? (_childNodes = new Dictionary<object, Node>());
 
-        public Node this[IComparable key]
+        public Node this[object key]
         {
             get
             {
@@ -78,15 +69,15 @@ namespace Platform.Data.Core
                     child = AddChild(key);
                 return child;
             }
-            set { SetChild(key); }
+            set
+            {
+                SetChildValue(value, key);
+            }
         }
 
-        public Node AddChild(IComparable key)
-        {
-            return AddChild(key, null);
-        }
+        public Node AddChild(object key) => AddChild(key, null);
 
-        public Node AddChild(IComparable key, object value)
+        public Node AddChild(object key, object value)
         {
             //ValidateKeyAlreadyExists(key);
 
@@ -94,7 +85,7 @@ namespace Platform.Data.Core
             return AddChild(child);
         }
 
-        private void ValidateKeyAlreadyExists(IComparable key)
+        private void ValidateKeyAlreadyExists(object key)
         {
             if (ChildNodes.ContainsKey(key))
                 throw new InvalidOperationException("Child collection already contains node with the same key.");
@@ -109,7 +100,7 @@ namespace Platform.Data.Core
             return child;
         }
 
-        public Node GetChild(params IComparable[] keys)
+        public Node GetChild(params object[] keys)
         {
             var node = this;
             for (var i = 0; i < keys.Length; i++)
@@ -122,32 +113,20 @@ namespace Platform.Data.Core
             return node;
         }
 
-        public object GetChildValue(params IComparable[] keys)
+        public object GetChildValue(params object[] keys)
         {
             var childNode = GetChild(keys);
 
-            if (childNode == null)
-                return null;
-
-            return childNode.Value;
+            return childNode?.Value;
         }
 
-        public bool ContainsChild(params IComparable[] keys)
-        {
-            return GetChild(keys) != null;
-        }
+        public bool ContainsChild(params object[] keys) => GetChild(keys) != null;
 
-        public Node SetChild(params IComparable[] keys)
-        {
-            return SetChildValue(null, keys);
-        }
+        public Node SetChild(params object[] keys) => SetChildValue(null, keys);
 
-        public Node SetChild(IComparable key)
-        {
-            return SetChildValue(null, key);
-        }
+        public Node SetChild(object key) => SetChildValue(null, key);
 
-        public Node SetChildValue(object value, params IComparable[] keys)
+        public Node SetChildValue(object value, params object[] keys)
         {
             var node = this;
             for (var i = 0; i < keys.Length; i++)
@@ -162,7 +141,7 @@ namespace Platform.Data.Core
             return node;
         }
 
-        public Node SetChildValue(object value, IComparable key)
+        public Node SetChildValue(object value, object key)
         {
             Node child;
             if (!ChildNodes.TryGetValue(key, out child))

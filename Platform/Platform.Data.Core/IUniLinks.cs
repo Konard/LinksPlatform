@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 // ReSharper disable TypeParameterCanBeVariant
 
@@ -7,14 +8,27 @@ namespace Platform.Data.Core
     /// <remarks>Minimal sufficient universal Links API (for bulk operations).</remarks>
     public partial interface IUniLinks<TLink>
     {
-        TLink[][][] Trigger(TLink[] condition, TLink[] substitution);
+        IList<IList<IList<TLink>>> Trigger(IList<TLink> condition, IList<TLink> substitution);
     }
 
     /// <remarks>Minimal sufficient universal Links API (for step by step operations).</remarks>
     public partial interface IUniLinks<TLink>
     {
-        void Trigger(TLink[] patternOrCondition, Func<TLink[], TLink> matchHandler,
-                     TLink[] substitution, Func<TLink[], TLink[], TLink> substitutionHandler);
+        /// <returns>
+        /// TLink that represents True (was finished fully) or TLink that represents False (was stopped).
+        /// This is done to assure ability to push up stop signal through recursion stack.
+        /// </returns>
+        TLink Trigger(IList<TLink> patternOrCondition, Func<IList<TLink>, TLink> matchHandler,
+                      IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutionHandler);
+    }
+
+    /// <remarks>Extended with small optimization.</remarks>
+    public partial interface IUniLinks<TLink>
+    {
+        /// <remarks>
+        /// Something simple should be simple and optimized.
+        /// </remarks>
+        TLink Count(IList<TLink> restrictions);
     }
 
     /// <remarks>

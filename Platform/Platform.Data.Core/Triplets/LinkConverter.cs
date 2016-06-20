@@ -29,97 +29,46 @@ namespace Platform.Data.Core.Triplets
             return list;
         }
 
-        public static Link FromNumber(long number)
-        {
-            return NumberHelpers.FromNumber(number);
-        }
+        public static Link FromNumber(long number) => NumberHelpers.FromNumber(number);
 
-        public static long ToNumber(Link number)
-        {
-            return NumberHelpers.ToNumber(number);
-        }
+        public static long ToNumber(Link number) => NumberHelpers.ToNumber(number);
 
-        public static Link FromChar(char c)
-        {
-            return CharacterHelpers.FromChar(c);
-        }
+        public static Link FromChar(char c) => CharacterHelpers.FromChar(c);
 
-        public static char ToChar(Link charLink)
-        {
-            return CharacterHelpers.ToChar(charLink);
-        }
+        public static char ToChar(Link charLink) => CharacterHelpers.ToChar(charLink);
 
-        public static Link FromChars(char[] chars)
-        {
-            return FromObjectsToSequence(chars, FromChar);
-        }
+        public static Link FromChars(char[] chars) => FromObjectsToSequence(chars, FromChar);
 
-        public static Link FromChars(char[] chars, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(chars, takeFrom, takeUntil, FromChar);
-        }
+        public static Link FromChars(char[] chars, int takeFrom, int takeUntil) => FromObjectsToSequence(chars, takeFrom, takeUntil, FromChar);
 
-        public static Link FromNumbers(long[] numbers)
-        {
-            return FromObjectsToSequence(numbers, FromNumber);
-        }
+        public static Link FromNumbers(long[] numbers) => FromObjectsToSequence(numbers, FromNumber);
 
-        public static Link FromNumbers(long[] numbers, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(numbers, takeFrom, takeUntil, FromNumber);
-        }
+        public static Link FromNumbers(long[] numbers, int takeFrom, int takeUntil) => FromObjectsToSequence(numbers, takeFrom, takeUntil, FromNumber);
 
-        public static Link FromNumbers(ushort[] numbers)
-        {
-            return FromObjectsToSequence(numbers, x => FromNumber(x));
-        }
+        public static Link FromNumbers(ushort[] numbers) => FromObjectsToSequence(numbers, x => FromNumber(x));
 
-        public static Link FromNumbers(ushort[] numbers, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
-        }
+        public static Link FromNumbers(ushort[] numbers, int takeFrom, int takeUntil) => FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
 
-        public static Link FromNumbers(uint[] numbers)
-        {
-            return FromObjectsToSequence(numbers, x => FromNumber(x));
-        }
+        public static Link FromNumbers(uint[] numbers) => FromObjectsToSequence(numbers, x => FromNumber(x));
 
-        public static Link FromNumbers(uint[] numbers, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
-        }
+        public static Link FromNumbers(uint[] numbers, int takeFrom, int takeUntil) => FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
 
-        public static Link FromNumbers(byte[] numbers)
-        {
-            return FromObjectsToSequence(numbers, x => FromNumber(x));
-        }
+        public static Link FromNumbers(byte[] numbers) => FromObjectsToSequence(numbers, x => FromNumber(x));
 
-        public static Link FromNumbers(byte[] numbers, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
-        }
+        public static Link FromNumbers(byte[] numbers, int takeFrom, int takeUntil) => FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x));
 
-        public static Link FromNumbers(bool[] numbers)
-        {
-            return FromObjectsToSequence(numbers, x => FromNumber(x ? 1 : 0));
-        }
+        public static Link FromNumbers(bool[] numbers) => FromObjectsToSequence(numbers, x => FromNumber(x ? 1 : 0));
 
-        public static Link FromNumbers(bool[] numbers, int takeFrom, int takeUntil)
-        {
-            return FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x ? 1 : 0));
-        }
+        public static Link FromNumbers(bool[] numbers, int takeFrom, int takeUntil) => FromObjectsToSequence(numbers, takeFrom, takeUntil, x => FromNumber(x ? 1 : 0));
 
-        public static Link FromObjectsToSequence<T>(T[] objects, Func<T, Link> converter)
-        {
-            return FromObjectsToSequence(objects, 0, objects.Length, converter);
-        }
+        public static Link FromObjectsToSequence<T>(T[] objects, Func<T, Link> converter) => FromObjectsToSequence(objects, 0, objects.Length, converter);
 
         public static Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
         {
             var length = takeUntil - takeFrom;
 
             if (length <= 0)
-                throw new ArgumentOutOfRangeException("length", "Нельзя преобразовать пустой список к связям.");
+                throw new ArgumentOutOfRangeException(nameof(takeUntil), "Нельзя преобразовать пустой список к связям.");
 
             var copy = new Link[length];
 
@@ -155,7 +104,7 @@ namespace Platform.Data.Core.Triplets
             if (link.IsString())
                 return ToString(ToList(link.Target));
 
-            throw new ArgumentOutOfRangeException("link", "Specified link is not a string.");
+            throw new ArgumentOutOfRangeException(nameof(link), "Specified link is not a string.");
         }
 
         public static string ToString(List<Link> charLinks)

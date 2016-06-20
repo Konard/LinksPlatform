@@ -37,7 +37,7 @@ namespace Platform.Data.Core.Sequences
 
             _initialized = true;
 
-            var firstLink = _links.Create(0, 0);
+            var firstLink = _links.CreatePoint();
 
             if (firstLink != FirstCharLink)
             {
@@ -50,7 +50,8 @@ namespace Platform.Data.Core.Sequences
                 for (var i = FirstCharLink + 1; i <= LastCharLink; i++)
                 {
                     // From NIL to It (NIL -> Character) transformation meaning, (or infinite amount of NIL characters before actual Character)
-                    var createdLink = _links.Create(firstLink, 0);
+                    var createdLink = _links.CreatePoint();
+                    _links.Update(createdLink, firstLink, createdLink);
                     if (createdLink != i)
                         throw new Exception("Unable to initialize UTF 16 table.");
                 }
@@ -67,25 +68,19 @@ namespace Platform.Data.Core.Sequences
         // 65536 (0(1) + 65535 = 65536 possible values)
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong FromCharToLink(char character)
-        {
-            return ((ulong)character + 1);
-        }
+        public static ulong FromCharToLink(char character) => ((ulong)character + 1);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char FromLinkToChar(ulong link)
-        {
-            return (char)(link - 1);
-        }
+        public static char FromLinkToChar(ulong link) => (char)(link - 1);
 
-        public static string FromSequenceLinkToString(ulong link, Links links)
+        public static string FromSequenceLinkToString(ulong link, ILinks<ulong> links)
         {
             var sb = new StringBuilder();
 
             if (links.Exists(link))
             {
-                StopableSequenceWalker.WalkRight(link, links.GetSourceCore, links.GetTargetCore,
-                    x => x <= MapSize || links.GetSourceCore(x) == x || links.GetTargetCore(x) == x, element =>
+                StopableSequenceWalker.WalkRight(link, links.GetSource, links.GetTarget,
+                    x => x <= MapSize || links.GetSource(x) == x || links.GetTarget(x) == x, element =>
                     {
                         sb.Append(FromLinkToChar(element));
                         return true;
@@ -95,10 +90,7 @@ namespace Platform.Data.Core.Sequences
             return sb.ToString();
         }
 
-        public static ulong[] FromCharsToLinkArray(char[] chars)
-        {
-            return FromCharsToLinkArray(chars, chars.Length);
-        }
+        public static ulong[] FromCharsToLinkArray(char[] chars) => FromCharsToLinkArray(chars, chars.Length);
 
         public static ulong[] FromCharsToLinkArray(char[] chars, int count)
         {

@@ -71,7 +71,7 @@ namespace Platform.Data.Core.Triplets
             string nameLocal = null;
             if (Net.Name.ReferersBySourceCount < link.ReferersBySourceCount)
             {
-                Net.Name.WalkThroughReferersBySource(referer =>
+                Net.Name.WalkThroughReferersAsSource(referer =>
                 {
                     if (referer.Linker == Net.ThatIsRepresentedBy)
                     {
@@ -86,7 +86,7 @@ namespace Platform.Data.Core.Triplets
             }
             else
             {
-                link.WalkThroughReferersBySource(referer =>
+                link.WalkThroughReferersAsSource(referer =>
                 {
                     if (referer.Linker == Net.Has)
                     {
@@ -120,38 +120,23 @@ namespace Platform.Data.Core.Triplets
 
         // Несколько не правильное определение, так выйдет, что любая сумма входящая в диапазон значений char будет символом.
         // Нужно изменить определение чара, идеально: char consists of sum of [8, 64].
-        public static bool IsChar(this Link link)
-        {
-            return CharacterHelpers.IsChar(link);
-        }
+        public static bool IsChar(this Link link) => CharacterHelpers.IsChar(link);
 
-        public static bool IsGroup(this Link link)
-        {
-            return link != null
-                && link.Source == Net.Group
-                && link.Linker == Net.ThatConsistsOf;
-        }
+        public static bool IsGroup(this Link link) => link != null
+                                                   && link.Source == Net.Group
+                                                   && link.Linker == Net.ThatConsistsOf;
 
-        public static bool IsSum(this Link link)
-        {
-            return link != null
-                && link.Source == Net.Sum
-                && link.Linker == Net.Of;
-        }
+        public static bool IsSum(this Link link) => link != null
+                                                 && link.Source == Net.Sum
+                                                 && link.Linker == Net.Of;
 
-        public static bool IsString(this Link link)
-        {
-            return link != null
-                && link.Source == Net.String
-                && link.Linker == Net.ThatConsistsOf;
-        }
+        public static bool IsString(this Link link) => link != null
+                                                    && link.Source == Net.String
+                                                    && link.Linker == Net.ThatConsistsOf;
 
-        public static bool IsName(this Link link)
-        {
-            return link != null
-                && link.Source == Net.Name
-                && link.Linker == Net.Of;
-        }
+        public static bool IsName(this Link link) => link != null
+                                                  && link.Source == Net.Name
+                                                  && link.Linker == Net.Of;
 
         public static Link[] GetArrayOfRererersBySource(this Link link)
         {
@@ -161,7 +146,7 @@ namespace Platform.Data.Core.Triplets
             {
                 var array = new Link[link.ReferersBySourceCount];
                 var index = 0;
-                link.WalkThroughReferersBySource(referer => array[index++] = referer);
+                link.WalkThroughReferersAsSource(referer => array[index++] = referer);
                 return array;
             }
         }
@@ -174,7 +159,7 @@ namespace Platform.Data.Core.Triplets
             {
                 var array = new Link[link.ReferersByLinkerCount];
                 var index = 0;
-                link.WalkThroughReferersByLinker(referer => array[index++] = referer);
+                link.WalkThroughReferersAsLinker(referer => array[index++] = referer);
                 return array;
             }
         }
@@ -187,14 +172,11 @@ namespace Platform.Data.Core.Triplets
             {
                 var array = new Link[link.ReferersByTargetCount];
                 var index = 0;
-                link.WalkThroughReferersByTarget(referer => array[index++] = referer);
+                link.WalkThroughReferersAsTarget(referer => array[index++] = referer);
                 return array;
             }
         }
 
-        public static void WalkThroughSequence(this Link link, Action<Link> action)
-        {
-            SequenceWalker.WalkRight(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, action);
-        }
+        public static void WalkThroughSequence(this Link link, Action<Link> action) => SequenceWalker.WalkRight(link, x => x.Source, x => x.Target, x => x.Linker != Net.And, action);
     }
 }

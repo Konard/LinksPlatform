@@ -4,6 +4,8 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Platform.Helpers;
 
+// ReSharper disable ForCanBeConvertedToForeach
+
 namespace Platform.Data.Core.Collections
 {
     /// <remarks>
@@ -16,7 +18,7 @@ namespace Platform.Data.Core.Collections
     ///     TODO: Compare what is faster to store BitSetsIn16Bits or to calculate it
     ///     TODO: Avoid int usage (replace to long)
     /// </remarks>
-    public sealed class BitString
+    public class BitString
     {
         private static readonly byte[][] BitSetsIn16Bits;
         private long[] _array;
@@ -56,7 +58,7 @@ namespace Platform.Data.Core.Collections
         {
             if (bits == null)
             {
-                throw new ArgumentNullException("bits");
+                throw new ArgumentNullException(nameof(bits));
             }
 
             _length = bits._length;
@@ -79,7 +81,7 @@ namespace Platform.Data.Core.Collections
         {
             if (length < 0)
             {
-                throw new ArgumentOutOfRangeException("length");
+                throw new ArgumentOutOfRangeException(nameof(length));
             }
 
             _length = length;
@@ -121,20 +123,11 @@ namespace Platform.Data.Core.Collections
         private long _minPositiveWord;
         private long _maxPositiveWord;
 
-        public long Count
-        {
-            get { return _length; }
-        }
+        public long Count => _length;
 
-        public bool IsReadOnly
-        {
-            get { return false; }
-        }
+        public bool IsReadOnly => false;
 
-        public bool IsSynchronized
-        {
-            get { return false; }
-        }
+        public bool IsSynchronized => false;
 
         public bool this[int index]
         {
@@ -186,16 +179,9 @@ namespace Platform.Data.Core.Collections
             }
         }
 
-        public object SyncRoot
-        {
-            get { return this; }
-        }
+        public object SyncRoot => this;
 
-        public object Clone()
-        {
-            // LAMESPEC: docs say shallow, MS makes deep.
-            return new BitString(this);
-        }
+        public object Clone() => new BitString(this);
 
         public BitString Not()
         {
@@ -229,7 +215,7 @@ namespace Platform.Data.Core.Collections
             //_version++;
 
 #if DEBUG
-            ConsoleHelpers.Debug("AND -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            ConsoleHelpers.Debug("AND -> Len: {0}, Time: {1}", _array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -253,7 +239,7 @@ namespace Platform.Data.Core.Collections
             //_version++;
 
 #if DEBUG
-            ConsoleHelpers.Debug("OR -> Len: {0}, Time: {1}", this._array.Length, sw.Elapsed.TotalMilliseconds);
+            ConsoleHelpers.Debug("OR -> Len: {0}, Time: {1}", _array.Length, sw.Elapsed.TotalMilliseconds);
 #endif
 
             return this;
@@ -566,7 +552,7 @@ namespace Platform.Data.Core.Collections
         {
             if (Length != other.Length)
             {
-                throw new ArgumentException("Bit strings must have same size", "other");
+                throw new ArgumentException("Bit strings must have same size", nameof(other));
             }
 
 #if DEBUG
@@ -611,7 +597,7 @@ namespace Platform.Data.Core.Collections
         {
             if (Length != other.Length)
             {
-                throw new ArgumentException("Bit strings must have same size", "other");
+                throw new ArgumentException("Bit strings must have same size", nameof(other));
             }
 
             var from = Math.Max(_minPositiveWord, other._minPositiveWord);
@@ -644,7 +630,7 @@ namespace Platform.Data.Core.Collections
         {
             if (Length != other.Length)
             {
-                throw new ArgumentException("Bit strings must have same size", "other");
+                throw new ArgumentException("Bit strings must have same size", nameof(other));
             }
 
             var from = Math.Max(_minPositiveWord, other._minPositiveWord);
@@ -684,7 +670,7 @@ namespace Platform.Data.Core.Collections
         {
             if (Length != other.Length)
             {
-                throw new ArgumentException("Bit strings must have same size", "other");
+                throw new ArgumentException("Bit strings must have same size", nameof(other));
             }
 
             var from = Math.Max(_minPositiveWord, other._minPositiveWord);

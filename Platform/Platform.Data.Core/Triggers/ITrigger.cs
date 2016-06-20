@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Triggers
 {
-    public interface ITrigger
+    internal interface ITrigger
     {
         ICondition Condition { get; }
         // or IEvent MatchingEvent { get; }

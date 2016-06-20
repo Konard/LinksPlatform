@@ -3,7 +3,7 @@
     /// <summary>
     /// Представляет простейшую реализацию хранилища элементов.
     /// </summary>
-    public class DefaultElements
+    internal class ElementsConstants
     {
         public static bool Stop = false;
         public static bool Continue = true;

@@ -50,7 +50,7 @@ namespace Platform.Data.Core.Triplets
         Code
     }
 
-    public partial class Net
+    public class Net
     {
         public static Link Link;
         public static Link Thing;
@@ -102,30 +102,15 @@ namespace Platform.Data.Core.Triplets
             Create();
         }
 
-        public static Link CreateThing()
-        {
-            return Link.Create(Link.Itself, IsA, Thing);
-        }
+        public static Link CreateThing() => Link.Create(Link.Itself, IsA, Thing);
 
-        public static Link CreateMappedThing(object mapping)
-        {
-            return Link.CreateMapped(Link.Itself, IsA, Thing, mapping);
-        }
+        public static Link CreateMappedThing(object mapping) => Link.CreateMapped(Link.Itself, IsA, Thing, mapping);
 
-        public static Link CreateLink()
-        {
-            return Link.Create(Link.Itself, IsA, Link);
-        }
+        public static Link CreateLink() => Link.Create(Link.Itself, IsA, Link);
 
-        public static Link CreateMappedLink(object mapping)
-        {
-            return Link.CreateMapped(Link.Itself, IsA, Link, mapping);
-        }
+        public static Link CreateMappedLink(object mapping) => Link.CreateMapped(Link.Itself, IsA, Link, mapping);
 
-        public static Link CreateSet()
-        {
-            return Link.Create(Link.Itself, IsA, Set);
-        }
+        public static Link CreateSet() => Link.Create(Link.Itself, IsA, Set);
 
         private static void Create()
         {

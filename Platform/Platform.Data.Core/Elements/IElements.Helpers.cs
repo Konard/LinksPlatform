@@ -6,7 +6,7 @@
     /// </summary>
     /// <typeparam name="TElement">Тип индекса (идентификатора/адреса) элемента.</typeparam>
     /// <remarks>Здесь располагаются вспомогательные (избыточные) методы.</remarks>
-    public partial interface IElements<TElement>
+    internal partial interface IElements<TElement>
     {
         /// <summary>
         /// Возвращает общее число элементов находящихся в хранилище.

@@ -21,7 +21,7 @@
 //    /// </summary>
 //    /// <typeparam name="TElement">Тип индекса (идентификатора/адреса) элемента.</typeparam>
 //    /// <remarks>Здесь располагается методы соотствующие шаблону Create-Read-Update-Delete (CRUD).</remarks>
-//    public partial interface IElements<TElement>
+//    internal partial interface IElements<TElement>
 //    {
 //        /// <summary>
 //        /// Создаёт элемент (если он ещё не существует), либо возвращает индекс существующего элемента

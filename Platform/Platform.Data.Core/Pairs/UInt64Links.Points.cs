@@ -18,22 +18,14 @@
     /// например "PairOf" обозначить что является точно парой, а что точно точкой.
     /// И наоборот этот же метод поможет, если уже существует точка, но нам нужна пара.
     /// </remarks>
-    partial class Links
+    public partial class UInt64Links
     {
         /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой полностью (связью замкнутой на себе дважды).</summary>
         /// <param name="link">Индекс проверяемой связи.</param>
         /// <returns>Значение, определяющее является ли связь точкой полностью.</returns>
         public bool IsFullPoint(ulong link)
         {
-            return Sync.ExecuteReadOperation(() =>
-            {
-                EnsureLinkExists(link);
-                return IsFullPointCore(link);
-            });
-        }
-
-        public bool IsFullPointCore(ulong link)
-        {
+            this.EnsureLinkExists(link);
             var values = _memoryManager.GetLinkValue(link);
             return Point<ulong>.IsFullPoint(values);
         }
@@ -41,21 +33,13 @@
         /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
         /// <param name="link">Индекс проверяемой связи.</param>
         /// <returns>Значение, определяющее является ли связь точкой частично.</returns>
-        public bool IsPartialPoint(ulong link)
-        {
-            return Sync.ExecuteReadOperation(() =>
-            {
-                EnsureLinkExists(link);
-                return IsFullPointCore(link);
-            });
-        }
-
         /// <remarks>
         /// Достаточно любой одной ссылки на себя.
         /// Также в будущем можно будет проверять и всех родителей, чтобы проверить есть ли ссылки на себя (на эту связь).
         /// </remarks>
-        public bool IsPartialPointCore(ulong link)
+        public bool IsPartialPoint(ulong link)
         {
+            this.EnsureLinkExists(link);
             var values = _memoryManager.GetLinkValue(link);
             return Point<ulong>.IsPartialPoint(values);
         }

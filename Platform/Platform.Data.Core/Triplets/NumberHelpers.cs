@@ -24,10 +24,7 @@ namespace Platform.Data.Core.Triplets
             LinksToNumbers[Net.One] = 1;
         }
 
-        public static void Recreate()
-        {
-            Create();
-        }
+        public static void Recreate() => Create();
 
         private static Link FromPowerOf2(long powerOf2)
         {
@@ -111,7 +108,7 @@ namespace Platform.Data.Core.Triplets
 
                 return number;
             }
-            throw new ArgumentOutOfRangeException("link", "Specified link is not a number.");
+            throw new ArgumentOutOfRangeException(nameof(link), "Specified link is not a number.");
         }
 
         private static void GoDownAndTakeIt(Link link, out long number)

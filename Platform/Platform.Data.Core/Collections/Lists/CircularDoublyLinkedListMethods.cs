@@ -3,16 +3,16 @@
     /// <remarks>
     /// Based on https://en.wikipedia.org/wiki/Doubly_linked_list
     /// </remarks>
-    public abstract class CircularDoublyLinkedListMethods : DoublyLinkedListMethodsBase<ulong>
+    public abstract class CircularDoublyLinkedListMethods<TElement> : DoublyLinkedListMethodsBase<TElement>
     {
-        public void AttachBefore(ulong baseElement, ulong newElement)
+        public void AttachBefore(TElement baseElement, TElement newElement)
         {
             var baseElementPrevious = GetPrevious(baseElement);
 
             SetPrevious(newElement, baseElementPrevious);
             SetNext(newElement, baseElement);
 
-            if (baseElement == GetFirst())
+            if (Equals(baseElement, GetFirst()))
                 SetFirst(newElement);
 
             SetNext(baseElementPrevious, newElement);
@@ -21,14 +21,14 @@
             IncrementSize();
         }
 
-        public void AttachAfter(ulong baseElement, ulong newElement)
+        public void AttachAfter(TElement baseElement, TElement newElement)
         {
             var baseElementNext = GetNext(baseElement);
 
             SetPrevious(newElement, baseElement);
             SetNext(newElement, baseElementNext);
 
-            if (baseElement == GetLast())
+            if (Equals(baseElement, GetLast()))
                 SetLast(newElement);
 
             SetPrevious(baseElementNext, newElement);
@@ -37,10 +37,10 @@
             IncrementSize();
         }
 
-        public void AttachAsFirst(ulong element)
+        public void AttachAsFirst(TElement element)
         {
             var first = GetFirst();
-            if (first == 0)
+            if (EqualToZero(first))
             {
                 SetFirst(element);
                 SetLast(element);
@@ -53,38 +53,38 @@
                 AttachBefore(first, element);
         }
 
-        public void AttachAsLast(ulong element)
+        public void AttachAsLast(TElement element)
         {
             var last = GetLast();
-            if (last == 0)
+            if (EqualToZero(last))
                 AttachAsFirst(element);
             else
                 AttachAfter(last, element);
         }
 
-        public void Detach(ulong element)
+        public void Detach(TElement element)
         {
             var elementPrevious = GetPrevious(element);
             var elementNext = GetNext(element);
 
-            if (elementNext == element)
+            if (Equals(elementNext, element))
             {
-                SetFirst(0);
-                SetLast(0);
+                SetFirst(GetZero());
+                SetLast(GetZero());
             }
             else
             {
                 SetNext(elementPrevious, elementNext);
                 SetPrevious(elementNext, elementPrevious);
 
-                if (element == GetFirst())
+                if (Equals(element, GetFirst()))
                     SetFirst(elementNext);
-                if (element == GetLast())
+                if (Equals(element, GetLast()))
                     SetLast(elementPrevious);
             }
 
-            SetPrevious(element, 0);
-            SetNext(element, 0);
+            SetPrevious(element, GetZero());
+            SetNext(element, GetZero());
 
             DecrementSize();
         }

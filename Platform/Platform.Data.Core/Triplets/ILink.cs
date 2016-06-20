@@ -1,19 +1,41 @@
-﻿/*
+﻿using System;
 
+namespace Platform.Data.Core.Triplets
+{
+    public partial interface ILink<TLink>
+        where TLink : ILink<TLink>
+    {
+        TLink Source { get; }
+        TLink Linker { get; }
+        TLink Target { get; }
+    }
+
+    public partial interface ILink<TLink>
+        where TLink : ILink<TLink>
+    {
+        bool WalkThroughReferersAsLinker(Func<TLink, bool> walker);
+        bool WalkThroughReferersAsSource(Func<TLink, bool> walker);
+        bool WalkThroughReferersAsTarget(Func<TLink, bool> walker);
+        void WalkThroughReferers(Func<TLink, bool> walker);
+    }
+
+    public partial interface ILink<TLink>
+        where TLink : ILink<TLink>
+    {
+        void WalkThroughReferersAsLinker(Action<TLink> walker);
+        void WalkThroughReferersAsSource(Action<TLink> walker);
+        void WalkThroughReferersAsTarget(Action<TLink> walker);
+        void WalkThroughReferers(Action<TLink> walker);
+    }
+}
+
+/*
 using System;
 namespace NetLibrary
 {
     interface ILink
     {
-        ILink Source { get; }
-        ILink Linker { get; }
-        ILink Target { get; }
-
-        void WalkThroughReferersByLinker(Action<ILink> walker);
-        void WalkThroughReferersAsSource(Action<ILink> walker);
-        void WalkThroughReferersAsTarget(Action<ILink> walker);
-
-        // И статические методы (общие для всех связей)
+        // Cтатические методы (общие для всех связей)
 
         public static ILink Create(ILink source, ILink linker, ILink target);
         public static void Update(ref ILink link, ILink newSource, ILink newLinker, ILink newTarget);
@@ -21,7 +43,6 @@ namespace NetLibrary
         public static ILink Search(ILink source, ILink linker, ILink target);
     }
 }
-
 */
 
 /*

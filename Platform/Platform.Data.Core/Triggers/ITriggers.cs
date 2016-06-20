@@ -1,6 +1,6 @@
 ﻿namespace Platform.Data.Core.Triggers
 {
-    public interface ITriggers
+    internal interface ITriggers
     {
         void Start();
         void Stop();

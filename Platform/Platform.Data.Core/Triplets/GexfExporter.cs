@@ -10,8 +10,12 @@ using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Data.Core.Triplets
 {
-    public static class XmlGenerator
+    public static class GexfExporter
     {
+        private const string SourceLabel = "Source";
+        private const string LinkerLabel = "Linker";
+        private const string TargetLabel = "Target";
+
         public static string ToXml()
         {
             var sb = new StringBuilder();
@@ -74,9 +78,5 @@ namespace Platform.Data.Core.Triplets
                 }
             });
         }
-
-        private const string SourceLabel = "Source";
-        private const string LinkerLabel = "Linker";
-        private const string TargetLabel = "Target";
     }
 }

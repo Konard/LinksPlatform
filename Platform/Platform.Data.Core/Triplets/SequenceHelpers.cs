@@ -6,7 +6,7 @@ using Platform.Data.Core.Sequences;
 namespace Platform.Data.Core.Triplets
 {
     /// <remarks>
-    /// TODO: Check that CollectMatchingSequences algorithm is working, if not throw it out.
+    /// TODO: Check that CollectMatchingSequences algorithm is working, if not throw it away.
     /// TODO: Think of the abstraction on Sequences that can be equally usefull for triple links, pair links and so on.
     /// </remarks>
     public class SequenceHelpers
@@ -25,7 +25,7 @@ namespace Platform.Data.Core.Triplets
 
             sb.Append('{');
 
-            var walker = StopableSequenceWalker.WalkRight(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
+            StopableSequenceWalker.WalkRight(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
             {
                 if (visitedElements > 0)
                     sb.Append(',');
@@ -138,7 +138,7 @@ namespace Platform.Data.Core.Triplets
 
             TryStepRight(startLink, rightLink, result, 0);
 
-            startLink.WalkThroughReferersByTarget(couple =>
+            startLink.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
                         if (TryStepRight(couple, rightLink, result, 2))
@@ -154,7 +154,7 @@ namespace Platform.Data.Core.Triplets
         {
             var added = 0;
 
-            startLink.WalkThroughReferersBySource(couple =>
+            startLink.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
                     {
@@ -185,7 +185,7 @@ namespace Platform.Data.Core.Triplets
 
             TryStepLeft(startLink, leftLink, result, 0);
 
-            startLink.WalkThroughReferersBySource(couple =>
+            startLink.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
                         if (TryStepLeft(couple, leftLink, result, 2))
@@ -201,7 +201,7 @@ namespace Platform.Data.Core.Triplets
         {
             var added = 0;
 
-            startLink.WalkThroughReferersByTarget(couple =>
+            startLink.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
                     {

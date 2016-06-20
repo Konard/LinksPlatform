@@ -1,10 +1,13 @@
 ﻿using System;
 using Platform.Data.Core.Pairs;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Sequences
 {
     public struct SequencesOptions // TODO: To use type parameter <TLink> the ILinks<TLink> must contain GetConstants function.
     {
+        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+
         public ulong SequenceMarkerLink;
         public bool UseCascadeUpdate;
         public bool UseCascadeDelete;
@@ -20,8 +23,8 @@ namespace Platform.Data.Core.Sequences
 
         public void InitOptions(ILinks<ulong> links)
         {
-            if (UseSequenceMarker && SequenceMarkerLink == LinksConstants.Null)
-                SequenceMarkerLink = links.Create(LinksConstants.Itself, LinksConstants.Itself);
+            if (UseSequenceMarker && SequenceMarkerLink == Constants.Null)
+                SequenceMarkerLink = links.CreatePoint();
         }
 
         public void ValidateOptions()

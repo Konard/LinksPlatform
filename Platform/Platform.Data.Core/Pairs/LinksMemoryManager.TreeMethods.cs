@@ -1,131 +1,134 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Collections.Trees;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
-    unsafe partial class LinksMemoryManager
+    unsafe partial class LinksMemoryManager<T>
     {
-        private abstract class LinksTreeMethodsBase : SizeBalancedTreeMethods2
+        private abstract class LinksTreeMethodsBase : SizeBalancedTreeMethods2<T>
         {
-            protected readonly Link* Links;
-            protected readonly LinksHeader* Header;
+            protected readonly ILinksCombinedConstants<bool, T, int> Constants;
+            protected readonly IntPtr Links;
+            protected readonly IntPtr Header;
 
-            protected LinksTreeMethodsBase(LinksMemoryManager links, LinksHeader* header)
+            protected LinksTreeMethodsBase(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
             {
-                Links = links._links;
+                Links = links;
                 Header = header;
+                Constants = constants;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected abstract ulong GetTreeRoot();
+            protected abstract T GetTreeRoot();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected abstract ulong GetBasePartValue(ulong link);
+            protected abstract T GetBasePartValue(T link);
 
-            public ulong this[ulong index]
+            public T this[T index]
             {
                 get
                 {
                     var root = GetTreeRoot();
-                    if (index >= GetSize(root))
-                        return 0;
+                    if (GreaterOrEqualThan(index, GetSize(root)))
+                        return GetZero();
 
-                    while (root != 0)
+                    while (!EqualToZero(root))
                     {
-                        var left = *GetLeft(root);
+                        var left = GetLeft(root).GetValue<T>();
                         var leftSize = GetSizeOrZero(left);
-                        if (index < leftSize)
+                        if (LessThan(index, leftSize))
                         {
                             root = left;
                             continue;
                         }
 
-                        if (index == leftSize)
+                        if (Equals(index, leftSize))
                             return root;
 
-                        root = *GetRight(root);
-                        index -= (leftSize + 1);
+                        root = GetRight(root).GetValue<T>();
+                        index = Subtract(index, Increment(leftSize));
                     }
-                    return 0; // TODO: Impossible situation exception (only if tree structure broken)
+                    return GetZero(); // TODO: Impossible situation exception (only if tree structure broken)
                 }
             }
 
             // TODO: Return indices range instead of references count
-            public ulong CalculateReferences(ulong link)
+            public T CalculateReferences(T link)
             {
                 var root = GetTreeRoot();
                 var total = GetSize(root);
 
-                var totalRightIgnore = 0UL;
+                var totalRightIgnore = GetZero();
 
-                while (root != 0)
+                while (!EqualToZero(root))
                 {
                     var @base = GetBasePartValue(root);
 
-                    if (@base <= link)
-                        root = *GetRight(root);
+                    if (LessOrEqualThan(@base, link))
+                        root = GetRight(root).GetValue<T>();
                     else
                     {
-                        totalRightIgnore += GetRightSize(root) + 1;
+                        totalRightIgnore = Add(totalRightIgnore, Increment(GetRightSize(root)));
 
-                        root = *GetLeft(root);
+                        root = GetLeft(root).GetValue<T>();
                     }
                 }
 
                 root = GetTreeRoot();
 
-                var totalLeftIgnore = 0UL;
+                var totalLeftIgnore = GetZero();
 
-                while (root != 0)
+                while (!EqualToZero(root))
                 {
                     var @base = GetBasePartValue(root);
 
-                    if (@base >= link)
-                        root = *GetLeft(root);
+                    if (GreaterOrEqualThan(@base, link))
+                        root = GetLeft(root).GetValue<T>();
                     else
                     {
-                        totalLeftIgnore += GetLeftSize(root) + 1;
+                        totalLeftIgnore = Add(totalLeftIgnore, Increment(GetLeftSize(root)));
 
-                        root = *GetRight(root);
+                        root = GetRight(root).GetValue<T>();
                     }
                 }
 
-                return total - totalRightIgnore - totalLeftIgnore;
+                return Subtract(Subtract(total, totalRightIgnore), totalLeftIgnore);
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool EachReference(ulong source, Func<ulong, bool> handler)
+            public bool EachReference(T source, Func<T, bool> handler)
             {
                 return EachReferenceCore(source, GetTreeRoot(), handler);
             }
 
-            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker
-            private bool EachReferenceCore(ulong @base, ulong link, Func<ulong, bool> handler)
+            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker 3. Use low-level MSIL stack.
+            private bool EachReferenceCore(T @base, T link, Func<T, bool> handler)
             {
-                if (link == 0)
+                if (EqualToZero(link))
                     return true;
 
                 var linkBase = GetBasePartValue(link);
 
-                if (linkBase > @base)
+                if (GreaterThan(linkBase, @base))
                 {
-                    if (EachReferenceCore(@base, *GetLeft(link), handler) == LinksConstants.Break)
+                    if (EachReferenceCore(@base, GetLeft(link).GetValue<T>(), handler) == Constants.Break)
                         return false;
                 }
-                else if (linkBase < @base)
+                else if (LessThan(linkBase, @base))
                 {
-                    if (EachReferenceCore(@base, *GetRight(link), handler) == LinksConstants.Break)
+                    if (EachReferenceCore(@base, GetRight(link).GetValue<T>(), handler) == Constants.Break)
                         return false;
                 }
                 else //if (linkSource == source)
                 {
-                    if (handler(link) == LinksConstants.Break)
+                    if (handler(link) == Constants.Break)
                         return false;
 
-                    if (EachReferenceCore(@base, *GetLeft(link), handler) == LinksConstants.Break)
+                    if (EachReferenceCore(@base, GetLeft(link).GetValue<T>(), handler) == Constants.Break)
                         return false;
-                    if (EachReferenceCore(@base, *GetRight(link), handler) == LinksConstants.Break)
+                    if (EachReferenceCore(@base, GetRight(link).GetValue<T>(), handler) == Constants.Break)
                         return false;
                 }
 
@@ -135,61 +138,67 @@ namespace Platform.Data.Core.Pairs
 
         private class LinksSourcesTreeMethods : LinksTreeMethodsBase
         {
-            public LinksSourcesTreeMethods(LinksMemoryManager links, LinksHeader* header)
-                : base(links, header)
+            public LinksSourcesTreeMethods(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
+                : base(links, header, constants)
             {
             }
 
-            protected override ulong* GetLeft(ulong node)
+            protected override IntPtr GetLeft(T node)
             {
-                return &Links[node].LeftAsSource;
+                return Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
             }
 
-            protected override ulong* GetRight(ulong node)
+            protected override IntPtr GetRight(T node)
             {
-                return &Links[node].RightAsSource;
+                return Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
             }
 
-            protected override ulong GetSize(ulong node)
+            protected override T GetSize(T node)
             {
-                return Links[node].SizeAsSource;
+                return (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
             }
 
-            protected override void SetLeft(ulong node, ulong left)
+            protected override void SetLeft(T node, T left)
             {
-                Links[node].LeftAsSource = left;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).SetValue(left);
             }
 
-            protected override void SetRight(ulong node, ulong right)
+            protected override void SetRight(T node, T right)
             {
-                Links[node].RightAsSource = right;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).SetValue(right);
             }
 
-            protected override void SetSize(ulong node, ulong size)
+            protected override void SetSize(T node, T size)
             {
-                Links[node].SizeAsSource = size;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(size);
             }
 
-            protected override bool FirstIsToTheLeftOfSecond(ulong first, ulong second)
+            protected override bool FirstIsToTheLeftOfSecond(T first, T second)
             {
-                return Links[first].Source < Links[second].Source ||
-                       (Links[first].Source == Links[second].Source && Links[first].Target < Links[second].Target);
+                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>();
+                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
+
+                return LessThan(firstSource, secondSource) ||
+                       (Equals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
             }
 
-            protected override bool FirstIsToTheRightOfSecond(ulong first, ulong second)
+            protected override bool FirstIsToTheRightOfSecond(T first, T second)
             {
-                return Links[first].Source > Links[second].Source ||
-                       (Links[first].Source == Links[second].Source && Links[first].Target > Links[second].Target);
+                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>();
+                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
+
+                return GreaterThan(firstSource, secondSource) ||
+                       (Equals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
             }
 
-            protected override ulong GetTreeRoot()
+            protected override T GetTreeRoot()
             {
-                return Header->FirstAsSource;
+                return (Header + LinksHeader.FirstAsSourceOffset).GetValue<T>();
             }
 
-            protected override ulong GetBasePartValue(ulong link)
+            protected override T GetBasePartValue(T link)
             {
-                return Links[link].Source;
+                return (Links.GetElement(LinkSizeInBytes, link) + Link.SourceOffset).GetValue<T>();
             }
 
             /// <summary>
@@ -199,98 +208,103 @@ namespace Platform.Data.Core.Pairs
             /// <param name="source">Индекс связи, которая является началом на искомой связи.</param>
             /// <param name="target">Индекс связи, которая является концом на искомой связи.</param>
             /// <returns>Индекс искомой связи.</returns>
-            public ulong Search(ulong source, ulong target)
+            public T Search(T source, T target)
             {
-                var root = Header->FirstAsSource;
+                var root = GetTreeRoot();
 
-                while (root != 0)
+                while (!EqualToZero(root))
                 {
-                    var rootSource = Links[root].Source;
-                    var rootTarget = Links[root].Target;
+                    var rootSource = (Links.GetElement(LinkSizeInBytes, root) + Link.SourceOffset).GetValue<T>();
+                    var rootTarget = (Links.GetElement(LinkSizeInBytes, root) + Link.TargetOffset).GetValue<T>();
 
                     if (FirstIsToTheLeftOfSecond(source, target, rootSource, rootTarget)) // node.Key < root.Key
-                        root = *GetLeft(root);
+                        root = GetLeft(root).GetValue<T>();
                     else if (FirstIsToTheRightOfSecond(source, target, rootSource, rootTarget)) // node.Key > root.Key
-                        root = *GetRight(root);
+                        root = GetRight(root).GetValue<T>();
                     else // node.Key == root.Key
                         return root;
                 }
 
-                return 0;
+                return GetZero();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
+            private bool FirstIsToTheLeftOfSecond(T firstSource, T firstTarget, T secondSource,
+                T secondTarget)
             {
-                return firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
+                return LessThan(firstSource, secondSource) || (Equals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
+            private bool FirstIsToTheRightOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
             {
-                return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
+                return GreaterThan(firstSource, secondSource) || (Equals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
             }
         }
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
         {
-            public LinksTargetsTreeMethods(LinksMemoryManager links, LinksHeader* header)
-                : base(links, header)
+            public LinksTargetsTreeMethods(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
+                : base(links, header, constants)
             {
             }
 
-            protected override ulong* GetLeft(ulong node)
+            protected override IntPtr GetLeft(T node)
             {
-                return &Links[node].LeftAsTarget;
+                return Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
             }
 
-            protected override ulong* GetRight(ulong node)
+            protected override IntPtr GetRight(T node)
             {
-                return &Links[node].RightAsTarget;
+                return Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
             }
 
-            protected override ulong GetSize(ulong node)
+            protected override T GetSize(T node)
             {
-                return Links[node].SizeAsTarget;
+                return (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
             }
 
-            protected override void SetLeft(ulong node, ulong left)
+            protected override void SetLeft(T node, T left)
             {
-                Links[node].LeftAsTarget = left;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).SetValue(left);
             }
 
-            protected override void SetRight(ulong node, ulong right)
+            protected override void SetRight(T node, T right)
             {
-                Links[node].RightAsTarget = right;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).SetValue(right);
             }
 
-            protected override void SetSize(ulong node, ulong size)
+            protected override void SetSize(T node, T size)
             {
-                Links[node].SizeAsTarget = size;
+                (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(size);
             }
 
-            protected override bool FirstIsToTheLeftOfSecond(ulong first, ulong second)
+            protected override bool FirstIsToTheLeftOfSecond(T first, T second)
             {
-                return Links[first].Target < Links[second].Target ||
-                       (Links[first].Target == Links[second].Target && Links[first].Source < Links[second].Source);
+                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>();
+                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
+
+                return LessThan(firstTarget, secondTarget) ||
+                       (Equals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
             }
 
-            protected override bool FirstIsToTheRightOfSecond(ulong first, ulong second)
+            protected override bool FirstIsToTheRightOfSecond(T first, T second)
             {
-                return Links[first].Target > Links[second].Target ||
-                       (Links[first].Target == Links[second].Target && Links[first].Source > Links[second].Source);
+                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>();
+                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
+
+                return GreaterThan(firstTarget, secondTarget) ||
+                       (Equals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
             }
 
-            protected override ulong GetTreeRoot()
+            protected override T GetTreeRoot()
             {
-                return Header->FirstAsTarget;
+                return (Header + LinksHeader.FirstAsTargetOffset).GetValue<T>();
             }
 
-            protected override ulong GetBasePartValue(ulong link)
+            protected override T GetBasePartValue(T link)
             {
-                return Links[link].Target;
+                return (Links.GetElement(LinkSizeInBytes, link) + Link.TargetOffset).GetValue<T>();
             }
         }
     }

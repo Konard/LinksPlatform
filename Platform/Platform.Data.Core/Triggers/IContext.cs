@@ -1,6 +1,6 @@
 ﻿namespace Platform.Data.Core.Triggers
 {
-    public interface IContext
+    internal interface IContext
     {
         ITrigger Trigger { get; }
         // Before

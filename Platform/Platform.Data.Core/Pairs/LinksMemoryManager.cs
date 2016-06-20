@@ -1,71 +1,167 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Disposal;
+using System.Runtime.InteropServices;
+using Platform.Data.Core.Exceptions;
+using Platform.Helpers;
+using Platform.Helpers.Collections;
+using Platform.Helpers.Disposables;
 using Platform.Memory;
+using static Platform.Helpers.MathHelpers;
 
 #pragma warning disable 0649
 #pragma warning disable 169
+#pragma warning disable 618
+
+// ReSharper disable StaticMemberInGenericType
+// ReSharper disable BuiltInTypeReferenceStyle
+// ReSharper disable MemberCanBePrivate.Local
+// ReSharper disable UnusedMember.Local
 
 namespace Platform.Data.Core.Pairs
 {
     /// <remarks>
     /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).
     /// </remarks>
-    public unsafe partial class LinksMemoryManager : DisposalBase, ILinksMemoryManager<ulong>
+    public partial class LinksMemoryManager<T> : DisposableBase, ILinksMemoryManager<T>
     {
         /// <summary>Возвращает размер одной связи в байтах.</summary>
         /// <remarks>
         /// Используется только во вне класса, не рекомедуется использовать внутри.
         /// Так как во вне не обязательно будет доступен unsafe С#.
         /// </remarks>
-        public static readonly int LinkSizeInBytes = sizeof(Link);
+        public static readonly int LinkSizeInBytes = UnsafeHelpers.SizeOf<Link>();
+
+        public static readonly int LinkHeaderSizeInBytes = UnsafeHelpers.SizeOf<LinksHeader>();
 
         public static readonly long DefaultLinksSizeStep = LinkSizeInBytes * 1024 * 1024;
 
         private struct Link
         {
-            public ulong Source;
-            public ulong Target;
-            public ulong LeftAsSource;
-            public ulong RightAsSource;
-            public ulong SizeAsSource;
-            public ulong LeftAsTarget;
-            public ulong RightAsTarget;
-            public ulong SizeAsTarget;
+            public static readonly int SourceOffset = Marshal.OffsetOf(typeof(Link), nameof(Source)).ToInt32();
+            public static readonly int TargetOffset = Marshal.OffsetOf(typeof(Link), nameof(Target)).ToInt32();
+            public static readonly int LeftAsSourceOffset = Marshal.OffsetOf(typeof(Link), nameof(LeftAsSource)).ToInt32();
+            public static readonly int RightAsSourceOffset = Marshal.OffsetOf(typeof(Link), nameof(RightAsSource)).ToInt32();
+            public static readonly int SizeAsSourceOffset = Marshal.OffsetOf(typeof(Link), nameof(SizeAsSource)).ToInt32();
+            public static readonly int LeftAsTargetOffset = Marshal.OffsetOf(typeof(Link), nameof(LeftAsTarget)).ToInt32();
+            public static readonly int RightAsTargetOffset = Marshal.OffsetOf(typeof(Link), nameof(RightAsTarget)).ToInt32();
+            public static readonly int SizeAsTargetOffset = Marshal.OffsetOf(typeof(Link), nameof(SizeAsTarget)).ToInt32();
+
+            public T Source;
+            public T Target;
+            public T LeftAsSource;
+            public T RightAsSource;
+            public T SizeAsSource;
+            public T LeftAsTarget;
+            public T RightAsTarget;
+            public T SizeAsTarget;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetSource(IntPtr pointer) => (pointer + SourceOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetTarget(IntPtr pointer) => (pointer + TargetOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetLeftAsSource(IntPtr pointer) => (pointer + LeftAsSourceOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetRightAsSource(IntPtr pointer) => (pointer + RightAsSourceOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetSizeAsSource(IntPtr pointer) => (pointer + SizeAsSourceOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetLeftAsTarget(IntPtr pointer) => (pointer + LeftAsTargetOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetRightAsTarget(IntPtr pointer) => (pointer + RightAsTargetOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetSizeAsTarget(IntPtr pointer) => (pointer + SizeAsTargetOffset).GetValue<T>();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetSource(IntPtr pointer, T value) => (pointer + SourceOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetTarget(IntPtr pointer, T value) => (pointer + TargetOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetLeftAsSource(IntPtr pointer, T value) => (pointer + LeftAsSourceOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetRightAsSource(IntPtr pointer, T value) => (pointer + RightAsSourceOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetSizeAsSource(IntPtr pointer, T value) => (pointer + SizeAsSourceOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetLeftAsTarget(IntPtr pointer, T value) => (pointer + LeftAsTargetOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetRightAsTarget(IntPtr pointer, T value) => (pointer + RightAsTargetOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetSizeAsTarget(IntPtr pointer, T value) => (pointer + SizeAsTargetOffset).SetValue(value);
         }
 
         private struct LinksHeader
         {
-            public ulong AllocatedLinks;
-            public ulong ReservedLinks;
-            public ulong FreeLinks;
-            public ulong FirstFreeLink;
-            public ulong FirstAsSource;
-            public ulong FirstAsTarget;
-            public ulong LastFreeLink;
-            public ulong Reserved8;
+            public static readonly int AllocatedLinksOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(AllocatedLinks)).ToInt32();
+            public static readonly int ReservedLinksOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(ReservedLinks)).ToInt32();
+            public static readonly int FreeLinksOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(FreeLinks)).ToInt32();
+            public static readonly int FirstFreeLinkOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(FirstFreeLink)).ToInt32();
+            public static readonly int FirstAsSourceOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(FirstAsSource)).ToInt32();
+            public static readonly int FirstAsTargetOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(FirstAsTarget)).ToInt32();
+            public static readonly int LastFreeLinkOffset = Marshal.OffsetOf(typeof(LinksHeader), nameof(LastFreeLink)).ToInt32();
+
+            public T AllocatedLinks;
+            public T ReservedLinks;
+            public T FreeLinks;
+            public T FirstFreeLink;
+            public T FirstAsSource;
+            public T FirstAsTarget;
+            public T LastFreeLink;
+            public T Reserved8;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetAllocatedLinks(IntPtr pointer) => (pointer + AllocatedLinksOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetReservedLinks(IntPtr pointer) => (pointer + ReservedLinksOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetFreeLinks(IntPtr pointer) => (pointer + FreeLinksOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetFirstFreeLink(IntPtr pointer) => (pointer + FirstFreeLinkOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetFirstAsSource(IntPtr pointer) => (pointer + FirstAsSourceOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetFirstAsTarget(IntPtr pointer) => (pointer + FirstAsTargetOffset).GetValue<T>();
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static T GetLastFreeLink(IntPtr pointer) => (pointer + LastFreeLinkOffset).GetValue<T>();
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static IntPtr GetFirstAsSourcePointer(IntPtr pointer) => pointer + FirstAsSourceOffset;
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static IntPtr GetFirstAsTargetPointer(IntPtr pointer) => pointer + FirstAsTargetOffset;
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetAllocatedLinks(IntPtr pointer, T value) => (pointer + AllocatedLinksOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetReservedLinks(IntPtr pointer, T value) => (pointer + ReservedLinksOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetFreeLinks(IntPtr pointer, T value) => (pointer + FreeLinksOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetFirstFreeLink(IntPtr pointer, T value) => (pointer + FirstFreeLinkOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetFirstAsSource(IntPtr pointer, T value) => (pointer + FirstAsSourceOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetFirstAsTarget(IntPtr pointer, T value) => (pointer + FirstAsTargetOffset).SetValue(value);
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            public static void SetLastFreeLink(IntPtr pointer, T value) => (pointer + LastFreeLinkOffset).SetValue(value);
         }
 
         private readonly long _memoryReservationStep;
 
         private readonly IResizableDirectMemory _memory;
-        private LinksHeader* _header;
-        private Link* _links;
+        private IntPtr _header;
+        private IntPtr _links;
 
         private LinksTargetsTreeMethods _targetsTreeMethods;
         private LinksSourcesTreeMethods _sourcesTreeMethods;
 
-        // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно
-        // TODO: использовать не список а дерево, так как так можно быстрее проверить на наличие связи внутри
+        // TODO: Возможно чтобы гарантированно проверять на то, является ли связь удалённой, нужно использовать не список а дерево, так как так можно быстрее проверить на наличие связи внутри
         private UnusedLinksListMethods _unusedLinksListMethods;
 
         /// <summary>
         /// Возвращает общее число связей находящихся в хранилище.
         /// </summary>
-        private ulong Total
-        {
-            get { return _header->AllocatedLinks - _header->FreeLinks; }
-        }
+        private T Total => Subtract(LinksHeader.GetAllocatedLinks(_header), LinksHeader.GetFreeLinks(_header));
 
         public LinksMemoryManager(string address)
             : this(address, DefaultLinksSizeStep)
@@ -92,328 +188,361 @@ namespace Platform.Data.Core.Pairs
             _memory = memory;
             _memoryReservationStep = memoryReservationStep;
 
-            UpdatePointers(_memory);
+            if (memory.ReservedCapacity < memoryReservationStep)
+                memory.ReservedCapacity = memoryReservationStep;
+
+            SetPointers(_memory);
 
             // Гарантия корректности _memory.UsedCapacity относительно _header->AllocatedLinks
-            _memory.UsedCapacity = (long)_header->AllocatedLinks * sizeof(Link) + sizeof(LinksHeader);
+            _memory.UsedCapacity = (long)(Integer<T>)LinksHeader.GetAllocatedLinks(_header) * LinkSizeInBytes + LinkHeaderSizeInBytes;
 
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
-            _header->ReservedLinks = (ulong)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
+            LinksHeader.SetReservedLinks(_header, (Integer<T>)((_memory.ReservedCapacity - LinkHeaderSizeInBytes) / LinkSizeInBytes));
         }
 
-        public ulong Count(params ulong[] restrictions)
+        // TODO: Дать возможность переопределять в конструкторе
+        public ILinksCombinedConstants<bool, T, int> Constants { get; } = Default<LinksConstants<bool, T, int>>.Instance;
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public T Count(IList<T> restrictions)
         {
             // Если нет ограничений, тогда возвращаем общее число связей находящихся в хранилище.
-            if (restrictions.Length == 0)
+            if (restrictions.Count == 0)
                 return Total;
-            if (restrictions.Length == 1)
-                return Exists(restrictions[LinksConstants.IndexPart]) ? 1UL : 0;
-            if (restrictions.Length == 2)
+            if (restrictions.Count == 1)
             {
-                var index = restrictions[LinksConstants.IndexPart];
+                var index = restrictions[Constants.IndexPart];
+
+                if (Equals(index, Constants.Any))
+                    return Total;
+
+                return Exists(index) ? (Integer<T>)1 : (Integer<T>)0;
+            }
+            if (restrictions.Count == 2)
+            {
+                var index = restrictions[Constants.IndexPart];
                 var value = restrictions[1];
 
-                if (index == LinksConstants.Null)
+                if (Equals(index, Constants.Any))
                 {
-                    if (value == LinksConstants.Any)
-                        return Total; // Null - как отсутствие ограничения
+                    if (Equals(value, Constants.Any))
+                        return Total; // Any - как отсутствие ограничения
 
-                    return _sourcesTreeMethods.CalculateReferences(value)
-                         + _targetsTreeMethods.CalculateReferences(value);
+                    return Add(_sourcesTreeMethods.CalculateReferences(value), _targetsTreeMethods.CalculateReferences(value));
                 }
                 else
                 {
                     if (!Exists(index))
-                        return 0;
+                        return (Integer<T>)0;
 
-                    if (value == LinksConstants.Any)
-                        return 1;
+                    if (Equals(value, Constants.Any))
+                        return (Integer<T>)1;
 
-                    var storedLinkValue = GetLinkValue(index);
-                    if (storedLinkValue[LinksConstants.SourcePart] == value ||
-                        storedLinkValue[LinksConstants.TargetPart] == value)
-                        return 1;
-                    return 0;
+                    var storedLinkValue = GetLinkUnsafe(index);
+                    if (Equals(Link.GetSource(storedLinkValue), value) ||
+                        Equals(Link.GetTarget(storedLinkValue), value))
+                        return (Integer<T>)1;
+                    return (Integer<T>)0;
                 }
             }
-            if (restrictions.Length == 3)
+            if (restrictions.Count == 3)
             {
-                var index = restrictions[LinksConstants.IndexPart];
-                var source = restrictions[LinksConstants.SourcePart];
-                var target = restrictions[LinksConstants.TargetPart];
+                var index = restrictions[Constants.IndexPart];
+                var source = restrictions[Constants.SourcePart];
+                var target = restrictions[Constants.TargetPart];
 
-                if (index == LinksConstants.Null)
+                if (Equals(index, Constants.Any))
                 {
-                    if (source == LinksConstants.Any && target == LinksConstants.Any)
-                    {
+                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
                         return Total;
-                    }
-                    else if (source == LinksConstants.Any)
-                    {
+                    else if (Equals(source, Constants.Any))
                         return _targetsTreeMethods.CalculateReferences(target);
-                    }
-                    else if (target == LinksConstants.Any)
-                    {
+                    else if (Equals(target, Constants.Any))
                         return _sourcesTreeMethods.CalculateReferences(source);
-                    }
-                    else //if(source != Null && target != Null)
+                    else //if(source != Any && target != Any)
                     {
-                        // Эквивалент Exists(source, target) => Count(0, source, target) > 0
+                        // Эквивалент Exists(source, target) => Count(Any, source, target) > 0
                         var link = _sourcesTreeMethods.Search(source, target);
-                        return link != LinksConstants.Null ? 1UL : 0UL;
+                        return Equals(link, Constants.Null) ? (Integer<T>)0 : (Integer<T>)1;
                     }
                 }
                 else
                 {
                     if (!Exists(index))
-                        return 0;
+                        return (Integer<T>)0;
 
-                    if (source == LinksConstants.Any && target == LinksConstants.Any)
-                        return 1;
+                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                        return (Integer<T>)1;
 
-                    var storedLinkValue = GetLinkValue(index);
+                    var storedLinkValue = GetLinkUnsafe(index);
 
-                    if (source != LinksConstants.Any && target != LinksConstants.Any)
+                    if (!Equals(source, Constants.Any) && !Equals(target, Constants.Any))
                     {
-                        if (storedLinkValue[LinksConstants.SourcePart] == source &&
-                            storedLinkValue[LinksConstants.TargetPart] == target)
-                            return 1;
-                        return 0;
+                        if (Equals(Link.GetSource(storedLinkValue), source) &&
+                            Equals(Link.GetTarget(storedLinkValue), target))
+                            return (Integer<T>)1;
+                        return (Integer<T>)0;
                     }
 
-                    var value = default(ulong);
-                    if (source == LinksConstants.Any) value = target;
-                    if (target == LinksConstants.Any) value = source;
+                    var value = default(T);
+                    if (Equals(source, Constants.Any)) value = target;
+                    if (Equals(target, Constants.Any)) value = source;
 
-                    if (storedLinkValue[LinksConstants.SourcePart] == value ||
-                        storedLinkValue[LinksConstants.TargetPart] == value)
-                        return 1;
-                    return 0;
+                    if (Equals(Link.GetSource(storedLinkValue), value) ||
+                        Equals(Link.GetTarget(storedLinkValue), value))
+                        return (Integer<T>)1;
+                    return (Integer<T>)0;
                 }
             }
             throw new NotSupportedException("Другие размеры и способы ограничений не поддерживаются.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Each(Func<ulong, bool> handler, params ulong[] valuesRestriction)
+        public bool Each(Func<T, bool> handler, IList<T> restrictions)
         {
-            var index = valuesRestriction[LinksConstants.IndexPart];
-            var source = valuesRestriction[LinksConstants.SourcePart];
-            var target = valuesRestriction[LinksConstants.TargetPart];
-
-            if (index == LinksConstants.Null)
+            if (restrictions.Count == 0)
             {
-                if (source == LinksConstants.Any && target == LinksConstants.Any)
-                {
-                    // Этот блок используется в GetEnumerator, CopyTo, Clear
-                    for (ulong link = 1; link <= _header->AllocatedLinks; link++)
-                        if (Exists(link))
-                            if (handler(link) == LinksConstants.Break)
-                                return LinksConstants.Break;
-                }
-                else if (source == LinksConstants.Any)
-                {
-                    return _targetsTreeMethods.EachReference(target, handler);
-                }
-                else if (target == LinksConstants.Any)
-                {
-                    return _sourcesTreeMethods.EachReference(source, handler);
-                }
-                else //if(source != Null && target != Null)
-                {
-                    var link = _sourcesTreeMethods.Search(source, target);
+                for (T link = (Integer<T>)1; LessOrEqualThan(link, (T)(Integer<T>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
+                    if (Exists(link))
+                        if (handler(link) == Constants.Break)
+                            return Constants.Break;
 
-                    if (link != LinksConstants.Null)
-                        if (handler(link) == LinksConstants.Break)
-                            return LinksConstants.Break;
-                }
+                return Constants.Continue;
             }
-            else
+            if (restrictions.Count == 1)
             {
+                var index = restrictions[Constants.IndexPart];
+
+                if (Equals(index, Constants.Any))
+                    return Each(handler, ArrayPool<T>.Empty);
+
                 if (!Exists(index))
-                    return LinksConstants.Continue;
+                    return Constants.Continue;
 
-                if (source == LinksConstants.Any && target == LinksConstants.Any)
-                    return handler(index);
-
-                var storedLinkValue = GetLinkValue(index);
-
-                if (source != LinksConstants.Any && target != LinksConstants.Any)
-                {
-                    if (storedLinkValue[LinksConstants.SourcePart] == source &&
-                        storedLinkValue[LinksConstants.TargetPart] == target)
-                        return handler(index);
-                    return LinksConstants.Continue;
-                }
-
-                var value = default(ulong);
-                if (source == LinksConstants.Any) value = target;
-                if (target == LinksConstants.Any) value = source;
-
-                if (storedLinkValue[LinksConstants.SourcePart] == value ||
-                    storedLinkValue[LinksConstants.TargetPart] == value)
-                    return handler(index);
-                return LinksConstants.Continue;
+                return handler(index);
             }
-            return LinksConstants.Continue;
-        }
+            if (restrictions.Count == 2)
+            {
+                var index = restrictions[Constants.IndexPart];
+                var value = restrictions[1];
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public ulong Search(ulong source, ulong target)
-        {
-            return _sourcesTreeMethods.Search(source, target);
+                if (Equals(index, Constants.Any))
+                {
+                    if (Equals(value, Constants.Any))
+                        return Each(handler, ArrayPool<T>.Empty);
+
+                    if (Each(handler, new[] { index, value, Constants.Any }) == Constants.Break)
+                        return Constants.Break;
+
+                    return Each(handler, new[] { index, Constants.Any, value });
+                }
+                else
+                {
+                    if (!Exists(index))
+                        return Constants.Continue;
+
+                    if (Equals(value, Constants.Any))
+                        return handler(index);
+
+                    var storedLinkValue = GetLinkUnsafe(index);
+                    if (Equals(Link.GetSource(storedLinkValue), value) ||
+                        Equals(Link.GetTarget(storedLinkValue), value))
+                        return handler(index);
+                    return Constants.Continue;
+                }
+            }
+            if (restrictions.Count == 3)
+            {
+                var index = restrictions[Constants.IndexPart];
+                var source = restrictions[Constants.SourcePart];
+                var target = restrictions[Constants.TargetPart];
+
+                if (Equals(index, Constants.Any))
+                {
+                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                        return Each(handler, ArrayPool<T>.Empty);
+                    else if (Equals(source, Constants.Any))
+                        return _targetsTreeMethods.EachReference(target, handler);
+                    else if (Equals(target, Constants.Any))
+                        return _sourcesTreeMethods.EachReference(source, handler);
+                    else //if(source != Any && target != Any)
+                    {
+                        var link = _sourcesTreeMethods.Search(source, target);
+
+                        return Equals(link, Constants.Null) ? Constants.Continue : handler(link);
+                    }
+                }
+                else
+                {
+                    if (!Exists(index))
+                        return Constants.Continue;
+
+                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                        return handler(index);
+
+                    var storedLinkValue = GetLinkUnsafe(index);
+
+                    if (!Equals(source, Constants.Any) && !Equals(target, Constants.Any))
+                    {
+                        if (Equals(Link.GetSource(storedLinkValue), source) &&
+                            Equals(Link.GetTarget(storedLinkValue), target))
+                            return handler(index);
+                        return Constants.Continue;
+                    }
+
+                    var value = default(T);
+                    if (Equals(source, Constants.Any)) value = target;
+                    if (Equals(target, Constants.Any)) value = source;
+
+                    if (Equals(Link.GetSource(storedLinkValue), value) ||
+                        Equals(Link.GetTarget(storedLinkValue), value))
+                        return handler(index);
+                    return Constants.Continue;
+                }
+            }
+            throw new NotSupportedException("Другие размеры и способы ограничений не поддерживаются.");
         }
 
         /// <remarks>
         /// TODO: Возможно можно перемещать значения, если указан индекс, но значение существует в другом месте (но не в менеджере памяти, а в логике Links)
         /// </remarks>
-        public void SetLinkValue(params ulong[] values)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void SetLinkValue(IList<T> values)
         {
-            var linkIndex = values[LinksConstants.IndexPart];
-            var link = &_links[linkIndex];
+            var linkIndex = values[Constants.IndexPart];
+            var link = GetLinkUnsafe(linkIndex);
 
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
-            if (link->Source != LinksConstants.Null) _sourcesTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsSource);
-            if (link->Target != LinksConstants.Null) _targetsTreeMethods.RemoveUnsafe(linkIndex, &_header->FirstAsTarget);
+            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.RemoveUnsafe(linkIndex, LinksHeader.GetFirstAsSourcePointer(_header));
+            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.RemoveUnsafe(linkIndex, LinksHeader.GetFirstAsTargetPointer(_header));
 
-            link->Source = values[LinksConstants.SourcePart];
-            link->Target = values[LinksConstants.TargetPart];
+            Link.SetSource(link, values[Constants.SourcePart]);
+            Link.SetTarget(link, values[Constants.TargetPart]);
 
-            if (link->Source != LinksConstants.Null) _sourcesTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsSource);
-            if (link->Target != LinksConstants.Null) _targetsTreeMethods.AddUnsafe(linkIndex, &_header->FirstAsTarget);
-        }
-
-        public ulong[] GetLinkValue(ulong linkIndex)
-        {
-            var values = new ulong[3];
-            var link = &_links[linkIndex];
-
-            values[LinksConstants.IndexPart] = linkIndex;
-            values[LinksConstants.SourcePart] = link->Source;
-            values[LinksConstants.TargetPart] = link->Target;
-
-            return values;
+            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.AddUnsafe(linkIndex, LinksHeader.GetFirstAsSourcePointer(_header));
+            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.AddUnsafe(linkIndex, LinksHeader.GetFirstAsTargetPointer(_header));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public Pairs.Link GetLinkValueStruct(ulong linkIndex)
+        public IList<T> GetLinkValue(T linkIndex)
         {
-            var link = &_links[linkIndex];
-            return new Pairs.Link(linkIndex, link->Source, link->Target);
+            return GetLinkStruct(linkIndex);
         }
 
-        /// <summary>
-        /// Выделяет следующую свободную связь и возвращает её индекс.
-        /// </summary>
-        /// <returns>Индекс свободной связи.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public Link<T> GetLinkStruct(T linkIndex)
+        {
+            var link = GetLinkUnsafe(linkIndex);
+            return new Link<T>(linkIndex, Link.GetSource(link), Link.GetTarget(link));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private IntPtr GetLinkUnsafe(T linkIndex)
+        {
+            return _links.GetElement(LinkSizeInBytes, linkIndex);
+        }
+
         /// <remarks>
         /// TODO: Возможно нужно будет заполнение нулями, если внешнее API ими не заполняет пространство
         /// </remarks>
-        public ulong AllocateLink()
+        public T AllocateLink()
         {
-            var freeLink = _header->FirstFreeLink;
+            var freeLink = LinksHeader.GetFirstFreeLink(_header);
 
-            if (freeLink != LinksConstants.Null)
+            if (!Equals(freeLink, Constants.Null))
                 _unusedLinksListMethods.Detach(freeLink);
             else
             {
-                if (_header->AllocatedLinks == long.MaxValue)
-                    throw new Exception(string.Format("Количество связей в базе данных не может превышать {0}.",
-                        long.MaxValue));
+                if (GreaterThan(LinksHeader.GetAllocatedLinks(_header), Constants.MaxPossibleIndex))
+                    throw new LinksLimitReachedException((Integer<T>)Constants.MaxPossibleIndex);
 
-                if (_header->AllocatedLinks >= (_header->ReservedLinks - 1))
+                if (GreaterOrEqualThan(LinksHeader.GetAllocatedLinks(_header), Decrement(LinksHeader.GetReservedLinks(_header))))
                 {
                     _memory.ReservedCapacity += _memoryReservationStep;
-                    UpdatePointers(_memory);
-                    _header->ReservedLinks = (ulong)(_memory.ReservedCapacity / sizeof(Link));
+                    SetPointers(_memory);
+                    LinksHeader.SetReservedLinks(_header, (Integer<T>)(_memory.ReservedCapacity / LinkSizeInBytes));
                 }
 
-                _header->AllocatedLinks++;
-                _memory.UsedCapacity += sizeof(Link);
-                freeLink = _header->AllocatedLinks;
+                LinksHeader.SetAllocatedLinks(_header, Increment(LinksHeader.GetAllocatedLinks(_header)));
+                _memory.UsedCapacity += LinkSizeInBytes;
+                freeLink = LinksHeader.GetAllocatedLinks(_header);
             }
 
             return freeLink;
         }
 
-        /// <summary>
-        /// Высвобождает используемое связью пространство.
-        /// </summary>
-        /// <param name="link">Индекс высвобождаемой связи.</param>
-        public void FreeLink(ulong link)
+        public void FreeLink(T link)
         {
-            if (link < _header->AllocatedLinks)
-            {
+            if (LessThan(link, LinksHeader.GetAllocatedLinks(_header)))
                 _unusedLinksListMethods.AttachAsFirst(link);
-            }
-            else if (link == _header->AllocatedLinks)
+            else if (Equals(link, LinksHeader.GetAllocatedLinks(_header)))
             {
-                _header->AllocatedLinks--;
-                _memory.UsedCapacity -= sizeof(Link);
+                LinksHeader.SetAllocatedLinks(_header, Decrement(LinksHeader.GetAllocatedLinks(_header)));
+                _memory.UsedCapacity -= LinkSizeInBytes;
 
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
-                while (_header->AllocatedLinks > 0 && IsUnusedLink(_header->AllocatedLinks))
+                while (GreaterThan(LinksHeader.GetAllocatedLinks(_header), (T)(Integer<T>)0) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
                 {
-                    _unusedLinksListMethods.Detach(_header->AllocatedLinks);
+                    _unusedLinksListMethods.Detach(LinksHeader.GetAllocatedLinks(_header));
 
-                    _header->AllocatedLinks--;
-                    _memory.UsedCapacity -= sizeof(Link);
+                    LinksHeader.SetAllocatedLinks(_header, Decrement(LinksHeader.GetAllocatedLinks(_header)));
+                    _memory.UsedCapacity -= LinkSizeInBytes;
                 }
             }
         }
 
-        /// <summary>
-        /// Выполняет обновление указателей на массив связей и заголовок базы данных.
-        /// </summary>
-        /// <param name="memory">Объект для работы с файлом как виртуальным блоком памяти.</param>
         /// <remarks>
         /// TODO: Возможно это должно быть событием, вызываемым из IMemory, в том случае, если адрес реально поменялся
+        /// 
+        /// Указатель this.links может быть в том же месте, 
+        /// так как 0-я связь не используется и имеет такой же размер как Header,
+        /// поэтому header размещается в том же месте, что и 0-я связь
         /// </remarks>
-        private void UpdatePointers(IResizableDirectMemory memory)
+        private void SetPointers(IDirectMemory memory)
         {
-            _header = (LinksHeader*)memory.Pointer;
-
-            // Указатель this.links может быть в том же месте, 
-            // так как 0-я связь не используется и имеет такой же размер как Header,
-            // поэтому header размещается в том же месте, что и 0-я связь
-            _links = (Link*)memory.Pointer;
-
-            _sourcesTreeMethods = new LinksSourcesTreeMethods(this, _header);
-            _targetsTreeMethods = new LinksTargetsTreeMethods(this, _header);
-            _unusedLinksListMethods = new UnusedLinksListMethods(this, _header);
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool Exists(ulong link)
-        {
-            return link != LinksConstants.Null && link <= _header->AllocatedLinks && !IsUnusedLink(link);
-        }
-
-        /// <summary>
-        /// Проверяет находится ли связь в списке свободных связей.
-        /// </summary>
-        /// <param name="link">Индекс проверяемой связи.</param>
-        /// <returns>Значение, определяющие включена ли связь в список свободных связей.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsUnusedLink(ulong link)
-        {
-            return _header->FirstFreeLink == link
-                   || (_links[link].SizeAsSource == LinksConstants.Null && _links[link].Source != LinksConstants.Null);
-        }
-
-        protected override bool AllowMultipleDisposeCalls
-        {
-            get
+            if (memory == null)
             {
-                return true;
+                _header = _links = IntPtr.Zero;
+
+                _unusedLinksListMethods = null;
+                _targetsTreeMethods = null;
+                _unusedLinksListMethods = null;
+            }
+            else
+            {
+                _header = _links = memory.Pointer;
+
+                _sourcesTreeMethods = new LinksSourcesTreeMethods(_links, _header, Constants);
+                _targetsTreeMethods = new LinksTargetsTreeMethods(_links, _header, Constants);
+                _unusedLinksListMethods = new UnusedLinksListMethods(_links, _header);
             }
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool Exists(T link)
+        {
+            return GreaterOrEqualThan(link, Constants.MinPossibleIndex) && LessOrEqualThan(link, LinksHeader.GetAllocatedLinks(_header)) && !IsUnusedLink(link);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private bool IsUnusedLink(T link)
+        {
+            return Equals(LinksHeader.GetFirstFreeLink(_header), link)
+                   || (Equals(Link.GetSizeAsSource(GetLinkUnsafe(link)), Constants.Null) && !Equals(Link.GetSource(GetLinkUnsafe(link)), Constants.Null));
+        }
+
+        #region Disposable
+
+        protected override bool AllowMultipleDisposeCalls => true;
+
         protected override void DisposeCore(bool manual)
         {
+            SetPointers(null);
             if (manual)
-                DisposalHelpers.TryDispose(_memory);
+                Disposable.TryDispose(_memory);
         }
+
+        #endregion
     }
 }

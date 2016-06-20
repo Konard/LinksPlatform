@@ -1,68 +1,70 @@
-﻿using Platform.Data.Core.Collections.Lists;
+﻿using System;
+using Platform.Data.Core.Collections.Lists;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
-    unsafe partial class LinksMemoryManager
+    partial class LinksMemoryManager<T>
     {
-        private class UnusedLinksListMethods : CircularDoublyLinkedListMethods
+        private class UnusedLinksListMethods : CircularDoublyLinkedListMethods<T>
         {
-            private readonly Link* _links;
-            private readonly LinksHeader* _header;
+            private readonly IntPtr _links;
+            private readonly IntPtr _header;
 
-            public UnusedLinksListMethods(LinksMemoryManager links, LinksHeader* header)
+            public UnusedLinksListMethods(IntPtr links, IntPtr header)
             {
-                _links = links._links;
+                _links = links;
                 _header = header;
             }
 
-            protected override ulong GetFirst()
+            protected override T GetFirst()
             {
-                return _header->FirstFreeLink;
+                return (_header + LinksHeader.FirstFreeLinkOffset).GetValue<T>();
             }
 
-            protected override ulong GetLast()
+            protected override T GetLast()
             {
-                return _header->LastFreeLink;
+                return (_header + LinksHeader.LastFreeLinkOffset).GetValue<T>();
             }
 
-            protected override ulong GetPrevious(ulong element)
+            protected override T GetPrevious(T element)
             {
-                return _links[element].Source;
+                return (_links.GetElement(LinkSizeInBytes, element) + Link.SourceOffset).GetValue<T>();
             }
 
-            protected override ulong GetNext(ulong element)
+            protected override T GetNext(T element)
             {
-                return _links[element].Target;
+                return (_links.GetElement(LinkSizeInBytes, element) + Link.TargetOffset).GetValue<T>();
             }
 
-            protected override ulong GetSize()
+            protected override T GetSize()
             {
-                return _header->FreeLinks;
+                return (_header + LinksHeader.FreeLinksOffset).GetValue<T>();
             }
 
-            protected override void SetFirst(ulong element)
+            protected override void SetFirst(T element)
             {
-                _header->FirstFreeLink = element;
+                (_header + LinksHeader.FirstFreeLinkOffset).SetValue(element);
             }
 
-            protected override void SetLast(ulong element)
+            protected override void SetLast(T element)
             {
-                _header->LastFreeLink = element;
+                (_header + LinksHeader.LastFreeLinkOffset).SetValue(element);
             }
 
-            protected override void SetPrevious(ulong element, ulong previous)
+            protected override void SetPrevious(T element, T previous)
             {
-                _links[element].Source = previous;
+                (_links.GetElement(LinkSizeInBytes, element) + Link.SourceOffset).SetValue(previous);
             }
 
-            protected override void SetNext(ulong element, ulong next)
+            protected override void SetNext(T element, T next)
             {
-                _links[element].Target = next;
+                (_links.GetElement(LinkSizeInBytes, element) + Link.TargetOffset).SetValue(next);
             }
 
-            protected override void SetSize(ulong size)
+            protected override void SetSize(T size)
             {
-                _header->FreeLinks = size;
+                (_header + LinksHeader.FreeLinksOffset).SetValue(size);
             }
         }
     }

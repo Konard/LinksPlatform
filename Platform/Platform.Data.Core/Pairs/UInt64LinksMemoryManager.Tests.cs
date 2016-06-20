@@ -7,7 +7,10 @@ using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Data.Core.Pairs
 {
-    unsafe partial class LinksMemoryManager
+    /// <summary>
+    /// TODO: Make separate GEXF Exporter.
+    /// </summary>
+    unsafe partial class UInt64LinksMemoryManager
     {
         public void ExportSourcesTree(string outputFilename)
         {
