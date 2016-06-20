@@ -1,14 +1,14 @@
 ﻿using System.IO;
-using Platform.Helpers.Disposal;
+using Platform.Helpers.Disposables;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 
 namespace Platform.Tests.Data.Core
 {
-    public class TempLinksTestScope : DisposalBase
+    public class TempLinksTestScope : DisposableBase
     {
-        public readonly LinksMemoryManager MemoryManager;
-        public readonly Links Links;
+        public readonly ILinksMemoryManager<ulong> MemoryManager;
+        public readonly UInt64Links Links;
         public readonly Sequences Sequences;
         public readonly string TempFilename;
         public readonly string TempTransactionLogFilename;
@@ -20,16 +20,17 @@ namespace Platform.Tests.Data.Core
             TempFilename = Path.GetTempFileName();
             TempTransactionLogFilename = Path.GetTempFileName();
 
-            MemoryManager = new LinksMemoryManager(TempFilename);
-            Links = useLog ? new Links(MemoryManager, TempTransactionLogFilename) : new Links(MemoryManager);
+            MemoryManager = new UInt64LinksMemoryManager(TempFilename);
+            //MemoryManager = new LinksMemoryManager<ulong>(TempFilename);
+            Links = useLog ? new UInt64Links(MemoryManager, TempTransactionLogFilename) : new UInt64Links(MemoryManager);
             if (useSequences)
-                Sequences = new Sequences(Links, sequencesOptions);
+                Sequences = new Sequences(new SynchronizedLinks<ulong>(Links), sequencesOptions);
         }
 
         protected override void DisposeCore(bool manual)
         {
             if (manual)
-                DisposalHelpers.TryDispose(Links);
+                Disposable.TryDispose(Links);
 
             if (_deleteFiles)
                 DeleteFiles();
