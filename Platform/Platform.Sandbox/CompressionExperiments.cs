@@ -10,6 +10,7 @@ using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
+using Platform.Helpers.Collections.Optimizations;
 
 namespace Platform.Sandbox
 {
@@ -19,12 +20,13 @@ namespace Platform.Sandbox
         {
             File.Delete("web.links");
 
-            using (var memoryManager = new LinksMemoryManager("web.links", 8 * 1024 * 1024))
-            using (var links = new Links(memoryManager))
+            using (var memoryManager = new UInt64LinksMemoryManager("web.links", 8 * 1024 * 1024))
+            using (var links = new UInt64Links(memoryManager))
             {
-                UnicodeMap.InitNew(links);
+                var syncLinks = new SynchronizedLinks<ulong>(links);
+                UnicodeMap.InitNew(syncLinks);
 
-                var sequences = new Sequences(links);
+                var sequences = new Sequences(syncLinks);
 
                 // Get content
                 const string url = "https://en.wikipedia.org/wiki/Main_Page";
@@ -65,7 +67,7 @@ namespace Platform.Sandbox
                 for (var i = 0; i < 1; i++)
                 {
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Data.Core.Sequences.Compressor(links, sequences, 1);
+                    var compressor = new Data.Core.Sequences.Compressor(syncLinks, sequences, 1);
                     responseCompressedArray3 = compressor.Precompress(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
                 }
@@ -101,17 +103,17 @@ namespace Platform.Sandbox
                 //    }
                 //}
 
-                var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, links);
+                var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, syncLinks);
 
                 Global.Trash = (unpack == pageContents);
 
-                var totalLinks = links.Count() - UnicodeMap.MapSize;
+                var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
                 Console.WriteLine(totalLinks);
 
                 Global.Trash = totalLinks;
 
-                links.Create(urlLink, responseLink2);
+                syncLinks.CreateAndUpdate(urlLink, responseLink2);
 
                 var divLinksArray = UnicodeMap.FromStringToLinkArray("div");
 
@@ -137,18 +139,19 @@ namespace Platform.Sandbox
             {
                 File.Delete("stats.links");
 
-                using (var memoryManager = new LinksMemoryManager("stats.links", 8 * 1024 * 1024))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var links = new UInt64Links(memoryManager))
                 {
-                    UnicodeMap.InitNew(links);
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
+                    UnicodeMap.InitNew(syncLinks);
 
-                    var sequences = new Sequences(links);
+                    var sequences = new Sequences(syncLinks);
 
                     var sw3 = Stopwatch.StartNew(); sequences.CreateBalancedVariant(responseSourceArray); sw3.Stop();
 
-                    var totalLinks = links.Count() - UnicodeMap.MapSize;
+                    var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
-                    Console.WriteLine("Balanced Variant: {0}, {1}, {2}", sw3.Elapsed, responseSourceArray.Length, totalLinks);
+                    Console.WriteLine($"Balanced Variant: {sw3.Elapsed}, {responseSourceArray.Length}, {totalLinks}");
                 }
             }
 
@@ -160,21 +163,22 @@ namespace Platform.Sandbox
 
                 File.Delete("stats.links");
 
-                using (var memoryManager = new LinksMemoryManager("stats.links", 8 * 1024 * 1024))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var links = new UInt64Links(memoryManager))
                 {
-                    UnicodeMap.InitNew(links);
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
+                    UnicodeMap.InitNew(syncLinks);
 
-                    var sequences = new Sequences(links);
+                    var sequences = new Sequences(syncLinks);
 
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Data.Core.Sequences.Compressor(links, sequences, minFrequency);
+                    var compressor = new Data.Core.Sequences.Compressor(syncLinks, sequences, minFrequency);
                     var responseCompressedArray3 = compressor.Precompress(responseSourceArray);
                     sequences.CreateBalancedVariant(responseCompressedArray3); sw3.Stop();
 
-                    var totalLinks = links.Count() - UnicodeMap.MapSize;
+                    var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
-                    Console.WriteLine("{0}, {1}, {2}, {3}", sw3.Elapsed, minFrequency, responseSourceArray.Length, totalLinks);
+                    Console.WriteLine($"{sw3.Elapsed}, {minFrequency}, {responseSourceArray.Length}, {totalLinks}");
                 }
             }
 
@@ -202,7 +206,7 @@ namespace Platform.Sandbox
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
         /// Slow version (pairs' frequencies dictionary is recreated).
         /// </remarks>
-        public static ulong[] PrecompressSequence1(this Links links, ulong[] sequence)
+        public static ulong[] PrecompressSequence1(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
             if (sequence.IsNullOrEmpty())
                 return null;
@@ -215,13 +219,13 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             Array.Copy(sequence, copy, sequence.Length);
 
-            Link maxPair;
+            UInt64Link maxPair;
 
             do
             {
-                var pairsFrequencies = new Dictionary<Link, ulong>();
+                var pairsFrequencies = new Dictionary<UInt64Link, ulong>();
 
-                maxPair = Link.Null;
+                maxPair = UInt64Link.Null;
                 ulong maxFrequency = 1;
 
                 for (var i = 1; i < copy.Length; i++)
@@ -231,7 +235,7 @@ namespace Platform.Sandbox
                     while (i < copy.Length && copy[i] == 0) i++;
                     if (i == copy.Length) break;
 
-                    var pair = new Link(copy[startIndex], copy[i]);
+                    var pair = new UInt64Link(copy[startIndex], copy[i]);
 
                     ulong frequency;
                     if (pairsFrequencies.TryGetValue(pair, out frequency))
@@ -252,7 +256,7 @@ namespace Platform.Sandbox
 
                 if (!maxPair.IsNull())
                 {
-                    var maxPairLink = links.Create(maxPair.Source, maxPair.Target);
+                    var maxPairLink = links.CreateAndUpdate(maxPair.Source, maxPair.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
@@ -303,7 +307,7 @@ namespace Platform.Sandbox
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
         /// Faster version (pairs' frequencies dictionary is not recreated).
         /// </remarks>
-        public static ulong[] PrecompressSequence2(this Links links, ulong[] sequence)
+        public static ulong[] PrecompressSequence2(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
             if (sequence.IsNullOrEmpty())
                 return null;
@@ -315,16 +319,16 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             copy[0] = sequence[0];
 
-            var pairsFrequencies = new Dictionary<Link, ulong>();
+            var pairsFrequencies = new Dictionary<UInt64Link, ulong>();
 
-            var maxPair = Link.Null;
+            var maxPair = UInt64Link.Null;
             ulong maxFrequency = 1;
 
             for (var i = 1; i < sequence.Length; i++)
             {
                 copy[i] = sequence[i];
 
-                var pair = new Link(sequence[i - 1], sequence[i]);
+                var pair = new UInt64Link(sequence[i - 1], sequence[i]);
 
                 ulong frequency;
                 if (pairsFrequencies.TryGetValue(pair, out frequency))
@@ -347,7 +351,7 @@ namespace Platform.Sandbox
             {
                 var maxPairSource = maxPair.Source;
 
-                var maxPairLink = links.Create(maxPairSource, maxPair.Target);
+                var maxPairLink = links.CreateAndUpdate(maxPairSource, maxPair.Target);
 
                 // Substitute all usages
                 for (var i = 1; i < copy.Length; i++)
@@ -381,7 +385,7 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldPair = new Link(copy[previous], oldLeft);
+                                    var nextOldPair = new UInt64Link(copy[previous], oldLeft);
                                     //if (!nextOldPair.Equals(maxPair))
                                     {
                                         //pairsFrequencies[nextOldPair]--;
@@ -389,7 +393,7 @@ namespace Platform.Sandbox
                                             pairsFrequencies[nextOldPair] = frequency - 1;
                                     }
 
-                                    var nextNewPair = new Link(copy[previous], copy[startIndex]);
+                                    var nextNewPair = new UInt64Link(copy[previous], copy[startIndex]);
                                     //pairsFrequencies[nextNewPair]++;
                                     if (pairsFrequencies.TryGetValue(nextNewPair, out frequency))
                                         pairsFrequencies[nextNewPair] = frequency + 1;
@@ -406,7 +410,7 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldPair = new Link(oldRight, copy[next]);
+                                    var nextOldPair = new UInt64Link(oldRight, copy[next]);
                                     //if (!nextOldPair.Equals(maxPair))
                                     {
                                         //pairsFrequencies[nextOldPair]--;
@@ -414,7 +418,7 @@ namespace Platform.Sandbox
                                             pairsFrequencies[nextOldPair] = frequency - 1;
                                     }
 
-                                    var nextNewPair = new Link(copy[startIndex], copy[next]);
+                                    var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
                                     //pairsFrequencies[nextNewPair]++;
                                     if (pairsFrequencies.TryGetValue(nextNewPair, out frequency))
                                         pairsFrequencies[nextNewPair] = frequency + 1;
@@ -434,7 +438,7 @@ namespace Platform.Sandbox
 
                 //}
 
-                maxPair = Link.Null;
+                maxPair = UInt64Link.Null;
                 maxFrequency = 1;
 
                 foreach (var pairsFrequency in pairsFrequencies)
@@ -521,27 +525,27 @@ namespace Platform.Sandbox
 
         public struct Compressor
         {
-            private readonly Links _links;
+            private readonly SynchronizedLinks<ulong> _links;
             private readonly Sequences _sequences;
-            private Link _maxPair;
+            private UInt64Link _maxPair;
             private ulong _maxFrequency;
-            private Link _maxPair2;
+            private UInt64Link _maxPair2;
             private ulong _maxFrequency2;
-            private UnsafeDictionary<Link, ulong> _pairsFrequencies;
+            private UnsafeDictionary<UInt64Link, ulong> _pairsFrequencies;
 
-            public Compressor(Links links, Sequences sequences)
+            public Compressor(SynchronizedLinks<ulong> links, Sequences sequences)
             {
                 _links = links;
                 _sequences = sequences;
-                _maxPair = Link.Null;
+                _maxPair = UInt64Link.Null;
                 _maxFrequency = 1;
-                _maxPair2 = Link.Null;
+                _maxPair2 = UInt64Link.Null;
                 _maxFrequency2 = 1;
-                _pairsFrequencies = new UnsafeDictionary<Link, ulong>();
+                _pairsFrequencies = new UnsafeDictionary<UInt64Link, ulong>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private ulong IncrementFrequency(Link pair)
+            private ulong IncrementFrequency(UInt64Link pair)
             {
                 ulong frequency;
                 if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -558,7 +562,7 @@ namespace Platform.Sandbox
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void DecrementFrequency(Link pair)
+            private void DecrementFrequency(UInt64Link pair)
             {
                 ulong frequency;
                 if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -596,7 +600,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
                     UpdateMaxPair(pair, IncrementFrequency(pair));
                 }
 
@@ -604,7 +608,7 @@ namespace Platform.Sandbox
                 {
                     var maxPairSource = _maxPair.Source;
                     var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
 
                     oldLength--;
                     var oldLengthMinusTwo = oldLength - 1;
@@ -618,14 +622,14 @@ namespace Platform.Sandbox
                             if (r > 0)
                             {
                                 var previous = copy[w - 1];
-                                DecrementFrequency(new Link(previous, maxPairSource));
-                                IncrementFrequency(new Link(previous, maxPairResult));
+                                DecrementFrequency(new UInt64Link(previous, maxPairSource));
+                                IncrementFrequency(new UInt64Link(previous, maxPairResult));
                             }
                             if (r < oldLengthMinusTwo)
                             {
                                 var next = copy[r + 2];
-                                DecrementFrequency(new Link(maxPairTarget, next));
-                                IncrementFrequency(new Link(maxPairResult, next));
+                                DecrementFrequency(new UInt64Link(maxPairTarget, next));
+                                IncrementFrequency(new UInt64Link(maxPairResult, next));
                             }
 
                             copy[w++] = maxPairResult;
@@ -682,7 +686,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     ulong frequency;
                     if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -709,7 +713,7 @@ namespace Platform.Sandbox
 
                     var maxPairSource = maxPair.Source;
 
-                    var maxPairLink = _links.Create(maxPairSource, maxPair.Target);
+                    var maxPairLink = _links.CreateAndUpdate(maxPairSource, maxPair.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
@@ -750,7 +754,7 @@ namespace Platform.Sandbox
                                     while (previous >= 0 && copy[previous] == 0) previous--;
                                     if (previous >= 0)
                                     {
-                                        var previousOldPair = new Link(copy[previous], oldLeft);
+                                        var previousOldPair = new UInt64Link(copy[previous], oldLeft);
                                         //if (!nextOldPair.Equals(maxPair))
                                         {
                                             //pairsFrequencies[nextOldPair]--;
@@ -766,7 +770,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var previousNewPair = new Link(copy[previous], copy[startIndex]);
+                                        var previousNewPair = new UInt64Link(copy[previous], copy[startIndex]);
                                         //pairsFrequencies[nextNewPair]++;
                                         if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
                                         {
@@ -785,7 +789,7 @@ namespace Platform.Sandbox
                                     while (next < copy.Length && copy[next] == 0) next++;
                                     if (next < copy.Length)
                                     {
-                                        var nextOldPair = new Link(oldRight, copy[next]);
+                                        var nextOldPair = new UInt64Link(oldRight, copy[next]);
                                         //if (!nextOldPair.Equals(maxPair))
                                         {
                                             //pairsFrequencies[nextOldPair]--;
@@ -801,7 +805,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var nextNewPair = new Link(copy[startIndex], copy[next]);
+                                        var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
                                         //pairsFrequencies[nextNewPair]++;
                                         if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
                                         {
@@ -832,7 +836,7 @@ namespace Platform.Sandbox
 
                     _pairsFrequencies.Remove(_maxPair);
 
-                    _maxPair = Link.Null;
+                    _maxPair = UInt64Link.Null;
                     _maxFrequency = 1;
 
                     foreach (var pairsFrequency in _pairsFrequencies)
@@ -937,7 +941,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     ulong frequency;
                     if (_pairsFrequencies.TryGetValue(pair, out frequency))
@@ -966,7 +970,7 @@ namespace Platform.Sandbox
 
                     var maxPairSource = maxPair.Source;
 
-                    var maxPairLink = _links.Create(maxPairSource, maxPair.Target);
+                    var maxPairLink = _links.CreateAndUpdate(maxPairSource, maxPair.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
@@ -1014,7 +1018,7 @@ namespace Platform.Sandbox
                                     while (previous >= 0 && copy[previous] == 0) previous--;
                                     if (previous >= 0)
                                     {
-                                        var previousOldPair = new Link(copy[previous], oldLeft);
+                                        var previousOldPair = new UInt64Link(copy[previous], oldLeft);
                                         //if (!nextOldPair.Equals(maxPair))
                                         {
                                             //pairsFrequencies[nextOldPair]--;
@@ -1030,7 +1034,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var previousNewPair = new Link(copy[previous], copy[startIndex]);
+                                        var previousNewPair = new UInt64Link(copy[previous], copy[startIndex]);
                                         //pairsFrequencies[nextNewPair]++;
                                         if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
                                         {
@@ -1050,7 +1054,7 @@ namespace Platform.Sandbox
                                     while (next < copy.Length && copy[next] == 0) next++;
                                     if (next < copy.Length)
                                     {
-                                        var nextOldPair = new Link(oldRight, copy[next]);
+                                        var nextOldPair = new UInt64Link(oldRight, copy[next]);
                                         //if (!nextOldPair.Equals(maxPair))
                                         {
                                             //pairsFrequencies[nextOldPair]--;
@@ -1066,7 +1070,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var nextNewPair = new Link(copy[startIndex], copy[next]);
+                                        var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
                                         //pairsFrequencies[nextNewPair]++;
                                         if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
                                         {
@@ -1089,7 +1093,7 @@ namespace Platform.Sandbox
                             //tempPair.Source = copy[startIndex];
                             //tempPair.Target = copy[i];
 
-                            var pair = new Link(copy[startIndex], copy[i]);
+                            var pair = new UInt64Link(copy[startIndex], copy[i]);
 
                             //if (!maxPair.Equals(pair))
                             //{
@@ -1145,11 +1149,11 @@ namespace Platform.Sandbox
                 var copy = new ulong[sequence.Length];
                 Array.Copy(sequence, copy, copy.Length);
 
-                var set = new HashSet<Link>();
+                var set = new HashSet<UInt64Link>();
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     //UpdateMaxPair(pair, IncrementFrequency(pair));
                     //if(_maxFrequency >= 2)
@@ -1167,7 +1171,7 @@ namespace Platform.Sandbox
                 {
                     var maxPairSource = _maxPair.Source;
                     var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
 
                     oldLength--;
                     //var oldLengthMinusTwo = oldLength - 1;
@@ -1204,7 +1208,7 @@ namespace Platform.Sandbox
 
                     //_pairsFrequencies.Remove(_maxPair);
 
-                    _maxPair = Link.Null;
+                    _maxPair = UInt64Link.Null;
 
                     //ResetMaxPair();
                     set.Clear();
@@ -1214,7 +1218,7 @@ namespace Platform.Sandbox
 
                     for (var i = 1; i < newLength; i++)
                     {
-                        var pair = new Link(copy[i - 1], copy[i]);
+                        var pair = new UInt64Link(copy[i - 1], copy[i]);
 
                         //UpdateMaxPair(pair, IncrementFrequency(pair));
                         //if (_maxFrequency >= 2)
@@ -1266,11 +1270,11 @@ namespace Platform.Sandbox
                 var copy = new ulong[sequence.Length];
                 Array.Copy(sequence, copy, copy.Length);
 
-                var set = new HashSet<Link>();
+                var set = new HashSet<UInt64Link>();
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     //UpdateMaxPair(pair, IncrementFrequency(pair));
                     //if(_maxFrequency >= 2)
@@ -1288,12 +1292,12 @@ namespace Platform.Sandbox
                 {
                     var maxPairSource = _maxPair.Source;
                     var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
 
                     oldLength--;
                     var oldLengthMinusTwo = oldLength - 1;
 
-                    _maxPair = Link.Null;
+                    _maxPair = UInt64Link.Null;
                     set.Clear();
 
                     // Substitute all usages
@@ -1338,7 +1342,7 @@ namespace Platform.Sandbox
 
                             if (_maxPair.IsNull()) // 4 sec
                             {
-                                var pair = new Link(copy[r], copy[r + 1]);
+                                var pair = new UInt64Link(copy[r], copy[r + 1]);
                                 if (!set.Add(pair)) _maxPair = pair;
                             }
                             copy[w++] = copy[r];
@@ -1422,7 +1426,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new Link(sequence[i - 1], sequence[i]);
+                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
                     UpdateMaxPair(pair, IncrementFrequency(pair));
                 }
 
@@ -1430,7 +1434,7 @@ namespace Platform.Sandbox
                 {
                     var maxPairSource = _maxPair.Source;
                     var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.Create(maxPairSource, maxPairTarget);
+                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
 
                     oldLength--;
                     //var oldLengthMinusTwo = oldLength - 1;
@@ -1496,14 +1500,14 @@ namespace Platform.Sandbox
 
             private void ResetMaxPair()
             {
-                _maxPair = Link.Null;
+                _maxPair = UInt64Link.Null;
                 _maxFrequency = 1;
-                _maxPair2 = Link.Null;
+                _maxPair2 = UInt64Link.Null;
                 _maxFrequency2 = 1;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void UpdateMaxPair(Link pair, ulong frequency)
+            private void UpdateMaxPair(UInt64Link pair, ulong frequency)
             {
                 if (frequency > 1)
                 {
@@ -1520,7 +1524,7 @@ namespace Platform.Sandbox
                 }
             }
 
-            private void UpdateMaxPair2(Link pair, ulong frequency)
+            private void UpdateMaxPair2(UInt64Link pair, ulong frequency)
             {
                 if (!_maxPair.Equals(pair))
                 {

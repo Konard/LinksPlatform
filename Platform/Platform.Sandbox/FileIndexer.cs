@@ -5,15 +5,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers.Collections;
 
 namespace Platform.Sandbox
 {
     public class FileIndexer
     {
         private readonly Sequences _sequences;
-        private readonly Links _links;
+        private readonly SynchronizedLinks<ulong> _links;
 
-        public FileIndexer(Links links, Sequences sequences)
+        public FileIndexer(SynchronizedLinks<ulong> links, Sequences sequences)
         {
             _links = links;
             _sequences = sequences;
@@ -34,10 +35,11 @@ namespace Platform.Sandbox
 
                 ConcurrentQueue<Task> tasks = new ConcurrentQueue<Task>();
 
+                // TODO: Try use IDirectMemory + Partitioner
                 while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
                 {
                     if (lastCharOfPreviousChunk != '\0')
-                        _links.Create(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
+                        _links.CreateAndUpdate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
                             UnicodeMap.FromCharToLink(buffer[0]));
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
@@ -46,27 +48,50 @@ namespace Platform.Sandbox
                     var readCharsCopy = readChars;
                     buffer = new char[stepSize];
 
-                    tasks.Enqueue(Task.Run(() =>
+                    tasks.EnqueueTask(() =>
                     {
                         var linkArray = UnicodeMap.FromCharsToLinkArray(bufferCopy, readCharsCopy);
                         _sequences.BulkIndex(linkArray);
-                    }));
+                    });
 
-                    Task task;
-                    while (tasks.Count > 3 && tasks.TryDequeue(out task))
-                        await task;
+                    if (tasks.Count > 3) await tasks.AwaitAll();
 
-                    Console.WriteLine("chars: {0}, links: {1}", steps * stepSize + readChars, _links.Count() - UnicodeMap.MapSize);
+                    Console.WriteLine($"chars: {(ulong) steps*stepSize + (ulong) readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
 
                     steps++;
                 }
 
-                {
-                    Task task;
-                    while (tasks.TryDequeue(out task))
-                        await task;
-                }
+                await tasks.AwaitAll();
             }
+        }
+
+        public async Task IndexParallelAsync(string path, CancellationToken cancellationToken)
+        {
+            var partitioner = Partitioner.Create(File.ReadLines(path), EnumerablePartitionerOptions.NoBuffering);
+
+            // TODO: Looks like it should safely wait for each operation to finish on cancel
+            Parallel.ForEach(partitioner, (line, state) =>
+            {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    state.Stop();
+                    return;
+                }
+
+                if (string.IsNullOrWhiteSpace(line))
+                    return;
+
+                // NewLine -> First Character
+                _links.CreateAndUpdate(UnicodeMap.FromCharToLink('\n'), UnicodeMap.FromCharToLink(line[0]));
+
+                var linkArray = UnicodeMap.FromStringToLinkArray(line);
+                _sequences.BulkIndex(linkArray);
+
+                // Last Character -> NewLine
+                _links.CreateAndUpdate(UnicodeMap.FromCharToLink(line[line.Length - 1]), UnicodeMap.FromCharToLink('\n'));
+
+                Console.WriteLine($"parsed line of {line.Length} chars, links: {_links.Count() - UnicodeMap.MapSize}");
+            });
         }
     }
 }

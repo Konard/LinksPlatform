@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.InteropServices;
 
 namespace Platform.Sandbox
 {
@@ -8,8 +9,8 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            new CSVExporterCLI().Run(args);
-            //new FileIndexerCLI().Run(args);
+            //new CSVExporterCLI().Run(args);
+            new FileIndexerCLI().Run(args);
             //new WikipediaImporterCLI().Run(args);
 
             //DllImportTest.Test();
@@ -27,7 +28,7 @@ namespace Platform.Sandbox
 
             //Link.StartMemoryManager(@"data.dat");
 
-            Console.WriteLine("Start time: {0}", sw.Elapsed);
+            Console.WriteLine($"Start time: {sw.Elapsed}");
             Console.WriteLine();
 
             //Console.WriteLine(Net.Letter.ToString());
@@ -72,11 +73,18 @@ namespace Platform.Sandbox
 
             //Link.StopMemoryManager();
 
-            Console.WriteLine("Total time: {0}", sw.Elapsed);
+            Console.WriteLine($"Total time: {sw.Elapsed}");
             Console.WriteLine();
 
             Console.WriteLine("All jobs done.");
             Console.ReadKey();
+        }
+
+        static void DisposableNullTest()
+        {
+      
+
+            Console.WriteLine("ok");
         }
 
         //static void CompressionDifferenceTests()

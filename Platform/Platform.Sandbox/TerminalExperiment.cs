@@ -34,7 +34,7 @@ namespace Platform.Sandbox
 
         public static void LinkCreated(LinkDefinition createdLink)
         {
-            Console.WriteLine("Link created: {0} {1} {2}", createdLink.Source.ToIndex(), createdLink.Linker.ToIndex(), createdLink.Target.ToIndex());
+            Console.WriteLine($"Link created: {createdLink.Source.ToIndex()} {createdLink.Linker.ToIndex()} {createdLink.Target.ToIndex()}");
         }
     }
 }

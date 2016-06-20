@@ -23,13 +23,14 @@ namespace Platform.Sandbox
             {
                 var cancellationSource = ConsoleHelpers.HandleCancellation();
 
-                using (var memoryManager = new LinksMemoryManager(linksFile))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager(linksFile))
+                using (var links = new UInt64Links(memoryManager))
                 {
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
                     bool isUnicodeMapped;
                     bool.TryParse(unicodeMapped, out isUnicodeMapped);
 
-                    var exporter = new CSVExporter(links, isUnicodeMapped);
+                    var exporter = new CSVExporter(syncLinks, isUnicodeMapped);
 
                     exporter.Export(exportTo, cancellationSource.Token);
                 }

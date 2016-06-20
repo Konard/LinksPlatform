@@ -14,7 +14,7 @@ namespace Platform.Sandbox
 
             public override string ToString()
             {
-                return string.Format("Value = {0}, Size = {1}", Value, Size);
+                return $"Value = {Value}, Size = {Size}";
             }
 
             public bool Validate()

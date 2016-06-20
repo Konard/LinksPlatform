@@ -4,6 +4,7 @@ using System.IO;
 using System.IO.MemoryMappedFiles;
 using Platform.Data.Core.Triplets;
 using Platform.Helpers;
+using Platform.Helpers.IO;
 
 namespace Platform.Sandbox
 {
@@ -95,7 +96,7 @@ namespace Platform.Sandbox
 
             var xmlFilename = Path.Combine(Path.GetDirectoryName(readableFilename), Path.GetFileNameWithoutExtension(readableFilename) + ".gexf");
 
-            XmlGenerator.ToFile(xmlFilename, link =>
+            GexfExporter.ToFile(xmlFilename, link =>
             {
                 return (link.ReferersByLinkerCount < (link.ReferersBySourceCount + link.ReferersByTargetCount)) && ((link.ReferersBySourceCount + link.ReferersByTargetCount + link.ReferersByLinkerCount) >= 5);
             });

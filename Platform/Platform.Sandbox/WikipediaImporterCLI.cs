@@ -21,11 +21,13 @@ namespace Platform.Sandbox
             {
                 var cancellationSource = ConsoleHelpers.HandleCancellation();
 
-                using (var memoryManager = new LinksMemoryManager(linksFile, LinksMemoryManager.DefaultLinksSizeStep * 16))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager(linksFile, UInt64LinksMemoryManager.DefaultLinksSizeStep * 16))
+                
+                using (var links = new UInt64Links(memoryManager))
                 {
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
                     UnicodeMap.InitNew(links);
-                    var sequences = new Sequences(links);
+                    var sequences = new Sequences(syncLinks);
                     var wikipediaStorage = new WikipediaLinksStorage(sequences);
                     var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
 

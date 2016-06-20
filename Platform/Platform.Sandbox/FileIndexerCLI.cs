@@ -25,15 +25,16 @@ namespace Platform.Sandbox
             {
                 var cancellationSource = ConsoleHelpers.HandleCancellation();
 
-                using (var memoryManager = new LinksMemoryManager(linksFile, LinksMemoryManager.DefaultLinksSizeStep * 16))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager(linksFile, UInt64LinksMemoryManager.DefaultLinksSizeStep * 16))
+                using (var links = new UInt64Links(memoryManager))
                 {
-                    UnicodeMap.InitNew(links);
-                    var sequences = new Sequences(links);
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
+                    UnicodeMap.InitNew(syncLinks);
+                    var sequences = new Sequences(syncLinks);
 
-                    var fileIndexer = new FileIndexer(links, sequences);
+                    var fileIndexer = new FileIndexer(syncLinks, sequences);
 
-                    fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
+                    fileIndexer.IndexParallelAsync(fileToIndex, cancellationSource.Token).Wait();
                 }
             }
 

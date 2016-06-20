@@ -1,10 +1,10 @@
-﻿#if NET45
-
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Reflection.Emit;
+using System.Reflection;
 using Platform.Data.Core.Triplets;
-using Platform.Helpers;
+using Sigil;
+using Sigil.NonGeneric;
+using Label = System.Reflection.Emit.Label;
 
 namespace Platform.Sandbox
 {
@@ -145,7 +145,7 @@ namespace Platform.Sandbox
             var checker = CreateSelectionChecker(selectionOfManySample);
 
             var set = Net.CreateSet().SetName("set of 'name' link referers");
-            Net.Name.WalkThroughReferersBySource(referer =>
+            Net.Name.WalkThroughReferersAsSource(referer =>
             {
                 Link.Create(referer, Net.ContainedBy, set);
             });
@@ -274,7 +274,7 @@ namespace Platform.Sandbox
                 arguments.WalkThroughSequence(arg => argumentsList.Add(arg));
             else if (arguments.Is(Net.Set))
             {
-                arguments.WalkThroughReferersByTarget(referer =>
+                arguments.WalkThroughReferersAsTarget(referer =>
                 {
                     if (referer.Linker == Net.ContainedBy)
                         argumentsList.Add(referer.Source);
@@ -503,12 +503,12 @@ namespace Platform.Sandbox
 
             if (set.Is(Net.Set))
             {
-                set.WalkThroughReferersByTarget(referer =>
+                set.WalkThroughReferersAsTarget(referer =>
                     {
                         if (referer.Linker == Net.ContainedBy && checker(referer.Source))
                             result.Add(referer.Source);
                     });
-                set.WalkThroughReferersBySource(referer =>
+                set.WalkThroughReferersAsSource(referer =>
                     {
                         if (referer.Linker == Net.Contains && checker(referer.Target))
                             result.Add(referer.Target);
@@ -546,18 +546,18 @@ namespace Platform.Sandbox
 
                     EmitSelectionCheckerCore(il, exitOnFalseLabel, new List<string>(), definition);
 
-                    il.EmitLiteralLoad(true); // Помещаем результат по умолчанию в стек
-                    il.EmitJumpTo(finalExitLabel);
+                    il.LoadConstant(true); // Помещаем результат по умолчанию в стек
+                    il.Branch(finalExitLabel);
 
                     il.MarkLabel(exitOnFalseLabel);
-                    il.EmitLiteralLoad(false); // Помещаем результат в случае неудачи в стек
+                    il.LoadConstant(false); // Помещаем результат в случае неудачи в стек
 
                     il.MarkLabel(finalExitLabel);
-                    il.Emit(OpCodes.Ret);
+                    il.Return();
                 });
         }
 
-        private static void EmitSelectionCheckerCore(ILGenerator il, Label exitLabel, List<string> levels, Link selectionQueryDefinition)
+        private static void EmitSelectionCheckerCore(Emit<Func<Link,bool>> il, Sigil.Label exitLabel, List<string> levels, Link selectionQueryDefinition)
         {
             Link sourceLink, linkerLink, targetLink;
             GetLinks(selectionQueryDefinition, out sourceLink, out linkerLink, out targetLink);
@@ -603,27 +603,26 @@ namespace Platform.Sandbox
             }
         }
 
-        private static void EmitEqualityCheck(ILGenerator il, Label exitLabel, List<string> levels, Link standardLink, string nameOfStandardLinkProperty)
+        private static void EmitEqualityCheck(Emit<Func<Link, bool>> il, Sigil.Label exitLabel, List<string> levels, Link standardLink, string nameOfStandardLinkProperty)
         {
-            // Получаем сравнивание значение
-            il.Emit(OpCodes.Ldarga_S, (byte)0);
-            levels.ForEach((x) =>
+            // Получаем сравниваемое значение
+            il.LoadArgument(0);
+
+            levels.ForEach(x =>
             {
-                il.EmitCall(typeof(Link).GetMethod("get_" + x));
-                il.Emit(OpCodes.Stloc_0);
-                il.Emit(OpCodes.Ldloca_S, (byte)0);
+                il.Call(typeof(Link).GetMethod("get_" + x));
             });
-            il.EmitCall(typeof(Link).GetMethod("get_" + nameOfStandardLinkProperty));
+            il.Call(typeof(Link).GetMethod("get_" + nameOfStandardLinkProperty));
 
             // Создаём структуру Link по указателю на эталонную связя
-            il.EmitLiteralLoad(standardLink.ToIndex());
-            il.Emit(OpCodes.Conv_U);
-            il.Emit(OpCodes.Newobj, typeof(Link).GetConstructors()[0]);
+            il.LoadConstant(standardLink.ToIndex());
+            il.Convert<ulong>();
+            il.NewObject<Link>();
 
             // Выполняем сравнение
-            il.EmitCall(typeof(Link).GetMethod("op_Equality"));
+            il.Call(typeof(Link).GetMethod("op_Equality"));
 
-            il.Emit(OpCodes.Brfalse_S, exitLabel);
+            il.BranchIfFalse(exitLabel);
         }
 
         private static HashSet<Link> ExecuteLinksSelection(Link selectionQuery, Link argument)
@@ -717,17 +716,17 @@ namespace Platform.Sandbox
             if (param.Target == _sourceLink)
             {
                 foreach (var value in paramValues)
-                    value.WalkThroughReferersBySource(referer => { result.Add(referer); });
+                    value.WalkThroughReferersAsSource(referer => { result.Add(referer); });
             }
             else if (param.Target == _linkerLink)
             {
                 foreach (var value in paramValues)
-                    value.WalkThroughReferersByLinker(referer => { result.Add(referer); });
+                    value.WalkThroughReferersAsLinker(referer => { result.Add(referer); });
             }
             else if (param.Target == _targetLink)
             {
                 foreach (var value in paramValues)
-                    value.WalkThroughReferersByTarget(referer => { result.Add(referer); });
+                    value.WalkThroughReferersAsTarget(referer => { result.Add(referer); });
             }
 
             return result;
@@ -739,15 +738,15 @@ namespace Platform.Sandbox
 
             if (param.Target == _sourceLink)
             {
-                param.Source.WalkThroughReferersBySource(referer => { result.Add(referer); });
+                param.Source.WalkThroughReferersAsSource(referer => { result.Add(referer); });
             }
             else if (param.Target == _linkerLink)
             {
-                param.Source.WalkThroughReferersByLinker(referer => { result.Add(referer); });
+                param.Source.WalkThroughReferersAsLinker(referer => { result.Add(referer); });
             }
             else if (param.Target == _targetLink)
             {
-                param.Source.WalkThroughReferersByTarget(referer => { result.Add(referer); });
+                param.Source.WalkThroughReferersAsTarget(referer => { result.Add(referer); });
             }
 
             return result;
@@ -833,5 +832,3 @@ namespace Platform.Sandbox
         }
     }
 }
-
-#endif

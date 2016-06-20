@@ -72,7 +72,7 @@ namespace Platform.Sandbox
 
                         context.IncrementChildNameCount(elementName);
 
-                        elementName = string.Format("{0}[{1}]", elementName, context.ChildrenNamesCounts[elementName]);
+                        elementName = $"{elementName}[{context.ChildrenNamesCounts[elementName]}]";
 
                         if (!reader.IsEmptyElement)
                         {

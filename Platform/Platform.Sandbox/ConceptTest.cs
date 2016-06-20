@@ -8,9 +8,13 @@ namespace Platform.Sandbox
     {
         public static void TestGexf(string filename)
         {
-            using (var memoryManager = new LinksMemoryManager(filename, 512 * 1024 * 1024))
-            using (var links = new Links(memoryManager))
+            using (var memoryManager = new UInt64LinksMemoryManager(filename, 512 * 1024 * 1024))
             {
+                var options = new LinksOptions<ulong>();
+                options.MemoryManager = memoryManager;
+                var linksFactory = new LinksFactory<ulong>(options);
+                var links = linksFactory.Create();
+
                 const int linksToCreate = 1024;
 
                 links.RunRandomCreations(linksToCreate);
@@ -25,9 +29,10 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var memoryManager = new LinksMemoryManager(filename, 512 * 1024 * 1024))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager(filename, 512 * 1024 * 1024))
+                using (var links = new UInt64Links(memoryManager))
                 {
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
                     //links.EnterTransaction();
 
                     var link = memoryManager.AllocateLink();
@@ -35,17 +40,17 @@ namespace Platform.Sandbox
 
                     Console.ReadKey();
 
-                    var temp1 = links.Create(0, 0);
-                    var temp2 = links.Create(0, 0);
-                    var temp3 = links.Create(temp1, temp2);
-                    var temp4 = links.Create(temp1, temp3);
-                    var temp5 = links.Create(temp4, temp2);
+                    var temp1 = syncLinks.Create();
+                    var temp2 = syncLinks.Create();
+                    var temp3 = syncLinks.CreateAndUpdate(temp1, temp2);
+                    var temp4 = syncLinks.CreateAndUpdate(temp1, temp3);
+                    var temp5 = syncLinks.CreateAndUpdate(temp4, temp2);
 
                     //links.Delete(links.GetSource(temp2), links.GetTarget(temp2));
 
                     //links.Each(0, temp2, x => links.PrintLink(x));
 
-                    links.Each(0, 0, x =>
+                    syncLinks.Each(syncLinks.Constants.Any, syncLinks.Constants.Any, x =>
                     {
                         memoryManager.PrintLink(x);
                         return true;
@@ -55,9 +60,9 @@ namespace Platform.Sandbox
 
                     Console.WriteLine("---");
 
-                    Console.WriteLine(links.Count());
+                    Console.WriteLine(syncLinks.Count());
 
-                    var sequences = new Sequences(links);
+                    var sequences = new Sequences(syncLinks);
 
                     //var seq = sequences.Create(temp1, temp5, temp2, temp1, temp2); //, temp5);
 
@@ -83,12 +88,12 @@ namespace Platform.Sandbox
 
                     Console.WriteLine(sequencesCount);
 
-                    Console.WriteLine(links.Count());
+                    Console.WriteLine(syncLinks.Count());
 
                     sequences.Create(temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1,
                         temp1);
 
-                    Console.WriteLine(links.Count());
+                    Console.WriteLine(syncLinks.Count());
 
 
                     Console.ReadKey();
@@ -110,7 +115,7 @@ namespace Platform.Sandbox
 
                     Console.WriteLine("---");
 
-                    links.Each(0, 0, x =>
+                    syncLinks.Each(syncLinks.Constants.Any, syncLinks.Constants.Any, x =>
                     {
                         memoryManager.PrintLink(x);
                         return true;
@@ -134,7 +139,7 @@ namespace Platform.Sandbox
             Console.ReadKey();
         }
 
-        private static void PrintLink(this LinksMemoryManager links, ulong link)
+        private static void PrintLink(this UInt64LinksMemoryManager links, ulong link)
         {
             Console.WriteLine(links.FormatLink(link));
         }

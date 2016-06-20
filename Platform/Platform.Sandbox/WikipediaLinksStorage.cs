@@ -1,12 +1,15 @@
 ﻿using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers;
 
 namespace Platform.Sandbox
 {
     public class WikipediaLinksStorage : IWikipediaStorage<ulong>
     {
+        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+
         private readonly Sequences _sequences;
-        private readonly Links _links;
+        private readonly SynchronizedLinks<ulong> _links;
         private ulong _elementMarker;
         private ulong _textElementMarker;
         private ulong _documentMarker;
@@ -36,7 +39,7 @@ namespace Platform.Sandbox
         private ulong CreateConstant(ulong markerIndex)
         {
             if (!_links.Exists(markerIndex))
-                _links.Create(LinksConstants.Itself, LinksConstants.Itself);
+                _links.Create();
             return markerIndex;
         }
 
@@ -59,7 +62,7 @@ namespace Platform.Sandbox
         {
             var contentSequence = CreateSequence1(content);
 
-            return _links.Create(marker, contentSequence);
+            return _links.CreateAndUpdate(marker, contentSequence);
         }
 
         private ulong CreateSequence0(string @string)
@@ -78,7 +81,7 @@ namespace Platform.Sandbox
 
         public void AttachElementToParent(ulong elementToAttach, ulong parent)
         {
-            _links.Create(parent, elementToAttach);
+            _links.CreateAndUpdate(parent, elementToAttach);
         }
     }
 }
