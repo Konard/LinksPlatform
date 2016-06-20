@@ -13,6 +13,8 @@ namespace Platform.Data.MasterServer
 {
     public static class Program
     {
+        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+
         private const string DefaultDatabaseFilename = "db.links";
 
         private static bool LinksServerRunning = true;
@@ -28,15 +30,16 @@ namespace Platform.Data.MasterServer
                 File.Delete(DefaultDatabaseFilename);
 #endif
 
-                using (var memoryManager = new LinksMemoryManager(DefaultDatabaseFilename, 8 * 1024 * 1024))
-                using (var links = new Links(memoryManager))
+                using (var memoryManager = new UInt64LinksMemoryManager(DefaultDatabaseFilename, 8 * 1024 * 1024))
+                using (var links = new UInt64Links(memoryManager))
                 {
-                    UnicodeMap = new UnicodeMap(links);
+                    var syncLinks = new SynchronizedLinks<ulong>(links);
+                    UnicodeMap = new UnicodeMap(syncLinks);
                     UnicodeMap.Init();
 
-                    var sequences = new Sequences(links);
+                    var sequences = new Sequences(syncLinks);
 
-                    PrintContents(links, sequences);
+                    PrintContents(syncLinks, sequences);
 
                     Console.WriteLine("Links server started.");
                     Console.WriteLine("Press CTRL+C or ESC to stop server.");
@@ -49,7 +52,7 @@ namespace Platform.Data.MasterServer
                             {
                                 message = message.Trim();
 
-                                Console.WriteLine("<- {0}", message);
+                                Console.WriteLine($"<- {message}");
 
                                 if (IsSearch(message))
                                     sequences.Search(sender, ProcessSequenceForSearch(message));
@@ -66,14 +69,12 @@ namespace Platform.Data.MasterServer
                                 while (receiver.Available > 0)
                                     handleMessage(receiver.ReceiveString());
 
-#if NET45
                                 while (Console.KeyAvailable)
                                 {
                                     var info = Console.ReadKey(true);
                                     if (info.Key == ConsoleKey.Escape)
                                         LinksServerRunning = false;
                                 }
-#endif
 
                                 Thread.Sleep(1);
                             }
@@ -97,7 +98,7 @@ namespace Platform.Data.MasterServer
             LinksServerRunning = false;
         }
 
-        private static void PrintContents(Links links, Sequences sequences)
+        private static void PrintContents(SynchronizedLinks<ulong> links, Sequences sequences)
         {
             if (links.Count() == UnicodeMap.LastCharLink)
                 Console.WriteLine("Database is empty.");
@@ -126,7 +127,7 @@ namespace Platform.Data.MasterServer
             if (link <= (char.MaxValue + 1))
                 sb.Append(UnicodeMap.FromLinkToChar(link));
             else
-                sb.AppendFormat("({0})", link);
+                sb.Append($"({link})");
         }
 
         private static bool IsSearch(string message)
@@ -193,7 +194,7 @@ namespace Platform.Data.MasterServer
                         }
                     }
                     else if (sequence[r] == '_')
-                        result[w++] = LinksConstants.Any;
+                        result[w++] = Constants.Any;
                     else if (sequence[r] == '*')
                         result[w++] = Sequences.ZeroOrMany;
                     else
@@ -224,46 +225,43 @@ namespace Platform.Data.MasterServer
         {
             var link = sequences.Create(sequence);
 
-            sender.Send(string.Format("Sequence with balanced variant at {0} created.", link));
+            sender.Send($"Sequence with balanced variant at {link} created.");
         }
 
         private static void Search(this Sequences sequences, UdpSender sender, ulong[] sequence)
         {
-            var containsAny = Array.IndexOf(sequence, LinksConstants.Any) >= 0;
+            var containsAny = Array.IndexOf(sequence, Constants.Any) >= 0;
             var containsZeroOrMany = Array.IndexOf(sequence, Sequences.ZeroOrMany) >= 0;
 
             if (containsZeroOrMany)
             {
                 var patternMatched = sequences.MatchPattern(sequence);
 
-                sender.Send(string.Format("{0} sequences matched pattern.", patternMatched.Count));
+                sender.Send($"{patternMatched.Count} sequences matched pattern.");
                 foreach (var result in patternMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result, sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
             }
             if (!containsZeroOrMany)
             {
                 var fullyMatched = sequences.Each(sequence);
 
-                sender.Send(string.Format("{0} sequences matched fully.", fullyMatched.Count));
+                sender.Send($"{fullyMatched.Count} sequences matched fully.");
                 foreach (var result in fullyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result,
-                        sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
             }
             if (!containsAny && !containsZeroOrMany)
             {
                 var partiallyMatched = sequences.GetAllPartiallyMatchingSequences1(sequence);
 
-                sender.Send(string.Format("{0} sequences matched partially.", partiallyMatched.Count));
+                sender.Send($"{partiallyMatched.Count} sequences matched partially.");
                 foreach (var result in partiallyMatched)
-                    sender.Send(string.Format("\t{0}: {1}", result,
-                        sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
 
                 var allConnections = sequences.GetAllConnections(sequence);
 
-                sender.Send(string.Format("{0} sequences connects query elements.", allConnections.Count));
+                sender.Send($"{allConnections.Count} sequences connects query elements.");
                 foreach (var result in allConnections)
-                    sender.Send(string.Format("\t{0}: {1}", result,
-                        sequences.FormatSequence(result, AppendLinkToString, false)));
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
             }
         }
     }

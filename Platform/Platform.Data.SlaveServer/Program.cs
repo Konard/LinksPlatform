@@ -17,7 +17,7 @@ namespace Platform.Data.SlaveServer
                 LinksServerStoped = true;
             };
 
-            var links = new Links2();
+            //var links = new Links2();
 
             //var sequences = new Sequences(links);
 
@@ -29,7 +29,7 @@ namespace Platform.Data.SlaveServer
                 {
                     if (!string.IsNullOrWhiteSpace(m))
                     {
-                        Console.WriteLine("R.M.: {0}", m);
+                        Console.WriteLine($"R.M.: {m}");
 
                         if (m.EndsWith("?"))
                         {

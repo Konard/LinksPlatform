@@ -25,9 +25,7 @@ namespace Platform.Data.ConsoleTerminal
 
                         while (TerminalRunning)
                         {
-#if DNX451
                             while (Console.KeyAvailable)
-#endif
                             {
                                 var line = Console.ReadLine();
                                 if (!string.IsNullOrWhiteSpace(line))
@@ -40,7 +38,7 @@ namespace Platform.Data.ConsoleTerminal
                             {
                                 var message = receiver.ReceiveString();
                                 if (!string.IsNullOrWhiteSpace(message))
-                                    Console.WriteLine("<- {0}", message);
+                                    Console.WriteLine($"<- {message}");
                             }
 
                             Thread.Sleep(1);
