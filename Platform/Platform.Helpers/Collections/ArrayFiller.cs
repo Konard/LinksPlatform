@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers.Collections
 {
@@ -29,6 +30,13 @@ namespace Platform.Helpers.Collections
         public bool AddAndReturnTrue(TElement element)
         {
             _array[_position++] = element;
+            return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public bool AddFirstAndReturnTrue(IList<TElement> collection)
+        {
+            _array[_position++] = collection[0];
             return true;
         }
     }
