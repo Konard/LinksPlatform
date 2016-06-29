@@ -10,6 +10,7 @@ namespace Platform.Data.Core.Collections.Trees
     /// <summary>
     /// Combination of Size, Height (AVL), and threads.
     /// Based on: https://github.com/programmatom/TreeLib/blob/master/TreeLib/TreeLib/Generated/AVLTreeList.cs
+    /// Which itself based on: https://github.com/GNOME/glib/blob/master/glib/gtree.c
     /// </summary>
     public abstract class SizeBalancedTreeMethods3<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
