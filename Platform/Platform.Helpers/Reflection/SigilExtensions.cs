@@ -44,6 +44,45 @@ namespace Platform.Helpers.Reflection
             return emiter;
         }
 
+        public static Emit<TDelegate> LoadConstant<TDelegate>(this Emit<TDelegate> emiter, Type constantType, object constantValue)
+        {
+            if (constantType == typeof(float))
+                emiter.LoadConstant((float)constantValue);
+            else if (constantType == typeof(double))
+                emiter.LoadConstant((double)constantValue);
+            else if (constantType == typeof(long))
+                emiter.LoadConstant((long)constantValue);
+            else if (constantType == typeof(ulong))
+                emiter.LoadConstant((ulong)constantValue);
+            else if (constantType == typeof(int))
+                emiter.LoadConstant((int)constantValue);
+            else if (constantType == typeof(uint))
+                emiter.LoadConstant((uint)constantValue);
+            else if (constantType == typeof(short))
+            {
+                emiter.LoadConstant((short)constantValue);
+                emiter.Convert<short>();
+            }
+            else if (constantType == typeof(ushort))
+            {
+                emiter.LoadConstant((ushort)constantValue);
+                emiter.Convert<ushort>();
+            }
+            else if (constantType == typeof(sbyte))
+            {
+                emiter.LoadConstant((sbyte)constantValue);
+                emiter.Convert<sbyte>();
+            }
+            else if (constantType == typeof(byte))
+            {
+                emiter.LoadConstant((byte)constantValue);
+                emiter.Convert<byte>();
+            }
+            else
+                throw new NotSupportedException();
+            return emiter;
+        }
+
         public static Emit<TDelegate> Increment<TDelegate>(this Emit<TDelegate> emiter, Type valueType)
         {
             emiter.LoadConstantOne(valueType);

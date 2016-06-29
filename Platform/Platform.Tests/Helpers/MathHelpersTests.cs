@@ -32,5 +32,83 @@ namespace Platform.Tests.Helpers
             Assert.True(MathHelpers<sbyte>.LessOrEqualThan(1, 5));
             Assert.Throws<NotSupportedException>(() => MathHelpers<string>.Subtract("1", "2"));
         }
+
+        [Fact]
+        public void PartialReadWriteTest()
+        {
+            {
+                uint firstValue = 1;
+                uint secondValue = 1543;
+
+                // Pack (join) two values at the same time
+                uint value = (secondValue << 1) | firstValue;
+
+                uint unpackagedFirstValue = value & 1;
+                uint unpackagedSecondValue = (value & 0xFFFFFFFE) >> 1;
+
+                Assert.True(firstValue == unpackagedFirstValue);
+                Assert.True(secondValue == unpackagedSecondValue);
+
+                // Using universal functions:
+
+                Assert.True(PartialRead(value, 0, 1) == firstValue);
+                Assert.True(PartialRead(value, 1, -1) == secondValue);
+
+                firstValue = 0;
+                secondValue = 6892;
+
+                value = PartialWrite(value, firstValue, 0, 1);
+                value = PartialWrite(value, secondValue, 1, -1);
+
+                Assert.True(PartialRead(value, 0, 1) == firstValue);
+                Assert.True(PartialRead(value, 1, -1) == secondValue);
+            }
+
+            {
+                uint firstValue = 1;
+                uint secondValue = 1543;
+
+                // Pack (join) two values at the same time
+                uint value = (secondValue << 1) | firstValue;
+
+                uint unpackagedFirstValue = value & 1;
+                uint unpackagedSecondValue = (value & 0xFFFFFFFE) >> 1;
+
+                Assert.True(firstValue == unpackagedFirstValue);
+                Assert.True(secondValue == unpackagedSecondValue);
+
+                // Using universal functions:
+
+                Assert.True(MathHelpers.PartialRead(value, 0, 1) == firstValue);
+                Assert.True(MathHelpers.PartialRead(value, 1, -1) == secondValue);
+
+                firstValue = 0;
+                secondValue = 6892;
+
+                value = MathHelpers.PartialWrite(value, firstValue, 0, 1);
+                value = MathHelpers.PartialWrite(value, secondValue, 1, -1);
+
+                Assert.True(MathHelpers.PartialRead(value, 0, 1) == firstValue);
+                Assert.True(MathHelpers.PartialRead(value, 1, -1) == secondValue);
+            }
+        }
+
+        private uint PartialWrite(uint target, uint source, int shift, int limit)
+        {
+            if (shift < 0) shift = 32 + shift;
+            if (limit < 0) limit = 32 + limit;
+            var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
+            var targetMask = ~(sourceMask << shift);
+            return (target & targetMask) | ((source & sourceMask) << shift);
+        }
+
+        private uint PartialRead(uint target, int shift, int limit)
+        {
+            if (shift < 0) shift = 32 + shift;
+            if (limit < 0) limit = 32 + limit;
+            var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
+            var targetMask = sourceMask << shift;
+            return (target & targetMask) >> shift;
+        }
     }
 }

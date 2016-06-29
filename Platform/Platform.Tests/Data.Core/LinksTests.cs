@@ -19,6 +19,62 @@ namespace Platform.Tests.Data.Core
         #region Concept
 
         [Fact]
+        public void MultipleCreateAndDeleteTest()
+        {
+            //const int N = 21;
+
+            using (var scope = new TempLinksTestScope())
+            {
+                var links = scope.Links;
+
+
+                for (var N = 0; N < 100; N++)
+                {
+                    var random = new Random(N);
+
+                    var created = 0;
+                    var deleted = 0;
+
+                    for (var i = 0; i < N; i++)
+                    {
+                        var linksCount = links.Count();
+
+                        var createPoint = random.NextBoolean();
+
+                        if (linksCount > 2 && createPoint)
+                        {
+                            var source = random.NextUInt64(1, linksCount);
+                            var target = random.NextUInt64(1, linksCount);
+
+                            var resultLink = links.CreateAndUpdate(source, target);
+                            if (resultLink > linksCount)
+                                created++;
+                        }
+                        else
+                        {
+                            links.Create();
+                            created++;
+                        }
+                    }
+
+                    Assert.True(created == (int)links.Count());
+
+                    for (var i = 0; i < N; i++)
+                    {
+                        var link = (ulong)i + 1;
+                        if (links.Exists(link))
+                        {
+                            links.Delete(link);
+                            deleted++;
+                        }
+                    }
+
+                    Assert.True(links.Count() == 0);
+                }
+            }
+        }
+
+        [Fact]
         public void CascadeUpdateTest()
         {
             var itself = Constants.Itself;

@@ -322,14 +322,26 @@ namespace Platform.Data.Core.Pairs
             var link = GetLinkUnsafe(linkIndex);
 
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
-            if (link->Source != Constants.Null) _sourcesTreeMethods.RemoveUnsafe(linkIndex, new IntPtr(&_header->FirstAsSource));
-            if (link->Target != Constants.Null) _targetsTreeMethods.RemoveUnsafe(linkIndex, new IntPtr(&_header->FirstAsTarget));
+            if (link->Source != Constants.Null) _sourcesTreeMethods.Detach(new IntPtr(&_header->FirstAsSource), linkIndex);
+            if (link->Target != Constants.Null) _targetsTreeMethods.Detach(new IntPtr(&_header->FirstAsTarget), linkIndex);
+
+            var leftTreeSize = _sourcesTreeMethods.GetSize(new IntPtr(&_header->FirstAsSource));
+            var rightTreeSize = _targetsTreeMethods.GetSize(new IntPtr(&_header->FirstAsTarget));
+
+            if (leftTreeSize != rightTreeSize)
+                throw new Exception("One of the trees is broken.");
 
             link->Source = values[Constants.SourcePart];
             link->Target = values[Constants.TargetPart];
 
-            if (link->Source != Constants.Null) _sourcesTreeMethods.AddUnsafe(linkIndex, new IntPtr(&_header->FirstAsSource));
-            if (link->Target != Constants.Null) _targetsTreeMethods.AddUnsafe(linkIndex, new IntPtr(&_header->FirstAsTarget));
+            if (link->Source != Constants.Null) _sourcesTreeMethods.Attach(new IntPtr(&_header->FirstAsSource), linkIndex);
+            if (link->Target != Constants.Null) _targetsTreeMethods.Attach(new IntPtr(&_header->FirstAsTarget), linkIndex);
+
+            leftTreeSize = _sourcesTreeMethods.GetSize(new IntPtr(&_header->FirstAsSource));
+            rightTreeSize = _targetsTreeMethods.GetSize(new IntPtr(&_header->FirstAsTarget));
+
+            if (leftTreeSize != rightTreeSize)
+                throw new Exception("One of the trees is broken.");
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

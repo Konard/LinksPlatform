@@ -413,14 +413,14 @@ namespace Platform.Data.Core.Pairs
             var link = GetLinkUnsafe(linkIndex);
 
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
-            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.RemoveUnsafe(linkIndex, LinksHeader.GetFirstAsSourcePointer(_header));
-            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.RemoveUnsafe(linkIndex, LinksHeader.GetFirstAsTargetPointer(_header));
+            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Detach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Detach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
 
             Link.SetSource(link, values[Constants.SourcePart]);
             Link.SetTarget(link, values[Constants.TargetPart]);
 
-            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.AddUnsafe(linkIndex, LinksHeader.GetFirstAsSourcePointer(_header));
-            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.AddUnsafe(linkIndex, LinksHeader.GetFirstAsTargetPointer(_header));
+            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

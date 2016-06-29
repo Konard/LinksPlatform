@@ -9,17 +9,8 @@ namespace Platform.Data.Core.Collections.Trees
     /// </remarks>
     public abstract class SizeBalancedTreeMethods<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
-        public void AddUnsafe(TElement node, IntPtr root)
+        protected override void AttachCore(IntPtr root, TElement node)
         {
-            if (EqualToZero(root.GetValue<TElement>()))
-            {
-                SetSize(node, GetOne());
-
-                root.SetValue(node);
-
-                return;
-            }
-
             while (true)
             {
                 var left = GetLeft(root.GetValue<TElement>());
@@ -144,15 +135,7 @@ namespace Platform.Data.Core.Collections.Trees
             }
         }
 
-        public void RemoveUnsafe(TElement node, IntPtr root)
-        {
-            if (EqualToZero(root.GetValue<TElement>()))
-                throw new Exception($"Элемент с {node} не содержится в дереве.");
-
-            RemoveUnsafeCore(node, root);
-        }
-
-        private void RemoveUnsafeCore(TElement node, IntPtr root)
+        protected override void DetachCore(IntPtr root, TElement node)
         {
             while (true)
             {
@@ -223,7 +206,7 @@ namespace Platform.Data.Core.Collections.Trees
                             while (!EqualToZero(GetRight(replacement).GetValue<TElement>()))
                                 replacement = GetRight(replacement).GetValue<TElement>();
 
-                            RemoveUnsafeCore(replacement, left);
+                            DetachCore(left, replacement);
 
                             SetLeft(replacement, left.GetValue<TElement>());
                             SetRight(replacement, right.GetValue<TElement>());
@@ -237,7 +220,7 @@ namespace Platform.Data.Core.Collections.Trees
                             while (!EqualToZero(GetLeft(replacement).GetValue<TElement>()))
                                 replacement = GetLeft(replacement).GetValue<TElement>();
 
-                            RemoveUnsafeCore(replacement, right);
+                            DetachCore(right, replacement);
 
                             SetLeft(replacement, left.GetValue<TElement>());
                             SetRight(replacement, right.GetValue<TElement>());

@@ -9,7 +9,7 @@ namespace Platform.Data.Core.Collections.Trees
     /// </remarks>
     public abstract class SizeBalancedTreeMethods2<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
-        private void Insert(IntPtr root, TElement newNode)
+        protected override void AttachCore(IntPtr root, TElement newNode)
         {
             if (ValueEqualToZero(root))
             {
@@ -22,18 +22,18 @@ namespace Platform.Data.Core.Collections.Trees
 
                 if (FirstIsToTheLeftOfSecond(newNode, root.GetValue<TElement>()))
                 {
-                    Insert(GetLeft(root.GetValue<TElement>()), newNode);
+                    AttachCore(GetLeft(root.GetValue<TElement>()), newNode);
                     LeftMaintain(root);
                 }
                 else
                 {
-                    Insert(GetRight(root.GetValue<TElement>()), newNode);
+                    AttachCore(GetRight(root.GetValue<TElement>()), newNode);
                     RightMaintain(root);
                 }
             }
         }
 
-        private void Detach(IntPtr root, TElement nodeToDetach)
+        protected override void DetachCore(IntPtr root, TElement nodeToDetach)
         {
             if (ValueEqualToZero(root))
                 return;
@@ -65,7 +65,7 @@ namespace Platform.Data.Core.Collections.Trees
                 while (!ValueEqualToZero(GetLeft(minNode)))
                     minNode = GetLeft(minNode).GetValue<TElement>(); /* Передвигаемся до минимума */
 
-                Detach(GetRight(nodeToDetach), minNode);
+                DetachCore(GetRight(nodeToDetach), minNode);
 
                 SetLeft(minNode, GetLeft(nodeToDetach).GetValue<TElement>());
                 if (!ValueEqualToZero(GetRight(nodeToDetach)))
@@ -157,28 +157,6 @@ namespace Platform.Data.Core.Collections.Trees
                     RightMaintain(root);
                 }
             }
-        }
-
-        public void AddUnsafe(TElement node, IntPtr root)
-        {
-            if (ValueEqualToZero(root))
-            {
-                SetSize(node, GetOne());
-
-                root.SetValue(node);
-
-                return;
-            }
-
-            Insert(root, node);
-        }
-
-        public void RemoveUnsafe(TElement node, IntPtr root)
-        {
-            if (ValueEqualToZero(root))
-                throw new Exception($"Элемент с {node} не содержится в дереве.");
-
-            Detach(root, node);
         }
     }
 }

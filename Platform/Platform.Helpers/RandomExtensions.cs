@@ -12,5 +12,11 @@ namespace Platform.Helpers
                 return minValue;
             return (ulong)(rnd.NextDouble() * (maxValue - minValue)) + minValue;
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool NextBoolean(this Random rnd)
+        {
+            return rnd.Next(2) == 1;
+        }
     }
 }
