@@ -20,6 +20,9 @@ namespace Platform.Helpers.Collections
     /// <remarks>
     /// Original idea from http://geekswithblogs.net/blackrob/archive/2014/12/18/array-pooling-in-csharp.aspx
     /// </remarks>
+    /// <remarks>
+    /// TODO: Possible optimization: to use separate array cache per thread.
+    /// </remarks>
     public class ArrayPool<T>
     {
         private readonly ConcurrentDictionary<int, ConcurrentStack<T[]>> _pool = new ConcurrentDictionary<int, ConcurrentStack<T[]>>();
