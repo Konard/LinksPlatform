@@ -12,6 +12,9 @@ namespace Platform.Data.Core.Collections.Trees
     /// Based on: https://github.com/programmatom/TreeLib/blob/master/TreeLib/TreeLib/Generated/AVLTreeList.cs
     /// Which itself based on: https://github.com/GNOME/glib/blob/master/glib/gtree.c
     /// </summary>
+    /// <remarks>
+    /// TODO: Compare performance with and without unchecked.
+    /// </remarks>
     public abstract class SizeBalancedTreeMethods3<TElement> : SizeBalancedTreeMethodsBase<TElement>
     {
         private const int MaxPath = 92;
@@ -190,6 +193,8 @@ namespace Platform.Data.Core.Collections.Trees
         {
             unchecked
             {
+                //ValidateSizes(node);
+
                 var right = GetRight(node).GetValue<TElement>();
 
                 if (GetLeftIsChild(right))
@@ -227,6 +232,8 @@ namespace Platform.Data.Core.Collections.Trees
                     SetBalance(node, (sbyte)(rootBalance - rightBalance - 1));
                 }
 
+                //ValidateSizes(right);
+
                 return right;
             }
         }
@@ -235,6 +242,8 @@ namespace Platform.Data.Core.Collections.Trees
         {
             unchecked
             {
+                //ValidateSizes(node);
+
                 var left = GetLeft(node).GetValue<TElement>();
 
                 if (GetRightIsChild(left))
@@ -271,6 +280,8 @@ namespace Platform.Data.Core.Collections.Trees
                         SetBalance(left, (sbyte)(rootBalance + leftBalance + 2));
                     SetBalance(node, (sbyte)(rootBalance + 1));
                 }
+
+                //ValidateSizes(left);
 
                 return left;
             }
@@ -349,21 +360,21 @@ namespace Platform.Data.Core.Collections.Trees
                             SetLeftIsChild(parent, false);
                             SetLeft(parent, GetLeft(currentNode).GetValue<TElement>());
                             IncrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parentValue); // Thread Change, No Size Change (should be decremented already)
                         }
                         else
                         {
                             SetRightIsChild(parent, false);
                             SetRight(parent, GetRight(currentNode).GetValue<TElement>());
                             DecrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parent);  // Thread Change, No Size Change (should be decremented already)
                         }
                     }
                     else // node has a right child
                     {
                         var successor = GetNext(currentNode);
                         SetLeft(successor, GetLeft(currentNode).GetValue<TElement>());
-                        //FixSize(successor);
+                        //FixSize(successor);  // Thread Change, No Size Change (should be decremented already)
 
                         var right = GetRight(currentNode).GetValue<TElement>();
                         if (Equals(parent, default(TElement)))
@@ -372,13 +383,13 @@ namespace Platform.Data.Core.Collections.Trees
                         {
                             SetLeft(parent, right);
                             IncrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parentValue); // Thread Change, No Size Change (should be decremented already)
                         }
                         else
                         {
                             SetRight(parent, right);
                             DecrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parentValue); // Thread Change, No Size Change (should be decremented already)
                         }
                     }
                 }
@@ -388,7 +399,7 @@ namespace Platform.Data.Core.Collections.Trees
                     {
                         var predecessor = GetPrevious(currentNode);
                         SetRight(predecessor, GetRight(currentNode).GetValue<TElement>());
-                        //FixSize(predecessor.GetValue<TElement>());
+                        //FixSize(predecessor.GetValue<TElement>()); // Thread Change, No Size Change (should be decremented already)
 
                         var leftValue = GetLeft(currentNode).GetValue<TElement>();
                         if (Equals(parent, default(TElement)))
@@ -397,13 +408,13 @@ namespace Platform.Data.Core.Collections.Trees
                         {
                             SetLeft(parent, leftValue);
                             IncrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parentValue); // Thread Change, No Size Change (should be decremented already)
                         }
                         else
                         {
                             SetRight(parent, leftValue);
                             DecrementBalance(parent);
-                            //FixSize(parentValue);
+                            //FixSize(parentValue); // Thread Change, No Size Change (should be decremented already)
                         }
                     }
                     else // node has a both children (left and right)
@@ -420,6 +431,8 @@ namespace Platform.Data.Core.Collections.Trees
                         {
                             path[++pathPosition] = successorParent = successor;
                             successor = GetLeft(successor).GetValue<TElement>();
+                            if (!Equals(successorParent, currentNode))
+                                DecrementSize(successorParent);
                         }
 
                         path[previousPathPosition] = successor;
@@ -459,24 +472,24 @@ namespace Platform.Data.Core.Collections.Trees
                         SetLeft(successor, left);
                         SetBalance(successor, GetBalance(currentNode));
 
-                        // TODO: Check if this is needed
-                        //FixSize(leftValue);
-                        //FixSize(successorValue);
+                        FixSize(successor);
 
                         if (Equals(parent, default(TElement)))
                             root.SetValue(successor);
                         else if (isLeftNode)
                         {
                             SetLeft(parent, successor);
-                            //FixSize(parentValue); // TODO: Check if this is needed
+                            //FixSize(parentValue); // Should be decremented already
                         }
                         else
                         {
                             SetRight(parent, successor);
-                            //FixSize(parentValue); // TODO: Check if this is needed
+                            //FixSize(parentValue); // Should be decremented already
                         }
                     }
                 }
+
+                ValidateSizes(root);
 
                 // restore balance
                 if (!Equals(balanceNode, default(TElement)))
@@ -532,7 +545,7 @@ namespace Platform.Data.Core.Collections.Trees
                 ArrayPool.Free(path);
             }
 
-            FixSizes(root); // TODO: Remove hack
+            //FixSizes(root); // TODO: Remove hack
             ValidateSizes(root); // TODO: Fix sizes and remove validation
         }
     }

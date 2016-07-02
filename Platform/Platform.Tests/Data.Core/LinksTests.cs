@@ -27,7 +27,6 @@ namespace Platform.Tests.Data.Core
             {
                 var links = scope.Links;
 
-
                 for (var N = 0; N < 100; N++)
                 {
                     var random = new Random(N);
