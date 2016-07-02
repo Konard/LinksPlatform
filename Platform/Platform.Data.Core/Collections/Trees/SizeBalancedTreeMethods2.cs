@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Collections.Trees
     /// Можно сделать прошитую версию дерева, чтобы сделать проход по дереву более оптимальным.
     /// Также имеет смысл разобраться почему не работает версия с идеальной балансировкой.
     /// </remarks>
-    public abstract class SizeBalancedTreeMethods2<TElement> : SizeBalancedTreeMethodsBase<TElement>
+    public abstract class SizeBalancedTreeMethods2<TElement> : BinaryTreeMethodsBase<TElement>
     {
         protected override void AttachCore(IntPtr root, TElement newNode)
         {

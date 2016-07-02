@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Helpers;
 
 namespace Platform.Data.Core.Collections.Trees
 {
-    public abstract class SizeBalancedTreeMethodsBase<TElement> : GenericCollectionMethodsBase<TElement>
+    public abstract class BinaryTreeMethodsBase<TElement> : GenericCollectionMethodsBase<TElement>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract IntPtr GetLeft(TElement node);
@@ -97,7 +96,7 @@ namespace Platform.Data.Core.Collections.Trees
             //Debug.WriteLine(PrintNodes(root));
             //Debug.WriteLine("----------------");
 
-            var sizeBefore = GetSize(root);
+            //var sizeBefore = GetSize(root);
 
             if (ValueEqualToZero(root))
             {
@@ -116,10 +115,10 @@ namespace Platform.Data.Core.Collections.Trees
 
             //ValidateSizes(root);
 
-            var sizeAfter = GetSize(root);
+            //var sizeAfter = GetSize(root);
 
-            if (!Equals(MathHelpers.Increment(sizeBefore), sizeAfter))
-                throw new Exception("Tree was broken after attach.");
+            //if (!Equals(MathHelpers.Increment(sizeBefore), sizeAfter))
+            //    throw new Exception("Tree was broken after attach.");
         }
 
         protected abstract void AttachCore(IntPtr root, TElement node);
@@ -132,7 +131,7 @@ namespace Platform.Data.Core.Collections.Trees
             //Debug.WriteLine(PrintNodes(root));
             //Debug.WriteLine("----------------");
 
-            var sizeBefore = GetSize(root);
+            //var sizeBefore = GetSize(root);
 
             if (ValueEqualToZero(root))
                 throw new Exception($"Элемент с {node} не содержится в дереве.");
@@ -145,10 +144,10 @@ namespace Platform.Data.Core.Collections.Trees
 
             //ValidateSizes(root);
 
-            var sizeAfter = GetSize(root);
+            //var sizeAfter = GetSize(root);
 
-            if (!Equals(MathHelpers.Decrement(sizeBefore), sizeAfter))
-                throw new Exception("Tree was broken after detach.");
+            //if (!Equals(MathHelpers.Decrement(sizeBefore), sizeAfter))
+            //    throw new Exception("Tree was broken after detach.");
         }
 
         protected abstract void DetachCore(IntPtr root, TElement node);

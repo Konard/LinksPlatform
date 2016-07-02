@@ -8,7 +8,7 @@ namespace Platform.Data.Core.Pairs
 {
     unsafe partial class UInt64LinksMemoryManager
     {
-        private abstract class LinksTreeMethodsBase : SizeBalancedTreeMethods3<ulong>
+        private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<ulong>
         {
             protected readonly ILinksCombinedConstants<bool, ulong, int> Constants;
             protected readonly Link* Links;

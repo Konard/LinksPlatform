@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Collections.Trees
     /// <remarks>
     /// TODO: Compare performance with and without unchecked.
     /// </remarks>
-    public abstract class SizeBalancedTreeMethods3<TElement> : SizeBalancedTreeMethodsBase<TElement>
+    public abstract class SizedAndThreadedAVLBalancedTreeMethods<TElement> : BinaryTreeMethodsBase<TElement>
     {
         private const int MaxPath = 92;
 

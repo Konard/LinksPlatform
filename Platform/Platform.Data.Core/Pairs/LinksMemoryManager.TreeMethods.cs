@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Pairs
 {
     unsafe partial class LinksMemoryManager<T>
     {
-        private abstract class LinksTreeMethodsBase : SizeBalancedTreeMethods3<T>
+        private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<T>
         {
             protected readonly ILinksCombinedConstants<bool, T, int> Constants;
             protected readonly IntPtr Links;
