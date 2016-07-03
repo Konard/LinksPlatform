@@ -168,11 +168,62 @@ namespace Platform.Data.Core.Pairs
                 return total - totalRightIgnore - totalLeftIgnore;
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool EachReference(ulong source, Func<ulong, bool> handler)
+            public bool EachReference(ulong link, Func<ulong, bool> handler)
             {
-                return EachReferenceCore(source, GetTreeRoot(), handler);
+                var root = GetTreeRoot();
+
+                if (root == 0)
+                    return true;
+
+                ulong first = 0, last = 0, current = root;
+                while (current != 0)
+                {
+                    var @base = GetBasePartValue(current);
+                    if (@base <= link)
+                    {
+                        if (@base == link)
+                            last = current;
+                        current = GetRightOrDefault(current);
+                    }
+                    else
+                        current = GetLeftOrDefault(current);
+                }
+
+                if (last != 0)
+                {
+                    current = root;
+                    while (current != 0)
+                    {
+                        var @base = GetBasePartValue(current);
+                        if (@base >= link)
+                        {
+                            if (@base == link)
+                                first = current;
+                            current = GetLeftOrDefault(current);
+                        }
+                        else
+                            current = GetRightOrDefault(current);
+                    }
+
+                    current = first;
+                    while (true)
+                    {
+                        if (!handler(current))
+                            return false;
+                        if (current == last)
+                            break;
+                        current = GetNext(current);
+                    }
+                }
+
+                return true;
             }
+
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            //public bool EachReference(ulong source, Func<ulong, bool> handler)
+            //{
+            //    return EachReferenceCore(source, GetTreeRoot(), handler);
+            //}
 
             // TODO: 1. Move target, handler to separate object. 2. Use stack or walker 3. Use low-level MSIL stack.
             //private bool EachReferenceCore(ulong @base, ulong link, Func<ulong, bool> handler)

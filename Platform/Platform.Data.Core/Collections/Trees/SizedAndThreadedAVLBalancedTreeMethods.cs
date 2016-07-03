@@ -54,6 +54,7 @@ namespace Platform.Data.Core.Collections.Trees
         {
             unchecked
             {
+                // TODO: Try to use stackalloc as an optimization (requires code generation, because of generics)
                 var path = ArrayPool.Allocate<TElement>(MaxPath);
 
                 var pathPosition = 0;
@@ -275,7 +276,7 @@ namespace Platform.Data.Core.Collections.Trees
             }
         }
 
-        private TElement GetNext(TElement node)
+        protected TElement GetNext(TElement node)
         {
             unchecked
             {
@@ -289,7 +290,7 @@ namespace Platform.Data.Core.Collections.Trees
             }
         }
 
-        private TElement GetPrevious(TElement node)
+        protected TElement GetPrevious(TElement node)
         {
             unchecked
             {

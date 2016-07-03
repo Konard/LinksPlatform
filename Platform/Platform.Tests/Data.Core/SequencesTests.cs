@@ -492,8 +492,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        // TODO: Optimize code to make it fast again.
-        [Fact(Skip = "became too slow after latest changes (ulong to generic)")]
+        [Fact]
         public void CompressionEfficiencyTest()
         {
             var strings = ExampleText.Split(new [] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
