@@ -179,40 +179,26 @@ namespace Platform.Data.Core.Pairs
                 while (current != 0)
                 {
                     var @base = GetBasePartValue(current);
-                    if (@base <= link)
+                    if (@base >= link)
                     {
                         if (@base == link)
-                            last = current;
-                        current = GetRightOrDefault(current);
+                            first = current;
+                        current = GetLeftOrDefault(current);
                     }
                     else
-                        current = GetLeftOrDefault(current);
+                        current = GetRightOrDefault(current);
                 }
 
-                if (last != 0)
+                if (first != 0)
                 {
-                    current = root;
-                    while (current != 0)
-                    {
-                        var @base = GetBasePartValue(current);
-                        if (@base >= link)
-                        {
-                            if (@base == link)
-                                first = current;
-                            current = GetLeftOrDefault(current);
-                        }
-                        else
-                            current = GetRightOrDefault(current);
-                    }
-
                     current = first;
                     while (true)
                     {
                         if (!handler(current))
                             return false;
-                        if (current == last)
-                            break;
                         current = GetNext(current);
+                        if (current == 0 || GetBasePartValue(current) != link)
+                            break;
                     }
                 }
 
