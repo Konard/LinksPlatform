@@ -25,7 +25,7 @@
     "net45": { },
     "netstandard1.5": {
       "dependencies": {
-        "System.Threading.Thread": "4.0.0-rc2-24027"
+        "System.Threading.Thread": "4.0.0"
       }
     }
   }
