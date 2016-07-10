@@ -8,7 +8,7 @@ namespace Platform.Tests.Data.Core
     public class TempLinksTestScope : DisposableBase
     {
         public readonly ILinksMemoryManager<ulong> MemoryManager;
-        public readonly UInt64Links Links;
+        public readonly SynchronizedLinks<ulong> Links;
         public readonly Sequences Sequences;
         public readonly string TempFilename;
         public readonly string TempTransactionLogFilename;
@@ -22,15 +22,15 @@ namespace Platform.Tests.Data.Core
 
             MemoryManager = new UInt64LinksMemoryManager(TempFilename);
             //MemoryManager = new LinksMemoryManager<ulong>(TempFilename);
-            Links = useLog ? new UInt64Links(MemoryManager, TempTransactionLogFilename) : new UInt64Links(MemoryManager);
+            Links = new SynchronizedLinks<ulong>(useLog ? new UInt64Links(MemoryManager, TempTransactionLogFilename) : new UInt64Links(MemoryManager));
             if (useSequences)
-                Sequences = new Sequences(new SynchronizedLinks<ulong>(Links), sequencesOptions);
+                Sequences = new Sequences(Links, sequencesOptions);
         }
 
         protected override void DisposeCore(bool manual)
         {
             if (manual)
-                Disposable.TryDispose(Links);
+                Disposable.TryDispose(Links.Unsync);
 
             if (_deleteFiles)
                 DeleteFiles();

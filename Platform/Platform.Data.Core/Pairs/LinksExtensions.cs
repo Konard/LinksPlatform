@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -186,6 +187,125 @@ namespace Platform.Data.Core.Pairs
             var constants = links.Constants;
             return MathHelpers.GreaterOrEqualThan(constants.MinPossibleIndex, reference) && MathHelpers.LessOrEqualThan(reference, constants.MaxPossibleIndex);
         }
+
+        #region Points
+
+        /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой полностью (связью замкнутой на себе дважды).</summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="link">Индекс проверяемой связи.</param>
+        /// <returns>Значение, определяющее является ли связь точкой полностью.</returns>
+        /// <remarks>
+        /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.
+        /// Но что, если точка уже есть, а нужно создать пару с таким же значением? Должны ли точка и пара существовать одновременно?
+        /// Или в качестве решения для точек нужно использовать 0 в качестве начала и конца, а сортировать по индексу в массиве связей?
+        /// Какое тогда будет значение Source и Target у точки? 0 или её индекс?
+        /// Или точка должна быть одновременно точкой и парой, а также последовательностями из самой себя любого размера?
+        /// Как только есть ссылка на себя, появляется этот парадокс, причём достаточно даже одной ссылки на себя (частичной точки).
+        /// А что если не выбирать что является точкой, пара нулей (цикл через пустоту) или 
+        /// самостоятельный цикл через себя? Что если предоставить все варианты использования связей?
+        /// Что если разрешить и нули, а так же частичные варианты?
+        /// 
+        /// Что если точка, это только в том случае когда link.Source == link && link.Target == link , т.е. дважды ссылка на себя.
+        /// А пара это тогда, когда link.Source == link.Target && link.Source != link , т.е. ссылка не на себя а во вне.
+        /// 
+        /// Тогда если у нас уже создана пара, но нам нужна точка, мы можем используя промежуточную связь,
+        /// например "PairOf" обозначить что является точно парой, а что точно точкой.
+        /// И наоборот этот же метод поможет, если уже существует точка, но нам нужна пара.
+        /// </remarks>
+        public static bool IsFullPoint<T>(this ILinks<T> links, T link)
+        {
+            links.EnsureLinkExists(link);
+            return Point<T>.IsFullPoint(links.GetLink(link));
+        }
+        
+
+        /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="link">Индекс проверяемой связи.</param>
+        /// <returns>Значение, определяющее является ли связь точкой частично.</returns>
+        /// <remarks>
+        /// Достаточно любой одной ссылки на себя.
+        /// Также в будущем можно будет проверять и всех родителей, чтобы проверить есть ли ссылки на себя (на эту связь).
+        /// </remarks>
+        public static bool IsPartialPoint<T>(this ILinks<T> links, T link)
+        {
+            links.EnsureLinkExists(link);
+            return Point<T>.IsPartialPoint(links.GetLink(link));
+        }
+
+        #endregion
+
+        #region Paths
+
+        /// <remarks>
+        /// TODO: Как так? Как то что ниже может быть корректно?
+        /// Скорее всего практически не применимо
+        /// Предполагалось, что можно было конвертировать формируемый в проходе через SequenceWalker 
+        /// Stack в конкретный путь из Source, Target до связи, но это не всегда так.
+        /// TODO: Возможно нужен метод, который именно выбрасывает исключения (EnsurePathExists)
+        /// </remarks>
+        public static bool CheckPathExistance<T>(this ILinks<T> links, params T[] path)
+        {
+            var current = path[0];
+
+            //EnsureLinkExists(current, "path");
+            if (!links.Exists(current))
+                return false;
+
+            for (var i = 1; i < path.Length; i++)
+            {
+                var next = path[i];
+
+                var values = links.GetLink(current);
+                var source = values[Constants.SourcePart];
+                var target = values[Constants.TargetPart];
+
+                if (Equals(source, target) && Equals(source, next))
+                    //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
+                    return false;
+                if (!Equals(next, source) && !Equals(next, target))
+                    //throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
+                    return false;
+
+                current = next;
+            }
+
+            return true;
+        }
+
+        /// <remarks>
+        /// Может потребовать дополнительного стека для PathElement's при использовании SequenceWalker.
+        /// </remarks>
+        public static T GetByKeys<T>(this ILinks<T> links, T root, params int[] path)
+        {
+            links.EnsureLinkExists(root, "root");
+
+            var currentLink = root;
+            for (var i = 0; i < path.Length; i++)
+                currentLink = links.GetLink(currentLink)[path[i]];
+            return currentLink;
+        }
+
+        public static T GetSquareMatrixSequenceElementByIndex<T>(this ILinks<T> links, T root, ulong size, ulong index)
+        {
+            var source = Constants.SourcePart;
+            var target = Constants.TargetPart;
+
+            if (!MathHelpers.IsPowerOfTwo(size))
+                throw new ArgumentOutOfRangeException(nameof(size), "Sequences with sizes other than powers of two are not supported.");
+
+            var path = new BitArray(BitConverter.GetBytes(index));
+            var length = MathHelpers.GetLowestBitPosition(size);
+
+            links.EnsureLinkExists(root, "root");
+
+            var currentLink = root;
+            for (var i = length - 1; i >= 0; i--)
+                currentLink = links.GetLink(currentLink)[path[i] ? target : source];
+            return currentLink;
+        }
+
+        #endregion
 
         /// <summary>
         /// Возвращает индекс начальной (Source) связи для указанной связи.

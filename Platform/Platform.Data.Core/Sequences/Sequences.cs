@@ -79,7 +79,7 @@ namespace Platform.Data.Core.Sequences
             if (Options.UseSequenceMarker)
                 return Links.SearchOrDefault(Options.SequenceMarkerLink, sequence) != Constants.Null;
 
-            return !Sync.ExecuteReadOperation(() => ((UInt64Links)Links.Unsync).IsPartialPoint(sequence)); // TODO: Или просто return true;
+            return !Sync.ExecuteReadOperation(() => Links.Unsync.IsPartialPoint(sequence));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -598,7 +598,7 @@ namespace Platform.Data.Core.Sequences
         private bool IsGarbage(ulong link)
         {
             return link != Options.SequenceMarkerLink
-                && !((UInt64Links)Links.Unsync).IsPartialPoint(link)
+                && !Links.Unsync.IsPartialPoint(link)
                 && Links.Count(link) == 0;
         }
 

@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers.IO;
 using Platform.Helpers;
+using Platform.Helpers.Disposables;
 using Xunit;
 
 namespace Platform.Tests.Data.Core
@@ -96,7 +98,7 @@ namespace Platform.Tests.Data.Core
 
                 Global.Trash = links.Count();
 
-                links.Dispose(); // Close links to access log
+                Disposable.TryDispose(links.Unsync); // Close links to access log
 
                 Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
             }
@@ -115,7 +117,7 @@ namespace Platform.Tests.Data.Core
 
                 links.Delete(l1);
 
-                links.Dispose(); // Close links to access log
+                Disposable.TryDispose(links.Unsync); // Close links to access log
 
                 Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
             }
@@ -128,7 +130,8 @@ namespace Platform.Tests.Data.Core
             using (var scope = new TempLinksTestScope(useLog: true))
             {
                 var links = scope.Links;
-                using (var transaction = links.BeginTransaction())
+                var uint64Links = (UInt64Links)links.Unsync;
+                using (var transaction = uint64Links.BeginTransaction())
                 {
                     var l1 = links.Create();
                     var l2 = links.Create();
@@ -142,7 +145,7 @@ namespace Platform.Tests.Data.Core
 
                 Global.Trash = links.Count();
 
-                links.Dispose();
+                Disposable.TryDispose(links.Unsync);
 
                 Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
             }
@@ -160,7 +163,8 @@ namespace Platform.Tests.Data.Core
                 using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
                     var links = scope.Links;
-                    using (var transaction = links.BeginTransaction())
+                    var uint64Links = (UInt64Links)links.Unsync;
+                    using (var transaction = uint64Links.BeginTransaction())
                     {
                         var l1 = links.CreateAndUpdate(itself, itself);
                         var l2 = links.CreateAndUpdate(itself, itself);
@@ -220,7 +224,7 @@ namespace Platform.Tests.Data.Core
                     links.CreateAndUpdate(l2, itself);
                     links.CreateAndUpdate(l2, itself);
 
-                    links.Dispose();
+                    Disposable.TryDispose(links.Unsync);
 
                     Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
                 }
@@ -228,7 +232,8 @@ namespace Platform.Tests.Data.Core
                 using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
                     var links = scope.Links;
-                    using (var transaction = links.BeginTransaction())
+                    var uint64Links = (UInt64Links)links.Unsync;
+                    using (var transaction = uint64Links.BeginTransaction())
                     {
                         l2 = links.Update(l2, l1);
 
@@ -402,19 +407,49 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void PathsTest()
         {
-            var itself = Constants.Itself;
             var source = Constants.SourcePart;
             var target = Constants.TargetPart;
 
             using (var scope = new TempLinksTestScope())
             {
                 var links = scope.Links;
-                var l1 = links.CreateAndUpdate(itself, itself);
-                var l2 = links.CreateAndUpdate(itself, itself);
+                var l1 = links.CreatePoint();
+                var l2 = links.CreatePoint();
 
                 var r1 = links.GetByKeys(l1, source, target, source);
                 var r2 = links.CheckPathExistance(l2, l2, l2, l2);
             }
+        }
+
+        [Fact]
+        public void StringFormattingTest()
+        {
+            using (var scope = new TempLinksTestScope(useSequences: true))
+            {
+                var links = scope.Links;
+                var sequences = scope.Sequences; // TODO: Auto use sequences on Sequences getter.
+
+                var a = links.CreatePoint();
+                var b = links.CreatePoint();
+                var c = links.CreatePoint();
+
+                var ab = links.CreateAndUpdate(a, b);
+                var cb = links.CreateAndUpdate(c, b);
+                var ac = links.CreateAndUpdate(a, c);
+
+                Debug.WriteLine(links.FormatStructure(ab, link => link.IsFullPoint(), true));
+                Debug.WriteLine(links.FormatStructure(cb, link => link.IsFullPoint(), true));
+                Debug.WriteLine(links.FormatStructure(ac, link => link.IsFullPoint(), true));
+
+                Debug.WriteLine(sequences.FormatSequence(ab, DefaultFormatter, false));
+                Debug.WriteLine(sequences.FormatSequence(cb, DefaultFormatter, false));
+                Debug.WriteLine(sequences.FormatSequence(ac, DefaultFormatter, false));
+            }
+        }
+
+        public void DefaultFormatter(StringBuilder sb, ulong link)
+        {
+            sb.Append(link.ToString());
         }
 
         #endregion
