@@ -28,7 +28,7 @@ namespace Platform.Data.Core.Pairs
     /// 
     /// Решить отключать ли проверки при компиляции под Release. Т.е. исключения будут выбрасываться только при #if DEBUG
     /// </remarks>
-    public sealed partial class UInt64Links : DisposableBase, ILinks<ulong>
+    public partial class UInt64Links : DisposableBase, ILinks<ulong>
     {
         private readonly ILinksMemoryManager<ulong> _memoryManager;
 
