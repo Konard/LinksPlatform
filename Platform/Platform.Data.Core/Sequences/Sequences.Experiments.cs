@@ -495,27 +495,36 @@ namespace Platform.Data.Core.Sequences
 
         public string FormatSequence(LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
         {
-            var visitedElements = 0;
+            return Links.SyncRoot.ExecuteReadOperation(() => FormatSequence(Links.Unsync, sequenceLink, elementToString, insertComma, knownElements));
+        }
 
+        private string FormatSequence(ILinks<LinkIndex> links, LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
+        {
             var linksInSequence = new HashSet<ulong>(knownElements);
+            var entered = new HashSet<ulong>();
 
             var sb = new StringBuilder();
 
             sb.Append('{');
 
-            if (Links.Exists(sequenceLink))
+            if (links.Exists(sequenceLink))
             {
-                StopableSequenceWalker.WalkRight(sequenceLink, Links.Unsync.GetSource, Links.Unsync.GetTarget,
-                    x => linksInSequence.Contains(x) || Links.Unsync.GetTarget(x) == x, element =>
+                StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
+                    x => linksInSequence.Contains(x) || links.IsFullPoint(x), entered.AddAndReturnVoid, x => {}, entered.DoNotContains, element =>
                     {
-                        if (insertComma && visitedElements > 0)
+                        if (insertComma && sb.Length > 0)
                             sb.Append(',');
 
-                        elementToString(sb, element);
+                        if (entered.Contains(element))
+                        {
+                            sb.Append('{');
+                            elementToString(sb, element);
+                            sb.Append('}');
+                        }
+                        else
+                            elementToString(sb, element);
 
-                        visitedElements++;
-
-                        if (visitedElements < MaxSequenceFormatSize)
+                        if (sb.Length < MaxSequenceFormatSize)
                         {
                             return true;
                         }

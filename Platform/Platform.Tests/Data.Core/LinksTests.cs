@@ -422,7 +422,7 @@ namespace Platform.Tests.Data.Core
         }
 
         [Fact]
-        public void StringFormattingTest()
+        public void RecursiveStringFormattingTest()
         {
             using (var scope = new TempLinksTestScope(useSequences: true))
             {
@@ -437,13 +437,23 @@ namespace Platform.Tests.Data.Core
                 var cb = links.CreateAndUpdate(c, b);
                 var ac = links.CreateAndUpdate(a, c);
 
+                a = links.Update(a, c, b);
+                b = links.Update(b, a, c);
+                c = links.Update(c, a, b);
+
                 Debug.WriteLine(links.FormatStructure(ab, link => link.IsFullPoint(), true));
                 Debug.WriteLine(links.FormatStructure(cb, link => link.IsFullPoint(), true));
                 Debug.WriteLine(links.FormatStructure(ac, link => link.IsFullPoint(), true));
 
-                Debug.WriteLine(sequences.FormatSequence(ab, DefaultFormatter, false));
-                Debug.WriteLine(sequences.FormatSequence(cb, DefaultFormatter, false));
-                Debug.WriteLine(sequences.FormatSequence(ac, DefaultFormatter, false));
+                Assert.True(links.FormatStructure(cb, link => link.IsFullPoint(), true) == "(5:(4:5 (6:5 4)) 6)");
+                Assert.True(links.FormatStructure(ac, link => link.IsFullPoint(), true) == "(6:(5:(4:5 6) 6) 4)");
+                Assert.True(links.FormatStructure(ab, link => link.IsFullPoint(), true) == "(4:(5:4 (6:5 4)) 6)");
+
+                // TODO: Think how to build balanced syntax tree while formatting structure (eg. "(4:(5:4 6) (6:5 4)") instead of "(4:(5:4 (6:5 4)) 6)"
+                
+                Assert.True(sequences.FormatSequence(cb, DefaultFormatter, false) == "{{5}{5}{4}{6}}");
+                Assert.True(sequences.FormatSequence(ac, DefaultFormatter, false) == "{{5}{6}{6}{4}}");
+                Assert.True(sequences.FormatSequence(ab, DefaultFormatter, false) == "{{4}{5}{4}{6}}");
             }
         }
 

@@ -21,6 +21,72 @@ namespace Platform.Data.Core.Sequences
     public class StopableSequenceWalker
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool WalkRight<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Action<TLink> enter, Action<TLink> exit, Func<TLink, bool> canEnter, Func<TLink, bool> visit)
+        {
+            var exited = 0;
+            var stack = new Stack<TLink>();
+            var element = sequence;
+
+            if (isElement(element))
+                return visit(element);
+
+            while (true)
+            {
+                if (isElement(element))
+                {
+                    if (stack.Count == 0)
+                        return true;
+
+                    element = stack.Pop();
+                    exit(element);
+                    exited++;
+
+                    var source = getSource(element);
+                    var target = getTarget(element);
+
+                    // Обработка элемента
+                    if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
+                        return false;
+                    if ((isElement(target) || !canEnter(target)) && !visit(target))
+                        return false;
+
+                    element = target;
+                }
+                else
+                {
+                    if (canEnter(element))
+                    {
+                        enter(element);
+                        exited = 0;
+                        stack.Push(element);
+
+                        element = getSource(element);
+                    }
+                    else
+                    {
+                        if (stack.Count == 0)
+                            return true;
+
+                        element = stack.Pop();
+                        exit(element);
+                        exited++;
+
+                        var source = getSource(element);
+                        var target = getTarget(element);
+
+                        // Обработка элемента
+                        if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
+                            return false;
+                        if ((isElement(target) || !canEnter(target)) && !visit(target))
+                            return false;
+
+                        element = target;
+                    }
+                }
+            }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool WalkRight<TLink>(TLink sequence, Func<TLink, TLink> getSource, Func<TLink, TLink> getTarget, Func<TLink, bool> isElement, Func<TLink, bool> visit)
         {
             var stack = new Stack<TLink>();

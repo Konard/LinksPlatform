@@ -123,16 +123,17 @@ namespace Platform.Data.Core.Pairs
             return false;
         }
 
-        public static string FormatStructure(this ILinks<ulong> links, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false)
+        public static string FormatStructure(this ILinks<ulong> links, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false, bool renderDebug = false)
         {
             var sb = new StringBuilder();
+            var visited = new HashSet<ulong>();
 
-            links.AppendStructure(sb, linkIndex, isElement, renderIndex);
+            links.AppendStructure(sb, visited, linkIndex, isElement, renderIndex, renderDebug);
 
             return sb.ToString();
         }
 
-        public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false)
+        public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, HashSet<ulong> visited, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false, bool renderDebug = false)
         {
             if (sb == null)
                 throw new ArgumentNullException(nameof(sb));
@@ -140,46 +141,59 @@ namespace Platform.Data.Core.Pairs
             if (linkIndex == Constants.Null || linkIndex == Constants.Any || linkIndex == Constants.Itself)
                 return;
 
-            sb.Append('(');
-
             if (links.Exists(linkIndex))
             {
-                var link = new UInt64Link(links.GetLink(linkIndex));
-
-                if (renderIndex)
+                if (visited.Add(linkIndex))
                 {
-                    sb.Append(link.Index);
-                    sb.Append(':');
-                }
+                    sb.Append('(');
 
-                if (link.Source == link.Index)
-                    sb.Append(link.Index);
+                    var link = new UInt64Link(links.GetLink(linkIndex));
+
+                    if (renderIndex)
+                    {
+                        sb.Append(link.Index);
+                        sb.Append(':');
+                    }
+
+                    if (link.Source == link.Index)
+                        sb.Append(link.Index);
+                    else
+                    {
+                        var source = new UInt64Link(links.GetLink(link.Source));
+                        if (isElement(source))
+                            sb.Append(source.Index);
+                        else
+                            links.AppendStructure(sb, visited, source.Index, isElement, renderIndex);
+                    }
+
+                    sb.Append(' ');
+
+                    if (link.Target == link.Index)
+                        sb.Append(link.Index);
+                    else
+                    {
+                        var target = new UInt64Link(links.GetLink(link.Target));
+                        if (isElement(target))
+                            sb.Append(target.Index);
+                        else
+                            links.AppendStructure(sb, visited, target.Index, isElement, renderIndex);
+                    }
+
+                    sb.Append(')');
+                }
                 else
                 {
-                    var source = new UInt64Link(links.GetLink(link.Source));
-                    if (isElement(source))
-                        sb.Append(source.Index);
-                    else
-                        links.AppendStructure(sb, source.Index, isElement, renderIndex);
-                }
-
-                sb.Append(' ');
-
-                if (link.Target == link.Index)
-                    sb.Append(link.Index);
-                else
-                {
-                    var target = new UInt64Link(links.GetLink(link.Target));
-                    if (isElement(target))
-                        sb.Append(target.Index);
-                    else
-                        links.AppendStructure(sb, target.Index, isElement, renderIndex);
+                    if (renderDebug)
+                        sb.Append('*');
+                    sb.Append(linkIndex);
                 }
             }
             else
+            {
+                if (renderDebug)
+                    sb.Append('~');
                 sb.Append(linkIndex);
-
-            sb.Append(')');
+            }
         }
 
         public static bool IsInnerReference<T>(this ILinks<T> links, T reference)
@@ -217,7 +231,7 @@ namespace Platform.Data.Core.Pairs
             links.EnsureLinkExists(link);
             return Point<T>.IsFullPoint(links.GetLink(link));
         }
-        
+
 
         /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
         /// <param name="links">Хранилище связей.</param>
