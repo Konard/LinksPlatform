@@ -48,13 +48,13 @@ namespace Platform.Sandbox
                     var readCharsCopy = readChars;
                     buffer = new char[stepSize];
 
-                    tasks.EnqueueTask(() =>
+                    tasks.EnqueueRunnedTask(() =>
                     {
                         var linkArray = UnicodeMap.FromCharsToLinkArray(bufferCopy, readCharsCopy);
                         _sequences.BulkIndex(linkArray);
                     });
 
-                    if (tasks.Count > 3) await tasks.AwaitAll();
+                    if (tasks.Count > 3) await tasks.AwaitOne();
 
                     Console.WriteLine($"chars: {(ulong) steps*stepSize + (ulong) readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
 

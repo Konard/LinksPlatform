@@ -23,7 +23,16 @@ namespace Platform.Helpers.Collections
                 await item;
         }
 
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnqueueTask(this ConcurrentQueue<Task> queue, Action action) => queue.Enqueue(new Task(action));
+        public static async Task AwaitOne(this ConcurrentQueue<Task> queue)
+        {
+            Task item;
+            if(queue.TryDequeue(out item))
+                await item;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void EnqueueRunnedTask(this ConcurrentQueue<Task> queue, Action action) => queue.Enqueue(Task.Run(action));
     }
 }

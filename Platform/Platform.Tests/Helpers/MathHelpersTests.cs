@@ -93,6 +93,7 @@ namespace Platform.Tests.Helpers
             }
         }
 
+        // TODO: Can be optimized using precalculation of TargetMask and SourceMask
         private uint PartialWrite(uint target, uint source, int shift, int limit)
         {
             if (shift < 0) shift = 32 + shift;

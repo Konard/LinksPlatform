@@ -221,15 +221,17 @@ namespace Platform.Data.Core.Sequences
 
             var i = sequence.Length;
 
+            var links = Links.Unsync;
+
             Sync.ExecuteReadOperation(() =>
             {
-                while (--i >= 1 && (indexed = Links.Unsync.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) {}
+                while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) {}
             });
 
             Sync.ExecuteWriteOperation(() =>
             {
                 for (; i >= 1; i--)
-                    Links.Unsync.CreateAndUpdate(sequence[i - 1], sequence[i]);
+                    links.CreateAndUpdate(sequence[i - 1], sequence[i]);
             });
 
             return indexed;
