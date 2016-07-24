@@ -90,7 +90,13 @@ namespace Platform.Helpers.Disposables
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void EnsureNotDisposed()
         {
-            Ensure.NotDisposed(this, ObjectName);
+            // TODO: Make this check removable (for example enable only if Debug is enabled)
+            // Faster implementation (if not disposed ObjectName is not accessed)
+            if (_disposed > 0)
+                throw new ObjectDisposedException(ObjectName);
+
+            // This can reduce performance (ObjectName always accessed)
+            //Ensure.NotDisposed(this, ObjectName);
         }
     }
 }
