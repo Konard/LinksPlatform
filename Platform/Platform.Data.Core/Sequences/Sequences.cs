@@ -207,7 +207,7 @@ namespace Platform.Data.Core.Sequences
             var indexed = true;
 
             var i = sequence.Length;
-            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) {}
+            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
 
             for (; i >= 1; i--)
                 Links.CreateAndUpdate(sequence[i - 1], sequence[i]);
@@ -225,7 +225,7 @@ namespace Platform.Data.Core.Sequences
 
             Sync.ExecuteReadOperation(() =>
             {
-                while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) {}
+                while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
             });
 
             Sync.ExecuteWriteOperation(() =>
@@ -237,12 +237,28 @@ namespace Platform.Data.Core.Sequences
             return indexed;
         }
 
+        public bool BulkIndexUnsync(ulong[] sequence)
+        {
+            var indexed = true;
+
+            var i = sequence.Length;
+
+            var links = Links.Unsync;
+
+            while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
+
+            for (; i >= 1; i--)
+                links.CreateAndUpdate(sequence[i - 1], sequence[i]);
+
+            return indexed;
+        }
+
         public bool CheckIndex(ulong[] sequence)
         {
             var indexed = true;
 
             var i = sequence.Length;
-            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) {}
+            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
 
             return indexed;
         }

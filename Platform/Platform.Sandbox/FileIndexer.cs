@@ -20,6 +20,38 @@ namespace Platform.Sandbox
             _sequences = sequences;
         }
 
+        public void IndexSync(string path, CancellationToken cancellationToken)
+        {
+            const int stepSize = 1024 * 1024;
+
+            using (var reader = File.OpenText(path))
+            {
+                var steps = 0;
+
+                char[] buffer = new char[stepSize];
+                int readChars = 0;
+
+                char lastCharOfPreviousChunk = '\0';
+
+                // TODO: Try use IDirectMemory + Partitioner
+                while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
+                {
+                    if (lastCharOfPreviousChunk != '\0')
+                        _links.CreateAndUpdate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
+                            UnicodeMap.FromCharToLink(buffer[0]));
+
+                    lastCharOfPreviousChunk = buffer[readChars - 1];
+                   
+                    var linkArray = UnicodeMap.FromCharsToLinkArray(buffer, readChars);
+                    _sequences.BulkIndexUnsync(linkArray);
+
+                    Console.WriteLine($"chars: {(ulong)steps * stepSize + (ulong)readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
+
+                    steps++;
+                }
+            }
+        }
+
         public async Task IndexAsync(string path, CancellationToken cancellationToken)
         {
             const int stepSize = 1024 * 1024;

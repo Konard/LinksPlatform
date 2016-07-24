@@ -34,7 +34,8 @@ namespace Platform.Sandbox
 
                     var fileIndexer = new FileIndexer(syncLinks, sequences);
 
-                    fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
+                    //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
+                    fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
                 }
             }
 
