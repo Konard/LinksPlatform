@@ -1,28 +1,23 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Platform.Helpers.Reflection;
+using System.Reflection;
 
 namespace Platform.Helpers
 {
-    /// <remarks>
-    /// Looks like a serious optimizations needed here.
-    /// </remarks>
     public static class IntPtrExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TElement GetValue<TElement>(this IntPtr pointer)
         {
-#if NET45
-            return (TElement)Marshal.PtrToStructure(pointer, typeof(TElement));
-#else
-            return Marshal.PtrToStructure<TElement>(pointer);
-#endif
+            return IntPtrExtensions<TElement>.CompiledGetValue(pointer);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void SetValue<TElement>(this IntPtr pointer, TElement value)
         {
-            Marshal.StructureToPtr(value, pointer, true);
+            IntPtrExtensions<TElement>.CompiledSetValue(pointer, value);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -41,6 +36,54 @@ namespace Platform.Helpers
         public static IntPtr GetElement<TIndex>(this IntPtr pointer, int elementSize, TIndex index)
         {
             return pointer.GetElement((long)elementSize, (Integer)(Integer<TIndex>)index);
+        }
+    }
+
+    public static class IntPtrExtensions<T>
+    {
+        public static readonly Func<IntPtr, T> CompiledGetValue;
+        public static readonly Action<IntPtr, T> CompiledSetValue;
+
+        static IntPtrExtensions()
+        {
+            DelegateHelpers.Compile(out CompiledGetValue, emiter =>
+            {
+                if (CachedTypeInfo<T>.IsNumeric)
+                {
+                    emiter.LoadArgument(0);
+                    emiter.LoadIndirect<T>();
+                    emiter.Return();
+                }
+                else
+                {
+                    emiter.LoadArguments(0);
+#if NET45
+                    emiter.LoadConstant(typeof(T));
+                    emiter.Call(typeof(Marshal).GetTypeInfo().GetMethod("PtrToStructure", new[] { typeof(object), typeof(Type), typeof(bool) }));
+                    emiter.Unbox<T>();
+#else
+                    emiter.Call(typeof(Marshal).GetGenericMethod("PtrToStructure", new [] { typeof(T) }, new[] { typeof(IntPtr), typeof(Type), typeof(bool) }));
+#endif
+                    emiter.Return();
+                }
+            });
+
+            DelegateHelpers.Compile(out CompiledSetValue, emiter =>
+            {
+                if (CachedTypeInfo<T>.IsNumeric)
+                {
+                    emiter.LoadArguments(0, 1);
+                    emiter.StoreIndirect<T>();
+                    emiter.Return();
+                }
+                else
+                {
+                    emiter.LoadArguments(0, 1);
+                    emiter.LoadConstant(true);
+                    emiter.Call(typeof(Marshal).GetTypeInfo().GetMethod("StructureToPtr", new[] { typeof(object), typeof(IntPtr), typeof(bool) }));
+                    emiter.Return();
+                }
+            });
         }
     }
 }

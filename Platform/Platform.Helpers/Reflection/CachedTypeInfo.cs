@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Runtime.InteropServices;
 
 // ReSharper disable AssignmentInConditionalExpression
 
@@ -21,6 +22,10 @@ namespace Platform.Helpers.Reflection
         public static readonly bool CanBeNumeric;
 
         public static readonly bool IsNullable;
+
+        public static readonly int BitsLength;
+        public static readonly T MinValue;
+        public static readonly T MaxValue;
 
         static CachedTypeInfo()
         {
@@ -54,6 +59,18 @@ namespace Platform.Helpers.Reflection
                 UnderlyingType == typeof(TimeSpan))
                 CanBeNumeric = true;
 
+            BitsLength = Marshal.SizeOf(UnderlyingType) * 8;
+
+            if (UnderlyingType == typeof(Boolean))
+            {
+                MinValue = (T)(object)false;
+                MaxValue = (T)(object)true;
+            }
+            else
+            {
+                MinValue = (T)UnderlyingType.GetStaticFieldValue("MinValue");
+                MaxValue = (T)UnderlyingType.GetStaticFieldValue("MaxValue");
+            }
 
             if (IsSigned)
             {

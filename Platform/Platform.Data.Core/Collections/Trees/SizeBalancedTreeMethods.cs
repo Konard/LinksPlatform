@@ -13,9 +13,9 @@ namespace Platform.Data.Core.Collections.Trees
         {
             while (true)
             {
-                var left = GetLeft(root.GetValue<TElement>());
+                var left = GetLeftPointer(root.GetValue<TElement>());
                 var leftSize = GetSizeOrZero(left.GetValue<TElement>());
-                var right = GetRight(root.GetValue<TElement>());
+                var right = GetRightPointer(root.GetValue<TElement>());
                 var rightSize = GetSizeOrZero(right.GetValue<TElement>());
 
                 if (FirstIsToTheLeftOfSecond(node, root.GetValue<TElement>())) // node.Key < root.Key
@@ -32,7 +32,7 @@ namespace Platform.Data.Core.Collections.Trees
                     }
                     if (FirstIsToTheRightOfSecond(node, left.GetValue<TElement>())) // node.Key > left.Key
                     {
-                        var leftRight = GetRight(left.GetValue<TElement>()).GetValue<TElement>();
+                        var leftRight = GetRightValue(left.GetValue<TElement>());
                         var leftRightSize = GetSizeOrZero(leftRight);
                         if (GreaterThan(Increment(leftRightSize), rightSize))
                         {
@@ -61,7 +61,7 @@ namespace Platform.Data.Core.Collections.Trees
                     }
                     else // node.Key < left.Key
                     {
-                        var leftLeft = GetLeft(left.GetValue<TElement>()).GetValue<TElement>();
+                        var leftLeft = GetLeftValue(left.GetValue<TElement>());
                         var leftLeftSize = GetSizeOrZero(leftLeft);
                         if (GreaterThan(Increment(leftLeftSize), rightSize))
                         {
@@ -89,7 +89,7 @@ namespace Platform.Data.Core.Collections.Trees
                     }
                     if (FirstIsToTheRightOfSecond(node, right.GetValue<TElement>())) // node.Key > right.Key
                     {
-                        var rightRight = GetRight(right.GetValue<TElement>()).GetValue<TElement>();
+                        var rightRight = GetRightValue(right.GetValue<TElement>());
                         var rightRightSize = GetSizeOrZero(rightRight);
                         if (GreaterThan(Increment(rightRightSize), leftSize))
                         {
@@ -104,7 +104,7 @@ namespace Platform.Data.Core.Collections.Trees
                     }
                     else // node.Key < right.Key
                     {
-                        var rightLeft = GetLeft(right.GetValue<TElement>()).GetValue<TElement>();
+                        var rightLeft = GetLeftValue(right.GetValue<TElement>());
                         var rightLeftSize = GetSizeOrZero(rightLeft);
                         if (GreaterThan(Increment(rightLeftSize), leftSize))
                         {
@@ -139,9 +139,9 @@ namespace Platform.Data.Core.Collections.Trees
         {
             while (true)
             {
-                var left = GetLeft(root.GetValue<TElement>());
+                var left = GetLeftPointer(root.GetValue<TElement>());
                 var leftSize = GetSizeOrZero(left.GetValue<TElement>());
-                var right = GetRight(root.GetValue<TElement>());
+                var right = GetRightPointer(root.GetValue<TElement>());
                 var rightSize = GetSizeOrZero(right.GetValue<TElement>());
 
                 if (FirstIsToTheLeftOfSecond(node, root.GetValue<TElement>())) // node.Key < root.Key
@@ -149,9 +149,9 @@ namespace Platform.Data.Core.Collections.Trees
                     if (EqualToZero (left.GetValue<TElement>()))
                         throw new Exception($"Элемент {node} не содержится в дереве.");
 
-                    var rightLeft = GetLeft(right.GetValue<TElement>()).GetValue<TElement>();
+                    var rightLeft = GetLeftValue(right.GetValue<TElement>());
                     var rightLeftSize = GetSizeOrZero(rightLeft);
-                    var rightRight = GetRight(right.GetValue<TElement>()).GetValue<TElement>();
+                    var rightRight = GetRightValue(right.GetValue<TElement>());
                     var rightRightSize = GetSizeOrZero(rightRight);
 
                     if (GreaterThan(rightRightSize, Decrement(leftSize)))
@@ -175,9 +175,9 @@ namespace Platform.Data.Core.Collections.Trees
                     if (EqualToZero (right.GetValue<TElement>() ))
                         throw new Exception($"Элемент {node} не содержится в дереве.");
 
-                    var leftLeft = GetLeft(left.GetValue<TElement>()).GetValue<TElement>();
+                    var leftLeft = GetLeftValue(left.GetValue<TElement>());
                     var leftLeftSize = GetSizeOrZero(leftLeft);
-                    var leftRight = GetRight(left.GetValue<TElement>()).GetValue<TElement>();
+                    var leftRight = GetRightValue(left.GetValue<TElement>());
                     var leftRightSize = GetSizeOrZero(leftRight);
 
                     if (GreaterThan(leftLeftSize,Decrement(rightSize)))
@@ -203,8 +203,8 @@ namespace Platform.Data.Core.Collections.Trees
                         if (GreaterThan(leftSize, rightSize))
                         {
                             var replacement = left.GetValue<TElement>();
-                            while (!EqualToZero(GetRight(replacement).GetValue<TElement>()))
-                                replacement = GetRight(replacement).GetValue<TElement>();
+                            while (!EqualToZero(GetRightValue(replacement)))
+                                replacement = GetRightValue(replacement);
 
                             DetachCore(left, replacement);
 
@@ -217,8 +217,8 @@ namespace Platform.Data.Core.Collections.Trees
                         else
                         {
                             var replacement = right.GetValue<TElement>();
-                            while (!EqualToZero(GetLeft(replacement).GetValue<TElement>()))
-                                replacement = GetLeft(replacement).GetValue<TElement>();
+                            while (!EqualToZero(GetLeftValue(replacement)))
+                                replacement = GetLeftValue(replacement);
 
                             DetachCore(right, replacement);
 

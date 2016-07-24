@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+
+using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Helpers;
@@ -8,9 +10,13 @@ namespace Platform.Data.Core.Collections.Trees
     public abstract class BinaryTreeMethodsBase<TElement> : GenericCollectionMethodsBase<TElement>
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract IntPtr GetLeft(TElement node);
+        protected abstract IntPtr GetLeftPointer(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected abstract IntPtr GetRight(TElement node);
+        protected abstract IntPtr GetRightPointer(TElement node);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected abstract TElement GetLeftValue(TElement node);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected abstract TElement GetRightValue(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected abstract TElement GetSize(TElement node);
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -25,10 +31,10 @@ namespace Platform.Data.Core.Collections.Trees
         protected abstract bool FirstIsToTheRightOfSecond(TElement first, TElement second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetLeftOrDefault(TElement node) => GetLeft(node) != IntPtr.Zero ? GetLeft(node).GetValue<TElement>() : default(TElement);
+        protected virtual TElement GetLeftOrDefault(TElement node) => GetLeftPointer(node) != IntPtr.Zero ? GetLeftValue(node) : default(TElement);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetRightOrDefault(TElement node) => GetRight(node) != IntPtr.Zero ? GetRight(node).GetValue<TElement>() : default(TElement);
+        protected virtual TElement GetRightOrDefault(TElement node) => GetRightPointer(node) != IntPtr.Zero ? GetRightValue(node) : default(TElement);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void IncrementSize(TElement node) => SetSize(node, Increment(GetSize(node)));
@@ -50,28 +56,43 @@ namespace Platform.Data.Core.Collections.Trees
 
         protected void LeftRotate(IntPtr root)
         {
-            var rootValue = root.GetValue<TElement>();
-            var right = GetRight(rootValue).GetValue<TElement>();
+            root.SetValue(LeftRotate(root.GetValue<TElement>()));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TElement LeftRotate(TElement root)
+        {
+            var right = GetRightValue(root);
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
             if (EqualToZero(right))
-                return;
-            SetRight(rootValue, GetLeft(right).GetValue<TElement>());
-            SetLeft(right, rootValue);
-            SetSize(right, GetSize(rootValue));
-            FixSize(rootValue);
-            root.SetValue(right);
+                throw new Exception("Right is null.");
+#endif
+            SetRight(root, GetLeftValue(right));
+            SetLeft(right, root);
+            SetSize(right, GetSize(root));
+            FixSize(root);
+
+            return right;
         }
 
         protected void RightRotate(IntPtr root)
         {
-            var rootValue = root.GetValue<TElement>();
-            var left = GetLeft(rootValue).GetValue<TElement>();
+            root.SetValue(RightRotate(root.GetValue<TElement>()));
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected TElement RightRotate(TElement root)
+        {
+            var left = GetLeftValue(root);
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
             if (EqualToZero(left))
-                return;
-            SetLeft(rootValue, GetRight(left).GetValue<TElement>());
-            SetRight(left, rootValue);
-            SetSize(left, GetSize(rootValue));
-            FixSize(rootValue);
-            root.SetValue(left);
+                throw new Exception("Left is null.");
+#endif
+            SetLeft(root, GetRightValue(left));
+            SetRight(left, root);
+            SetSize(left, GetSize(root));
+            FixSize(root);
+            return left;
         }
 
         public bool Contains(TElement node, TElement root)
@@ -79,9 +100,9 @@ namespace Platform.Data.Core.Collections.Trees
             while (!EqualToZero(root))
             {
                 if (FirstIsToTheLeftOfSecond(node, root)) // node.Key < root.Key
-                    root = GetLeft(root).GetValue<TElement>();
+                    root = GetLeftOrDefault(root);
                 else if (FirstIsToTheRightOfSecond(node, root)) // node.Key > root.Key
-                    root = GetRight(root).GetValue<TElement>();
+                    root = GetRightOrDefault(root);
                 else // node.Key == root.Key
                     return true;
             }
@@ -90,13 +111,15 @@ namespace Platform.Data.Core.Collections.Trees
 
         public void Attach(IntPtr root, TElement node)
         {
-            //ValidateSizes(root);
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+            ValidateSizes(root);
 
-            //Debug.WriteLine("--BeforeAttach--");
-            //Debug.WriteLine(PrintNodes(root));
-            //Debug.WriteLine("----------------");
+            Debug.WriteLine("--BeforeAttach--");
+            Debug.WriteLine(PrintNodes(root));
+            Debug.WriteLine("----------------");
 
-            //var sizeBefore = GetSize(root);
+            var sizeBefore = GetSize(root);
+#endif
 
             if (ValueEqualToZero(root))
             {
@@ -109,45 +132,51 @@ namespace Platform.Data.Core.Collections.Trees
 
             AttachCore(root, node);
 
-            //Debug.WriteLine("--AfterAttach--");
-            //Debug.WriteLine(PrintNodes(root));
-            //Debug.WriteLine("----------------");
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+            Debug.WriteLine("--AfterAttach--");
+            Debug.WriteLine(PrintNodes(root));
+            Debug.WriteLine("----------------");
 
-            //ValidateSizes(root);
+            ValidateSizes(root);
 
-            //var sizeAfter = GetSize(root);
+            var sizeAfter = GetSize(root);
 
-            //if (!Equals(MathHelpers.Increment(sizeBefore), sizeAfter))
-            //    throw new Exception("Tree was broken after attach.");
+            if (!Equals(MathHelpers.Increment(sizeBefore), sizeAfter))
+                throw new Exception("Tree was broken after attach.");
+#endif
         }
 
         protected abstract void AttachCore(IntPtr root, TElement node);
 
         public void Detach(IntPtr root, TElement node)
         {
-            //ValidateSizes(root);
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+            ValidateSizes(root);
 
-            //Debug.WriteLine("--BeforeDetach--");
-            //Debug.WriteLine(PrintNodes(root));
-            //Debug.WriteLine("----------------");
+            Debug.WriteLine("--BeforeDetach--");
+            Debug.WriteLine(PrintNodes(root));
+            Debug.WriteLine("----------------");
 
-            //var sizeBefore = GetSize(root);
+            var sizeBefore = GetSize(root);
 
             if (ValueEqualToZero(root))
                 throw new Exception($"Элемент с {node} не содержится в дереве.");
+#endif
 
             DetachCore(root, node);
 
-            //Debug.WriteLine("--AfterDetach--");
-            //Debug.WriteLine(PrintNodes(root));
-            //Debug.WriteLine("----------------");
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+            Debug.WriteLine("--AfterDetach--");
+            Debug.WriteLine(PrintNodes(root));
+            Debug.WriteLine("----------------");
 
-            //ValidateSizes(root);
+            ValidateSizes(root);
 
-            //var sizeAfter = GetSize(root);
+            var sizeAfter = GetSize(root);
 
-            //if (!Equals(MathHelpers.Decrement(sizeBefore), sizeAfter))
-            //    throw new Exception("Tree was broken after detach.");
+            if (!Equals(MathHelpers.Decrement(sizeBefore), sizeAfter))
+                throw new Exception("Tree was broken after detach.");
+#endif
         }
 
         protected abstract void DetachCore(IntPtr root, TElement node);

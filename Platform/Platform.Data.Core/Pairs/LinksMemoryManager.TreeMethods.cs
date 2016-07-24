@@ -5,11 +5,11 @@ using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
-    unsafe partial class LinksMemoryManager<T>
+    partial class LinksMemoryManager<T>
     {
         private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<T>
         {
-            protected readonly ILinksCombinedConstants<bool, T, int> Constants;
+            private readonly ILinksCombinedConstants<bool, T, int> _constants;
             protected readonly IntPtr Links;
             protected readonly IntPtr Header;
 
@@ -17,7 +17,7 @@ namespace Platform.Data.Core.Pairs
             {
                 Links = links;
                 Header = header;
-                Constants = constants;
+                _constants = constants;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -36,7 +36,7 @@ namespace Platform.Data.Core.Pairs
 
                     while (!EqualToZero(root))
                     {
-                        var left = GetLeft(root).GetValue<T>();
+                        var left = GetLeftOrDefault(root);
                         var leftSize = GetSizeOrZero(left);
                         if (LessThan(index, leftSize))
                         {
@@ -47,7 +47,7 @@ namespace Platform.Data.Core.Pairs
                         if (Equals(index, leftSize))
                             return root;
 
-                        root = GetRight(root).GetValue<T>();
+                        root = GetRightOrDefault(root);
                         index = Subtract(index, Increment(leftSize));
                     }
                     return GetZero(); // TODO: Impossible situation exception (only if tree structure broken)
@@ -67,12 +67,12 @@ namespace Platform.Data.Core.Pairs
                     var @base = GetBasePartValue(root);
 
                     if (LessOrEqualThan(@base, link))
-                        root = GetRight(root).GetValue<T>();
+                        root = GetRightOrDefault(root);
                     else
                     {
                         totalRightIgnore = Add(totalRightIgnore, Increment(GetRightSize(root)));
 
-                        root = GetLeft(root).GetValue<T>();
+                        root = GetLeftOrDefault(root);
                     }
                 }
 
@@ -85,55 +85,96 @@ namespace Platform.Data.Core.Pairs
                     var @base = GetBasePartValue(root);
 
                     if (GreaterOrEqualThan(@base, link))
-                        root = GetLeft(root).GetValue<T>();
+                        root = GetLeftOrDefault(root);
                     else
                     {
                         totalLeftIgnore = Add(totalLeftIgnore, Increment(GetLeftSize(root)));
 
-                        root = GetRight(root).GetValue<T>();
+                        root = GetRightOrDefault(root);
                     }
                 }
 
                 return Subtract(Subtract(total, totalRightIgnore), totalLeftIgnore);
             }
 
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool EachReference(T source, Func<T, bool> handler)
+            public bool EachReference(T link, Func<T, bool> handler)
             {
-                return EachReferenceCore(source, GetTreeRoot(), handler);
-            }
+                var root = GetTreeRoot();
 
-            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker 3. Use low-level MSIL stack.
-            private bool EachReferenceCore(T @base, T link, Func<T, bool> handler)
-            {
-                if (EqualToZero(link))
+                if (EqualToZero(root))
                     return true;
 
-                var linkBase = GetBasePartValue(link);
-
-                if (GreaterThan(linkBase, @base))
+                T first = GetZero(), current = root;
+                while (!EqualToZero(current))
                 {
-                    if (EachReferenceCore(@base, GetLeft(link).GetValue<T>(), handler) == Constants.Break)
-                        return false;
+                    var @base = GetBasePartValue(current);
+                    if (MathHelpers.GreaterOrEqualThan(@base, link))
+                    {
+                        if (Equals(@base, link))
+                            first = current;
+                        current = GetLeftOrDefault(current);
+                    }
+                    else
+                        current = GetRightOrDefault(current);
                 }
-                else if (LessThan(linkBase, @base))
-                {
-                    if (EachReferenceCore(@base, GetRight(link).GetValue<T>(), handler) == Constants.Break)
-                        return false;
-                }
-                else //if (linkSource == source)
-                {
-                    if (handler(link) == Constants.Break)
-                        return false;
 
-                    if (EachReferenceCore(@base, GetLeft(link).GetValue<T>(), handler) == Constants.Break)
-                        return false;
-                    if (EachReferenceCore(@base, GetRight(link).GetValue<T>(), handler) == Constants.Break)
-                        return false;
+                if (!EqualToZero(first))
+                {
+                    var breakConstant = _constants.Break;
+
+                    current = first;
+                    while (true)
+                    {
+                        if (handler(current) == breakConstant)
+                            return false;
+                        current = GetNext(current);
+                        if (EqualToZero(current) || !Equals(GetBasePartValue(current), link))
+                            break;
+                    }
                 }
 
                 return true;
             }
+
+            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+            //public bool EachReference(T source, Func<T, bool> handler)
+            //{
+            //    return EachReferenceCore(source, GetTreeRoot(), handler);
+            //}
+
+            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker 3. Use low-level MSIL stack.
+            //private bool EachReferenceCore(T @base, T link, Func<T, bool> handler)
+            //{
+            //    if (EqualToZero(link))
+            //        return true;
+
+            //    var linkBase = GetBasePartValue(link);
+
+            //    var breakConstant = Constants.Break;
+
+            //    if (GreaterThan(linkBase, @base))
+            //    {
+            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
+            //            return false;
+            //    }
+            //    else if (LessThan(linkBase, @base))
+            //    {
+            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
+            //            return false;
+            //    }
+            //    else //if (linkSource == source)
+            //    {
+            //        if (handler(link) == breakConstant)
+            //            return false;
+
+            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
+            //            return false;
+            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
+            //            return false;
+            //    }
+
+            //    return true;
+            //}
         }
 
         private class LinksSourcesTreeMethods : LinksTreeMethodsBase
@@ -155,9 +196,13 @@ namespace Platform.Data.Core.Pairs
 
             //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(size);
 
-            protected override IntPtr GetLeft(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
+            protected override IntPtr GetLeftPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
 
-            protected override IntPtr GetRight(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
+            protected override IntPtr GetRightPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
+
+            protected override T GetLeftValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).GetValue<T>();
+
+            protected override T GetRightValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).GetValue<T>();
 
             protected override T GetSize(T node)
             {
@@ -262,9 +307,9 @@ namespace Platform.Data.Core.Pairs
                     var rootTarget = (Links.GetElement(LinkSizeInBytes, root) + Link.TargetOffset).GetValue<T>();
 
                     if (FirstIsToTheLeftOfSecond(source, target, rootSource, rootTarget)) // node.Key < root.Key
-                        root = GetLeft(root).GetValue<T>();
+                        root = GetLeftOrDefault(root);
                     else if (FirstIsToTheRightOfSecond(source, target, rootSource, rootTarget)) // node.Key > root.Key
-                        root = GetRight(root).GetValue<T>();
+                        root = GetRightOrDefault(root);
                     else // node.Key == root.Key
                         return root;
                 }
@@ -273,8 +318,7 @@ namespace Platform.Data.Core.Pairs
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool FirstIsToTheLeftOfSecond(T firstSource, T firstTarget, T secondSource,
-                T secondTarget)
+            private bool FirstIsToTheLeftOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
             {
                 return LessThan(firstSource, secondSource) || (Equals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
             }
@@ -305,9 +349,13 @@ namespace Platform.Data.Core.Pairs
 
             //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(size);
 
-            protected override IntPtr GetLeft(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
+            protected override IntPtr GetLeftPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
 
-            protected override IntPtr GetRight(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
+            protected override IntPtr GetRightPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
+
+            protected override T GetLeftValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).GetValue<T>();
+
+            protected override T GetRightValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).GetValue<T>();
 
             protected override T GetSize(T node)
             {

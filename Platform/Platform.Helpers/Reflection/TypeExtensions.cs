@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
@@ -8,6 +9,27 @@ namespace Platform.Helpers.Reflection
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static FieldInfo GetFirstField(this Type type) => type.GetFields()[0];
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static object GetStaticFieldValue(this Type type, string name) => type.GetTypeInfo().GetField(name).GetValue(null);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static MethodInfo GetGenericMethod(this Type type, string name, Type[] genericParameterTypes, Type[] argumentTypes)
+        {
+            var methods = from m in type.GetMethods()
+                          where m.Name == "MyMethod"
+                                && m.IsGenericMethodDefinition
+
+                          let typeParams = m.GetGenericArguments()
+                          let normalParams = m.GetParameters().Select(x => x.ParameterType)
+
+                          where typeParams.SequenceEqual(genericParameterTypes)
+                             && normalParams.SequenceEqual(argumentTypes)
+                          select m;
+
+            var myMethod = methods.Single();
+            return myMethod;
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static Type GetBaseType(this Type type) => type.GetTypeInfo().BaseType;

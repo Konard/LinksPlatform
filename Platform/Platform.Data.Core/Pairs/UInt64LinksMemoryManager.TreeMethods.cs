@@ -10,7 +10,7 @@ namespace Platform.Data.Core.Pairs
     {
         private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<ulong>
         {
-            protected readonly ILinksCombinedConstants<bool, ulong, int> Constants;
+            private readonly ILinksCombinedConstants<bool, ulong, int> _constants;
             protected readonly Link* Links;
             protected readonly LinksHeader* Header;
 
@@ -18,7 +18,7 @@ namespace Platform.Data.Core.Pairs
             {
                 Links = links;
                 Header = header;
-                Constants = constants;
+                _constants = constants;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -26,34 +26,6 @@ namespace Platform.Data.Core.Pairs
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected abstract ulong GetBasePartValue(ulong link);
-
-            //public ulong this[ulong index]
-            //{
-            //    get
-            //    {
-            //        var root = GetTreeRoot();
-            //        if (index >= GetSize(root))
-            //            return 0;
-
-            //        while (root != 0)
-            //        {
-            //            var left = GetLeft(root).GetValue<ulong>();
-            //            var leftSize = GetSizeOrZero(left);
-            //            if (index < leftSize)
-            //            {
-            //                root = left;
-            //                continue;
-            //            }
-
-            //            if (index == leftSize)
-            //                return root;
-
-            //            root = GetRight(root).GetValue<ulong>();
-            //            index -= (leftSize + 1);
-            //        }
-            //        return 0; // TODO: Impossible situation exception (only if tree structure broken)
-            //    }
-            //}
 
             public ulong this[ulong index]
             {
@@ -84,48 +56,6 @@ namespace Platform.Data.Core.Pairs
             }
 
             // TODO: Return indices range instead of references count
-            //public ulong CalculateReferences(ulong link)
-            //{
-            //    var root = GetTreeRoot();
-            //    var total = GetSize(root);
-
-            //    var totalRightIgnore = 0UL;
-
-            //    while (root != 0)
-            //    {
-            //        var @base = GetBasePartValue(root);
-
-            //        if (@base <= link)
-            //            root = GetRight(root).GetValue<ulong>();
-            //        else
-            //        {
-            //            totalRightIgnore += GetRightSize(root) + 1;
-
-            //            root = GetLeft(root).GetValue<ulong>();
-            //        }
-            //    }
-
-            //    root = GetTreeRoot();
-
-            //    var totalLeftIgnore = 0UL;
-
-            //    while (root != 0)
-            //    {
-            //        var @base = GetBasePartValue(root);
-
-            //        if (@base >= link)
-            //            root = GetLeft(root).GetValue<ulong>();
-            //        else
-            //        {
-            //            totalLeftIgnore += GetLeftSize(root) + 1;
-
-            //            root = GetRight(root).GetValue<ulong>();
-            //        }
-            //    }
-
-            //    return total - totalRightIgnore - totalLeftIgnore;
-            //}
-
             public ulong CalculateReferences(ulong link)
             {
                 var root = GetTreeRoot();
@@ -175,7 +105,7 @@ namespace Platform.Data.Core.Pairs
                 if (root == 0)
                     return true;
 
-                ulong first = 0, last = 0, current = root;
+                ulong first = 0, current = root;
                 while (current != 0)
                 {
                     var @base = GetBasePartValue(current);
@@ -191,10 +121,12 @@ namespace Platform.Data.Core.Pairs
 
                 if (first != 0)
                 {
+                    var breakConstant = _constants.Break;
+
                     current = first;
                     while (true)
                     {
-                        if (!handler(current))
+                        if (handler(current) == breakConstant)
                             return false;
                         current = GetNext(current);
                         if (current == 0 || GetBasePartValue(current) != link)
@@ -219,60 +151,31 @@ namespace Platform.Data.Core.Pairs
 
             //    var linkBase = GetBasePartValue(link);
 
+            //    var breakConstant = _constants.Break;
+
             //    if (linkBase > @base)
             //    {
-            //        if (EachReferenceCore(@base, GetLeft(link).GetValue<ulong>(), handler) == Constants.Break)
+            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
             //            return false;
             //    }
             //    else if (linkBase < @base)
             //    {
-            //        if (EachReferenceCore(@base, GetRight(link).GetValue<ulong>(), handler) == Constants.Break)
+            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
             //            return false;
             //    }
             //    else //if (linkSource == source)
             //    {
-            //        if (handler(link) == Constants.Break)
+            //        if (handler(link) == breakConstant)
             //            return false;
 
-            //        if (EachReferenceCore(@base, GetLeft(link).GetValue<ulong>(), handler) == Constants.Break)
+            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
             //            return false;
-            //        if (EachReferenceCore(@base, GetRight(link).GetValue<ulong>(), handler) == Constants.Break)
+            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
             //            return false;
             //    }
 
             //    return true;
             //}
-
-            private bool EachReferenceCore(ulong @base, ulong link, Func<ulong, bool> handler)
-            {
-                if (link == 0)
-                    return true;
-
-                var linkBase = GetBasePartValue(link);
-
-                if (linkBase > @base)
-                {
-                    if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == Constants.Break)
-                        return false;
-                }
-                else if (linkBase < @base)
-                {
-                    if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == Constants.Break)
-                        return false;
-                }
-                else //if (linkSource == source)
-                {
-                    if (handler(link) == Constants.Break)
-                        return false;
-
-                    if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == Constants.Break)
-                        return false;
-                    if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == Constants.Break)
-                        return false;
-                }
-
-                return true;
-            }
 
             protected override void PrintNodeValue(ulong node, StringBuilder sb)
             {
@@ -303,9 +206,13 @@ namespace Platform.Data.Core.Pairs
 
             //protected override void SetSize(ulong node, ulong size) => Links[node].SizeAsSource = size;
 
-            protected override IntPtr GetLeft(ulong node) => new IntPtr(&Links[node].LeftAsSource);
+            protected override IntPtr GetLeftPointer(ulong node) => new IntPtr(&Links[node].LeftAsSource);
 
-            protected override IntPtr GetRight(ulong node) => new IntPtr(&Links[node].RightAsSource);
+            protected override IntPtr GetRightPointer(ulong node) => new IntPtr(&Links[node].RightAsSource);
+
+            protected override ulong GetLeftValue(ulong node) => Links[node].LeftAsSource;
+
+            protected override ulong GetRightValue(ulong node) => Links[node].RightAsSource;
 
             protected override ulong GetSize(ulong node)
             {
@@ -395,26 +302,6 @@ namespace Platform.Data.Core.Pairs
             /// <param name="source">Индекс связи, которая является началом на искомой связи.</param>
             /// <param name="target">Индекс связи, которая является концом на искомой связи.</param>
             /// <returns>Индекс искомой связи.</returns>
-            //public ulong Search(ulong source, ulong target)
-            //{
-            //    var root = Header->FirstAsSource;
-
-            //    while (root != 0)
-            //    {
-            //        var rootSource = Links[root].Source;
-            //        var rootTarget = Links[root].Target;
-
-            //        if (FirstIsToTheLeftOfSecond(source, target, rootSource, rootTarget)) // node.Key < root.Key
-            //            root = GetLeft(root).GetValue<ulong>();
-            //        else if (FirstIsToTheRightOfSecond(source, target, rootSource, rootTarget)) // node.Key > root.Key
-            //            root = GetRight(root).GetValue<ulong>();
-            //        else // node.Key == root.Key
-            //            return root;
-            //    }
-
-            //    return 0;
-            //}
-
             public ulong Search(ulong source, ulong target)
             {
                 var root = Header->FirstAsSource;
@@ -469,9 +356,13 @@ namespace Platform.Data.Core.Pairs
 
             //protected override void SetSize(ulong node, ulong size) => Links[node].SizeAsTarget = size;
 
-            protected override IntPtr GetLeft(ulong node) => new IntPtr(&Links[node].LeftAsTarget);
+            protected override IntPtr GetLeftPointer(ulong node) => new IntPtr(&Links[node].LeftAsTarget);
 
-            protected override IntPtr GetRight(ulong node) => new IntPtr(&Links[node].RightAsTarget);
+            protected override IntPtr GetRightPointer(ulong node) => new IntPtr(&Links[node].RightAsTarget);
+
+            protected override ulong GetLeftValue(ulong node) => Links[node].LeftAsTarget;
+
+            protected override ulong GetRightValue(ulong node) => Links[node].RightAsTarget;
 
             protected override ulong GetSize(ulong node)
             {
