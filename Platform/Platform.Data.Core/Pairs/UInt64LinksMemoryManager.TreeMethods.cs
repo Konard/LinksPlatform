@@ -396,6 +396,12 @@ namespace Platform.Data.Core.Pairs
                 var previousValue = Links[node].SizeAsTarget;
                 //return (Integer)MathHelpers.PartialRead(previousValue, 4, 1);
                 return (previousValue & 16) >> 4 == 1UL;
+
+                // TODO: Check if this is possible to use
+                //var nodeSize = GetSize(node);
+                //var left = GetLeftValue(node);
+                //var leftSize = GetSizeOrZero(left);
+                //return leftSize > 0 && nodeSize > leftSize;
             }
 
             protected override void SetLeftIsChild(ulong node, bool value)
@@ -411,6 +417,12 @@ namespace Platform.Data.Core.Pairs
                 var previousValue = Links[node].SizeAsTarget;
                 //return (Integer)MathHelpers.PartialRead(previousValue, 3, 1);
                 return (previousValue & 8) >> 3 == 1UL;
+
+                // TODO: Check if this is possible to use
+                //var nodeSize = GetSize(node);
+                //var right = GetRightValue(node);
+                //var rightSize = GetSizeOrZero(right);
+                //return rightSize > 0 && nodeSize > rightSize;
             }
 
             protected override void SetRightIsChild(ulong node, bool value)
