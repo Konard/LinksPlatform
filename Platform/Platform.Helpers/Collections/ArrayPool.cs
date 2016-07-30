@@ -1,19 +1,24 @@
 ﻿using System;
-using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Platform.Helpers.Disposables;
 
 namespace Platform.Helpers.Collections
 {
     public static class ArrayPool
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] Allocate<T>(Integer size)
         {
-            return Default<ArrayPool<T>>.Instance.Allocate(size);
+            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = Default<ArrayPool<T>>.Instance);
+            return arrayPool.Allocate(size);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Free<T>(T[] array)
         {
-            Default<ArrayPool<T>>.Instance.Free(array);
+            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = Default<ArrayPool<T>>.Instance);
+            arrayPool.Free(array);
         }
     }
 
@@ -25,14 +30,13 @@ namespace Platform.Helpers.Collections
     /// </remarks>
     public class ArrayPool<T>
     {
-        private readonly ConcurrentDictionary<int, ConcurrentStack<T[]>> _pool = new ConcurrentDictionary<int, ConcurrentStack<T[]>>();
+        [ThreadStatic] public static ArrayPool<T> ThreadDefault;
+
+        private readonly Dictionary<int, Stack<T[]>> _pool = new Dictionary<int, Stack<T[]>>();
 
         public static readonly T[] Empty = new T[0];
 
-        public Disposable<T[]> AllocateDisposable(long size)
-        {
-            return Disposable<T[]>.Create(Allocate(size), Free);
-        }
+        public Disposable<T[]> AllocateDisposable(long size) => Disposable<T[]>.Create(Allocate(size), Free);
 
         public Disposable<T[]> Resize(Disposable<T[]> source, long size)
         {
@@ -58,7 +62,7 @@ namespace Platform.Helpers.Collections
             Ensure.ArgumentNotNull(array, nameof(array));
             if (array.Length == 0)
                 return;
-            _pool.GetOrAdd(array.Length, size => new ConcurrentStack<T[]>()).Push(array);
+            _pool.GetOrAdd(array.Length, size => new Stack<T[]>()).Push(array);
         }
     }
 }

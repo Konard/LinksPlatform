@@ -54,10 +54,8 @@ namespace Platform.Data.Core.Collections.Trees
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void FixSize(TElement node) => SetSize(node, Increment(Add(GetLeftSize(node), GetRightSize(node))));
 
-        protected void LeftRotate(IntPtr root)
-        {
-            root.SetValue(LeftRotate(root.GetValue<TElement>()));
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void LeftRotate(IntPtr root) => root.SetValue(LeftRotate(root.GetValue<TElement>()));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected TElement LeftRotate(TElement root)
@@ -75,10 +73,8 @@ namespace Platform.Data.Core.Collections.Trees
             return right;
         }
 
-        protected void RightRotate(IntPtr root)
-        {
-            root.SetValue(RightRotate(root.GetValue<TElement>()));
-        }
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected void RightRotate(IntPtr root) => root.SetValue(RightRotate(root.GetValue<TElement>()));
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected TElement RightRotate(TElement root)
@@ -95,6 +91,7 @@ namespace Platform.Data.Core.Collections.Trees
             return left;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool Contains(TElement node, TElement root)
         {
             while (!EqualToZero(root))
@@ -107,6 +104,14 @@ namespace Platform.Data.Core.Collections.Trees
                     return true;
             }
             return false;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual void ClearNode(TElement node)
+        {
+            SetLeft(node, GetZero());
+            SetRight(node, GetZero());
+            SetSize(node, GetZero());
         }
 
         public void Attach(IntPtr root, TElement node)

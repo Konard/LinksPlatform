@@ -2,7 +2,6 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Collections.Trees;
-using Platform.Helpers;
 
 namespace Platform.Data.Core.Pairs
 {
@@ -343,6 +342,14 @@ namespace Platform.Data.Core.Pairs
             {
                 return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override void ClearNode(ulong node)
+            {
+                Links[node].LeftAsSource = 0UL;
+                Links[node].RightAsSource = 0UL;
+                Links[node].SizeAsSource = 0UL;
+            }
         }
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
@@ -471,6 +478,14 @@ namespace Platform.Data.Core.Pairs
             protected override ulong GetBasePartValue(ulong link)
             {
                 return Links[link].Target;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override void ClearNode(ulong node)
+            {
+                Links[node].LeftAsTarget = 0UL;
+                Links[node].RightAsTarget = 0UL;
+                Links[node].SizeAsTarget = 0UL;
             }
         }
     }

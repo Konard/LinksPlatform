@@ -1,4 +1,6 @@
-﻿using System;
+﻿//#define ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
+
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
@@ -325,11 +327,13 @@ namespace Platform.Data.Core.Pairs
             if (link->Source != Constants.Null) _sourcesTreeMethods.Detach(new IntPtr(&_header->FirstAsSource), linkIndex);
             if (link->Target != Constants.Null) _targetsTreeMethods.Detach(new IntPtr(&_header->FirstAsTarget), linkIndex);
 
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
             var leftTreeSize = _sourcesTreeMethods.GetSize(new IntPtr(&_header->FirstAsSource));
             var rightTreeSize = _targetsTreeMethods.GetSize(new IntPtr(&_header->FirstAsTarget));
 
             if (leftTreeSize != rightTreeSize)
                 throw new Exception("One of the trees is broken.");
+#endif
 
             link->Source = values[Constants.SourcePart];
             link->Target = values[Constants.TargetPart];
@@ -337,11 +341,13 @@ namespace Platform.Data.Core.Pairs
             if (link->Source != Constants.Null) _sourcesTreeMethods.Attach(new IntPtr(&_header->FirstAsSource), linkIndex);
             if (link->Target != Constants.Null) _targetsTreeMethods.Attach(new IntPtr(&_header->FirstAsTarget), linkIndex);
 
+#if ENABLE_TREE_AUTO_DEBUG_AND_VALIDATION
             leftTreeSize = _sourcesTreeMethods.GetSize(new IntPtr(&_header->FirstAsSource));
             rightTreeSize = _targetsTreeMethods.GetSize(new IntPtr(&_header->FirstAsTarget));
 
             if (leftTreeSize != rightTreeSize)
                 throw new Exception("One of the trees is broken.");
+#endif
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -450,7 +456,7 @@ namespace Platform.Data.Core.Pairs
                    || (_links[link].SizeAsSource == Constants.Null && _links[link].Source != Constants.Null);
         }
 
-        #region Disposable
+#region Disposable
 
         protected override bool AllowMultipleDisposeCalls => true;
 
@@ -461,6 +467,6 @@ namespace Platform.Data.Core.Pairs
                 Disposable.TryDispose(_memory);
         }
 
-        #endregion
+#endregion
     }
 }

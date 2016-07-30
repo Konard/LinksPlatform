@@ -210,7 +210,7 @@ namespace Platform.Data.Core.Sequences
             while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
 
             for (; i >= 1; i--)
-                Links.CreateAndUpdate(sequence[i - 1], sequence[i]);
+                Links.GetOrCreate(sequence[i - 1], sequence[i]);
 
             return indexed;
         }
@@ -231,7 +231,7 @@ namespace Platform.Data.Core.Sequences
             Sync.ExecuteWriteOperation(() =>
             {
                 for (; i >= 1; i--)
-                    links.CreateAndUpdate(sequence[i - 1], sequence[i]);
+                    links.GetOrCreate(sequence[i - 1], sequence[i]);
             });
 
             return indexed;
@@ -248,7 +248,7 @@ namespace Platform.Data.Core.Sequences
             while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
 
             for (; i >= 1; i--)
-                links.CreateAndUpdate(sequence[i - 1], sequence[i]);
+                links.GetOrCreate(sequence[i - 1], sequence[i]);
 
             return indexed;
         }
@@ -283,17 +283,21 @@ namespace Platform.Data.Core.Sequences
             if (length == 1)
                 return sequence[0];
 
+            var links = Links.Unsync;
+
+            // TODO: Replace CreateAndUpdate with GetOrCreate
             if (length == 2)
-                return Links.Unsync.CreateAndUpdate(sequence[0], sequence[1]);
+                return links.GetOrCreate(sequence[0], sequence[1]);
 
             // Needed only if we not allowed to change sequence itself (so it makes copy)
             // Нужно только если исходный массив последовательности изменять нельзя (тогда делается его копия)
             if (length > 2)
             {
+                // TODO: Try to use ArrayPool
                 var innerSequence = new ulong[length / 2 + length % 2];
 
                 for (var i = 0; i < length; i += 2)
-                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : Links.Unsync.CreateAndUpdate(sequence[i], sequence[i + 1]);
+                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
 
                 sequence = innerSequence;
                 length = innerSequence.Length;
@@ -302,12 +306,12 @@ namespace Platform.Data.Core.Sequences
             while (length > 2)
             {
                 for (var i = 0; i < length; i += 2)
-                    sequence[i / 2] = i + 1 == length ? sequence[i] : Links.Unsync.CreateAndUpdate(sequence[i], sequence[i + 1]);
+                    sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
 
                 length = length / 2 + length % 2;
             }
 
-            return Links.Unsync.CreateAndUpdate(sequence[0], sequence[1]);
+            return links.GetOrCreate(sequence[0], sequence[1]);
         }
 
         #endregion

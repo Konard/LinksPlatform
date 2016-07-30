@@ -94,7 +94,7 @@ namespace Platform.Data.Core.Sequences
             {
                 getLink = link => new UInt64Link(links.GetLink(link));
                 count = links.Count;
-                _createLink = links.CreateAndUpdate;
+                _createLink = links.GetOrCreate;
                 _createSequence = sequences.CreateBalancedVariant;
 
             }
@@ -102,7 +102,7 @@ namespace Platform.Data.Core.Sequences
             {
                 getLink = ((UInt64Links)links.Unsync).GetLinkStruct;
                 count = links.Unsync.Count;
-                _createLink = links.Unsync.CreateAndUpdate;
+                _createLink = links.Unsync.GetOrCreate;
                 _createSequence = sequences.CreateBalancedVariantCore;
             }
 
@@ -205,6 +205,7 @@ namespace Platform.Data.Core.Sequences
             if (_maxFrequency > _minFrequency)
             {
                 // Can be faster if source sequence allowed to be changed
+                // TODO: Try to use ArrayPool
                 var copy = new ulong[sequence.Length];
                 Array.Copy(sequence, copy, sequence.Length);
 

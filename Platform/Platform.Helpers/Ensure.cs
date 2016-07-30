@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Collections;
 
@@ -10,6 +11,7 @@ namespace Platform.Helpers
     /// </remarks>
     public static class Ensure
     {
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentNotNull<TArgument>(TArgument argument, string argumentName)
             where TArgument : class
@@ -18,6 +20,7 @@ namespace Platform.Helpers
                 throw new ArgumentNullException(argumentName);
         }
 
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentNotEmpty<TArgument>(TArgument[] argument, string argumentName)
         {
@@ -25,6 +28,7 @@ namespace Platform.Helpers
                 throw new ArgumentNullException(argumentName);
         }
 
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentZeroOrPositive(long argument, string argumentName)
         {
@@ -32,6 +36,7 @@ namespace Platform.Helpers
                 throw new ArgumentOutOfRangeException(argumentName, "Must be positive.");
         }
 
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentInRange<T>(T argument, Range<T> range)
             where T : IComparable<T>
@@ -39,6 +44,7 @@ namespace Platform.Helpers
             ArgumentInRange(argument, null, range);
         }
 
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentInRange<T>(T argument, string argumentName, Range<T> range)
             where T : IComparable<T>
@@ -47,6 +53,7 @@ namespace Platform.Helpers
                 throw new ArgumentOutOfRangeException(argumentName, $"{argument} is out of range {range}.");
         }
 
+        [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void NotDisposed(Disposables.IDisposable disposable, string objectName)
         {

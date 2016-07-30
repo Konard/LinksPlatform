@@ -17,6 +17,7 @@ namespace Platform.Data.Core.Collections.Trees
     /// </remarks>
     public abstract class SizedAndThreadedAVLBalancedTreeMethods<TElement> : BinaryTreeMethodsBase<TElement>
     {
+        // TODO: Link with size of TElement
         private const int MaxPath = 92;
 
         protected override void PrintNode(TElement node, StringBuilder sb, int level = 0)
@@ -494,16 +495,21 @@ namespace Platform.Data.Core.Collections.Trees
                     }
                 }
 
-                // TODO: Make a reset/crear all method
-                SetLeft(node, GetZero());
-                SetRight(node, GetZero());
-                SetSize(node, GetZero());
-                SetLeftIsChild(node, false);
-                SetRightIsChild(node, false);
-                SetBalance(node, 0);
+                ClearNode(node);
 
                 ArrayPool.Free(path);
             }
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected override void ClearNode(TElement node)
+        {
+            SetLeft(node, GetZero());
+            SetRight(node, GetZero());
+            SetSize(node, GetZero());
+            SetLeftIsChild(node, false);
+            SetRightIsChild(node, false);
+            SetBalance(node, 0);
         }
     }
 }

@@ -627,7 +627,7 @@ namespace Platform.Data.Core.Pairs
         /// <param name="target">Индекс связи, которая является концом для создаваемой связи.</param>
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T SearchOrCreate<T>(this ILinks<T> links, T source, T target)
+        public static T GetOrCreate<T>(this ILinks<T> links, T source, T target)
         {
             var link = links.SearchOrDefault(source, target);
             if (Equals(link, default(T)))
