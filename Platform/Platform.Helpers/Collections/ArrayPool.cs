@@ -10,14 +10,14 @@ namespace Platform.Helpers.Collections
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T[] Allocate<T>(Integer size)
         {
-            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = Default<ArrayPool<T>>.Instance);
+            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = new ArrayPool<T>());
             return arrayPool.Allocate(size);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void Free<T>(T[] array)
         {
-            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = Default<ArrayPool<T>>.Instance);
+            var arrayPool = ArrayPool<T>.ThreadDefault ?? (ArrayPool<T>.ThreadDefault = new ArrayPool<T>());
             arrayPool.Free(array);
         }
     }
@@ -26,7 +26,8 @@ namespace Platform.Helpers.Collections
     /// Original idea from http://geekswithblogs.net/blackrob/archive/2014/12/18/array-pooling-in-csharp.aspx
     /// </remarks>
     /// <remarks>
-    /// TODO: Possible optimization: to use separate array cache per thread.
+    /// TODO: Check actual performance
+    /// TODO: Check for memory leaks
     /// </remarks>
     public class ArrayPool<T>
     {
