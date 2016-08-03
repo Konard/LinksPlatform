@@ -5,7 +5,7 @@ namespace Platform.Helpers.Disposables
     public delegate void DisposedDelegate(bool manual);
 
     /// <example><code source="DisposableUsageExample.cs" /></example>
-    public partial class Disposable : DisposableBase
+    public class Disposable : DisposableBase
     {
         private static readonly DisposedDelegate EmptyDelegate = manual => { };
 
@@ -26,9 +26,57 @@ namespace Platform.Helpers.Disposables
         }
 
         protected override void DisposeCore(bool manual) => OnDispose(manual);
+
+        #region Helpers
+
+        public static bool TryDispose<T>(ref T @object)
+        {
+            try
+            {
+                var disposal = @object as DisposableBase;
+                if (disposal != null)
+                {
+                    if (!disposal.IsDisposed)
+                    {
+                        disposal.Dispose();
+                        @object = default(T);
+                        return true;
+                    }
+                }
+                else
+                {
+                    var disposable = @object as System.IDisposable;
+                    if (disposable != null)
+                    {
+                        disposable.Dispose();
+                        @object = default(T);
+                        return true;
+                    }
+                }
+
+            }
+            catch (Exception exception)
+            {
+                Global.OnIgnoredException(exception);
+            }
+
+            return false;
+        }
+
+        public static bool TryDispose<T>(T @object)
+        {
+            return TryDispose(ref @object);
+        }
+
+        public static void DisposeIfDisposable<T>(T @object)
+        {
+            TryDispose(ref @object);
+        }
+
+        #endregion
     }
 
-    public partial class Disposable<T> : Disposable
+    public class Disposable<T> : Disposable
     {
         public readonly T Object;
 
@@ -65,6 +113,15 @@ namespace Platform.Helpers.Disposables
 
             TryDispose(Object);
         }
+
+        #region Helpers
+
+        public static Disposable<T> Create(T value, Action<T> dispose)
+        {
+            return new Disposable<T>(value, dispose);
+        }
+
+        #endregion
     }
 
     public class Disposable<TPrimary, TAuxiliary> : Disposable<TPrimary>

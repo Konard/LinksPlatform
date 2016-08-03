@@ -661,7 +661,7 @@ namespace Platform.Data.Core.Pairs
         /// <param name="source">Индекс связи, которая является началом удаляемой связи.</param>
         /// <param name="target">Индекс связи, которая является концом удаляемой связи.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T DeleteOrNothing<T>(this ILinks<T> links, T source, T target)
+        public static T DeleteIfExists<T>(this ILinks<T> links, T source, T target)
         {
             var link = links.SearchOrDefault(source, target);
             if (!Equals(link, default(T)))
@@ -672,7 +672,7 @@ namespace Platform.Data.Core.Pairs
             return default(T);
         }
 
-        // Replace one link with another (replaced link is deleted, children are updated or deleted), it is actually merge operation
+        // Replace one link with another (replaced link is deleted, children are updated or deleted)
         public static T Merge<T>(this ILinks<T> links, T linkIndex, T newLink)
         {
             if (Equals(linkIndex, newLink))

@@ -71,7 +71,7 @@ namespace Platform.Communication.Protocol.Udp
                 // Send Packet to itself to switch Receiver from Receiving.
                 // TODO: Test new stopper
                 var loopback = new IPEndPoint(IPAddress.Loopback, _listenPort);
-                new UdpClient().SendAsync(new byte[0], 0, loopback).ContinueWith(Disposable.DisposeIfPossible);
+                new UdpClient().SendAsync(new byte[0], 0, loopback).ContinueWith(Disposable.DisposeIfDisposable);
 
                 _thread.Join();
                 _thread = null;

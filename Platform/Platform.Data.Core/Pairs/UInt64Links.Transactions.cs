@@ -301,7 +301,7 @@ namespace Platform.Data.Core.Pairs
                 this.CreateAndUpdate(source, target);
             }
             else if (transition.Before.IsNull()) // Revert Creation with Deletion
-                this.DeleteOrNothing(transition.After.Source, transition.After.Target);
+                this.DeleteIfExists(transition.After.Source, transition.After.Target);
             else // Revert Update
             {
                 var beforeSource = transition.Before.Source;
