@@ -350,6 +350,114 @@ namespace Platform.Data.Core.Pairs
                 Links[node].RightAsSource = 0UL;
                 Links[node].SizeAsSource = 0UL;
             }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong GetZero()
+            {
+                return 0UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong GetOne()
+            {
+                return 1UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong GetTwo()
+            {
+                return 2UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool ValueEqualToZero(IntPtr pointer)
+            {
+                return *(ulong*)pointer.ToPointer() == 0UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool EqualToZero(ulong value)
+            {
+                return value == 0UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool Equals(ulong first, ulong second)
+            {
+                return first == second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool GreaterThanZero(ulong value)
+            {
+                return value > 0UL;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool GreaterThan(ulong first, ulong second)
+            {
+                return first > second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool GreaterOrEqualThan(ulong first, ulong second)
+            {
+                return first >= second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool GreaterOrEqualThanZero(ulong value)
+            {
+                return true; // value >= 0 is always true for ulong
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool LessOrEqualThanZero(ulong value)
+            {
+                return value == 0; // value is always >= 0 for ulong
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool LessOrEqualThan(ulong first, ulong second)
+            {
+                return first <= second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool LessThanZero(ulong value)
+            {
+                return false; // value < 0 is always false for ulong
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override bool LessThan(ulong first, ulong second)
+            {
+                return first < second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong Increment(ulong value)
+            {
+                return ++value;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong Decrement(ulong value)
+            {
+                return --value;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong Add(ulong first, ulong second)
+            {
+                return first + second;
+            }
+
+            [MethodImpl(MethodImplOptions.AggressiveInlining)]
+            protected override ulong Subtract(ulong first, ulong second)
+            {
+                return first - second;
+            }
         }
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase

@@ -121,5 +121,24 @@ namespace Platform.Helpers.Reflection
                 emiter.UnsignedCompareLessThan();
             return emiter;
         }
+
+
+        public static Emit<TDelegate> BranchIfGreaterOrEqual<TDelegate>(this Emit<TDelegate> emiter, bool isSigned, Label label)
+        {
+            if (isSigned)
+                emiter.BranchIfGreaterOrEqual(label);
+            else
+                emiter.UnsignedBranchIfGreaterOrEqual(label);
+            return emiter;
+        }
+
+        public static Emit<TDelegate> BranchIfLessOrEqual<TDelegate>(this Emit<TDelegate> emiter, bool isSigned, Label label)
+        {
+            if (isSigned)
+                emiter.BranchIfLessOrEqual(label);
+            else
+                emiter.UnsignedBranchIfLessOrEqual(label);
+            return emiter;
+        }
     }
 }

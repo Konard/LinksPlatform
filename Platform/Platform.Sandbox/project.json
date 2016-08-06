@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "0.1.0-*",
   "title": "Platform.Sandbox",
   "description": "LinksPlatform's Platform.Sandbox Class Library",
@@ -19,7 +19,8 @@
 
   "buildOptions": {
     "emitEntryPoint": true,
-    "allowUnsafe": true
+    "allowUnsafe": true,
+    "optimize": true
   },
 
   "dependencies": {

@@ -90,9 +90,7 @@ namespace Platform.Data.Core.Collections.Trees
             else if (Equals(GetRightValue(parent.GetValue<TElement>()), nodeToDetach))
                 SetRight(parent.GetValue<TElement>(), replacementNode);
 
-            SetSize(nodeToDetach, GetZero());
-            SetLeft(nodeToDetach, GetZero());
-            SetRight(nodeToDetach, GetZero());
+            ClearNode(nodeToDetach);
         }
 
         private void LeftMaintain(IntPtr root)

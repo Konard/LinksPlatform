@@ -129,15 +129,17 @@ namespace Platform.Helpers
         /// TODO: Возможно использовать ссылку на существующий метод - оператор, а не компилировать новый (http://stackoverflow.com/questions/11113259/how-to-call-custom-operator-with-reflection)
         /// TODO: Решить что лучше dynamic operator или Auto&lt;T&gt; c заранее созданными операторами и возможность расширения через статические методы
         /// </remarks>
-        private static class CompiledOperations
+        public static class CompiledOperations
         {
             public static readonly Func<T, T, T> Add;
             public static readonly Func<T, T> Increment;
             public static readonly Func<T, T, T> Subtract;
             public static readonly Func<T, T> Decrement;
             public new static readonly Func<T, T, bool> Equals;
-            public static readonly Func<T, T, bool> GreaterThan;
-            public static readonly Func<T, T, bool> LessThan;
+            public static readonly Func<T, T, bool> Greater;
+            public static readonly Func<T, T, bool> GreaterOrEqual;
+            public static readonly Func<T, T, bool> Less;
+            public static readonly Func<T, T, bool> LessOrEqual;
             public static readonly Func<T, T> Abs;
             public static readonly Func<T, T> Negate;
             public static readonly Func<T, T, int, int, T> PartialWrite;
@@ -190,7 +192,7 @@ namespace Platform.Helpers
                     emiter.Return();
                 });
 
-                DelegateHelpers.Compile(out GreaterThan, emiter =>
+                DelegateHelpers.Compile(out Greater, emiter =>
                 {
                     EnsureNumeric();
 
@@ -199,12 +201,46 @@ namespace Platform.Helpers
                     emiter.Return();
                 });
 
-                DelegateHelpers.Compile(out LessThan, emiter =>
+                DelegateHelpers.Compile(out GreaterOrEqual, emiter =>
+                {
+                    EnsureNumeric();
+
+                    var secondIsGreaterOrEqual = emiter.DefineLabel();
+                    var theEnd = emiter.DefineLabel();
+
+                    emiter.LoadArguments(1, 0);
+                    emiter.BranchIfGreaterOrEqual(CachedTypeInfo<T>.IsSigned, secondIsGreaterOrEqual);
+                    emiter.LoadConstant(false);
+                    emiter.Branch(theEnd);
+                    emiter.MarkLabel(secondIsGreaterOrEqual);
+                    emiter.LoadConstant(true);
+                    emiter.MarkLabel(theEnd);
+                    emiter.Return();
+                });
+
+                DelegateHelpers.Compile(out Less, emiter =>
                 {
                     EnsureNumeric();
 
                     emiter.LoadArguments(0, 1);
                     emiter.CompareLessThan(CachedTypeInfo<T>.IsSigned);
+                    emiter.Return();
+                });
+
+                DelegateHelpers.Compile(out LessOrEqual, emiter =>
+                {
+                    EnsureNumeric();
+
+                    var secondIsLessOrEqual = emiter.DefineLabel();
+                    var theEnd = emiter.DefineLabel();
+
+                    emiter.LoadArguments(1, 0);
+                    emiter.BranchIfLessOrEqual(CachedTypeInfo<T>.IsSigned, secondIsLessOrEqual);
+                    emiter.LoadConstant(false);
+                    emiter.Branch(theEnd);
+                    emiter.MarkLabel(secondIsLessOrEqual);
+                    emiter.LoadConstant(true);
+                    emiter.MarkLabel(theEnd);
                     emiter.Return();
                 });
 
@@ -402,13 +438,13 @@ namespace Platform.Helpers
         public static bool Equals(T x, T y) => CompiledOperations.Equals(x, y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GreaterThan(T x, T y) => CompiledOperations.GreaterThan(x, y);
+        public static bool GreaterThan(T x, T y) => CompiledOperations.Greater(x, y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterOrEqualThan(T x, T y) => Equals(x, y) || GreaterThan(x, y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool LessThan(T x, T y) => CompiledOperations.LessThan(x, y);
+        public static bool LessThan(T x, T y) => CompiledOperations.Less(x, y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool LessOrEqualThan(T x, T y) => Equals(x, y) || LessThan(x, y);

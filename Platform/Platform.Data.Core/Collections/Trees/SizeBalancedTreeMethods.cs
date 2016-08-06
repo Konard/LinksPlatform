@@ -236,9 +236,7 @@ namespace Platform.Data.Core.Collections.Trees
                     else
                         root.SetValue(GetZero());
 
-                    SetLeft(node, GetZero());
-                    SetRight(node, GetZero());
-                    SetSize(node, GetZero());
+                    ClearNode(node);
 
                     break;
                 }
