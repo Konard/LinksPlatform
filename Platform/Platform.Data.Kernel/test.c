@@ -17,8 +17,7 @@ int main() {
     DeleteLink(isA); // Одна эта операция удалит все 4 связи
     DeleteLink(thing);
 
-    ResetStorageFileMemoryMapping();
-    CloseStorageFile();
+    CloseLinks();
     
     return 0;
 }

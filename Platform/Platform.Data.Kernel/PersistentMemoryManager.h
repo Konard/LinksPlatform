@@ -18,7 +18,8 @@ extern "C" {
     PREFIX_DLL signed_integer ShrinkStorageFile();
     PREFIX_DLL signed_integer SetStorageFileMemoryMapping();
     PREFIX_DLL signed_integer ResetStorageFileMemoryMapping();
-
+    PREFIX_DLL signed_integer CloseLinks();
+    
     PREFIX_DLL link_index GetMappedLink(signed_integer mappedIndex);
     PREFIX_DLL void SetMappedLink(signed_integer mappedIndex, link_index linkIndex);
 

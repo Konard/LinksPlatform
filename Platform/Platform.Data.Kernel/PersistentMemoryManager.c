@@ -551,6 +551,13 @@ signed_integer CloseStorageFile()
     return ERROR_RESULT;
 }
 
+signed_integer CloseLinks(){
+    signed_integer result = ResetStorageFileMemoryMapping();
+    if (!succeeded(result))
+        return result;
+    return CloseStorageFile();
+}
+
 link_index AllocateFromUnusedLinks()
 {
     link_index unusedLinkIndex = pointerToUnusedMarker->ByLinkerRootIndex;
