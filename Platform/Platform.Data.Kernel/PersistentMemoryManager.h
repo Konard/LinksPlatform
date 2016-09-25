@@ -11,13 +11,15 @@ extern "C" {
 #endif
 
     PREFIX_DLL void InitPersistentMemoryManager();
-
+    
     PREFIX_DLL signed_integer OpenStorageFile(char* filename);
     PREFIX_DLL signed_integer CloseStorageFile();
     PREFIX_DLL signed_integer EnlargeStorageFile();
     PREFIX_DLL signed_integer ShrinkStorageFile();
     PREFIX_DLL signed_integer SetStorageFileMemoryMapping();
     PREFIX_DLL signed_integer ResetStorageFileMemoryMapping();
+    
+    PREFIX_DLL signed_integer OpenLinks(char * filename);
     PREFIX_DLL signed_integer CloseLinks();
     
     PREFIX_DLL link_index GetMappedLink(signed_integer mappedIndex);

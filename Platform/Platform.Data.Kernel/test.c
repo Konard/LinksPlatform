@@ -2,10 +2,8 @@
 #include "PersistentMemoryManager.h"
 
 int main() {
-    InitPersistentMemoryManager();
 
-    OpenStorageFile("db.links");
-    SetStorageFileMemoryMapping();
+    OpenLinks("db.links");
 
     link_index isA = CreateLink(itself, itself, itself);
     link_index isNotA = CreateLink(itself, itself, isA);

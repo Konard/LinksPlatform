@@ -551,6 +551,14 @@ signed_integer CloseStorageFile()
     return ERROR_RESULT;
 }
 
+signed_integer OpenLinks(char * filename){
+    InitPersistentMemoryManager();
+    signed result = OpenStorageFile("db.links");
+    if (!succeeded(result))
+        return result;
+    return SetStorageFileMemoryMapping();
+}
+
 signed_integer CloseLinks(){
     signed_integer result = ResetStorageFileMemoryMapping();
     if (!succeeded(result))
