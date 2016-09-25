@@ -88,20 +88,8 @@ namespace Platform.Data.Core.Triplets
         private static extern void SetMappedLink(Int mappedIndex, LinkIndex linkIndex);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern void InitPersistentMemoryManager();
+        private static extern Int OpenLinks(string filename);
 
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int OpenStorageFile(string filename);
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int CloseStorageFile();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int SetStorageFileMemoryMapping();
-
-        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern Int ResetStorageFileMemoryMapping();
-        
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern Int CloseLinks();
 
@@ -226,11 +214,8 @@ namespace Platform.Data.Core.Triplets
             {
                 if (!MemoryManagerIsReady)
                 {
-                    InitPersistentMemoryManager();
-                    if (OpenStorageFile(storageFilename) == 0)
-                        throw new Exception("Файл хранилища с указанным именем не может быть открыт.");
-                    if (SetStorageFileMemoryMapping() == 0)
-                        throw new Exception($"Файл ({storageFilename}) хранилища не удалось отразить на оперативную память.");
+                    if (OpenLinks(storageFilename) == 0)
+                        throw new Exception($"Файл ({storageFilename}) хранилища не удалось открыть.");
 
                     MemoryManagerIsReady = true;
                 }
@@ -243,18 +228,15 @@ namespace Platform.Data.Core.Triplets
             {
                 if (MemoryManagerIsReady)
                 {
-                    if (ResetStorageFileMemoryMapping() == 0)
-                        throw new Exception("Отображение файла хранилища на оперативную память не удалось снять.");
-                    if (CloseStorageFile() == 0)
-                        throw new Exception(
-                            "Файл хранилища не удалось закрыть. Возможно он был уже закрыт, или не открывался вовсе.");
+                    if (CloseLinks() == 0)
+                        throw new Exception("Файл хранилища не удалось закрыть. Возможно он был уже закрыт, или не открывался вовсе.");
 
                     MemoryManagerIsReady = false;
                 }
             }
         }
 
-        public static implicit operator LinkIndex?(Link link) => link._link == 0 ? (LinkIndex?)null : link._link;
+        public static implicit operator LinkIndex? (Link link) => link._link == 0 ? (LinkIndex?)null : link._link;
 
         public static implicit operator Link(LinkIndex? link) => new Link(link ?? 0);
 
