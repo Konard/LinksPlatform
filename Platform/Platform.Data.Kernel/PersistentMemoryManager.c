@@ -551,7 +551,7 @@ signed_integer CloseStorageFile()
     return ERROR_RESULT;
 }
 
-signed_integer OpenLinks(char * filename){
+signed_integer OpenLinks(char* filename){
     InitPersistentMemoryManager();
     signed_integer result = OpenStorageFile("db.links");
     if (!succeeded(result))

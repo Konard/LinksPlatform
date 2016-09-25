@@ -19,7 +19,7 @@ extern "C" {
     PREFIX_DLL signed_integer SetStorageFileMemoryMapping();
     PREFIX_DLL signed_integer ResetStorageFileMemoryMapping();
     
-    PREFIX_DLL signed_integer OpenLinks(char * filename);
+    PREFIX_DLL signed_integer OpenLinks(char* filename);
     PREFIX_DLL signed_integer CloseLinks();
     
     PREFIX_DLL link_index GetMappedLink(signed_integer mappedIndex);
