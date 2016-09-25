@@ -10,14 +10,14 @@
 extern "C" {
 #endif
 
-    PREFIX_DLL void InitPersistentMemoryManager();
+    void InitPersistentMemoryManager();
     
-    PREFIX_DLL signed_integer OpenStorageFile(char* filename);
-    PREFIX_DLL signed_integer CloseStorageFile();
-    PREFIX_DLL signed_integer EnlargeStorageFile();
-    PREFIX_DLL signed_integer ShrinkStorageFile();
-    PREFIX_DLL signed_integer SetStorageFileMemoryMapping();
-    PREFIX_DLL signed_integer ResetStorageFileMemoryMapping();
+    signed_integer OpenStorageFile(char* filename);
+    signed_integer CloseStorageFile();
+    signed_integer EnlargeStorageFile();
+    signed_integer ShrinkStorageFile();
+    signed_integer SetStorageFileMemoryMapping();
+    signed_integer ResetStorageFileMemoryMapping();
     
     PREFIX_DLL signed_integer OpenLinks(char* filename);
     PREFIX_DLL signed_integer CloseLinks();
@@ -47,5 +47,4 @@ extern "C" {
 // 0001000110001000
 // 0000100000010000
 // 0000000110000000‬
-
 #endif
