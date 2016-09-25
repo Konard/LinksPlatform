@@ -101,6 +101,9 @@ namespace Platform.Data.Core.Triplets
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern Int ResetStorageFileMemoryMapping();
+        
+        [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
+        private static extern Int CloseLinks();
 
         #endregion
 
@@ -244,7 +247,7 @@ namespace Platform.Data.Core.Triplets
                         throw new Exception("Отображение файла хранилища на оперативную память не удалось снять.");
                     if (CloseStorageFile() == 0)
                         throw new Exception(
-                            "Файл хранилища не удалось закрыть, возможно он был уже закрыт, или не открывался вовсе.");
+                            "Файл хранилища не удалось закрыть. Возможно он был уже закрыт, или не открывался вовсе.");
 
                     MemoryManagerIsReady = false;
                 }
