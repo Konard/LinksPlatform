@@ -39,7 +39,7 @@ namespace Platform.Sandbox
                     if (!_unicodeMapped || links > UnicodeMap.MapSize)
                     {
                         if (lines > 0)
-                            writer.Write("\r\n");
+                            writer.WriteLine();
 
                         var link = new UInt64Link(_links.Unsync.GetLink(linkId)); // Use GetLinkCore only inside each (it is not thread safe).
 
