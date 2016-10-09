@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Platform.Data.Core.Collections;
@@ -414,57 +415,9 @@ namespace Platform.Tests.Data.Core
                     e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
                 };
 
-                var compressor = new Compressor(new SynchronizedLinks<ulong>(links), sequences);
+                var compressor = new Compressor(links.Unsync, sequences);
 
                 var compressedVariant = compressor.Compress(sequence);
-
-                // 1: [1]       (1->1) point
-                // 2: [2]       (2->2) point
-                // 3: [1,2]     (1->2) pair
-                // 4: [1,2,1,2] (3->3) pair
-
-                Assert.True(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
-                Assert.True(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
-                Assert.True(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
-                Assert.True(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
-
-                var source = Constants.SourcePart;
-                var target = Constants.TargetPart;
-
-                Assert.True(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
-                Assert.True(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
-                Assert.True(links.GetByKeys(compressedVariant, target, source) == sequence[2]);
-                Assert.True(links.GetByKeys(compressedVariant, target, target) == sequence[3]);
-
-                // 4 - length of sequence
-                Assert.True(links.GetSquareMatrixSequenceElementByIndex(compressedVariant, 4, 0) == sequence[0]);
-                Assert.True(links.GetSquareMatrixSequenceElementByIndex(compressedVariant, 4, 1) == sequence[1]);
-                Assert.True(links.GetSquareMatrixSequenceElementByIndex(compressedVariant, 4, 2) == sequence[2]);
-                Assert.True(links.GetSquareMatrixSequenceElementByIndex(compressedVariant, 4, 3) == sequence[3]);
-            }
-        }
-
-        [Fact]
-        public void GlobalCompressionTest()
-        {
-            using (var scope = new TempLinksTestScope(useSequences: true))
-            {
-                var links = scope.Links;
-                var sequences = scope.Sequences;
-
-                var e1 = links.Create();
-                var e2 = links.Create();
-
-                var sequence = new[]
-                {
-                    e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
-                };
-
-                sequences.Index(sequence);
-
-                var compressor = new Compressor(new SynchronizedLinks<ulong>(links), sequences);
-
-                var compressedVariant = compressor.CompressGlobal(sequence);
 
                 // 1: [1]       (1->1) point
                 // 2: [2]       (2->2) point
@@ -505,22 +458,37 @@ namespace Platform.Tests.Data.Core
                 scope1.Links.UseUnicode();
                 scope2.Links.UseUnicode();
 
-                var compressor1 = new Compressor(new SynchronizedLinks<ulong>(scope1.Links), scope1.Sequences);
-                var compressor2 = new Compressor(new SynchronizedLinks<ulong>(scope2.Links), scope2.Sequences);
+                var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
+                var compressor2 = scope2.Sequences;
+
+                var compressed1 = new List<ulong>();
+                var compressed2 = new List<ulong>();
+
+                var sw1 = Stopwatch.StartNew();
 
                 for (int i = 0; i < arrays.Length; i++)
-                {
-                    scope1.Sequences.Index(arrays[i]);
-                    scope2.Sequences.Index(arrays[i]);
-                }
+                    compressed1.Add(compressor1.Compress(arrays[i]));
+
+                var elapsed1 = sw1.Elapsed;
+
+                var sw2 = Stopwatch.StartNew();
 
                 for (int i = 0; i < arrays.Length; i++)
+                    compressed2.Add(compressor2.CreateBalancedVariantCore(arrays[i]));
+
+                var elapsed2 = sw2.Elapsed;
+
+                //Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
+
+                Assert.True(elapsed1 > elapsed2);
+
+                // Checks
+                for (int i = 0; i < arrays.Length; i++)
                 {
-                    var sequence1 = compressor1.Compress(arrays[i]);
+                    var sequence1 = compressed1[i];
+                    var sequence2 = compressed2[i];
 
                     var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
-
-                    var sequence2 = compressor2.CompressGlobal(arrays[i]);
 
                     var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
 
@@ -534,8 +502,11 @@ namespace Platform.Tests.Data.Core
                 }
 
                 Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+                Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
 
-                Assert.True(scope2.Links.Count() < scope1.Links.Count());
+                //Debug.WriteLine($"{((double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters)} | {((double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters)}");
+
+                Assert.True(scope1.Links.Count() < scope2.Links.Count());
             }
         }
 

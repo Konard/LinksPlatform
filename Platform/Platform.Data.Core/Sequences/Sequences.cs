@@ -71,7 +71,7 @@ namespace Platform.Data.Core.Sequences
             Options.InitOptions(Links);
 
             if (Options.UseCompression)
-                _compressor = new Compressor(links, this, threadSafe: false);
+                _compressor = new Compressor(links.Unsync, this);
         }
 
         private bool IsSequence(ulong sequence)

@@ -378,6 +378,18 @@ namespace Platform.Helpers.Collections.Optimizations
             return false;
         }
 
+        public bool TryGetEntry(TKey key, out Entry entry)
+        {
+            var i = FindEntry(key);
+            if (i >= 0)
+            {
+                entry = entries[i];
+                return true;
+            }
+            entry = default(Entry);
+            return false;
+        }
+
         bool ICollection<KeyValuePair<TKey, TValue>>.IsReadOnly
         {
             get { return false; }
