@@ -107,8 +107,8 @@ namespace Platform.Sandbox
 
                         if (topElement.StartsWith("page"))
                         {
-                            if (context.ChildrenNamesCounts["page"] % 100 == 0)
-                                Console.WriteLine(topElement);
+                            //if (context.ChildrenNamesCounts["page"] % 100 == 0)
+                            Console.WriteLine(topElement);
                         }
 
                         break;
@@ -117,7 +117,7 @@ namespace Platform.Sandbox
                         ConsoleHelpers.Debug("Starting text element...");
 
                         var content = reader.Value;
-
+                            
                         ConsoleHelpers.Debug("Content: {0}{1}", content.Truncate(50), content.Length >= 50 ? "..." : "");
 
                         var textElement = _storage.CreateTextElement(content: content);

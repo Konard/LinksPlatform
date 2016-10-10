@@ -10,8 +10,8 @@ namespace Platform.Sandbox
         public static void Main(string[] args)
         {
             //new CSVExporterCLI().Run(args);
-            new FileIndexerCLI().Run(args);
-            //new WikipediaImporterCLI().Run(args);
+            //new FileIndexerCLI().Run(args);
+            new WikipediaImporterCLI().Run(args);
 
             //DllImportTest.Test();
 
