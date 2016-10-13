@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
@@ -19,75 +20,164 @@ namespace Platform.Data.Core.Sequences
 
         private readonly Func<ulong, ulong, ulong> _createLink;
         private readonly Func<ulong[], ulong> _createSequence;
-        private UInt64Link _maxPair;
+        private readonly Func<ulong, ulong> _countLinkFrequency;
         private readonly ILinks<ulong> _links;
+        private readonly Sequences _sequences;
         private readonly ulong _minFrequencyToCompress;
-        private ulong _maxFrequency;
-        private UnsafeDictionary<UInt64Link, ulong> _pairsFrequencies;
+        private Pair _maxPair;
+        private Data _maxPairData;
+        private UnsafeDictionary<Pair, Data> _pairsFrequencies;
+
+        private struct Pair
+        {
+            public ulong Source;
+            public ulong Target;
+
+            public Pair(ulong source, ulong target)
+            {
+                Source = source;
+                Target = target;
+            }
+        }
+
+        private struct Data
+        {
+            public ulong Frequency;
+            public ulong Link;
+
+            public Data(ulong frequency, ulong link)
+            {
+                Frequency = frequency;
+                Link = link;
+            }
+        }
 
         /// <remarks>
-        /// TODO: Может стоит попробовать ref во всех методах
+        /// TODO: Может стоит попробовать ref во всех методах (IRefEqualityComparer)
+        /// 2x faster with comparer 
         /// </remarks>
-        public class LinkComparer : IEqualityComparer<UInt64Link>
+        private class PairComparer : IEqualityComparer<Pair>
         {
-            public static readonly LinkComparer Default = new LinkComparer();
+            public static readonly PairComparer Default = new PairComparer();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(UInt64Link x, UInt64Link y) => x.Source == y.Source &&
-                                                              x.Target == y.Target;
+            public bool Equals(Pair x, Pair y) => x.Source == y.Source && x.Target == y.Target;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(UInt64Link obj)
-            {
-                unchecked // Overflow is fine, just wrap
-                {
-                    return (int)((obj.Source << 16) ^ obj.Target);
-                }
-            }
+            public int GetHashCode(Pair obj) => (int)((obj.Source << 15) ^ obj.Target);
         }
 
         public Compressor(ILinks<ulong> links, Sequences sequences, ulong minFrequencyToCompress = 1)
         {
             _links = links;
+            _sequences = sequences;
             _createLink = _links.GetOrCreate;
-            _createSequence = sequences.CreateBalancedVariantCore;
+            _createSequence = _sequences.CreateBalancedVariantCore;
+            _countLinkFrequency = link =>
+            {
+                // Looks like a more correct way to calculate usage than _links.Count(Constants.Any, link);
+
+                var usagesSet = _sequences.AllBottomUsages(link);
+                var total = (ulong)usagesSet.Sum(x => (long)_sequences.CalculateSymbolFrequency(x, link));
+                return total; // TODO: Why +1 or -1 happens?
+            };
 
             if (minFrequencyToCompress == 0) minFrequencyToCompress = 1;
             _minFrequencyToCompress = minFrequencyToCompress;
             ResetMaxPair();
         }
 
+        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
+        //private void IncrementFrequency(Pair pair, out Data data)
+        //{
+        //    if (_pairsFrequencies.TryGetValue(pair, out data))
+        //    {
+        //        if (data.Frequency < ulong.MaxValue)
+        //        {
+        //            data.Frequency++;
+        //            _pairsFrequencies[pair] = data;
+        //        }
+        //    }
+        //    else
+        //    {
+        //        data.Frequency++;
+        //        _pairsFrequencies.Add(pair, data);
+        //    }
+        //}
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong IncrementFrequency(UInt64Link pair)
+        private void IncrementFrequency(ulong source, ulong target)
         {
-            ulong frequency;
-            if (_pairsFrequencies.TryGetValue(pair, out frequency))
-            {
-                frequency++;
-                _pairsFrequencies[pair] = frequency;
-            }
+            var pair = new Pair(source, target);
+
+            //Data data;
+            //if (_pairsFrequencies.TryGetValue(pair, out data))
+            //{
+            //    if (data.Frequency < ulong.MaxValue)
+            //    {
+            //        data.Frequency++;
+            //        _pairsFrequencies[pair] = data;
+            //    }
+            //}
+            //else
+            //{
+            //    data.Frequency++;
+            //    _pairsFrequencies.Add(pair, data);
+            //}
+
+            var entryIndex = _pairsFrequencies.FindEntry(ref pair);
+            if (entryIndex >= 0)
+                _pairsFrequencies.entries[entryIndex].value.Frequency++;
             else
-            {
-                frequency = 1;
-                _pairsFrequencies.Add(pair, frequency);
-            }
-            return frequency;
+                _pairsFrequencies.InsertUnsafe(pair, new Data(1, default(ulong)));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DecrementFrequency(UInt64Link pair)
+        private void DecrementFrequency(ulong source, ulong target)
         {
-            ulong frequency;
-            if (_pairsFrequencies.TryGetValue(pair, out frequency))
-            {
-                frequency--;
+            var pair = new Pair(source, target);
 
-                if (frequency == 0)
-                    _pairsFrequencies.Remove(pair);
-                else
-                    _pairsFrequencies[pair] = frequency;
+            //Data data;
+            //if (_pairsFrequencies.TryGetValue(pair, out data))
+            //{
+            //    if (data.Frequency > ulong.MinValue)
+            //    {
+            //        data.Frequency--;
+            //        _pairsFrequencies[pair] = data;
+            //    }
+            //}
+
+            var entryIndex = _pairsFrequencies.FindEntry(ref pair);
+            if (entryIndex >= 0)
+                _pairsFrequencies.entries[entryIndex].value.Frequency--;
+        }
+
+        public void ResetFrequencies()
+        {
+            _pairsFrequencies.Clear();
+        }
+
+        public void ValidateFrequencies()
+        {
+            var entries = _pairsFrequencies.entries;
+            var length = _pairsFrequencies.count;
+
+            for (var i = 0; i < length; i++)
+            {
+                if (entries[i].hashCode < 0) continue;
+
+                var value = entries[i].value;
+                var linkIndex = value.Link;
+
+                if (linkIndex != Constants.Null)
+                {
+                    var frequency = value.Frequency;
+                    var count = _countLinkFrequency(linkIndex);
+
+                    if ((frequency > count && frequency - count > 1) || (count > frequency && count - frequency > 1))
+                        throw new Exception("Frequencies validation failed.");
+                }
             }
-            //return frequency;
         }
 
         public ulong Compress(ulong[] sequence) => _createSequence(Precompress(sequence));
@@ -108,41 +198,61 @@ namespace Platform.Data.Core.Sequences
                 return new[] { _createLink(sequence[0], sequence[1]) };
 
             if (_pairsFrequencies == null)
-                _pairsFrequencies = new UnsafeDictionary<UInt64Link, ulong>(4096, LinkComparer.Default);
+                _pairsFrequencies = new UnsafeDictionary<Pair, Data>(4096, PairComparer.Default);
 
             for (var i = 1; i < sequence.Length; i++)
             {
                 var source = sequence[i - 1];
                 var target = sequence[i];
 
-                var link = _links.SearchOrDefault(source, target);
-                var pair = new UInt64Link(link, source, target);
+                var pair = new Pair(source, target);
 
-                // Preload actual frequency from storage {
-                if (link != default(ulong))
+                // Preload actual frequency from storage
+
+                //Data data;
+                //if (!_pairsFrequencies.TryGetValue(pair, out data))
+                //{
+                //    data.Link = _links.SearchOrDefault(source, target);
+                //    if (data.Link != default(ulong))
+                //    {
+                //        data.Frequency = _countLinkFrequency(data.Link);
+                //        _pairsFrequencies.Add(pair, data);
+                //    }
+                //}
+                //IncrementFrequency(pair, out data);
+
+                Data data;
+                var entryIndex = _pairsFrequencies.FindEntry(pair);
+                if (entryIndex >= 0)
                 {
-                    ulong frequency;
-                    if (!_pairsFrequencies.TryGetValue(pair, out frequency))
-                        _pairsFrequencies.Add(pair, _links.Count(Constants.Any, link));
+                    _pairsFrequencies.entries[entryIndex].value.Frequency++;
+                    data = _pairsFrequencies.entries[entryIndex].value;
                 }
-                // }
+                else
+                {
+                    data.Link = _links.SearchOrDefault(source, target);
+                    if (data.Link != default(ulong))
+                        data.Frequency = _countLinkFrequency(data.Link) + 1;
+                    else
+                        data.Frequency = 1;
+                    _pairsFrequencies.InsertUnsafe(pair, data);
+                }
 
-                UpdateMaxPair(pair, IncrementFrequency(pair));
+                UpdateMaxPair(ref pair, ref data);
             }
 
-            if (_maxFrequency > _minFrequencyToCompress)
+            if (_maxPairData.Frequency > _minFrequencyToCompress)
             {
                 // Can be faster if source sequence allowed to be changed
-                // TODO: Try to use ArrayPool
                 var copy = new ulong[sequence.Length];
+                //var copy = ArrayPool.Allocate<ulong>(sequence.Length);
                 Array.Copy(sequence, copy, sequence.Length);
 
                 var newLength = ReplacePairs(copy);
 
-                var final = new ulong[newLength];
-                Array.Copy(copy, final, newLength);
-
-                return final;
+                sequence = new ulong[newLength];
+                Array.Copy(copy, sequence, newLength);
+                //ArrayPool.Free(copy);
             }
 
             return sequence;
@@ -150,29 +260,24 @@ namespace Platform.Data.Core.Sequences
 
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-        /// Faster version (pairs' frequencies dictionary is not recreated).
         /// </remarks>
         private int ReplacePairs(ulong[] copy)
         {
             var oldLength = copy.Length;
             var newLength = copy.Length;
 
-            while (!_maxPair.IsNull())
+            while (_maxPair.Source != default(ulong) && _maxPair.Target != default(ulong))
             {
                 var maxPairSource = _maxPair.Source;
                 var maxPairTarget = _maxPair.Target;
-                ulong maxPairResult;
-                if (_maxPair.Index == Constants.Null)
+
+                if (_maxPairData.Link == Constants.Null)
                 {
-                    maxPairResult = _createLink(maxPairSource, maxPairTarget);
-                    _pairsFrequencies.Remove(_maxPair);
-                    _maxPair = new UInt64Link(maxPairResult, _maxPair.Source, _maxPair.Target);
-                    _pairsFrequencies.Add(_maxPair, _maxFrequency);
+                    _maxPairData.Link = _createLink(maxPairSource, maxPairTarget);
+                    _pairsFrequencies[_maxPair] = _maxPairData;
                 }
-                else
-                {
-                    maxPairResult = _maxPair.Index;
-                }
+
+                var maxPairReplacementLink = _maxPairData.Link;
 
                 oldLength--;
                 var oldLengthMinusTwo = oldLength - 1;
@@ -186,17 +291,17 @@ namespace Platform.Data.Core.Sequences
                         if (r > 0)
                         {
                             var previous = copy[w - 1];
-                            DecrementFrequency(new UInt64Link(previous, maxPairSource));
-                            IncrementFrequency(new UInt64Link(previous, maxPairResult));
+                            DecrementFrequency(previous, maxPairSource);
+                            IncrementFrequency(previous, maxPairReplacementLink);
                         }
                         if (r < oldLengthMinusTwo)
                         {
                             var next = copy[r + 2];
-                            DecrementFrequency(new UInt64Link(maxPairTarget, next));
-                            IncrementFrequency(new UInt64Link(maxPairResult, next));
+                            DecrementFrequency(maxPairTarget, next);
+                            IncrementFrequency(maxPairReplacementLink, next);
                         }
 
-                        copy[w++] = maxPairResult;
+                        copy[w++] = maxPairReplacementLink;
                         r++;
                         newLength--;
                     }
@@ -209,55 +314,51 @@ namespace Platform.Data.Core.Sequences
 
                 oldLength = newLength;
 
+                ResetMaxPair();
+
                 UpdateMaxPair(copy, newLength);
             }
 
             return newLength;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetMaxPair()
         {
-            _maxPair = UInt64Link.Null;
-            _maxFrequency = 1;
+            _maxPair = new Pair();
+            _maxPairData = new Data();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateMaxPair(ulong[] sequence, int length)
         {
-            ResetMaxPair();
-
-            for (var i = 1; i < length; i++)
+            for (var i = length - 1; i >= 1; i--)
             {
-                var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                var pair = new Pair(sequence[i - 1], sequence[i]);
+                //var data = _pairsFrequencies[pair];
+                //UpdateMaxPair(ref pair, ref data);
 
-                ulong frequency;
-                UnsafeDictionary<UInt64Link, ulong>.Entry entry;
-                if (_pairsFrequencies.TryGetEntry(pair, out entry))
-                {
-                    pair = entry.key;
-                    frequency = entry.value;
-                }
-                else
-                    throw new Exception("Pair frequency not found.");
-
-                UpdateMaxPair(pair, frequency);
+                UpdateMaxPair(ref pair, ref _pairsFrequencies.entries[_pairsFrequencies.FindEntry(ref pair)].value);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(UInt64Link pair, ulong frequency)
+        private void UpdateMaxPair(ref Pair pair, ref Data data)
         {
+            var frequency = data.Frequency;
+            var maxFrequency = _maxPairData.Frequency;
             if (frequency > _minFrequencyToCompress)
             {
-                if (_maxFrequency < frequency)
+                if (maxFrequency < frequency)
                 {
-                    _maxFrequency = frequency;
                     _maxPair = pair;
+                    _maxPairData = data;
                 }
-                else if (_maxFrequency == frequency &&
-                    (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                //else if (maxFrequency == frequency && (_maxPair.Source > pair.Source || (_maxPair.Source == pair.Source && _maxPair.Target > pair.Target))) // Gives worse compression
+                else if (maxFrequency == frequency && pair.Source + pair.Target < _maxPair.Source + _maxPair.Target) // Gives better compression
                 {
                     _maxPair = pair;
+                    _maxPairData = data;
                 }
             }
         }

@@ -401,6 +401,19 @@ namespace Platform.Data.Core.Pairs
             return links.Each(handler, restrictions);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static IList<TLink> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
+        {
+            var list = new List<TLink>();
+            var constants = links.Constants;
+            links.Each(link =>
+                       {
+                           list.Add(link[constants.IndexPart]);
+                           return true;
+                       }, restrictions);
+            return list;
+        }
+
         /// <summary>
         /// Возвращает значение, определяющее существует ли связь с указанным индексом в базе данных.
         /// </summary>

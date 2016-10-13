@@ -478,7 +478,7 @@ namespace Platform.Tests.Data.Core
 
                 var elapsed2 = sw2.Elapsed;
 
-                //Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
+                Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
 
                 Assert.True(elapsed1 > elapsed2);
 
@@ -504,9 +504,11 @@ namespace Platform.Tests.Data.Core
                 Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
                 Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
 
-                //Debug.WriteLine($"{((double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters)} | {((double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters)}");
+                Debug.WriteLine($"{((double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters)} | {((double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters)}");
 
                 Assert.True(scope1.Links.Count() < scope2.Links.Count());
+
+                compressor1.ValidateFrequencies();
             }
         }
 

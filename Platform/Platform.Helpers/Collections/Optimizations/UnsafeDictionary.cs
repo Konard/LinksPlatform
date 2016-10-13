@@ -20,14 +20,14 @@ namespace Platform.Helpers.Collections.Optimizations
         private int[] buckets;
         public Entry[] entries;
         private int capacity;
-        private int count;
-        private int version;
+        public int count;
+        //private int version;
         private int freeList;
         private int freeCount;
         private IEqualityComparer<TKey> comparer;
         private KeyCollection keys;
         private ValueCollection values;
-        private Object _syncRoot;     
+        private Object _syncRoot;
 
         public UnsafeDictionary() : this(1000, null) { }
 
@@ -149,7 +149,7 @@ namespace Platform.Helpers.Collections.Optimizations
                 freeList = -1;
                 count = 0;
                 freeCount = 0;
-                version++;
+                //version++;
             }
         }
 
@@ -216,11 +216,33 @@ namespace Platform.Helpers.Collections.Optimizations
             return new Enumerator(this, Enumerator.KeyValuePair);
         }
 
-        private int FindEntry(TKey key)
+        public int FindEntry(TKey key)
         {
             //if (key == null)
             //{
-            //    throw new ArgumentNullException("key");
+            //throw new ArgumentNullException("key");
+            //}
+
+            if (buckets != null)
+            {
+                var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+                for (var i = buckets[hashCode % buckets.Length]; i >= 0; i = entries[i].next)
+                {
+
+                    if (entries[i].hashCode == hashCode)
+                        if (comparer.Equals(entries[i].key, key))
+                            return i;
+
+                }
+            }
+            return -1;
+        }
+
+        public int FindEntry(ref TKey key)
+        {
+            //if (key == null)
+            //{
+            //throw new ArgumentNullException("key");
             //}
 
             if (buckets != null)
@@ -255,7 +277,7 @@ namespace Platform.Helpers.Collections.Optimizations
         public void StoreAtPosition(int pos, TValue value)
         {
             entries[pos].value = value;
-            version++;
+            //version++;
         }
 
         public TValue GetAtPosition(int pos)
@@ -270,8 +292,6 @@ namespace Platform.Helpers.Collections.Optimizations
             //    throw new ArgumentNullException("key");
             //}
 
-
-
             if (buckets == null) Initialize(capacity);
             var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
             for (var i = buckets[hashCode % buckets.Length]; i >= 0; i = entries[i].next)
@@ -283,7 +303,7 @@ namespace Platform.Helpers.Collections.Optimizations
                         return i;
                     }
                     entries[i].value = value;
-                    version++;
+                    //version++;
                     return i;
                 }
             }
@@ -306,7 +326,35 @@ namespace Platform.Helpers.Collections.Optimizations
             entries[index].key = key;
             entries[index].value = value;
             buckets[bucket] = index;
-            version++;
+            //version++;
+
+            return index;
+        }
+
+        public int InsertUnsafe(TKey key, TValue value)
+        {
+            if (buckets == null) Initialize(capacity);
+            var hashCode = comparer.GetHashCode(key) & 0x7FFFFFFF;
+            int index;
+            if (freeCount > 0)
+            {
+                index = freeList;
+                freeList = entries[index].next;
+                freeCount--;
+            }
+            else
+            {
+                if (count == entries.Length) Resize();
+                index = count;
+                count++;
+            }
+            var bucket = hashCode % buckets.Length;
+            entries[index].hashCode = hashCode;
+            entries[index].next = buckets[bucket];
+            entries[index].key = key;
+            entries[index].value = value;
+            buckets[bucket] = index;
+            //version++;
 
             return index;
         }
@@ -358,7 +406,7 @@ namespace Platform.Helpers.Collections.Optimizations
                         entries[i].value = default(TValue);
                         freeList = i;
                         freeCount++;
-                        version++;
+                        //version++;
                         return true;
                     }
                 }
@@ -454,15 +502,15 @@ namespace Platform.Helpers.Collections.Optimizations
 
                 //try
                 //{
-                    var count = this.count;
-                    var entries = this.entries;
-                    for (var i = 0; i < count; i++)
+                var count = this.count;
+                var entries = this.entries;
+                for (var i = 0; i < count; i++)
+                {
+                    if (entries[i].hashCode >= 0)
                     {
-                        if (entries[i].hashCode >= 0)
-                        {
-                            objects[index++] = new KeyValuePair<TKey, TValue>(entries[i].key, entries[i].value);
-                        }
+                        objects[index++] = new KeyValuePair<TKey, TValue>(entries[i].key, entries[i].value);
                     }
+                }
                 //}
                 //catch (ArrayTypeMismatchException)
                 //{
@@ -519,11 +567,11 @@ namespace Platform.Helpers.Collections.Optimizations
             {
                 //if (IsCompatibleKey(key))
                 //{
-                    var i = FindEntry((TKey)key);
-                    if (i >= 0)
-                    {
-                        return entries[i].value;
-                    }
+                var i = FindEntry((TKey)key);
+                if (i >= 0)
+                {
+                    return entries[i].value;
+                }
                 //}
                 return null;
             }
@@ -534,7 +582,7 @@ namespace Platform.Helpers.Collections.Optimizations
                 this[(TKey)key] = (TValue)value;
             }
         }
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private static void VerifyKey(object key)
         {
@@ -581,7 +629,7 @@ namespace Platform.Helpers.Collections.Optimizations
         {
             //if (IsCompatibleKey(key))
             //{
-                return ContainsKey((TKey)key);
+            return ContainsKey((TKey)key);
             //}
             //return false;
         }
@@ -595,7 +643,7 @@ namespace Platform.Helpers.Collections.Optimizations
         {
             //if (IsCompatibleKey(key))
             //{
-                Remove((TKey)key);
+            Remove((TKey)key);
             //}
         }
 
@@ -603,7 +651,7 @@ namespace Platform.Helpers.Collections.Optimizations
             IDictionaryEnumerator
         {
             private UnsafeDictionary<TKey, TValue> dictionary;
-            private int version;
+            //private int version;
             private int index;
             private KeyValuePair<TKey, TValue> current;
             private int getEnumeratorRetType;  // What should Enumerator.Current return?
@@ -614,7 +662,7 @@ namespace Platform.Helpers.Collections.Optimizations
             internal Enumerator(UnsafeDictionary<TKey, TValue> dictionary, int getEnumeratorRetType)
             {
                 this.dictionary = dictionary;
-                version = dictionary.version;
+                //version = dictionary.version;
                 index = 0;
                 this.getEnumeratorRetType = getEnumeratorRetType;
                 current = new KeyValuePair<TKey, TValue>();
@@ -856,10 +904,10 @@ namespace Platform.Helpers.Collections.Optimizations
                     var entries = dictionary.entries;
                     //try
                     //{
-                        for (var i = 0; i < count; i++)
-                        {
-                            if (entries[i].hashCode >= 0) objects[index++] = entries[i].key;
-                        }
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (entries[i].hashCode >= 0) objects[index++] = entries[i].key;
+                    }
                     //}
                     //catch (ArrayTypeMismatchException)
                     //{
@@ -882,13 +930,13 @@ namespace Platform.Helpers.Collections.Optimizations
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;
                 private int index;
-                private int version;
+                //private int version;
                 private TKey currentKey;
 
                 internal Enumerator(UnsafeDictionary<TKey, TValue> dictionary)
                 {
                     this.dictionary = dictionary;
-                    version = dictionary.version;
+                    //version = dictionary.version;
                     index = 0;
                     currentKey = default(TKey);
                 }
@@ -1081,10 +1129,10 @@ namespace Platform.Helpers.Collections.Optimizations
                     var entries = dictionary.entries;
                     //try
                     //{
-                        for (var i = 0; i < count; i++)
-                        {
-                            if (entries[i].hashCode >= 0) objects[index++] = entries[i].value;
-                        }
+                    for (var i = 0; i < count; i++)
+                    {
+                        if (entries[i].hashCode >= 0) objects[index++] = entries[i].value;
+                    }
                     //}
                     //catch (ArrayTypeMismatchException)
                     //{
@@ -1107,13 +1155,13 @@ namespace Platform.Helpers.Collections.Optimizations
             {
                 private UnsafeDictionary<TKey, TValue> dictionary;
                 private int index;
-                private int version;
+                //private int version;
                 private TValue currentValue;
 
                 internal Enumerator(UnsafeDictionary<TKey, TValue> dictionary)
                 {
                     this.dictionary = dictionary;
-                    version = dictionary.version;
+                    //version = dictionary.version;
                     index = 0;
                     currentValue = default(TValue);
                 }

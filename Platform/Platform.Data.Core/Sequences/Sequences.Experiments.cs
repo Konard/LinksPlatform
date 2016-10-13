@@ -510,35 +510,60 @@ namespace Platform.Data.Core.Sequences
             if (links.Exists(sequenceLink))
             {
                 StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
-                    x => linksInSequence.Contains(x) || links.IsFullPoint(x), entered.AddAndReturnVoid, x => {}, entered.DoNotContains, element =>
-                    {
-                        if (insertComma && sb.Length > 0)
-                            sb.Append(',');
+                    x => linksInSequence.Contains(x) || links.IsFullPoint(x), entered.AddAndReturnVoid, x => { }, entered.DoNotContains, element =>
+                     {
+                         if (insertComma && sb.Length > 0)
+                             sb.Append(',');
 
-                        if (entered.Contains(element))
-                        {
-                            sb.Append('{');
-                            elementToString(sb, element);
-                            sb.Append('}');
-                        }
-                        else
-                            elementToString(sb, element);
+                         if (entered.Contains(element))
+                         {
+                             sb.Append('{');
+                             elementToString(sb, element);
+                             sb.Append('}');
+                         }
+                         else
+                             elementToString(sb, element);
 
-                        if (sb.Length < MaxSequenceFormatSize)
-                        {
-                            return true;
-                        }
-                        else
-                        {
-                            sb.Append(insertComma ? ", ..." : "...");
-                            return false;
-                        }
-                    });
+                         if (sb.Length < MaxSequenceFormatSize)
+                         {
+                             return true;
+                         }
+                         else
+                         {
+                             sb.Append(insertComma ? ", ..." : "...");
+                             return false;
+                         }
+                     });
             }
 
             sb.Append('}');
 
             return sb.ToString();
+        }
+
+        public ulong CalculateSymbolFrequency(LinkIndex sequenceLink, LinkIndex symbolLink)
+        {
+            return Links.SyncRoot.ExecuteReadOperation(() => CalculateSymbolFrequency(Links.Unsync, sequenceLink, symbolLink));
+        }
+
+        private ulong CalculateSymbolFrequency(ILinks<LinkIndex> links, LinkIndex sequenceLink, LinkIndex symbolLink)
+        {
+            var total = 0UL;
+            //var entered = new HashSet<ulong>();
+            //, entered.AddAndReturnVoid, x => { }, entered.DoNotContains
+
+            if (links.Exists(sequenceLink))
+            {
+                StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
+                    x => x == symbolLink || links.IsPartialPoint(x), element =>
+                                                 {
+                                                     if (element == symbolLink)
+                                                         total++;
+                                                     return true;
+                                                 });
+            }
+
+            return total;
         }
 
         public List<ulong> GetAllPartiallyMatchingSequences0(params ulong[] sequence)
@@ -844,6 +869,34 @@ namespace Platform.Data.Core.Sequences
             };
             Links.Unsync.Each(link, Constants.Any, handler);
             Links.Unsync.Each(Constants.Any, link, handler);
+        }
+
+        public HashSet<ulong> AllBottomUsages(ulong link)
+        {
+            return Sync.ExecuteReadOperation(() =>
+            {
+                var visits = new HashSet<ulong>();
+                var usages = new HashSet<ulong>();
+                AllBottomUsagesCore(link, visits, usages);
+                return usages;
+            });
+        }
+
+        private void AllBottomUsagesCore(ulong link, HashSet<ulong> visits, HashSet<ulong> usages)
+        {
+            Func<ulong, bool> handler = pair =>
+            {
+                if (visits.Add(pair)) AllBottomUsagesCore(pair, visits, usages);
+                return true;
+            };
+
+            if (Links.Unsync.Count(Constants.Any, link) == 0)
+                usages.Add(link);
+            else
+            {
+                Links.Unsync.Each(link, Constants.Any, handler);
+                Links.Unsync.Each(Constants.Any, link, handler);
+            }
         }
 
         private bool AllUsagesCore1(ulong link, HashSet<ulong> usages, Func<ulong, bool> outerHandler)
