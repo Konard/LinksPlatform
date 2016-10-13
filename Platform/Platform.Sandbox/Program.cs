@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Platform.Sandbox
 {
@@ -11,7 +10,8 @@ namespace Platform.Sandbox
         {
             //new CSVExporterCLI().Run(args);
             //new FileIndexerCLI().Run(args);
-            new WikipediaImporterCLI().Run(args);
+            //new WikipediaImporterCLI().Run(args);
+            new WikipediaPagesCounterCLI().Run(args);
 
             //DllImportTest.Test();
 
