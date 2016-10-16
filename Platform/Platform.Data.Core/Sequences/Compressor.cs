@@ -158,7 +158,7 @@ namespace Platform.Data.Core.Sequences
                     var frequency = value.Frequency;
                     var count = _countLinkFrequency(linkIndex);
 
-                    if ((frequency > count && frequency - count > 1) || (count > frequency && count - frequency > 1))
+                    if ((frequency > count && frequency - count > _minFrequencyToCompress) || (count > frequency && count - frequency > _minFrequencyToCompress))
                         throw new Exception("Frequencies validation failed.");
                 }
                 //else
