@@ -446,7 +446,7 @@ namespace Platform.Tests.Data.Core
         }
 
         [Fact]
-        public void CompressionEfficiencyTest()
+        public static void CompressionEfficiencyTest()
         {
             var strings = ExampleText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
@@ -461,20 +461,23 @@ namespace Platform.Tests.Data.Core
                 var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
                 var compressor2 = scope2.Sequences;
 
-                var compressed1 = new List<ulong>();
-                var compressed2 = new List<ulong>();
+                var compressed1 = new ulong[arrays.Length];
+                var compressed2 = new ulong[arrays.Length];
 
                 var sw1 = Stopwatch.StartNew();
 
-                for (int i = 0; i < arrays.Length; i++)
-                    compressed1.Add(compressor1.Compress(arrays[i]));
+                var START = 0;
+                var END = arrays.Length;
+
+                for (int i = START; i < END; i++)
+                    compressed1[i] = compressor1.Compress(arrays[i]);
 
                 var elapsed1 = sw1.Elapsed;
 
                 var sw2 = Stopwatch.StartNew();
 
-                for (int i = 0; i < arrays.Length; i++)
-                    compressed2.Add(compressor2.CreateBalancedVariantCore(arrays[i]));
+                for (int i = START; i < END; i++)
+                    compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
 
@@ -483,7 +486,7 @@ namespace Platform.Tests.Data.Core
                 Assert.True(elapsed1 > elapsed2);
 
                 // Checks
-                for (int i = 0; i < arrays.Length; i++)
+                for (int i = START; i < END; i++)
                 {
                     var sequence1 = compressed1[i];
                     var sequence2 = compressed2[i];
@@ -504,7 +507,7 @@ namespace Platform.Tests.Data.Core
                 Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
                 Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
 
-                Debug.WriteLine($"{((double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters)} | {((double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters)}");
+                Debug.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
 
                 Assert.True(scope1.Links.Count() < scope2.Links.Count());
 

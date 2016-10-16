@@ -24,9 +24,21 @@ namespace Platform.Data.Core.Sequences
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;
         private readonly ulong _minFrequencyToCompress;
+        private readonly UnsafeDictionary<Pair, Data> _pairsCache;
         private Pair _maxPair;
         private Data _maxPairData;
-        private UnsafeDictionary<Pair, Data> _pairsFrequencies;
+
+        private struct HalfPair
+        {
+            public ulong Element;
+            public Data PairData;
+
+            public HalfPair(ulong element, Data pairData)
+            {
+                Element = element;
+                PairData = pairData;
+            }
+        }
 
         private struct Pair
         {
@@ -40,7 +52,7 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
-        private struct Data
+        private class Data
         {
             public ulong Frequency;
             public ulong Link;
@@ -49,6 +61,10 @@ namespace Platform.Data.Core.Sequences
             {
                 Frequency = frequency;
                 Link = link;
+            }
+
+            public Data()
+            {
             }
         }
 
@@ -85,82 +101,50 @@ namespace Platform.Data.Core.Sequences
             if (minFrequencyToCompress == 0) minFrequencyToCompress = 1;
             _minFrequencyToCompress = minFrequencyToCompress;
             ResetMaxPair();
+            _pairsCache = new UnsafeDictionary<Pair, Data>(4096, PairComparer.Default);
         }
 
-        //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-        //private void IncrementFrequency(Pair pair, out Data data)
-        //{
-        //    if (_pairsFrequencies.TryGetValue(pair, out data))
-        //    {
-        //        if (data.Frequency < ulong.MaxValue)
-        //        {
-        //            data.Frequency++;
-        //            _pairsFrequencies[pair] = data;
-        //        }
-        //    }
-        //    else
-        //    {
-        //        data.Frequency++;
-        //        _pairsFrequencies.Add(pair, data);
-        //    }
-        //}
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void IncrementFrequency(ulong source, ulong target)
+        private Data IncrementFrequency(ulong source, ulong target)
         {
             var pair = new Pair(source, target);
 
-            //Data data;
-            //if (_pairsFrequencies.TryGetValue(pair, out data))
-            //{
-            //    if (data.Frequency < ulong.MaxValue)
-            //    {
-            //        data.Frequency++;
-            //        _pairsFrequencies[pair] = data;
-            //    }
-            //}
-            //else
-            //{
-            //    data.Frequency++;
-            //    _pairsFrequencies.Add(pair, data);
-            //}
+            return IncrementFrequency(ref pair);
+        }
 
-            var entryIndex = _pairsFrequencies.FindEntry(ref pair);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private Data IncrementFrequency(ref Pair pair)
+        {
+            Data data;
+            var entryIndex = _pairsCache.FindEntry(pair);
             if (entryIndex >= 0)
-                _pairsFrequencies.entries[entryIndex].value.Frequency++;
+            {
+                data = _pairsCache.entries[entryIndex].value;
+                data.Frequency++;
+            }
             else
-                _pairsFrequencies.InsertUnsafe(pair, new Data(1, default(ulong)));
-        }
+            {
+                var link = _links.SearchOrDefault(pair.Source, pair.Target);
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void DecrementFrequency(ulong source, ulong target)
-        {
-            var pair = new Pair(source, target);
+                data = new Data(1, link);
 
-            //Data data;
-            //if (_pairsFrequencies.TryGetValue(pair, out data))
-            //{
-            //    if (data.Frequency > ulong.MinValue)
-            //    {
-            //        data.Frequency--;
-            //        _pairsFrequencies[pair] = data;
-            //    }
-            //}
-
-            var entryIndex = _pairsFrequencies.FindEntry(ref pair);
-            if (entryIndex >= 0)
-                _pairsFrequencies.entries[entryIndex].value.Frequency--;
+                if (link != default(ulong))
+                    data.Frequency += _countLinkFrequency(link);
+                    
+                _pairsCache.InsertUnsafe(pair, data);
+            }
+            return data;
         }
 
         public void ResetFrequencies()
         {
-            _pairsFrequencies.Clear();
+            _pairsCache.Clear();
         }
 
         public void ValidateFrequencies()
         {
-            var entries = _pairsFrequencies.entries;
-            var length = _pairsFrequencies.count;
+            var entries = _pairsCache.entries;
+            var length = _pairsCache.count;
 
             for (var i = 0; i < length; i++)
             {
@@ -169,7 +153,7 @@ namespace Platform.Data.Core.Sequences
                 var value = entries[i].value;
                 var linkIndex = value.Link;
 
-                if (linkIndex != Constants.Null)
+                if (linkIndex != default(ulong))
                 {
                     var frequency = value.Frequency;
                     var count = _countLinkFrequency(linkIndex);
@@ -177,6 +161,18 @@ namespace Platform.Data.Core.Sequences
                     if ((frequency > count && frequency - count > 1) || (count > frequency && count - frequency > 1))
                         throw new Exception("Frequencies validation failed.");
                 }
+                //else
+                //{
+                //    if (value.Frequency > 0)
+                //    {
+                //        var frequency = value.Frequency;
+                //        linkIndex = _createLink(entries[i].key.Source, entries[i].key.Target);
+                //        var count = _countLinkFrequency(linkIndex);
+
+                //        if ((frequency > count && frequency - count > 1) || (count > frequency && count - frequency > 1))
+                //            throw new Exception("Frequencies validation failed.");
+                //    }
+                //}
             }
         }
 
@@ -196,63 +192,35 @@ namespace Platform.Data.Core.Sequences
 
             if (sequence.Length == 2)
                 return new[] { _createLink(sequence[0], sequence[1]) };
+                
+            // TODO: arraypool with min size (to improve cache locality)
+            var copy = new HalfPair[sequence.Length];
 
-            if (_pairsFrequencies == null)
-                _pairsFrequencies = new UnsafeDictionary<Pair, Data>(4096, PairComparer.Default);
+            var pair = new Pair();
 
             for (var i = 1; i < sequence.Length; i++)
             {
-                var source = sequence[i - 1];
-                var target = sequence[i];
+                pair.Source = sequence[i - 1];
+                pair.Target = sequence[i];
 
-                var pair = new Pair(source, target);
+                var data = IncrementFrequency(ref pair);
 
-                // Preload actual frequency from storage
+                copy[i - 1].Element = sequence[i - 1];
+                copy[i - 1].PairData = data;
 
-                //Data data;
-                //if (!_pairsFrequencies.TryGetValue(pair, out data))
-                //{
-                //    data.Link = _links.SearchOrDefault(source, target);
-                //    if (data.Link != default(ulong))
-                //    {
-                //        data.Frequency = _countLinkFrequency(data.Link);
-                //        _pairsFrequencies.Add(pair, data);
-                //    }
-                //}
-                //IncrementFrequency(pair, out data);
-
-                Data data;
-                var entryIndex = _pairsFrequencies.FindEntry(pair);
-                if (entryIndex >= 0)
-                {
-                    _pairsFrequencies.entries[entryIndex].value.Frequency++;
-                    data = _pairsFrequencies.entries[entryIndex].value;
-                }
-                else
-                {
-                    data.Link = _links.SearchOrDefault(source, target);
-                    if (data.Link != default(ulong))
-                        data.Frequency = _countLinkFrequency(data.Link) + 1;
-                    else
-                        data.Frequency = 1;
-                    _pairsFrequencies.InsertUnsafe(pair, data);
-                }
-
-                UpdateMaxPair(ref pair, ref data);
+                UpdateMaxPair(ref pair, data);
             }
+            copy[sequence.Length - 1].Element = sequence[sequence.Length - 1];
+            copy[sequence.Length - 1].PairData = new Data();
 
-            if (_maxPairData.Frequency > _minFrequencyToCompress)
+            if (_maxPairData.Frequency > default(ulong))
             {
-                // Can be faster if source sequence allowed to be changed
-                var copy = new ulong[sequence.Length];
-                //var copy = ArrayPool.Allocate<ulong>(sequence.Length);
-                Array.Copy(sequence, copy, sequence.Length);
-
                 var newLength = ReplacePairs(copy);
 
                 sequence = new ulong[newLength];
-                Array.Copy(copy, sequence, newLength);
-                //ArrayPool.Free(copy);
+
+                for (int i = 0; i < newLength; i++)
+                    sequence[i] = copy[i].Element;
             }
 
             return sequence;
@@ -261,21 +229,18 @@ namespace Platform.Data.Core.Sequences
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
         /// </remarks>
-        private int ReplacePairs(ulong[] copy)
+        private int ReplacePairs(HalfPair[] copy)
         {
             var oldLength = copy.Length;
             var newLength = copy.Length;
 
-            while (_maxPair.Source != default(ulong) && _maxPair.Target != default(ulong))
+            while (_maxPairData.Frequency > default(ulong))
             {
                 var maxPairSource = _maxPair.Source;
                 var maxPairTarget = _maxPair.Target;
 
                 if (_maxPairData.Link == Constants.Null)
-                {
                     _maxPairData.Link = _createLink(maxPairSource, maxPairTarget);
-                    _pairsFrequencies[_maxPair] = _maxPairData;
-                }
 
                 var maxPairReplacementLink = _maxPairData.Link;
 
@@ -286,22 +251,22 @@ namespace Platform.Data.Core.Sequences
                 int w = 0, r = 0; // (r == read, w == write)
                 for (; r < oldLength; r++)
                 {
-                    if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                    if (copy[r].Element == maxPairSource && copy[r + 1].Element == maxPairTarget)
                     {
                         if (r > 0)
                         {
-                            var previous = copy[w - 1];
-                            DecrementFrequency(previous, maxPairSource);
-                            IncrementFrequency(previous, maxPairReplacementLink);
+                            var previous = copy[w - 1].Element;
+                            copy[w - 1].PairData.Frequency--;
+                            copy[w - 1].PairData = IncrementFrequency(previous, maxPairReplacementLink);
                         }
                         if (r < oldLengthMinusTwo)
                         {
-                            var next = copy[r + 2];
-                            DecrementFrequency(maxPairTarget, next);
-                            IncrementFrequency(maxPairReplacementLink, next);
+                            var next = copy[r + 2].Element;
+                            copy[r + 1].PairData.Frequency--;
+                            copy[w].PairData = IncrementFrequency(maxPairReplacementLink, next);
                         }
 
-                        copy[w++] = maxPairReplacementLink;
+                        copy[w++].Element = maxPairReplacementLink;
                         r++;
                         newLength--;
                     }
@@ -330,36 +295,29 @@ namespace Platform.Data.Core.Sequences
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(ulong[] sequence, int length)
+        private void UpdateMaxPair(HalfPair[] copy, int length)
         {
-            for (var i = length - 1; i >= 1; i--)
-            {
-                var pair = new Pair(sequence[i - 1], sequence[i]);
-                //var data = _pairsFrequencies[pair];
-                //UpdateMaxPair(ref pair, ref data);
+            var pair = new Pair();
 
-                UpdateMaxPair(ref pair, ref _pairsFrequencies.entries[_pairsFrequencies.FindEntry(ref pair)].value);
+            for (var i = 1; i < length; i++)
+            {
+                pair.Source = copy[i - 1].Element;
+                pair.Target = copy[i].Element;
+
+                UpdateMaxPair(ref pair, copy[i - 1].PairData);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(ref Pair pair, ref Data data)
+        private void UpdateMaxPair(ref Pair pair, Data data)
         {
             var frequency = data.Frequency;
             var maxFrequency = _maxPairData.Frequency;
-            if (frequency > _minFrequencyToCompress)
+
+            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target < _maxPair.Source + _maxPair.Target))
             {
-                if (maxFrequency < frequency)
-                {
-                    _maxPair = pair;
-                    _maxPairData = data;
-                }
-                //else if (maxFrequency == frequency && (_maxPair.Source > pair.Source || (_maxPair.Source == pair.Source && _maxPair.Target > pair.Target))) // Gives worse compression
-                else if (maxFrequency == frequency && pair.Source + pair.Target < _maxPair.Source + _maxPair.Target) // Gives better compression
-                {
-                    _maxPair = pair;
-                    _maxPairData = data;
-                }
+                _maxPair = pair;
+                _maxPairData = data;
             }
         }
     }
