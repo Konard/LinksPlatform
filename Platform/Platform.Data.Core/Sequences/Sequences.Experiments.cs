@@ -501,7 +501,7 @@ namespace Platform.Data.Core.Sequences
         private string FormatSequence(ILinks<LinkIndex> links, LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
         {
             var linksInSequence = new HashSet<ulong>(knownElements);
-            var entered = new HashSet<ulong>();
+            //var entered = new HashSet<ulong>();
 
             var sb = new StringBuilder();
 
@@ -510,30 +510,26 @@ namespace Platform.Data.Core.Sequences
             if (links.Exists(sequenceLink))
             {
                 StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
-                    x => linksInSequence.Contains(x) || links.IsFullPoint(x), entered.AddAndReturnVoid, x => { }, entered.DoNotContains, element =>
-                     {
-                         if (insertComma && sb.Length > 0)
-                             sb.Append(',');
+                    x => linksInSequence.Contains(x) || links.IsPartialPoint(x), element => // entered.AddAndReturnVoid, x => { }, entered.DoNotContains
+                    {
+                        if (insertComma && sb.Length > 1)
+                            sb.Append(',');
 
-                         if (entered.Contains(element))
-                         {
-                             sb.Append('{');
-                             elementToString(sb, element);
-                             sb.Append('}');
-                         }
-                         else
-                             elementToString(sb, element);
+                        //if (entered.Contains(element))
+                        //{
+                        //    sb.Append('{');
+                        //    elementToString(sb, element);
+                        //    sb.Append('}');
+                        //}
+                        //else
+                        elementToString(sb, element);
 
-                         if (sb.Length < MaxSequenceFormatSize)
-                         {
-                             return true;
-                         }
-                         else
-                         {
-                             sb.Append(insertComma ? ", ..." : "...");
-                             return false;
-                         }
-                     });
+                        if (sb.Length < MaxSequenceFormatSize)
+                            return true;
+
+                        sb.Append(insertComma ? ", ..." : "...");
+                        return false;
+                    });
             }
 
             sb.Append('}');
@@ -543,25 +539,46 @@ namespace Platform.Data.Core.Sequences
 
         public ulong CalculateSymbolFrequency(LinkIndex sequenceLink, LinkIndex symbolLink)
         {
-            return Links.SyncRoot.ExecuteReadOperation(() => CalculateSymbolFrequency(Links.Unsync, sequenceLink, symbolLink));
+            return Links.SyncRoot.ExecuteReadOperation(() =>
+            {
+                var links = Links.Unsync;
+                if (!links.Exists(sequenceLink))
+                    return 0UL;
+                if (Options.UseSequenceMarker)
+                    return CalculateSymbolFrequencyForMarkedSequences(links, sequenceLink, symbolLink);
+                return CalculateSymbolFrequency(links, sequenceLink, symbolLink);
+            });
         }
 
         private ulong CalculateSymbolFrequency(ILinks<LinkIndex> links, LinkIndex sequenceLink, LinkIndex symbolLink)
         {
             var total = 0UL;
-            //var entered = new HashSet<ulong>();
-            //, entered.AddAndReturnVoid, x => { }, entered.DoNotContains
 
-            if (links.Exists(sequenceLink))
-            {
-                StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
-                    x => x == symbolLink || links.IsPartialPoint(x), element =>
-                                                 {
-                                                     if (element == symbolLink)
-                                                         total++;
-                                                     return true;
-                                                 });
-            }
+            StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
+                                             x => x == symbolLink || links.IsPartialPoint(x), element =>
+                                             {
+                                                 if (element == symbolLink)
+                                                     total++;
+                                                 return true;
+                                             });
+
+            return total;
+        }
+
+        private ulong CalculateSymbolFrequencyForMarkedSequences(ILinks<LinkIndex> links, LinkIndex sequenceLink, LinkIndex symbolLink)
+        {
+            var total = 0UL;
+
+            if (!IsMarkedSequence(sequenceLink))
+                return total;
+
+            StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
+                                             x => x == symbolLink || links.IsPartialPoint(x), element =>
+                                             {
+                                                 if (element == symbolLink)
+                                                     total++;
+                                                 return true;
+                                             });
 
             return total;
         }
@@ -896,6 +913,82 @@ namespace Platform.Data.Core.Sequences
             {
                 Links.Unsync.Each(link, Constants.Any, handler);
                 Links.Unsync.Each(Constants.Any, link, handler);
+            }
+        }
+
+        public ulong CalculateTotalSymbolFrequency(ulong symbol)
+        {
+            return Sync.ExecuteReadOperation(() => CalculateTotalSymbolFrequencyCore(symbol));
+        }
+
+        public ulong CalculateTotalSymbolFrequencyCore(ulong symbol)
+        {
+            var calculator = new TotalSymbolFrequencyCalculator(this, Links.Unsync, symbol);
+            calculator.Calculate();
+            return calculator.Total;
+        }
+
+        private class TotalSymbolFrequencyCalculator
+        {
+            private readonly Sequences _sequences;
+            private readonly ILinks<ulong> _links;
+            private readonly ulong _symbol;
+            private readonly HashSet<ulong> _visits;
+            public ulong Total;
+
+            public TotalSymbolFrequencyCalculator(Sequences sequences, ILinks<ulong> links, ulong symbol)
+            {
+                _sequences = sequences;
+                _links = links;
+                _symbol = symbol;
+                _visits = new HashSet<ulong>();
+            }
+
+            public void Calculate()
+            {
+                if (Total > 0 || _visits.Count > 0)
+                    throw new InvalidOperationException("Calculation is finished already.");
+
+                if (_sequences.Options.UseSequenceMarker)
+                    CalculateCoreForMarkedSequences(_symbol);
+                else
+                    CalculateCore(_symbol);
+            }
+
+            private void CalculateCore(ulong link)
+            {
+                Func<ulong, bool> handler = pair =>
+                {
+                    if (_visits.Add(pair))
+                        CalculateCore(pair);
+                    return true;
+                };
+
+                if (_links.Count(Constants.Any, link) == 0)
+                    Total += _sequences.CalculateSymbolFrequency(_links, link, _symbol);
+                else
+                {
+                    _links.Each(link, Constants.Any, handler);
+                    _links.Each(Constants.Any, link, handler);
+                }
+            }
+
+            private void CalculateCoreForMarkedSequences(ulong link)
+            {
+                Func<ulong, bool> handler = pair =>
+                {
+                    if (_visits.Add(pair))
+                        CalculateCoreForMarkedSequences(pair);
+                    return true;
+                };
+
+                if (_links.Count(Constants.Any, link) == 0)
+                    Total += _sequences.CalculateSymbolFrequencyForMarkedSequences(_links, link, _symbol);
+                else
+                {
+                    _links.Each(link, Constants.Any, handler);
+                    _links.Each(Constants.Any, link, handler);
+                }
             }
         }
 

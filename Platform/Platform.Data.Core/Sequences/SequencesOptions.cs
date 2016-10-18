@@ -23,8 +23,20 @@ namespace Platform.Data.Core.Sequences
 
         public void InitOptions(ILinks<ulong> links)
         {
-            if (UseSequenceMarker && SequenceMarkerLink == Constants.Null)
-                SequenceMarkerLink = links.CreatePoint();
+            if (UseSequenceMarker)
+            {
+                if (SequenceMarkerLink == Constants.Null)
+                    SequenceMarkerLink = links.CreatePoint();
+                else
+                {
+                    if (!links.Exists(SequenceMarkerLink))
+                    {
+                        var link = links.CreatePoint();
+                        if(link != SequenceMarkerLink)
+                            throw new Exception("Cannot recreate sequence marker link.");
+                    }
+                }
+            }
         }
 
         public void ValidateOptions()

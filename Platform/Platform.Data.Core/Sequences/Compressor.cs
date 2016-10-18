@@ -89,14 +89,9 @@ namespace Platform.Data.Core.Sequences
             _sequences = sequences;
             _createLink = _links.GetOrCreate;
             _createSequence = _sequences.CreateBalancedVariantCore;
-            _countLinkFrequency = link =>
-            {
-                // Looks like a more correct way to calculate usage than _links.Count(Constants.Any, link);
 
-                var usagesSet = _sequences.AllBottomUsages(link);
-                var total = (ulong)usagesSet.Sum(x => (long)_sequences.CalculateSymbolFrequency(x, link));
-                return total; // TODO: Why +1 or -1 happens?
-            };
+            // Looks like a more correct way to calculate usage than _links.Count(Constants.Any, link);
+            _countLinkFrequency = _sequences.CalculateTotalSymbolFrequencyCore; // TODO: Why +1 or -1 happens?
 
             if (minFrequencyToCompress == 0) minFrequencyToCompress = 1;
             _minFrequencyToCompress = minFrequencyToCompress;

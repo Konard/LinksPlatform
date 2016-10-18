@@ -74,12 +74,21 @@ namespace Platform.Data.Core.Sequences
                 _compressor = new Compressor(links.Unsync, this);
         }
 
-        private bool IsSequence(ulong sequence)
+        private bool IsMarkedSequence(ulong sequenceCandidate)
         {
-            if (Options.UseSequenceMarker)
-                return Links.SearchOrDefault(Options.SequenceMarkerLink, sequence) != Constants.Null;
+            var links = Links.Unsync;
+            return links.GetSource(sequenceCandidate) == Options.SequenceMarkerLink || links.SearchOrDefault(Options.SequenceMarkerLink, sequenceCandidate) != Constants.Null;
+        }
 
-            return !Sync.ExecuteReadOperation(() => Links.Unsync.IsPartialPoint(sequence));
+        public bool IsSequence(ulong sequence)
+        {
+            return Sync.ExecuteReadOperation(() =>
+            {
+                if (Options.UseSequenceMarker)
+                    return IsMarkedSequence(sequence);
+
+                return !Links.Unsync.IsPartialPoint(sequence);
+            });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

@@ -37,7 +37,7 @@ namespace Platform.Data.MasterServer
                     UnicodeMap = new UnicodeMap(syncLinks);
                     UnicodeMap.Init();
 
-                    var sequences = new Sequences(syncLinks);
+                    var sequences = new Sequences(syncLinks, new SequencesOptions { UseSequenceMarker = true, SequenceMarkerLink = 65537, UseCompression = true });
 
                     PrintContents(syncLinks, sequences);
 
@@ -239,7 +239,10 @@ namespace Platform.Data.MasterServer
 
                 sender.Send($"{patternMatched.Count} sequences matched pattern.");
                 foreach (var result in patternMatched)
-                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
+                {
+                    var sequenceMarker = sequences.IsSequence(result) ? "[S]" : "[P]";
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, true)} {sequenceMarker}");
+                }
             }
             if (!containsZeroOrMany)
             {
@@ -247,7 +250,10 @@ namespace Platform.Data.MasterServer
 
                 sender.Send($"{fullyMatched.Count} sequences matched fully.");
                 foreach (var result in fullyMatched)
-                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
+                {
+                    var sequenceMarker = sequences.IsSequence(result) ? "[S]" : "[P]";
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, true)} {sequenceMarker}");
+                }
             }
             if (!containsAny && !containsZeroOrMany)
             {
@@ -255,13 +261,20 @@ namespace Platform.Data.MasterServer
 
                 sender.Send($"{partiallyMatched.Count} sequences matched partially.");
                 foreach (var result in partiallyMatched)
-                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
+                {
+                    var sequenceMarker = sequences.IsSequence(result) ? "[S]" : "[P]";
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, true)} {sequenceMarker}");
+                }
+                    
 
                 var allConnections = sequences.GetAllConnections(sequence);
 
                 sender.Send($"{allConnections.Count} sequences connects query elements.");
                 foreach (var result in allConnections)
-                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, false)}");
+                {
+                    var sequenceMarker = sequences.IsSequence(result) ? "[S]" : "[P]";
+                    sender.Send($"\t{result}: {sequences.FormatSequence(result, AppendLinkToString, true)} {sequenceMarker}");
+                }
             }
         }
     }
