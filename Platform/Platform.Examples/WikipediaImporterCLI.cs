@@ -6,9 +6,9 @@ using Platform.Helpers;
 
 namespace Platform.Examples
 {
-    public class WikipediaImporterCLI
+    public class WikipediaImporterCLI : ICommandLineInterface
     {
-        public void Run(string[] args)
+        public void Run(params string[] args)
         {
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(1, "Wikipedia xml file", args);

@@ -4,9 +4,9 @@ using Platform.Helpers;
 
 namespace Platform.Examples
 {
-    public class WikipediaPagesCounterCLI
+    public class WikipediaPagesCounterCLI : ICommandLineInterface
     {
-        public void Run(string[] args)
+        public void Run(params string[] args)
         {
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(0, "Wikipedia xml file", args);
 
