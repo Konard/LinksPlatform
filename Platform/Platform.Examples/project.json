@@ -3,7 +3,9 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",
-    "Platform.Data.Core": "0.1.0-*"
+    "Platform.Tests": "0.1.0-*",
+    "xunit.abstractions": "2.0.1",
+    "xunit.runner.utility": "2.2.0-beta3-build3402"
   },
 
   "frameworks": {

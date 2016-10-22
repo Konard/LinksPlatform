@@ -537,6 +537,55 @@ namespace Platform.Data.Core.Sequences
             return sb.ToString();
         }
 
+        public string SafeFormatSequence(LinkIndex sequenceLink, params LinkIndex[] knownElements)
+        {
+            return SafeFormatSequence(sequenceLink, (sb, x) => sb.Append(x), true, knownElements);
+        }
+
+        public string SafeFormatSequence(LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
+        {
+            return Links.SyncRoot.ExecuteReadOperation(() => SafeFormatSequence(Links.Unsync, sequenceLink, elementToString, insertComma, knownElements));
+        }
+
+        private string SafeFormatSequence(ILinks<LinkIndex> links, LinkIndex sequenceLink, Action<StringBuilder, LinkIndex> elementToString, bool insertComma, params LinkIndex[] knownElements)
+        {
+            var linksInSequence = new HashSet<ulong>(knownElements);
+            var entered = new HashSet<ulong>();
+
+            var sb = new StringBuilder();
+
+            sb.Append('{');
+
+            if (links.Exists(sequenceLink))
+            {
+                StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
+                    x => linksInSequence.Contains(x) || links.IsFullPoint(x), entered.AddAndReturnVoid, x => { }, entered.DoNotContains, element =>
+                    {
+                        if (insertComma && sb.Length > 1)
+                            sb.Append(',');
+
+                        if (entered.Contains(element))
+                        {
+                            sb.Append('{');
+                            elementToString(sb, element);
+                            sb.Append('}');
+                        }
+                        else
+                            elementToString(sb, element);
+
+                        if (sb.Length < MaxSequenceFormatSize)
+                            return true;
+
+                        sb.Append(insertComma ? ", ..." : "...");
+                        return false;
+                    });
+            }
+
+            sb.Append('}');
+
+            return sb.ToString();
+        }
+
         public ulong CalculateSymbolFrequency(LinkIndex sequenceLink, LinkIndex symbolLink)
         {
             return Links.SyncRoot.ExecuteReadOperation(() =>

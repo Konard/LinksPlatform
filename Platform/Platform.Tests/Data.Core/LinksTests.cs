@@ -451,9 +451,9 @@ namespace Platform.Tests.Data.Core
 
                 // TODO: Think how to build balanced syntax tree while formatting structure (eg. "(4:(5:4 6) (6:5 4)") instead of "(4:(5:4 (6:5 4)) 6)"
                 
-                Assert.True(sequences.FormatSequence(cb, DefaultFormatter, false) == "{{5}{5}{4}{6}}");
-                Assert.True(sequences.FormatSequence(ac, DefaultFormatter, false) == "{{5}{6}{6}{4}}");
-                Assert.True(sequences.FormatSequence(ab, DefaultFormatter, false) == "{{4}{5}{4}{6}}");
+                Assert.True(sequences.SafeFormatSequence(cb, DefaultFormatter, false) == "{{5}{5}{4}{6}}");
+                Assert.True(sequences.SafeFormatSequence(ac, DefaultFormatter, false) == "{{5}{6}{6}{4}}");
+                Assert.True(sequences.SafeFormatSequence(ab, DefaultFormatter, false) == "{{4}{5}{4}{6}}");
             }
         }
 
