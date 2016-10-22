@@ -1,22 +1,4 @@
 {
-  "version": "0.1.0-*",
-  "title": "Platform.ConsoleTerminal",
-  "description": "LinksPlatform's Platform.Data.ConsoleTerminal Class Library",
-  "authors": [ "Konstantin Diachenko" ],
-  "copyright": "Konstantin Diachenko",
-
-  "packOptions": {
-    "tags": [ "LinksPlatform", "UDP", "Client", "Terminal", "Console" ],
-    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.ConsoleTerminal",
-    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-    "requireLicenseAcceptance": true,
-    "repository": {
-      "type": "git",
-      "url": "git://github.com/Konard/LinksPlatform"
-    }
-  },
-
   "buildOptions": {
     "emitEntryPoint": true
   },

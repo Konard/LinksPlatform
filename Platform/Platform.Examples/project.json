@@ -1,5 +1,21 @@
 ﻿{
   "version": "0.0.1-*",
+  "title": "Platform.Examples",
+  "description": "LinksPlatform's Platform.Examples Class Library",
+  "authors": [ "Konstantin Diachenko" ],
+  "copyright": "Konstantin Diachenko",
+
+  "packOptions": {
+    "tags": [ "LinksPlatform", "Examples" ],
+    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Tests",
+    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
+    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
+    "requireLicenseAcceptance": true,
+    "repository": {
+      "type": "git",
+      "url": "git://github.com/Konard/LinksPlatform"
+    }
+  },
 
   "dependencies": {
     "NETStandard.Library": "1.6.0",

@@ -1,22 +1,4 @@
 ﻿{
-  "version": "0.1.0-*",
-  "title": "Platform.Data.MasterServer",
-  "description": "LinksPlatform's Platform.Data.MasterServer Class Library",
-  "authors": [ "Konstantin Diachenko" ],
-  "copyright": "Konstantin Diachenko",
-
-  "packOptions": {
-    "tags": [ "LinksPlatform", "UDP", "Server", "Console" ],
-    "projectUrl": "https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.MasterServer",
-    "iconUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png",
-    "licenseUrl": "https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE",
-    "requireLicenseAcceptance": true,
-    "repository": {
-      "type": "git",
-      "url": "git://github.com/Konard/LinksPlatform"
-    }
-  },
-
   "buildOptions": {
     "emitEntryPoint": true
   },
@@ -26,7 +8,7 @@
   },
 
   "frameworks": {
-    "net45": { },
+    "net45": {},
     "netcoreapp1.0": {
       "dependencies": {
         "Microsoft.NETCore.App": {
