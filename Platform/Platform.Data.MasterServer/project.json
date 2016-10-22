@@ -22,7 +22,7 @@
   },
 
   "dependencies": {
-    "Platform.Data.Core": "0.1.0-*"
+    "Platform.Examples": "*"
   },
 
   "frameworks": {

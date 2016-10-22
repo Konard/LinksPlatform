@@ -6,7 +6,7 @@ using Platform.Helpers;
 
 namespace Platform.Examples
 {
-    public class FileIndexerCLI
+    public class FileIndexerCLI : ICommandLineInterface
     {
         public void Run(string[] args)
         {

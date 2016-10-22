@@ -5,9 +5,9 @@ using Platform.Helpers;
 
 namespace Platform.Examples
 {
-    public class CSVExporterCLI
+    public class CSVExporterCLI : ICommandLineInterface
     {
-        public void Run(string[] args)
+        public void Run(params string[] args)
         {
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var exportTo = ConsoleHelpers.GetOrReadArgument(1, "Export to", args);
