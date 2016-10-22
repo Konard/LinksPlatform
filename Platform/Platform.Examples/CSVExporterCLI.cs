@@ -3,7 +3,7 @@ using System.IO;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     public class CSVExporterCLI
     {

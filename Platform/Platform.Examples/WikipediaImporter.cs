@@ -1,12 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Platform.Helpers;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     /// <remarks>
     /// TODO: Can be renamed to XMLImporter

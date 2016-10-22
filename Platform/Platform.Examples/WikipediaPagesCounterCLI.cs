@@ -2,7 +2,7 @@
 using System.IO;
 using Platform.Helpers;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     public class WikipediaPagesCounterCLI
     {

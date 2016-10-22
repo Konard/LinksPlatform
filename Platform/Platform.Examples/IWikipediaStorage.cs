@@ -1,4 +1,4 @@
-﻿namespace Platform.Sandbox
+﻿namespace Platform.Examples
 {
     public interface IWikipediaStorage<TLink>
     {

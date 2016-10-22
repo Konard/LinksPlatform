@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using Platform.Examples;
 
 namespace Platform.Sandbox
 {

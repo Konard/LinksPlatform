@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Platform.Helpers;
+using System.Linq;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     public class WikipediaPagesCounter
     {

@@ -2,7 +2,7 @@
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     public class WikipediaLinksStorage : IWikipediaStorage<ulong>
     {

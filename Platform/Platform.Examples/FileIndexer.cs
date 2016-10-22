@@ -7,7 +7,7 @@ using Platform.Data.Core.Pairs;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers.Collections;
 
-namespace Platform.Sandbox
+namespace Platform.Examples
 {
     public class FileIndexer
     {
