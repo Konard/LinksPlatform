@@ -6,6 +6,10 @@
 
 Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
 
+Сравнение моделей данных:
+
+![Comparison of models](https://github.com/Konard/LinksPlatform/raw/master/doc/relational_model_vs_associative_model_vs_links.png)
+
 Эта платформа использует объединённый тип данных - связь, который является комбинацией Элемента и Связи из оригинальной работы Симона Вильямса. Таким образом Элемент или Точка являются частным случаем связи, которая ссылается сама на себя.
 
 Также существует как минимум два варианта структуры Связи:
