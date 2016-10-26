@@ -6,6 +6,10 @@
 
 Inspired by work of Simon Williams ([The Associative Model of Data](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf), [whitepaper](http://iacis.org/iis/2009/P2009_1301.pdf).
 
+Comparison of models:
+
+![Comparison of models](https://github.com/Konard/LinksPlatform/raw/master/doc/relational_model_vs_associative_model_vs_links.png)
+
 This platform uses unified data type - link, which is a combination of Item and Link from a work by Simon Williams. So the Item or [Point](https://en.wikipedia.org/wiki/Point) is a specific case of link, which references itself.
 
 There also at least two variants of Link structure:
