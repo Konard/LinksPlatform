@@ -9,7 +9,9 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            new TestsRunnerCLI().Run(args);
+            new Zadacha().RunAll();
+
+            //new TestsRunnerCLI().Run(args);
 
             //new CSVExporterCLI().Run(args);
             //new FileIndexerCLI().Run(args);
