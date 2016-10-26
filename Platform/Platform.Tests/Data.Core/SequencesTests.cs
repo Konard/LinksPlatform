@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Platform.Data.Core.Collections;
@@ -509,6 +510,107 @@ namespace Platform.Tests.Data.Core
                 Debug.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
 
                 Assert.True(scope1.Links.Count() < scope2.Links.Count());
+
+                compressor1.ValidateFrequencies();
+            }
+        }
+
+        [Fact]
+        public static void CompressionStabilityTest()
+        {
+            // TODO: Fix bug
+            //const ulong minNumbers = 0;
+            //const ulong maxNumbers = 1000;
+
+            // TODO: Stability issue found at 10001
+            const ulong minNumbers = 10000;
+            const ulong maxNumbers = 20000;
+
+            var strings = new List<string>();
+
+            for (ulong i = minNumbers; i < maxNumbers; i++)
+                strings.Add(i.ToString());
+            
+            var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
+            var totalCharacters = arrays.Select(x => x.Length).Sum();
+
+            using (var scope1 = new TempLinksTestScope(useSequences: true))
+            using (var scope2 = new TempLinksTestScope(useSequences: true))
+            {
+                scope1.Links.UseUnicode();
+                scope2.Links.UseUnicode();
+
+                var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
+                var compressor2 = scope2.Sequences;
+
+                var compressed1 = new ulong[arrays.Length];
+                var compressed2 = new ulong[arrays.Length];
+
+                var sw1 = Stopwatch.StartNew();
+
+                var START = 0;
+                var END = arrays.Length;
+
+                for (int i = START; i < END; i++)
+                {
+                    var first = compressor1.Compress(arrays[i]);
+                    var second = compressor1.Compress(arrays[i]);
+
+                    if (first == second)
+                        compressed1[i] = first;
+                    else
+                    {
+                        // TODO: Find a solution for this case
+                    }
+                }
+
+                var elapsed1 = sw1.Elapsed;
+
+                var sw2 = Stopwatch.StartNew();
+
+                for (int i = START; i < END; i++)
+                {
+                    var first = compressor2.CreateBalancedVariantCore(arrays[i]);
+                    var second = compressor2.CreateBalancedVariantCore(arrays[i]);
+
+                    if (first == second)
+                        compressed2[i] = first;
+                }
+
+                var elapsed2 = sw2.Elapsed;
+
+                Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
+
+                Assert.True(elapsed1 > elapsed2);
+
+                // Checks
+                for (int i = START; i < END; i++)
+                {
+                    var sequence1 = compressed1[i];
+                    var sequence2 = compressed2[i];
+
+                    if (sequence1 != Constants.Null && sequence2 != Constants.Null)
+                    {
+                        var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
+
+                        var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
+
+                        var structure1 = scope1.Links.FormatStructure(sequence1, link => link.IsPartialPoint());
+                        var structure2 = scope2.Links.FormatStructure(sequence2, link => link.IsPartialPoint());
+
+                        if (sequence1 != Constants.Null && sequence2 != Constants.Null && arrays[i].Length > 3)
+                            Assert.False(structure1 == structure2);
+
+                        Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
+                    }
+                }
+
+                Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+                Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+
+                Debug.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
+
+                Assert.True(scope1.Links.Count() <= scope2.Links.Count());
 
                 compressor1.ValidateFrequencies();
             }
