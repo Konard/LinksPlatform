@@ -38,6 +38,11 @@ namespace Platform.Data.Core.Sequences
                 Element = element;
                 PairData = pairData;
             }
+
+            public override string ToString()
+            {
+                return $"{Element}: ({PairData})";
+            }
         }
 
         private struct Pair
@@ -49,6 +54,11 @@ namespace Platform.Data.Core.Sequences
             {
                 Source = source;
                 Target = target;
+            }
+
+            public override string ToString()
+            {
+                return $"{Source}->{Target}";
             }
         }
 
@@ -65,6 +75,11 @@ namespace Platform.Data.Core.Sequences
 
             public Data()
             {
+            }
+
+            public override string ToString()
+            {
+                return $"F: {Frequency}, L: {Link}";
             }
         }
 
@@ -309,7 +324,8 @@ namespace Platform.Data.Core.Sequences
             var frequency = data.Frequency;
             var maxFrequency = _maxPairData.Frequency;
 
-            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target < _maxPair.Source + _maxPair.Target))
+            //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target < /* gives better compression string data (and gives collisions quickly) */ _maxPair.Source + _maxPair.Target)) 
+            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target > /* gives better stability and better compression on sequent data (but gives collisions anyway) */ _maxPair.Source + _maxPair.Target)) 
             {
                 _maxPair = pair;
                 _maxPairData = data;

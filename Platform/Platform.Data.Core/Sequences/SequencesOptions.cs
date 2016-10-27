@@ -15,7 +15,8 @@ namespace Platform.Data.Core.Sequences
         public bool UseSequenceMarker;
         public bool UseCompression;
         public bool UseGarbageCollection;
-        public bool EnforceSingleSequenceVersionOnWrite;
+        public bool EnforceSingleSequenceVersionOnWriteBasedOnExisting;
+        public bool EnforceSingleSequenceVersionOnWriteBasedOnNew;
         // TODO: Реализовать компактификацию при чтении
         //public bool EnforceSingleSequenceVersionOnRead; 
         //public bool UseRequestMarker;

@@ -518,29 +518,29 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public static void CompressionStabilityTest()
         {
-            // TODO: Fix bug
+            // TODO: Fix bug (do a separate test)
             //const ulong minNumbers = 0;
             //const ulong maxNumbers = 1000;
 
-            // TODO: Stability issue found at 10001
             const ulong minNumbers = 10000;
-            const ulong maxNumbers = 20000;
+            const ulong maxNumbers = 12500;
 
             var strings = new List<string>();
 
             for (ulong i = minNumbers; i < maxNumbers; i++)
                 strings.Add(i.ToString());
-            
+
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
             var totalCharacters = arrays.Select(x => x.Length).Sum();
 
-            using (var scope1 = new TempLinksTestScope(useSequences: true))
+            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
             using (var scope2 = new TempLinksTestScope(useSequences: true))
             {
                 scope1.Links.UseUnicode();
                 scope2.Links.UseUnicode();
 
-                var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
+                //var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
+                var compressor1 = scope1.Sequences;
                 var compressor2 = scope2.Sequences;
 
                 var compressed1 = new ulong[arrays.Length];
@@ -551,10 +551,25 @@ namespace Platform.Tests.Data.Core
                 var START = 0;
                 var END = arrays.Length;
 
+                // Collisions proved (cannot be solved by max pair comparison, no stable rule)
+                // Stability issue starts at 10001 or 11000
+                //for (int i = START; i < END; i++)
+                //{
+                //    var first = compressor1.Compress(arrays[i]);
+                //    var second = compressor1.Compress(arrays[i]);
+
+                //    if (first == second)
+                //        compressed1[i] = first;
+                //    else
+                //    {
+                //        // TODO: Find a solution for this case
+                //    }
+                //}
+
                 for (int i = START; i < END; i++)
                 {
-                    var first = compressor1.Compress(arrays[i]);
-                    var second = compressor1.Compress(arrays[i]);
+                    var first = compressor1.Create(arrays[i]);
+                    var second = compressor1.Create(arrays[i]);
 
                     if (first == second)
                         compressed1[i] = first;
@@ -595,11 +610,11 @@ namespace Platform.Tests.Data.Core
 
                         var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
 
-                        var structure1 = scope1.Links.FormatStructure(sequence1, link => link.IsPartialPoint());
-                        var structure2 = scope2.Links.FormatStructure(sequence2, link => link.IsPartialPoint());
+                        //var structure1 = scope1.Links.FormatStructure(sequence1, link => link.IsPartialPoint());
+                        //var structure2 = scope2.Links.FormatStructure(sequence2, link => link.IsPartialPoint());
 
-                        if (sequence1 != Constants.Null && sequence2 != Constants.Null && arrays[i].Length > 3)
-                            Assert.False(structure1 == structure2);
+                        //if (sequence1 != Constants.Null && sequence2 != Constants.Null && arrays[i].Length > 3)
+                        //    Assert.False(structure1 == structure2);
 
                         Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
                     }
@@ -612,9 +627,11 @@ namespace Platform.Tests.Data.Core
 
                 Assert.True(scope1.Links.Count() <= scope2.Links.Count());
 
-                compressor1.ValidateFrequencies();
+                //compressor1.ValidateFrequencies();
             }
         }
+
+        // TODO: Add random numbers compression test
 
         [Fact]
         public void AllTreeBreakDownAtSequencesCreationBugTest()

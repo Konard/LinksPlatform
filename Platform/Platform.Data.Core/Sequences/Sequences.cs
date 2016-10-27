@@ -186,15 +186,24 @@ namespace Platform.Data.Core.Sequences
             if (Options.UseIndex)
                 Index(sequence);
 
-            if (Options.EnforceSingleSequenceVersionOnWrite)
+            var sequenceRoot = default(ulong);
+
+            if (Options.EnforceSingleSequenceVersionOnWriteBasedOnExisting)
+            {
+                var matches = Each(sequence);
+                if (matches.Count > 0)
+                    sequenceRoot = matches[0];
+            }
+            else if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew)
                 return CompactCore(sequence);
 
-            ulong sequenceRoot;
-
-            if (Options.UseCompression)
-                sequenceRoot = _compressor.Compress(sequence);
-            else
-                sequenceRoot = CreateBalancedVariantCore(sequence);
+            if (sequenceRoot == default(ulong))
+            {
+                if (Options.UseCompression)
+                    sequenceRoot = _compressor.Compress(sequence);
+                else
+                    sequenceRoot = CreateBalancedVariantCore(sequence);
+            }
 
             if (Options.UseSequenceMarker)
                 Links.Unsync.CreateAndUpdate(Options.SequenceMarkerLink, sequenceRoot);
@@ -473,7 +482,7 @@ namespace Platform.Data.Core.Sequences
         private ulong UpdateCore(ulong[] sequence, ulong[] newSequence)
         {
             ulong bestVariant;
-            if (Options.EnforceSingleSequenceVersionOnWrite && !sequence.EqualTo(newSequence))
+            if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew && !sequence.EqualTo(newSequence))
                 bestVariant = CompactCore(newSequence);
             else
                 bestVariant = CreateCore(newSequence);
