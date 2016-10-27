@@ -325,7 +325,7 @@ namespace Platform.Data.Core.Sequences
             var maxFrequency = _maxPairData.Frequency;
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target < /* gives better compression string data (and gives collisions quickly) */ _maxPair.Source + _maxPair.Target)) 
-            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target > /* gives better stability and better compression on sequent data (but gives collisions anyway) */ _maxPair.Source + _maxPair.Target)) 
+            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target > /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */ _maxPair.Source + _maxPair.Target)) 
             {
                 _maxPair = pair;
                 _maxPairData = data;

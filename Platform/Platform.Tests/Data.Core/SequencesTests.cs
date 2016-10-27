@@ -631,7 +631,89 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        // TODO: Add random numbers compression test
+        [Fact]
+        public static void RundomNumbersCompressionQualityTest()
+        {
+            const ulong N = 500;
+
+            //const ulong minNumbers = 10000;
+            //const ulong maxNumbers = 20000;
+
+            //var strings = new List<string>();
+
+            //for (ulong i = 0; i < N; i++)
+            //    strings.Add(RandomHelpers.DefaultFactory.NextUInt64(minNumbers, maxNumbers).ToString());
+
+            var strings = new List<string>();
+
+            for (ulong i = 0; i < N; i++)
+                strings.Add(RandomHelpers.DefaultFactory.NextUInt64().ToString());
+
+            strings = strings.Distinct().ToList();
+
+            var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
+            var totalCharacters = arrays.Select(x => x.Length).Sum();
+
+            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
+            using (var scope2 = new TempLinksTestScope(useSequences: true))
+            {
+                scope1.Links.UseUnicode();
+                scope2.Links.UseUnicode();
+
+                var compressor1 = scope1.Sequences;
+                var compressor2 = scope2.Sequences;
+
+                var compressed1 = new ulong[arrays.Length];
+                var compressed2 = new ulong[arrays.Length];
+
+                var sw1 = Stopwatch.StartNew();
+
+                var START = 0;
+                var END = arrays.Length;
+
+                for (int i = START; i < END; i++)
+                    compressed1[i] = compressor1.Create(arrays[i]);
+
+                var elapsed1 = sw1.Elapsed;
+
+                var sw2 = Stopwatch.StartNew();
+
+                for (int i = START; i < END; i++)
+                    compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
+
+                var elapsed2 = sw2.Elapsed;
+
+                Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
+
+                Assert.True(elapsed1 > elapsed2);
+
+                // Checks
+                for (int i = START; i < END; i++)
+                {
+                    var sequence1 = compressed1[i];
+                    var sequence2 = compressed2[i];
+
+                    if (sequence1 != Constants.Null && sequence2 != Constants.Null)
+                    {
+                        var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
+
+                        var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
+
+                        Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
+                    }
+                }
+
+                Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+                Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+
+                Debug.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
+
+                // Can be worse than balanced variant
+                //Assert.True(scope1.Links.Count() <= scope2.Links.Count());
+
+                //compressor1.ValidateFrequencies();
+            }
+        }
 
         [Fact]
         public void AllTreeBreakDownAtSequencesCreationBugTest()

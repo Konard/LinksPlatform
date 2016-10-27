@@ -10,7 +10,7 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            SequencesTests.CompressionEfficiencyTest();
+            SequencesTests.RundomNumbersCompressionQualityTest();
 
             //new Zadacha().RunAll();
 
