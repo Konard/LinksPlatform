@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Text;
@@ -801,22 +802,18 @@ namespace Platform.Tests.Data.Core
             using (var scope = new TempLinksTestScope())
             {
                 var links = scope.Links;
-                ulong counter = 0;
+
+                var counter = new Counter<IList<ulong>, ulong>(links.Constants.Continue);
 
                 ConsoleHelpers.Debug("Testing Each function.");
 
                 var sw = Stopwatch.StartNew();
 
-                links.Each(x =>
-                {
-                    counter++;
-
-                    return true;
-                });
+                links.Each(counter.IncrementAndReturnTrue);
 
                 var elapsedTime = sw.Elapsed;
 
-                var linksPerSecond = counter / elapsedTime.TotalSeconds;
+                var linksPerSecond = counter.Count / elapsedTime.TotalSeconds;
 
                 ConsoleHelpers.Debug("{0} Iterations of Each's handler function done in {1} ({2} links per second)",
                     counter, elapsedTime, (long)linksPerSecond);

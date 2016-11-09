@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
 
 namespace Platform.Data.Core.Pairs
@@ -11,7 +12,7 @@ namespace Platform.Data.Core.Pairs
     /// </remarks>
     public class SynchronizedLinks<T> : ISynchronizedLinks<T>
     {
-        public ILinksCombinedConstants<bool, T, int> Constants { get; }
+        public ILinksCombinedConstants<T, T, int> Constants { get; }
         public ISynchronization SyncRoot { get; }
         public ILinks<T> Sync { get; }
         public ILinks<T> Unsync { get; }
@@ -29,10 +30,18 @@ namespace Platform.Data.Core.Pairs
             Constants = links.Constants;
         }
 
-        public T Count(params T[] restrictions) => SyncRoot.ExecuteReadOperation(restrictions, Unsync.Count);
-        public bool Each(Func<IList<T>, bool> handler, IList<T> restrictions) => SyncRoot.ExecuteReadOperation(handler, restrictions, Unsync.Each);
+        public T Count(params T[] restriction) => SyncRoot.ExecuteReadOperation(restriction, Unsync.Count);
+        public T Each(Func<IList<T>, T> handler, IList<T> restrictions) => SyncRoot.ExecuteReadOperation(handler, restrictions, (handler1, restrictions1) => Unsync.Each(handler1, restrictions1));
         public T Create() => SyncRoot.ExecuteWriteOperation(Unsync.Create);
         public T Update(IList<T> restrictions) => SyncRoot.ExecuteWriteOperation(restrictions, Unsync.Update);
         public void Delete(T link) => SyncRoot.ExecuteWriteOperation(link, Unsync.Delete);
+
+        //public T Trigger(IList<T> restriction, Func<IList<T>, IList<T>, T> matchedHandler, IList<T> substitution, Func<IList<T>, IList<T>, T> substitutedHandler)
+        //{
+        //    if (restriction != null && substitution != null && !substitution.EqualTo(restriction))
+        //        return SyncRoot.ExecuteWriteOperation(restriction, matchedHandler, substitution, substitutedHandler, Unsync.Trigger);
+
+        //    return SyncRoot.ExecuteReadOperation(restriction, matchedHandler, substitution, substitutedHandler, Unsync.Trigger);
+        //}
     }
 }

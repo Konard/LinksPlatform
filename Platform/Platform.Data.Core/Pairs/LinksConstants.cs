@@ -11,6 +11,8 @@ namespace Platform.Data.Core.Pairs
         /// <summary>Возвращает булевское значение, обозначающее остановку прохода по связям.</summary>
         /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
         TDecision Break { get; }
+
+        TDecision Skip { get; }
     }
 
     /// <remarks>
@@ -31,6 +33,8 @@ namespace Platform.Data.Core.Pairs
         /// <summary>Возвращает булевское значение, обозначающее остановку прохода по связям.</summary>
         /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
         public TDecision Break { get; } = (Integer<TDecision>)0; // The same as Null
+
+        public TDecision Skip { get; } = (Integer<TDecision>) 1; // TODO: Подумать над корректной константой
     }
 
     public interface ILinksAddressConstants<TAddress>

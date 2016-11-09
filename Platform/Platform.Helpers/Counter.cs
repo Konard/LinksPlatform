@@ -11,7 +11,10 @@ namespace Platform.Helpers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Increment() => Count++;
+    }
 
+    public class Counter<TValue> : Counter
+    {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool IncrementAndReturnTrue()
         {
@@ -20,10 +23,34 @@ namespace Platform.Helpers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool IncrementAndReturnTrue(ulong value)
+        public bool IncrementAndReturnTrue(TValue value)
         {
             Count++;
             return true;
+        }
+    }
+
+    public class Counter<TValue, TDecision> : Counter
+    {
+        private readonly TDecision _trueValue;
+
+        public Counter(TDecision trueValue = default(TDecision))
+        {
+            _trueValue = trueValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TDecision IncrementAndReturnTrue()
+        {
+            Count++;
+            return _trueValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TDecision IncrementAndReturnTrue(TValue value)
+        {
+            Count++;
+            return _trueValue;
         }
     }
 }

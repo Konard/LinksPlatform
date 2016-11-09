@@ -8,16 +8,16 @@ namespace Platform.Data.Core.Pairs
     {
         public LinksInnerReferenceValidator(ILinks<T> links) : base(links) {}
 
-        public override bool Each(Func<IList<T>, bool> handler, IList<T> restrictions)
+        public override T Each(Func<IList<T>, T> handler, IList<T> restrictions)
         {
             Links.EnsureInnerReferenceExists(restrictions, nameof(restrictions));
             return base.Each(handler, restrictions);
         }
 
-        public override T Count(params T[] restrictions)
+        public override T Count(params T[] restriction)
         {
-            Links.EnsureInnerReferenceExists(restrictions, nameof(restrictions));
-            return base.Count(restrictions);
+            Links.EnsureInnerReferenceExists(restriction, nameof(restriction));
+            return base.Count(restriction);
         }
 
         public override T Update(IList<T> restrictions)

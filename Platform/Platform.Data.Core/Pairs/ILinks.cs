@@ -14,7 +14,7 @@ namespace Platform.Data.Core.Pairs
         /// Возвращает набор констант, который необходим для эффективной коммуникации с методами этого интерфейса.
         /// Эти константы не меняются с момента создания точки доступа к хранилищу.
         /// </summary>
-        ILinksCombinedConstants<bool, TLink, int> Constants { get; }
+        ILinksCombinedConstants<TLink, TLink, int> Constants { get; }
 
         #endregion
 
@@ -23,9 +23,9 @@ namespace Platform.Data.Core.Pairs
         /// <summary>
         /// Подсчитывает и возвращает общее число связей находящихся в хранилище, соответствующих указанным ограничениям.
         /// </summary>
-        /// <param name="restrictions">Ограничения на содержимое связей.</param>
+        /// <param name="restriction">Ограничения на содержимое связей.</param>
         /// <returns>Общее число связей находящихся в хранилище, соответствующих указанным ограничениям.</returns>
-        TLink Count(params TLink[] restrictions);
+        TLink Count(params TLink[] restriction);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
@@ -33,7 +33,7 @@ namespace Platform.Data.Core.Pairs
         /// <param name="handler">Обработчик каждой подходящей связи.</param>
         /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
-        bool Each(Func<IList<TLink>, bool> handler, IList<TLink> restrictions);
+        TLink Each(Func<IList<TLink>, TLink> handler, IList<TLink> restrictions);
 
         #endregion
 
@@ -45,11 +45,13 @@ namespace Platform.Data.Core.Pairs
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
         TLink Create(); // TODO: Возможно всегда нужно принимать restrictions, возможно и возвращать связь нужно целиком.
 
+        // 10001
+
         /// <summary>
         /// Обновляет связь с указанными началом (Source) и концом (Target)
         /// на связь с указанными началом (NewSource) и концом (NewTarget).
         /// </summary>
-        /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Itself - требование установить ссылку на себя, 1..∞ конкретный адрес другой связи.</param>
+        /// <param name="restriction">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Itself - требование установить ссылку на себя, 1..∞ конкретный адрес другой связи.</param>
         /// <returns>Индекс обновлённой связи.</returns>
         TLink Update(IList<TLink> restrictions); // TODO: Возможно и возвращать связь нужно целиком.
 

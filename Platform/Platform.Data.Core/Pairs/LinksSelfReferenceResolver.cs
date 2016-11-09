@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Pairs
     {
         public LinksSelfReferenceResolver(ILinks<T> links) : base(links) { }
 
-        public override bool Each(Func<IList<T>, bool> handler, IList<T> restrictions)
+        public override T Each(Func<IList<T>, T> handler, IList<T> restrictions)
         {
             if (!Equals(Constants.Any, Constants.Itself) && (Equals(restrictions[Constants.SourcePart], Constants.Itself) || Equals(restrictions[Constants.TargetPart], Constants.Itself)))
                 return Constants.Continue;

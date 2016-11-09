@@ -32,7 +32,7 @@ namespace Platform.Data.Core.Pairs
     {
         private readonly ILinksMemoryManager<ulong> _memoryManager;
 
-        public ILinksCombinedConstants<bool, ulong, int> Constants { get; } = Default<LinksConstants<bool, ulong, int>>.Instance;
+        public ILinksCombinedConstants<ulong, ulong, int> Constants { get; } = Default<LinksConstants<ulong, ulong, int>>.Instance;
 
         #region Links Logic
 
@@ -54,12 +54,12 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public unsafe UInt64Link GetLinkStruct(ulong link) => *((UInt64LinksMemoryManager)_memoryManager).GetLinkStruct(link);
 
-        public ulong Count(params ulong[] restrictions) => _memoryManager.Count(restrictions);
+        public ulong Count(params ulong[] restriction) => _memoryManager.Count(restriction);
 
-        public bool Each(Func<IList<ulong>, bool> handler, IList<ulong> restrictions)
+        public ulong Each(Func<IList<ulong>, ulong> handler, IList<ulong> restrictions)
         {
             this.EnsureLinkIsAnyOrExists(restrictions);
-            return _memoryManager.Each(link => handler(GetLinkStruct(link)), restrictions);
+            return _memoryManager.Each(link => handler(GetLinkStruct(link)) == Constants.Continue, restrictions) ? Constants.Continue : Constants.Break;
         }
 
         public ulong Create()
@@ -144,6 +144,11 @@ namespace Platform.Data.Core.Pairs
             _memoryManager.FreeLink(link);
 
             CommitDeletion(before);
+        }
+
+        public ulong Trigger(IList<ulong> restriction, Func<IList<ulong>, IList<ulong>, ulong> matchedHandler, IList<ulong> substitution, Func<IList<ulong>, IList<ulong>, ulong> substitutedHandler)
+        {
+            throw new NotImplementedException();
         }
 
         #endregion

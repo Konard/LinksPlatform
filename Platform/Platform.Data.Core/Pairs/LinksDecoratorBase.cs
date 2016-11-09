@@ -5,7 +5,7 @@ namespace Platform.Data.Core.Pairs
 {
     public abstract class LinksDecoratorBase<T> : ILinks<T>
     {
-        public ILinksCombinedConstants<bool, T, int> Constants { get; }
+        public ILinksCombinedConstants<T, T, int> Constants { get; }
 
         public readonly ILinks<T> Links;
 
@@ -15,14 +15,16 @@ namespace Platform.Data.Core.Pairs
             Constants = links.Constants;
         }
 
-        public virtual T Count(params T[] restrictions) => Links.Count(restrictions);
+        public virtual T Count(params T[] restriction) => Links.Count(restriction);
 
-        public virtual bool Each(Func<IList<T>, bool> handler, IList<T> restrictions) => Links.Each(handler, restrictions);
+        public virtual T Each(Func<IList<T>, T> handler, IList<T> restrictions) => Links.Each(handler, restrictions);
 
         public virtual T Create() => Links.Create();
 
         public virtual T Update(IList<T> restrictions) => Links.Update(restrictions);
 
         public virtual void Delete(T link) => Links.Delete(link);
+
+        //public T Trigger(IList<T> restriction, Func<IList<T>, IList<T>, T> matchedHandler, IList<T> substitution, Func<IList<T>, IList<T>, T> substitutedHandler) => Links.Trigger(restriction, matchedHandler, substitution, substitutedHandler);
     }
 }

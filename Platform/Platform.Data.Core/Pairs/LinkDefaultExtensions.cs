@@ -1,4 +1,6 @@
-﻿namespace Platform.Data.Core.Pairs
+﻿using Platform.Data.Core.Common;
+
+namespace Platform.Data.Core.Pairs
 {
     public static class LinkDefaultExtensions
     {

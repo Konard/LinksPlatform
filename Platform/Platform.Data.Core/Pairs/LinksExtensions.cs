@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
@@ -354,7 +355,7 @@ namespace Platform.Data.Core.Pairs
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<TLink> GetLink<TLink>(this ILinks<TLink> links, TLink link)
         {
-            var linkPartsSetter = new Setter<IList<TLink>>();
+            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue,  links.Constants.Break);
             links.Each(linkPartsSetter.SetAndReturnTrue, link);
             return linkPartsSetter.Result;
         }
@@ -371,7 +372,7 @@ namespace Platform.Data.Core.Pairs
         public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<TLink, bool> handler)
         {
             var constants = links.Constants;
-            return links.Each(link => handler(link[constants.IndexPart]), constants.Any, source, target);
+            return links.Each(link => handler(link[constants.IndexPart]) ? (TLink)constants.Continue : (TLink)constants.Break, constants.Any, source, target);
         }
 
         /// <summary>
@@ -383,7 +384,7 @@ namespace Platform.Data.Core.Pairs
         /// <param name="handler">Обработчик каждой подходящей связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, bool> handler)
+        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler)
         {
             return links.Each(handler, links.Constants.Any, source, target);
         }
@@ -396,9 +397,9 @@ namespace Platform.Data.Core.Pairs
         /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, bool> handler, params TLink[] restrictions)
+        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
         {
-            return links.Each(handler, restrictions);
+            return !Equals(links.Each(handler, restrictions), links.Constants.Break);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -409,7 +410,7 @@ namespace Platform.Data.Core.Pairs
             links.Each(link =>
                        {
                            list.Add(link[constants.IndexPart]);
-                           return true;
+                           return constants.Continue;
                        }, restrictions);
             return list;
         }

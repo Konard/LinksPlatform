@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core
+namespace Platform.Data.Core.Common
 {
     public static class Point<TLink>
     {
