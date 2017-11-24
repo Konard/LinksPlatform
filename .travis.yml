@@ -7,5 +7,6 @@ before_script:
   - cd Platform
   - dotnet restore
 script:  
-  - cd Platform\Platform.Tests
+  - cd Platform
+  - cd Platform.Tests
   - dotnet test 
