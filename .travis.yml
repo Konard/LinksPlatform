@@ -1,4 +1,11 @@
-language: csharp
-solution: Platform/Platform.sln
-mono:
-  - latest
+language: csharp  
+sudo: required  
+dist: trusty  
+mono: none
+dotnet: 2.0.0-preview2-006497
+before_script:
+  - cd Platform
+  - dotnet restore
+script:  
+  - cd Platform\Platform.Tests
+  - dotnet test 
