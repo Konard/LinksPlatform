@@ -2,11 +2,10 @@ language: csharp
 sudo: required  
 dist: trusty  
 mono: none
-dotnet: 2.0.3
+dotnet: 1.1.5
 before_script:
   - cd Platform
   - dotnet restore Platform.dotnet.sln
 script:
-  - cd Platform
   - cd Platform.Tests
   - dotnet test 
