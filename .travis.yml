@@ -5,8 +5,8 @@ mono: none
 dotnet: 2.0.3
 before_script:
   - cd Platform
-  - dotnet restore
-script:  
+  - dotnet restore Platform.dotnet.sln
+script:
   - cd Platform
   - cd Platform.Tests
   - dotnet test 
