@@ -10,6 +10,18 @@ env:
 before_script:
   - cd Platform
   - rm Platform.sln
+  - rm -r Platform.Data.ConsoleTerminal
+  - rm -r Platform.Data.IdClient
+  - rm -r Platform.Data.IdServer
+  - rm -r Platform.Data.Kernel.Tests
+  - rm -r Platform.Data.Kernel
+  - rm -r Platform.Data.MasterServer
+  - rm -r Platform.Data.SlaveServer
+  - rm -r Platform.Data.WebTerminal
+  - rm -r Platform.Examples
+  - rm -r Platform.Sandbox
+  - rm -r Platform.Tests.Runner
+  - rm -r Platform.WindowsAPI
   - dotnet migrate
   - dotnet restore
   - dotnet build
