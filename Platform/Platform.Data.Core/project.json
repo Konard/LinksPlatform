@@ -27,7 +27,6 @@
   },
 
   "frameworks": {
-    "net45": { },
     "netstandard1.5": { }
   }
 }
