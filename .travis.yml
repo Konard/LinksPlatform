@@ -9,6 +9,7 @@ env:
     - DOTNET_CLI_TELEMETRY_OPTOUT: 1
 before_script:
   - cd Platform/Platform.Tests
-  - dotnet restore project.json
+  - rm *.xproj
+  - dotnet restore
 script:
   - dotnet test 
