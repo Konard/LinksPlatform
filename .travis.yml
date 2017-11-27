@@ -10,7 +10,6 @@ env:
 before_script:
   - cd Platform
   - rm *.sln
-  - rm */*.xproj
   - dotnet restore
 script:
   - cd Platform.Tests
