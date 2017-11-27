@@ -22,7 +22,6 @@
   },
 
   "frameworks": {
-    "net45": { },
     "netstandard1.5": {
       "dependencies": {
         "System.Threading.Thread": "4.0.0"
