@@ -12,6 +12,7 @@ before_script:
   - rm Platform.sln
   - dotnet migrate
   - dotnet restore
+  - dotnet build
 script:
   - cd Platform.Tests
   - dotnet test 
