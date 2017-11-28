@@ -16,10 +16,9 @@ before_script:
   - rm -r Platform.Data.WebTerminal
   - rm -r Platform.Examples
   - rm -r Platform.Sandbox
-  - rm -r Platform.Tests.Runner
   - rm -r Platform.WindowsAPI
   - dotnet migrate
   - dotnet restore
   - dotnet build
 script:
-  - dotnet test Platform.Tests\Platform.Tests.csproj
+  - dotnet test Platform.Tests.Runner\Platform.Tests.Runner.csproj
