@@ -26,5 +26,4 @@ before_script:
   - dotnet restore
   - dotnet build
 script:
-  - cd Platform.Tests
-  - dotnet test 
+  - dotnet test Platform.Tests\Platform.Tests.csproj
