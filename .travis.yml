@@ -22,4 +22,4 @@ before_script:
   - dotnet build
 script:
   - cd Platform.Tests.Runner
-  - dotnet run 
+  - dotnet xunit
