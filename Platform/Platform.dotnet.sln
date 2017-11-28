@@ -13,7 +13,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Data.Core", "Platf
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Tests", "Platform.Tests\Platform.Tests.xproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Tests.Runner", "Platform.Tests.Runner\Platform.Tests.Runner.xproj", "{6CC39E4B-7E37-4223-9936-2F2495216E60}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Tests.Runner", "Platform.Tests.Runner\Platform.Tests.Runner.csproj", "{6CC39E4B-7E37-4223-9936-2F2495216E60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
