@@ -2,7 +2,7 @@ language: csharp
 sudo: required  
 dist: trusty  
 mono: none
-dotnet: 1.1.5
+dotnet: 2.0.3
 before_script:
   - cd Platform
   - rm Platform.sln
@@ -22,4 +22,4 @@ before_script:
   - dotnet build
 script:
   - cd Platform.Tests.Runner
-  - dotnet run -- -?
+  - dotnet run 
