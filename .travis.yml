@@ -18,7 +18,6 @@ before_script:
   - rm -r Platform.Sandbox
   - rm -r Platform.WindowsAPI
   - dotnet migrate
-  - dotnet add "Platform.Tests.Runner/Platform.Tests.Runner.csproj" reference "Platform.Tests/Platform.Tests.csproj"
   - dotnet restore
   - dotnet build
 script:
