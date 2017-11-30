@@ -18,7 +18,11 @@ before_script:
   - rm -r Platform.Sandbox
   - rm -r Platform.WindowsAPI
   - dotnet migrate
-  - ls Platform.Tests
+  - ls Platform.Test
+  - cat Platform.Communication/Platform.Communication.csproj
+  - cat Platform.Helpers/Platform.Helpers.csproj
+  - cat Platform.Memory/Platform.Memory.csproj
+  - cat Platform.Data.Core/Platform.Data.Core.csproj
   - cat Platform.Tests/Platform.Tests.csproj
   - dotnet restore
   - ls Platform.Tests
