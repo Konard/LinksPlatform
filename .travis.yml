@@ -19,7 +19,9 @@ before_script:
   - rm -r Platform.WindowsAPI
   - dotnet migrate
   - ls Platform.Tests
+  - cat Platform.Tests/Platform.Tests.csproj
   - dotnet restore
+  - ls Platform.Tests
   - dotnet build
 script:
   - cd Platform.Tests.Runner
