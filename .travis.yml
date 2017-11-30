@@ -21,4 +21,4 @@ before_script:
   - dotnet build
 script:
   - cd Platform.Tests.Runner
-  - dotnet xunit --help
+  - dotnet xunit -namespace "Platform.Tests"
