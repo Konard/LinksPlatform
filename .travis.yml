@@ -18,6 +18,7 @@ before_script:
   - rm -r Platform.Sandbox
   - rm -r Platform.WindowsAPI
   - dotnet migrate
+  - ls Platform.Tests
   - dotnet restore
   - dotnet build
 script:
