@@ -19,6 +19,6 @@ before_script:
   - rm -r Platform.Tests.Runner
   - rm Platform.Tests/Platform.Tests.Library.csproj
   - dotnet restore Platform.dotnet.sln
-  - dotnet build
+  - dotnet build Platform.dotnet.sln
 script:
   - dotnet xunit Platform.Tests/Platform.Tests.Host.csproj
