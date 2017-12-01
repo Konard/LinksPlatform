@@ -17,8 +17,10 @@ before_script:
   - rm -r Platform.Examples
   - rm -r Platform.Sandbox
   - rm -r Platform.WindowsAPI
+  - rm -r Platform.Tests.Runner
+  - rm Platform.Tests/Platform.Tests.Library.csproj
   - dotnet restore
   - dotnet build
 script:
-  - cd Platform.Tests.Runner
-  - dotnet xunit -namespace "Platform.Tests"
+  - cd Platform.Tests
+  - dotnet xunit
