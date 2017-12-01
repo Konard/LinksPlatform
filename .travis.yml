@@ -5,20 +5,9 @@ mono: none
 dotnet: 1.1.5
 before_script:
   - cd Platform
-  - rm -r Platform.Data.ConsoleTerminal
-  - rm -r Platform.Data.IdClient
-  - rm -r Platform.Data.IdServer
-  - rm -r Platform.Data.Kernel.Tests
-  - rm -r Platform.Data.Kernel
-  - rm -r Platform.Data.MasterServer
-  - rm -r Platform.Data.SlaveServer
-  - rm -r Platform.Data.WebTerminal
-  - rm -r Platform.Examples
-  - rm -r Platform.Sandbox
-  - rm -r Platform.WindowsAPI
-  - rm -r Platform.Tests.Runner
-  - rm Platform.Tests/Platform.Tests.Library.csproj
   - dotnet restore Platform.dotnet.sln
   - dotnet build Platform.dotnet.sln
 script:
-  - dotnet xunit Platform.Tests/Platform.Tests.Host.csproj
+  - cd Platform.Tests
+  - rm Platform.Tests.Library.csproj
+  - dotnet xunit
