@@ -13,17 +13,10 @@ namespace Platform.Data.Core.Sequences
 {
     partial class Sequences
     {
-        public bool IncrementPairsFrequencies(ulong[] sequence)
+        public void IncrementPairsFrequencies(ulong[] sequence)
         {
-            var indexed = true;
-
-            var i = sequence.Length;
-            //while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
-
             for (; i >= 1; i--)
-                Links.GetOrCreate(sequence[i - 1], sequence[i]);
-
-            return indexed;
+                IncrementPairFrequency(sequence[i - 1], sequence[i]);
         }
         
         public void IncrementPairFrequency(ulong source, ulong target)
@@ -31,8 +24,33 @@ namespace Platform.Data.Core.Sequences
             var pair = Links.GetOrCreate(source, target);
             
             var frequency = GetPairFrequency(pair);
-            frequency = IncrementPairFrequency(frequency);
+            frequency = IncrementFrequency(frequency);
             SetPairFrequency(pair, frequency);
+        }
+        
+        public ulong GetPairFrequency(ulong pair)
+        {
+            return 0;
+        }
+        
+        public ulong IncrementFrequency(ulong frequency)
+        {
+            return 0;
+        }
+        
+        public void SetPairFrequency(ulong pair, ulong frequency)
+        {
+            
+        }
+        
+        public ulong GetFrequencyMarker()
+        {
+            return 0;
+        }
+        
+        public void SetFrequencyMarker(ulong frequencyMarker)
+        {
+            
         }
     }
 }
