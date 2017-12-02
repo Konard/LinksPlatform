@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Sequences
     {
         public void IncrementPairsFrequencies(ulong[] sequence)
         {
-            for (; i >= 1; i--)
+            for (var i = sequence.Length - 1; i >= 1; i--)
                 IncrementPairFrequency(sequence[i - 1], sequence[i]);
         }
         
@@ -80,7 +80,7 @@ namespace Platform.Data.Core.Sequences
             if (source == target)
                 return Links.GetOrCreate(unaryNumber, _unaryOne);
             else
-                return Links.GetOrCreate(source, IncrementUnaryNumber(target, _unaryOne));
+                return Links.GetOrCreate(source, IncrementUnaryNumber(target));
         }
     }
 }
