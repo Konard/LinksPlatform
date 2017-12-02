@@ -30,20 +30,22 @@ namespace Platform.Tests.Data.Core
                 var balancedVariant = sequences.CreateBalancedVariant(sequence); sw1.Stop();
 
                 var sw2 = Stopwatch.StartNew();
-                var readSequence = sequences.ReadSequenceCore(balancedVariant, links.IsPartialPoint); sw2.Stop();
+                var readSequence1 = sequences.ReadSequenceCore(balancedVariant, links.IsPartialPoint); sw2.Stop();
 
-                // var sw3 = Stopwatch.StartNew();
-                // var searchResults3 = sequences.GetAllMatchingSequences1(sequence); sw3.Stop();
+                var sw3 = Stopwatch.StartNew();
+                var readSequence2 = new List<ulong>()
+                SequenceWalker.WalkRight(balancedVariant, 
+                                         links.GetSource, 
+                                         links.GetTarget,
+                                         links.IsPartialPoint,
+                                         readSequence2.Add);
+                sw3.Stop();
 
-                // На количестве в 200 элементов это будет занимать вечность
-                //var sw4 = Stopwatch.StartNew();
-                //var searchResults4 = sequences.Each(sequence); sw4.Stop();
-
-                Assert.True(sequence.SequenceEqual(readSequence)); //Count == 1 && balancedVariant == searchResults2[0]);
-
-                //Assert.True(searchResults3.Count == 1 && balancedVariant == searchResults3.First());
-
-                //Assert.True(sw1.Elapsed < sw2.Elapsed);
+                Assert.True(sequence.SequenceEqual(readSequence1));
+                
+                Assert.True(sequence.SequenceEqual(readSequence2)); 
+             
+                Assert.True(sw2.Elapsed < sw3.Elapsed);
 
                 for (var i = 0; i < sequenceLength; i++)
                     links.Delete(sequence[i]);
