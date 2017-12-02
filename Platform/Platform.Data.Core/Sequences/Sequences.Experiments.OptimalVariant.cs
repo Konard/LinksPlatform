@@ -35,7 +35,9 @@ namespace Platform.Data.Core.Sequences
         
         public ulong IncrementFrequency(ulong frequency)
         {
-            return 0;
+            var source = Links.GetSource(frequency);
+            var incrementedSource = IncrementUnaryNumber(source);
+            return Links.GetOrCreate(incrementedSource, _frequencyMarker);
         }
         
         public void SetPairFrequency(ulong pair, ulong frequency)
@@ -43,14 +45,42 @@ namespace Platform.Data.Core.Sequences
             
         }
         
+        private ulong _frequencyMarker;
+        
         public ulong GetFrequencyMarker()
         {
-            return 0;
+            return _frequencyMarker;
         }
         
         public void SetFrequencyMarker(ulong frequencyMarker)
         {
+            _frequencyMarker = frequencyMarker;
+        }
+        
+        private ulong _unaryOne;
+        
+        public ulong GetUnaryOne()
+        {
+            return _unaryOne;
+        }
+        
+        public void SetUnaryOne(ulong unaryOne)
+        {
+            _unaryOne = unaryOne;
+        }
+        
+        public ulong IncrementUnaryNumber(ulong unaryNumber)
+        {
+            if (unaryNumber == _unaryOne)
+                return Links.GetOrCreate(_unaryOne, _unaryOne);
             
+            var source = Links.GetSource(unaryNumber);
+            var target = Links.GetTarget(unaryNumber);
+            
+            if (source == target)
+                return Links.GetOrCreate(unaryNumber, _unaryOne);
+            else
+                return Links.GetOrCreate(source, IncrementUnaryNumber(target, _unaryOne));
         }
     }
 }
