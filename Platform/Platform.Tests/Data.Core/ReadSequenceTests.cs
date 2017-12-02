@@ -39,7 +39,7 @@ namespace Platform.Tests.Data.Core
                 //var sw4 = Stopwatch.StartNew();
                 //var searchResults4 = sequences.Each(sequence); sw4.Stop();
 
-                Assert.True(sequence.Length == readSequence.Length); //Count == 1 && balancedVariant == searchResults2[0]);
+                Assert.True(sequence.SequenceEqual(readSequence)); //Count == 1 && balancedVariant == searchResults2[0]);
 
                 //Assert.True(searchResults3.Count == 1 && balancedVariant == searchResults3.First());
 
