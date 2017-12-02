@@ -23,6 +23,8 @@ namespace Platform.Data.Core.Sequences
             while(hasElements)
             {
                 var nextArray = new ulong[length = length * 2];
+                
+                hasElements = false;
 
                 for (var i = 0; i < array.Length; i++)
                 {
