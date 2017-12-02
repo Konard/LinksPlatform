@@ -33,7 +33,7 @@ namespace Platform.Tests.Data.Core
                 var readSequence1 = sequences.ReadSequenceCore(balancedVariant, links.IsPartialPoint); sw2.Stop();
 
                 var sw3 = Stopwatch.StartNew();
-                var readSequence2 = new List<ulong>()
+                var readSequence2 = new List<ulong>();
                 SequenceWalker.WalkRight(balancedVariant, 
                                          links.GetSource, 
                                          links.GetTarget,
