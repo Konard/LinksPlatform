@@ -10,7 +10,7 @@ using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    public class ReadSequnceTests
+    public class ReadSequenceTests
     {
         [Fact]
         public void ReadSequenceTest()
