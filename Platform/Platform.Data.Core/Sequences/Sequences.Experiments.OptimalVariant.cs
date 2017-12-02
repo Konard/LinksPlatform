@@ -30,7 +30,22 @@ namespace Platform.Data.Core.Sequences
         
         public ulong GetPairFrequency(ulong pair)
         {
-            return 0;
+            var frequency = 0UL;
+            
+            Links.Unsync.Each(pair, Constants.Any, candidate =>
+            {
+                var candidateTarget = Links.GetTarget(candidate);
+                
+                if (candidateTarget == _frequencyMarker)
+                {
+                    frequency = candidate;
+                    return Constants.Break;
+                }
+                
+                return Constants.Continue;
+            });
+            
+            return frequency;
         }
         
         public ulong IncrementFrequency(ulong frequency)
@@ -42,7 +57,9 @@ namespace Platform.Data.Core.Sequences
         
         public void SetPairFrequency(ulong pair, ulong frequency)
         {
-            
+            var previousFrequency = GetPairFrequency(pair);
+            Links.Delete(previousFrequency);
+            Links.GetOrCreate(pair, frequency);
         }
         
         private ulong _frequencyMarker;
