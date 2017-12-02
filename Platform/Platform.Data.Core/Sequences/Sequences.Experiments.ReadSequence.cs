@@ -20,7 +20,8 @@ namespace Platform.Data.Core.Sequences
             var hasElements = !isElement(sequence);
             var array = new ulong[length];
             array[0] = sequence;
-            while(hasElements)
+            
+            while (hasElements)
             {
                 var nextArray = new ulong[length = length * 2];
                 
