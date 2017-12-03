@@ -86,6 +86,22 @@ namespace Platform.Data.Core.Sequences
         public void SetUnaryOne(ulong unaryOne)
         {
             _unaryOne = unaryOne;
+            InitUnaryToUInt64(unaryOne);
+        }
+        
+        private Dictionary<ulong, ulong> _unaryToUInt64;
+        
+        private void InitUnaryToUInt64(ulong unaryOne)
+        {
+            _unaryToUInt64 = new Dictionary<ulong, ulong>();
+            
+            _unaryToUInt64.Add(unaryOne, 1);
+            
+            var unary = unaryOne;
+            var uInt64 = 1;
+            
+            for (var i = 1; i < 64; i++)
+                _unaryToUInt64.Add(unary = links.GetOrCreate(unary, unary), uInt64 = uInt64 * 2);
         }
         
         public ulong IncrementUnaryNumber(ulong unaryNumber)
@@ -100,6 +116,32 @@ namespace Platform.Data.Core.Sequences
                 return Links.GetOrCreate(unaryNumber, _unaryOne);
             else
                 return Links.GetOrCreate(source, IncrementUnaryNumber(target));
+        }
+        
+        public ulong ConvertUnaryNumberToUInt64(ulong unaryNumber)
+        {
+            if (unaryNumber == 0)
+                return 0; 
+            if (unaryNumber == _unaryOne)
+                return 1;
+            
+            var source = Links.GetSource(unaryNumber);
+            var target = Links.GetTarget(unaryNumber);
+            
+            if (source == target)
+                return _unaryToUInt64[unaryNumber];
+            else
+            {
+                ulong result = _unaryToUInt64[source];
+                while (!_unaryToUInt64.TryGetValue(target))
+                {
+                    source = Links.GetSource(target);
+                    result += _unaryToUInt64[source];
+                    target = Links.GetTarget(target);
+                }
+                result += _unaryToUInt64[source];
+                return result;
+            }
         }
     }
 }
