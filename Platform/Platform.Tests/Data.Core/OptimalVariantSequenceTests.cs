@@ -39,7 +39,7 @@ namespace Platform.Tests.Data.Core
                 
                 sequences.PrintPairsFrequencies(sequence);
                 
-                var levels = CalculateElementsLocalLevels(sequence);
+                var levels = sequences.CalculateLocalElementLevels(sequence);
                 
                 for (var i = 0; i < levels.Length; i++)
                     Console.WriteLine("{0} = {1}", i, levels[i]);
