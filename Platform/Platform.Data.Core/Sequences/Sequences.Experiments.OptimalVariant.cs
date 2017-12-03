@@ -29,12 +29,13 @@ namespace Platform.Data.Core.Sequences
         {
             var pair = Links.GetOrCreate(source, target);
             
-            var previousFrequency = GetPairFrequency(pair);
+            var previousFrequencyContainer = GetPairFrequency(pair);
+            var previousFrequency = Links.GetTarget(previousFrequencyContainer);
             var frequency = IncrementFrequency(previousFrequency);
             
             Console.WriteLine("frequency = {0}", frequency);
             
-            SetPairFrequency(pair, previousFrequency, frequency);
+            SetPairFrequency(pair, previousFrequencyContainer, frequency);
             
             Console.WriteLine("GetPairFrequency(pair) = {0}", GetPairFrequency(pair) );
             
@@ -45,13 +46,14 @@ namespace Platform.Data.Core.Sequences
         {
             var pair = Links.GetOrCreate(source, target);
                            
-            var previousFrequency = GetPairFrequency(pair);
-            if (previousFrequency == 0)
+            var previousFrequencyContainer = GetPairFrequency(pair);
+            if (previousFrequencyContainer == 0)
                 Console.WriteLine("({0},{1}) - 0", source, target);
             else
             {
-                var frequency = Links.GetSource(previousFrequency);
-                var number = ConvertUnaryNumberToUInt64(frequency);
+                var frequency = Links.GetTarget(previousFrequencyContainer);
+                var frequencyNumber = Links.GetSource(frequency);
+                var number = ConvertUnaryNumberToUInt64(frequencyNumber);
             
                 Console.WriteLine("({0},{1}) - {2}", source, target, number);
             }
@@ -91,10 +93,10 @@ namespace Platform.Data.Core.Sequences
             return Links.GetOrCreate(incrementedSource, _frequencyMarker);
         }
         
-        public void SetPairFrequency(ulong pair, ulong previousFrequency, ulong frequency)
+        public void SetPairFrequency(ulong pair, ulong previousFrequencyContainer, ulong frequency)
         {
-            if (previousFrequency != 0)
-                Links.Delete(previousFrequency);
+            if (previousFrequencyContainer != 0)
+                Links.Delete(previousFrequencyContainer);
             var createdLink = Links.CreateAndUpdate(pair, frequency);
             Console.WriteLine("createdLink = {0}", createdLink);
         }
