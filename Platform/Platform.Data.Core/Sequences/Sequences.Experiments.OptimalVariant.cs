@@ -31,6 +31,9 @@ namespace Platform.Data.Core.Sequences
             
             var previousFrequency = GetPairFrequency(pair);
             var frequency = IncrementFrequency(previousFrequency);
+            
+            Console.WriteLine("frequency = {0}", frequency);
+            
             SetPairFrequency(pair, previousFrequency, frequency);
             
             Console.WriteLine("GetPairFrequency(pair) = {0}", GetPairFrequency(pair) );
@@ -87,7 +90,8 @@ namespace Platform.Data.Core.Sequences
         {
             if (previousFrequency != 0)
                 Links.Delete(previousFrequency);
-            Links.CreateAndUpdate(pair, frequency);
+            var createdLink = Links.CreateAndUpdate(pair, frequency);
+            Console.WriteLine("createdLink = {0}", createdLink);
         }
         
         private ulong _frequencyMarker;
