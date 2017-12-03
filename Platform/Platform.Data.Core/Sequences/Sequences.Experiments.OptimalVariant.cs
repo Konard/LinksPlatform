@@ -19,6 +19,12 @@ namespace Platform.Data.Core.Sequences
                 IncrementPairFrequency(sequence[i - 1], sequence[i]);
         }
         
+        public void PrintPairsFrequencies(ulong[] sequence)
+        {
+            for (var i = 1; i < sequence.Length; i++)
+                PrintPairFrequency(sequence[i - 1], sequence[i]);
+        }
+        
         public void IncrementPairFrequency(ulong source, ulong target)
         {
             var pair = Links.GetOrCreate(source, target);
@@ -26,6 +32,17 @@ namespace Platform.Data.Core.Sequences
             var previousFrequency = GetPairFrequency(pair);
             var frequency = IncrementFrequency(previousFrequency);
             SetPairFrequency(pair, previousFrequency, frequency);
+        }
+        
+        public void PrintPairFrequency(ulong source, ulong target)
+        {
+            var pair = Links.GetOrCreate(source, target);
+                           
+            var previousFrequency = GetPairFrequency(pair);
+            var frequency = Links.GetSource(previousFrequency);
+            var number = ConvertUnaryNumberToUInt64(frequency);
+            
+            Console.WriteLine("({0},{1}) - {2}", source, target, number);
         }
         
         public ulong GetPairFrequency(ulong pair)
