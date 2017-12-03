@@ -58,9 +58,10 @@ namespace Platform.Data.Core.Sequences
                         if (levelRepeat == 1)
                         {
                             sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);                
+                            // TODO: check for w it move actual levels to compare
                             var previousLevel = i < 2 ? currentLevel : levels[i - 2];
                             var nextLevel = i >= length - 1 ? currentLevel : levels[i + 1];
-                            var newLevel = currentLevel;
+                            var newLevel = GreatestNeigbourLowerThanCurrentOrCurrent(previousLevel, currentLevel, nextLevel);
                             levels[w] = newLevel;
                             w++;
                             levelRepeat = 0;
@@ -102,6 +103,13 @@ namespace Platform.Data.Core.Sequences
             return links.GetOrCreate(sequence[0], sequence[1]);
         }
         
+        public ulong GreatestNeigbourLowerThanCurrentOrCurrent(ulong previous, ulong current, ulong next)
+        {
+            if (previous > next)
+                return current < previous ? current : previous;
+            else
+                return current < next ? current : next;
+        }
         
         public ulong[] CalculateLocalElementLevels(ulong[] sequence)
         {
