@@ -63,9 +63,9 @@ namespace Platform.Data.Core.Sequences
                         levelRepeat = false;
                     }
                 }
-                    sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
+                    //sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
 
-                length = length / 2 + length % 2;
+                //length = length / 2 + length % 2;
             }
 
             return links.GetOrCreate(sequence[0], sequence[1]);
