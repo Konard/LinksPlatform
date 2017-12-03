@@ -20,7 +20,7 @@ namespace Platform.Data.Core.Sequences
             if (length == 1)
                 return sequence[0];
 
-            var links = Links.Unsync;
+            var links = Links; //Links.Unsync;
 
             // TODO: Replace CreateAndUpdate with GetOrCreate
             if (length == 2)
