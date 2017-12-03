@@ -39,10 +39,15 @@ namespace Platform.Data.Core.Sequences
             var pair = Links.GetOrCreate(source, target);
                            
             var previousFrequency = GetPairFrequency(pair);
-            var frequency = Links.GetSource(previousFrequency);
-            var number = ConvertUnaryNumberToUInt64(frequency);
+            if (previousFrequency == 0)
+                Console.WriteLine("({0},{1}) - 0", source, target);
+            else
+            {
+                var frequency = Links.GetSource(previousFrequency);
+                var number = ConvertUnaryNumberToUInt64(frequency);
             
-            Console.WriteLine("({0},{1}) - {2}", source, target, number);
+                Console.WriteLine("({0},{1}) - {2}", source, target, number);
+            }
         }
         
         public ulong GetPairFrequency(ulong pair)
