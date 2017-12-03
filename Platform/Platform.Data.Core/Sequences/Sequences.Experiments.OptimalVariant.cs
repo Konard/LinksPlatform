@@ -118,7 +118,7 @@ namespace Platform.Data.Core.Sequences
             var uInt64 = 1;
             
             for (var i = 1; i < 64; i++)
-                _unaryToUInt64.Add(unary = links.GetOrCreate(unary, unary), uInt64 = uInt64 * 2);
+                _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), uInt64 = uInt64 * 2);
         }
         
         public ulong IncrementUnaryNumber(ulong unaryNumber)
@@ -150,13 +150,14 @@ namespace Platform.Data.Core.Sequences
             else
             {
                 ulong result = _unaryToUInt64[source];
-                while (!_unaryToUInt64.TryGetValue(target))
+                ulong lastValue = 0;
+                while (!_unaryToUInt64.TryGetValue(target, out lastValue))
                 {
                     source = Links.GetSource(target);
                     result += _unaryToUInt64[source];
                     target = Links.GetTarget(target);
                 }
-                result += _unaryToUInt64[source];
+                result += lastValue;
                 return result;
             }
         }
