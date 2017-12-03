@@ -35,7 +35,10 @@ namespace Platform.Tests.Data.Core
                 sequences.SetFrequencyMarker(frequencyMarker);
 
                 var sw1 = Stopwatch.StartNew();
-                sequences.IncrementPairsFrequencies(sequence); sw1.Stop();                
+                sequences.IncrementPairsFrequencies(sequence); sw1.Stop();   
+                
+                sequences.PrintPairsFrequencies(sequence);
+                
             }
         }
     }
