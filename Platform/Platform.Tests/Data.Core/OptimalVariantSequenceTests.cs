@@ -22,11 +22,11 @@ namespace Platform.Tests.Data.Core
                 var links = scope.Links;
                 var sequences = scope.Sequences;
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
-
-                var sequence = new ulong[sequenceLength];
-                for (var i = 0; i < sequenceLength; i++)
-                    sequence[i] = links.Create();
-                    
+                
+                links.UseUnicode();
+                
+                var sequence = UnicodeMap.FromStringToLinkArray("зеленела зелёная зелень");
+                
                 var meaningRoot = links.Create();
                 var unaryOne = links.Create(meaningRoot, constants.Itself);
                 var frequencyMarker = links.Create(meaningRoot, constants.Itself);
@@ -34,14 +34,8 @@ namespace Platform.Tests.Data.Core
                 sequences.SetUnaryOne(unaryOne);
                 sequences.SetFrequencyMarker(frequencyMarker);
 
-
                 var sw1 = Stopwatch.StartNew();
-                sequences.IncrementPairsFrequencies(sequence); sw1.Stop();
-
-                
-
-                for (var i = 0; i < sequenceLength; i++)
-                    links.Delete(sequence[i]);
+                sequences.IncrementPairsFrequencies(sequence); sw1.Stop();                
             }
         }
     }
