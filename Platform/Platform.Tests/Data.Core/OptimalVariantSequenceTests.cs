@@ -21,7 +21,7 @@ namespace Platform.Tests.Data.Core
             {
                 var links = scope.Links;
                 var sequences = scope.Sequences;
-                var constants = scope.Constants;
+                var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
