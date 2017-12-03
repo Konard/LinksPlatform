@@ -27,9 +27,9 @@ namespace Platform.Tests.Data.Core
                 
                 var sequence = UnicodeMap.FromStringToLinkArray("зеленела зелёная зелень");
                 
-                var meaningRoot = links.Create();
-                var unaryOne = links.Create(meaningRoot, constants.Itself);
-                var frequencyMarker = links.Create(meaningRoot, constants.Itself);
+                var meaningRoot = links.CreatePoint();
+                var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 
                 sequences.SetUnaryOne(unaryOne);
                 sequences.SetFrequencyMarker(frequencyMarker);
