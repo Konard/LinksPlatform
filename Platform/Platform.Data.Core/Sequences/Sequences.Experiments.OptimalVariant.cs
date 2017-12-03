@@ -33,6 +33,8 @@ namespace Platform.Data.Core.Sequences
             var frequency = IncrementFrequency(previousFrequency);
             SetPairFrequency(pair, previousFrequency, frequency);
             
+            Console.WriteLine("GetPairFrequency(pair) = {0}", GetPairFrequency(pair) );
+            
             PrintPairFrequency(source, target);
         }
         
