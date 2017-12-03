@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Sequences
     {
         public void IncrementPairsFrequencies(ulong[] sequence)
         {
-            for (var i = sequence.Length - 1; i >= 1; i--)
+            for (var i = 1; i < sequence.Length; i++)
                 IncrementPairFrequency(sequence[i - 1], sequence[i]);
         }
         
@@ -56,7 +56,7 @@ namespace Platform.Data.Core.Sequences
         {
             var frequency = 0UL;
             
-            Links.Unsync.Each(pair, Constants.Any, candidate =>
+            Links.Each(pair, Constants.Any, candidate =>
             {
                 var candidateTarget = Links.GetTarget(candidate);
                 
@@ -85,7 +85,7 @@ namespace Platform.Data.Core.Sequences
         {
             if (previousFrequency != 0)
                 Links.Delete(previousFrequency);
-            Links.GetOrCreate(pair, frequency);
+            Links.CreateAndUpdate(pair, frequency);
         }
         
         private ulong _frequencyMarker;
