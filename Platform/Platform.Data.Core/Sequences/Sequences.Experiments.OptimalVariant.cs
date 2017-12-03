@@ -30,7 +30,7 @@ namespace Platform.Data.Core.Sequences
             var pair = Links.GetOrCreate(source, target);
             
             var previousFrequencyContainer = GetPairFrequency(pair);
-            var previousFrequency = Links.GetTarget(previousFrequencyContainer);
+            var previousFrequency = previousFrequencyContainer == 0 ? 0UL : Links.GetTarget(previousFrequencyContainer);
             var frequency = IncrementFrequency(previousFrequency);
             
             Console.WriteLine("frequency = {0}", frequency);
