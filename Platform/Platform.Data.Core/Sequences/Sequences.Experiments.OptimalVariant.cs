@@ -46,23 +46,54 @@ namespace Platform.Data.Core.Sequences
 
             while (length > 2)
             {
-                var levelRepeat = false;
+                var levelRepeat = 0;
                 var currentLevel = 0UL;
-                
+                var w = 0;
                 for (var i = 0; i < length; i++)
-                {
-                    
-                    
+                {                        
                     if (currentLevel == levels[i])
                     {
-                        levelRepeat = true;
+                        levelRepeat++;
+                        
+                        if (levelRepeat == 1)
+                        {
+                            sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);                
+                            var previousLevel = i < 2 ? currentLevel : levels[i - 2];
+                            var nextLevel = i >= length - 1 ? currentLevel : levels[i + 1];
+                            var newLevel = currentLevel;
+                            levels[w] = newLevel;
+                            w++;
+                            levelRepeat = 0;
+                        }
+                        else if (i > 0 && i == length - 1)
+                        {
+                            sequence[w] = sequence[i];
+                            levels[w] = levels[i];
+                            w++;
+                        }
                     }
                     else
                     {
                         currentLevel = levels[i];
-                        levelRepeat = false;
+                        levelRepeat = 0;
+                        
+                        if (i > 0)
+                        {
+                            sequence[w] = sequence[i - 1];
+                            levels[w] = levels[i - 1];
+                            w++;
+                            if (i == length - 1)
+                            {
+                                sequence[w] = sequence[i];
+                                levels[w] = levels[i];
+                                w++;
+                            }
+                        }
+                        
                     }
                 }
+                
+                length = w;
                     //sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
 
                 //length = length / 2 + length % 2;
