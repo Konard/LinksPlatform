@@ -32,6 +32,8 @@ namespace Platform.Data.Core.Sequences
             var previousFrequency = GetPairFrequency(pair);
             var frequency = IncrementFrequency(previousFrequency);
             SetPairFrequency(pair, previousFrequency, frequency);
+            
+            PrintPairFrequency(source, target);
         }
         
         public void PrintPairFrequency(ulong source, ulong target)
