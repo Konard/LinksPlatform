@@ -32,14 +32,8 @@ namespace Platform.Data.Core.Sequences
             var previousFrequencyContainer = GetPairFrequency(pair);
             var previousFrequency = previousFrequencyContainer == 0 ? 0UL : Links.GetTarget(previousFrequencyContainer);
             var frequency = IncrementFrequency(previousFrequency);
-            
-            Console.WriteLine("frequency = {0}", frequency);
-            
-            SetPairFrequency(pair, previousFrequencyContainer, frequency);
-            
-            Console.WriteLine("GetPairFrequency(pair) = {0}", GetPairFrequency(pair) );
-            
-            PrintPairFrequency(source, target);
+                      
+            SetPairFrequency(pair, previousFrequencyContainer, frequency);                       
         }
         
         public void PrintPairFrequency(ulong source, ulong target)
@@ -61,27 +55,23 @@ namespace Platform.Data.Core.Sequences
         
         public ulong GetPairFrequency(ulong pair)
         {
-            var frequency = 0UL;
+            var frequencyContainer = 0UL;
             
             Links.Each(pair, Constants.Any, candidate =>
             {
                 var candidateTarget = Links.GetTarget(candidate);
                 var frequencyTarget = Links.GetTarget(candidateTarget);
-                
-                //Console.WriteLine("candidate = {0}", candidate);
-                //Console.WriteLine("candidateTarget = {0}", candidateTarget);
-                //Console.WriteLine("_frequencyMarker = {0}", _frequencyMarker);
-                
+                              
                 if (frequencyTarget == _frequencyMarker)
                 {
-                    frequency = candidate;
+                    frequencyContainer = candidate;
                     return Constants.Break;
                 }
                 
                 return Constants.Continue;
             });
             
-            return frequency;
+            return frequencyContainer;
         }
         
         public ulong IncrementFrequency(ulong frequency)
@@ -97,8 +87,7 @@ namespace Platform.Data.Core.Sequences
         {
             if (previousFrequencyContainer != 0)
                 Links.Delete(previousFrequencyContainer);
-            var createdLink = Links.CreateAndUpdate(pair, frequency);
-            Console.WriteLine("createdLink = {0}", createdLink);
+            Links.CreateAndUpdate(pair, frequency);            
         }
         
         private ulong _frequencyMarker;
@@ -130,8 +119,7 @@ namespace Platform.Data.Core.Sequences
         
         private void InitUnaryToUInt64(ulong unaryOne)
         {
-            _unaryToUInt64 = new Dictionary<ulong, ulong>();
-            
+            _unaryToUInt64 = new Dictionary<ulong, ulong>();         
             _unaryToUInt64.Add(unaryOne, 1);
             
             var unary = unaryOne;
