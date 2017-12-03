@@ -115,10 +115,10 @@ namespace Platform.Data.Core.Sequences
             _unaryToUInt64.Add(unaryOne, 1);
             
             var unary = unaryOne;
-            var uInt64 = 1;
+            ulong uInt64 = 1UL;
             
             for (var i = 1; i < 64; i++)
-                _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), uInt64 = uInt64 * 2);
+                _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), uInt64 = uInt64 * 2UL);
         }
         
         public ulong IncrementUnaryNumber(ulong unaryNumber)
