@@ -87,7 +87,7 @@ namespace Platform.Data.Core.Sequences
             
         public ulong GetPairFrequencyUInt64Number(ulong source, ulong target)
         {
-            var pair = Links.GetOrCreate(source, target)
+            var pair = Links.GetOrCreate(source, target);
             var previousFrequencyContainer = GetPairFrequencyContainer(pair);
             var frequency = GetPairFrequency(previousFrequencyContainer);
             if (frequency == 0)
