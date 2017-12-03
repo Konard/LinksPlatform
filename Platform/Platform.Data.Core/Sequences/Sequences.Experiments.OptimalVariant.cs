@@ -13,6 +13,20 @@ namespace Platform.Data.Core.Sequences
 {
     partial class Sequences
     {
+        public ulong[] CalculateLocalElementLevels(ulong[] sequence)
+        {
+            var levels = new ulong[sequence.Length];
+            
+            
+            
+            for (var i = 1; i < sequence.Length - 1; i++)
+            {
+                
+            
+            
+                IncrementPairFrequency(sequence[i - 1], sequence[i]);
+        }
+        
         public void IncrementPairsFrequencies(ulong[] sequence)
         {
             for (var i = 1; i < sequence.Length; i++)
@@ -29,31 +43,20 @@ namespace Platform.Data.Core.Sequences
         {
             var pair = Links.GetOrCreate(source, target);
             
-            var previousFrequencyContainer = GetPairFrequency(pair);
-            var previousFrequency = previousFrequencyContainer == 0 ? 0UL : Links.GetTarget(previousFrequencyContainer);
+            var previousFrequencyContainer = GetPairFrequencyContainer(pair);
+            var previousFrequency = GetPairFrequency(previousFrequencyContainer);
             var frequency = IncrementFrequency(previousFrequency);
                       
             SetPairFrequency(pair, previousFrequencyContainer, frequency);                       
         }
         
         public void PrintPairFrequency(ulong source, ulong target)
-        {
-            var pair = Links.GetOrCreate(source, target);
-                           
-            var previousFrequencyContainer = GetPairFrequency(pair);
-            if (previousFrequencyContainer == 0)
-                Console.WriteLine("({0},{1}) - 0", source, target);
-            else
-            {
-                var frequency = Links.GetTarget(previousFrequencyContainer);
-                var frequencyNumber = Links.GetSource(frequency);
-                var number = ConvertUnaryNumberToUInt64(frequencyNumber);
-            
-                Console.WriteLine("({0},{1}) - {2}", source, target, number);
-            }
+        {          
+            var number = GetPairFrequencyUInt64Number(source, target);           
+            Console.WriteLine("({0},{1}) - {2}", source, target, number);
         }
         
-        public ulong GetPairFrequency(ulong pair)
+        public ulong GetPairFrequencyContainer(ulong pair)
         {
             var frequencyContainer = 0UL;
             
@@ -72,6 +75,24 @@ namespace Platform.Data.Core.Sequences
             });
             
             return frequencyContainer;
+        }
+        
+        public ulong GetPairFrequency(ulong frequencyContainer)
+        {
+            var frequency = frequencyContainer == 0 ? 0UL : Links.GetTarget(frequencyContainer);
+            return frequency;
+        }
+            
+        public ulong GetPairFrequencyUInt64Number(ulong source, ulong target)
+        {
+            var pair = Links.GetOrCreate(source, target)
+            var previousFrequencyContainer = GetPairFrequencyContainer(pair);
+            var frequency = GetPairFrequency(previousFrequencyContainer);
+            if (frequency == 0)
+                return 0;
+            var frequencyNumber = Links.GetSource(frequency);
+            var number = ConvertUnaryNumberToUInt64(frequencyNumber);
+            return number;
         }
         
         public ulong IncrementFrequency(ulong frequency)
