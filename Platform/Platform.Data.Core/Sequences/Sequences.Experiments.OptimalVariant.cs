@@ -64,12 +64,13 @@ namespace Platform.Data.Core.Sequences
             Links.Each(pair, Constants.Any, candidate =>
             {
                 var candidateTarget = Links.GetTarget(candidate);
+                var frequencyTarget = Links.GetTarget(candidateTarget);
                 
-                Console.WriteLine("candidate = {0}", candidate);
-                Console.WriteLine("candidateTarget = {0}", candidateTarget);
-                Console.WriteLine("_frequencyMarker = {0}", _frequencyMarker);
+                //Console.WriteLine("candidate = {0}", candidate);
+                //Console.WriteLine("candidateTarget = {0}", candidateTarget);
+                //Console.WriteLine("_frequencyMarker = {0}", _frequencyMarker);
                 
-                if (candidateTarget == _frequencyMarker)
+                if (frequencyTarget == _frequencyMarker)
                 {
                     frequency = candidate;
                     return Constants.Break;
