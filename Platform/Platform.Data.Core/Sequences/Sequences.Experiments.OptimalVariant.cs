@@ -16,15 +16,17 @@ namespace Platform.Data.Core.Sequences
         public ulong[] CalculateLocalElementLevels(ulong[] sequence)
         {
             var levels = new ulong[sequence.Length];
-            
-            
+            levels[0] = GetPairFrequencyUInt64Number(sequence[0], sequence[1]);   
             
             for (var i = 1; i < sequence.Length - 1; i++)
             {
-                
+                var previous = GetPairFrequencyUInt64Number(sequence[i - 1], sequence[i]);
+                var next = GetPairFrequencyUInt64Number(sequence[i], sequence[i + 1]);
+                levels[i] = previous > next ? previous : next;
+            }
             
-            
-                IncrementPairFrequency(sequence[i - 1], sequence[i]);
+            levels[levels.Length - 1] = GetPairFrequencyUInt64Number(sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+            return levels;
         }
         
         public void IncrementPairsFrequencies(ulong[] sequence)
