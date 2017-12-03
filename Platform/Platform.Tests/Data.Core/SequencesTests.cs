@@ -481,7 +481,7 @@ namespace Platform.Tests.Data.Core
 
                 var elapsed2 = sw2.Elapsed;
 
-                Debug.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
+                Console.WriteLine($"Compressor: {elapsed1}, Balanced sequence creator: {elapsed2}");
 
                 Assert.True(elapsed1 > elapsed2);
 
