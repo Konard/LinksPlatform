@@ -23,9 +23,9 @@ namespace Platform.Data.Core.Sequences
         {
             var pair = Links.GetOrCreate(source, target);
             
-            var frequency = GetPairFrequency(pair);
-            frequency = IncrementFrequency(frequency);
-            SetPairFrequency(pair, frequency);
+            var previousFrequency = GetPairFrequency(pair);
+            var frequency = IncrementFrequency(previousFrequency);
+            SetPairFrequency(pair, previousFrequency, frequency);
         }
         
         public ulong GetPairFrequency(ulong pair)
@@ -50,15 +50,17 @@ namespace Platform.Data.Core.Sequences
         
         public ulong IncrementFrequency(ulong frequency)
         {
+            if (frequency == 0)
+                return Links.GetOrCreate(_unaryOne, _frequencyMarker);
             var source = Links.GetSource(frequency);
             var incrementedSource = IncrementUnaryNumber(source);
             return Links.GetOrCreate(incrementedSource, _frequencyMarker);
         }
         
-        public void SetPairFrequency(ulong pair, ulong frequency)
+        public void SetPairFrequency(ulong pair, ulong previousFrequency, ulong frequency)
         {
-            var previousFrequency = GetPairFrequency(pair);
-            Links.Delete(previousFrequency);
+            if (previousFrequency != 0)
+                Links.Delete(previousFrequency);
             Links.GetOrCreate(pair, frequency);
         }
         
