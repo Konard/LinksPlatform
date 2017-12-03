@@ -46,7 +46,23 @@ namespace Platform.Data.Core.Sequences
 
             while (length > 2)
             {
-                for (var i = 0; i < length; i += 2)
+                var levelRepeat = false;
+                var currentLevel = 0UL;
+                
+                for (var i = 0; i < length; i++)
+                {
+                    
+                    
+                    if (currentLevel == levels[i])
+                    {
+                        levelRepeat = true;
+                    }
+                    else
+                    {
+                        currentLevel = levels[i];
+                        levelRepeat = false;
+                    }
+                }
                     sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
 
                 length = length / 2 + length % 2;
