@@ -65,6 +65,10 @@ namespace Platform.Data.Core.Sequences
             {
                 var candidateTarget = Links.GetTarget(candidate);
                 
+                Console.WriteLine("candidate = {0}", candidate);
+                Console.WriteLine("candidateTarget = {0}", candidateTarget);
+                Console.WriteLine("_frequencyMarker = {0}", _frequencyMarker);
+                
                 if (candidateTarget == _frequencyMarker)
                 {
                     frequency = candidate;
