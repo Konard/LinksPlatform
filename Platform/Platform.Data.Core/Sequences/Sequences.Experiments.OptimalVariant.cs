@@ -48,6 +48,7 @@ namespace Platform.Data.Core.Sequences
             {
                 var levelRepeat = 0;
                 var currentLevel = 0UL;
+                var previousLevel = levels[0];
                 var w = 0;
                 for (var i = 0; i < length; i++)
                 {                        
@@ -55,14 +56,13 @@ namespace Platform.Data.Core.Sequences
                     {
                         levelRepeat++;
                         
-                        if (levelRepeat == 1)
+                        if (levelRepeat == 2)
                         {
-                            sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);                
-                            // TODO: check for w it move actual levels to compare
-                            var previousLevel = i < 2 ? currentLevel : levels[i - 2];
+                            sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);                                            
                             var nextLevel = i >= length - 1 ? currentLevel : levels[i + 1];
                             var newLevel = GreatestNeigbourLowerThanCurrentOrCurrent(previousLevel, currentLevel, nextLevel);
                             levels[w] = newLevel;
+                            previousLevel = currentLevel;
                             w++;
                             levelRepeat = 0;
                         }
@@ -76,12 +76,13 @@ namespace Platform.Data.Core.Sequences
                     else
                     {
                         currentLevel = levels[i];
-                        levelRepeat = 0;
+                        levelRepeat = 1;
                         
                         if (i > 0)
                         {
                             sequence[w] = sequence[i - 1];
                             levels[w] = levels[i - 1];
+                            previousLevel = levels[w];
                             w++;
                             if (i == length - 1)
                             {
