@@ -49,12 +49,15 @@ namespace Platform.Data.Core.Sequences
                 var levelRepeat = 0;
                 var currentLevel = 0UL;
                 var previousLevel = levels[0];
+                var skipOnce = false;
                 var w = 0;
                 for (var i = 0; i < length; i++)
                 {                        
                     if (currentLevel == levels[i])
                     {
                         levelRepeat++;
+                        
+                        skipOnce = false;
                         
                         if (levelRepeat == 2)
                         {
@@ -65,6 +68,7 @@ namespace Platform.Data.Core.Sequences
                             previousLevel = currentLevel;
                             w++;
                             levelRepeat = 0;
+                            skipOnce = true;
                         }
                         else if (i > 0 && i == length - 1)
                         {
@@ -80,10 +84,15 @@ namespace Platform.Data.Core.Sequences
                         
                         if (i > 0)
                         {
-                            sequence[w] = sequence[i - 1];
-                            levels[w] = levels[i - 1];
-                            previousLevel = levels[w];
-                            w++;
+                            if (skipOnce) 
+                                skipOnce = false;
+                            else
+                            {
+                                sequence[w] = sequence[i - 1];
+                                levels[w] = levels[i - 1];
+                                previousLevel = levels[w];
+                                w++;
+                            }
                             if (i == length - 1)
                             {
                                 sequence[w] = sequence[i];
