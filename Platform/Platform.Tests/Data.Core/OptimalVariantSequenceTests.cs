@@ -44,6 +44,12 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < levels.Length; i++)
                     Console.WriteLine("{0} = {1}", i, levels[i]);
                 
+                var optimalVariant = sequences.CreateOptimalVariant(sequence);
+                
+                var sw3 = Stopwatch.StartNew();
+                var readSequence1 = sequences.ReadSequenceCore(optimalVariant, links.IsPartialPoint); sw3.Stop();
+               
+                Assert.True(sequence.SequenceEqual(readSequence1));
             }
         }
     }
