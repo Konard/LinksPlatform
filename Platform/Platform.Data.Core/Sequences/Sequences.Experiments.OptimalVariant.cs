@@ -108,7 +108,7 @@ namespace Platform.Data.Core.Sequences
                 length = w;
                     //sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
                 for (var i = 0; i < length; i++)
-                    Console.WriteLine("sequence[{0}] = {1}", i, levels[i]);
+                    Console.WriteLine("sequence[{0}] = {1}({2})", i, sequence[i], UnicodeMap.FromLinkToChar(sequence[i]));
                 
                 for (var i = 0; i < length; i++)
                     Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
