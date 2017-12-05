@@ -43,6 +43,7 @@ namespace Platform.Data.Core.Sequences
             
             var levels = CalculateLocalElementLevels(sequence);
             
+            var c = 0;
 
             while (length > 2)
             {
@@ -106,7 +107,16 @@ namespace Platform.Data.Core.Sequences
                 
                 length = w;
                     //sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
-
+                for (var i = 0; i < length; i++)
+                    Console.WriteLine("sequence[{0}] = {1}", i, levels[i]);
+                
+                for (var i = 0; i < length; i++)
+                    Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
+                
+                c++;
+                if(c > 20)
+                    break;
+                    
                 //length = length / 2 + length % 2;
             }
 
