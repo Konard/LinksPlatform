@@ -20,26 +20,12 @@ namespace Platform.Data.Core.Sequences
             if (length == 1)
                 return sequence[0];
 
-            var links = Links; //Links.Unsync;
-
-            // TODO: Replace CreateAndUpdate with GetOrCreate
+            var links = Links;
+            
             if (length == 2)
                 return links.GetOrCreate(sequence[0], sequence[1]);
-
-            // Needed only if we not allowed to change sequence itself (so it makes copy)
-            // Нужно только если исходный массив последовательности изменять нельзя (тогда делается его копия)
-            //if (length > 2)
-            
-                // TODO: Try to use ArrayPool
-                //var innerSequence = new ulong[length / 2 + length % 2];
-
-                //for (var i = 0; i < length; i += 2)
-                //    innerSequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
-
-                //sequence = innerSequence;
-                //length = innerSequence.Length;
-                
-                sequence = sequence.ToArray();
+                          
+            sequence = sequence.ToArray();
             
             var levels = CalculateLocalElementLevels(sequence);
             
