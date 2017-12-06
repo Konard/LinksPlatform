@@ -41,18 +41,20 @@ namespace Platform.Tests.Data.Core
                 
                 var levels = sequences.CalculateLocalElementLevels(sequence);
                 
-                for (var i = 0; i < levels.Length; i++)
-                    Console.WriteLine("{0} = {1}", i, levels[i]);
+                for (var i = 0; i < length; i++)
+                    Console.WriteLine("sequence[{0}] = {1}({2})", i, sequence[i], UnicodeMap.FromLinkToChar(sequence[i]));
+                
+                for (var i = 0; i < length; i++)
+                    Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
                 
                 var optimalVariant = sequences.CreateOptimalVariant(sequence);
                 
                 Console.WriteLine("optimalVariant = {0}", optimalVariant);
-                /*
+                
                 var sw3 = Stopwatch.StartNew();
                 var readSequence1 = sequences.ReadSequenceCore(optimalVariant, links.IsPartialPoint); sw3.Stop();
                
                 Assert.True(sequence.SequenceEqual(readSequence1));
-                */
             }
         }
     }
