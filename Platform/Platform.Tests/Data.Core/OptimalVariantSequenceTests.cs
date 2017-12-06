@@ -41,10 +41,10 @@ namespace Platform.Tests.Data.Core
                 
                 var levels = sequences.CalculateLocalElementLevels(sequence);
                 
-                for (var i = 0; i < length; i++)
+                for (var i = 0; i < sequence.Length; i++)
                     Console.WriteLine("sequence[{0}] = {1}({2})", i, sequence[i], UnicodeMap.FromLinkToChar(sequence[i]));
                 
-                for (var i = 0; i < length; i++)
+                for (var i = 0; i < levels.Length; i++)
                     Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
                 
                 var optimalVariant = sequences.CreateOptimalVariant(sequence);
