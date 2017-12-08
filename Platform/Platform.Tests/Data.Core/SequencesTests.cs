@@ -479,6 +479,13 @@ namespace Platform.Tests.Data.Core
 
                 var elapsed1 = sw1.Elapsed;
 
+                var sw2 = Stopwatch.StartNew();
+                
+                
+                for (int i = START; i < END; i++)
+                    compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
+
+                var elapsed2 = sw2.Elapsed;
                 
                 var sw3 = Stopwatch.StartNew();
                 
@@ -523,7 +530,7 @@ namespace Platform.Tests.Data.Core
 
                 Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
                 Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
-                Assert.True((int)(scope3.Links.Count() - UnicodeMap.MapSize) < totalC
+                Assert.True((int)(scope3.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
 
                 Console.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope3.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
                 
