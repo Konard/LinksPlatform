@@ -12,12 +12,10 @@ script:
   - rm Platform.Tests.Library.csproj
   - dotnet xunit -parallel none
 after_success:
-  - unzip
-  - mono
   - cd ../..
   - mkdir docfx
   - cd docfx
   - nuget install docfx.console
   - ls
   - git clone https://github.com/docascode/docfx-seed.git docfx-seed
-
+  - mono docfx.console.2.28.2/tools/docfx.exe docfx-seed/docfx.json
