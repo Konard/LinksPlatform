@@ -16,6 +16,4 @@ after_success:
   - nuget install docfx.console
   - ls
   - mono docfx.console.2.28.2/tools/docfx.exe docfx.json
-  - ls doc
-  - ls doc/generated
   - ls doc/generated/site
