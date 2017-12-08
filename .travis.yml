@@ -11,7 +11,7 @@ script:
   - cd Platform.Tests
   - rm Platform.Tests.Library.csproj
   - dotnet xunit -parallel none
-after_success
+after_success:
   - choco install docfx -y
   - cd ../..
   - docfx init -q
