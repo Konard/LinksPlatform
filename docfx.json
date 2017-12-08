@@ -3,7 +3,7 @@
     {
       "src": [
         {
-          "files": [ "Platform/Platform.dotnet.sln"],
+          "files": [ "Platform.dotnet.sln"],
           "exclude": [ "**/bin/**", "**/obj/**" ],
           "src": "Platform"
         }
