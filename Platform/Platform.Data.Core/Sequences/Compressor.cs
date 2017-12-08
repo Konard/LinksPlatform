@@ -24,7 +24,7 @@ namespace Platform.Data.Core.Sequences
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;
         private readonly ulong _minFrequencyToCompress;
-        private readonly UnsafeDictionary<Pair, Data> _pairsCache;
+        private readonly Dictionary<Pair, Data> _pairsCache;
         private Pair _maxPair;
         private Data _maxPairData;
 
@@ -111,7 +111,7 @@ namespace Platform.Data.Core.Sequences
             if (minFrequencyToCompress == 0) minFrequencyToCompress = 1;
             _minFrequencyToCompress = minFrequencyToCompress;
             ResetMaxPair();
-            _pairsCache = new UnsafeDictionary<Pair, Data>(4096, PairComparer.Default);
+            _pairsCache = new Dictionary<Pair, Data>(4096, PairComparer.Default);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -126,12 +126,8 @@ namespace Platform.Data.Core.Sequences
         private Data IncrementFrequency(ref Pair pair)
         {
             Data data;
-            var entryIndex = _pairsCache.FindEntry(pair);
-            if (entryIndex >= 0)
-            {
-                data = _pairsCache.entries[entryIndex].value;
-                data.Frequency++;
-            }
+            if (_pairsCache.TryGetValue(pair, out data))
+                data.Frequency++;                  
             else
             {
                 var link = _links.SearchOrDefault(pair.Source, pair.Target);
@@ -141,7 +137,7 @@ namespace Platform.Data.Core.Sequences
                 if (link != default(ulong))
                     data.Frequency += _countLinkFrequency(link);
                     
-                _pairsCache.InsertUnsafe(pair, data);
+                _pairsCache.Add(pair, data);
             }
             return data;
         }
@@ -153,14 +149,10 @@ namespace Platform.Data.Core.Sequences
 
         public void ValidateFrequencies()
         {
-            var entries = _pairsCache.entries;
-            var length = _pairsCache.count;
-
-            for (var i = 0; i < length; i++)
+            foreach(var entry in _pairsCache)
             {
-                if (entries[i].hashCode < 0) continue;
-
-                var value = entries[i].value;
+                var value = entry.Value;
+                   
                 var linkIndex = value.Link;
 
                 if (linkIndex != default(ulong))
@@ -176,7 +168,7 @@ namespace Platform.Data.Core.Sequences
                 //    if (value.Frequency > 0)
                 //    {
                 //        var frequency = value.Frequency;
-                //        linkIndex = _createLink(entries[i].key.Source, entries[i].key.Target);
+                //        linkIndex = _createLink(entry.Key.Source, entry.Key.Target);
                 //        var count = _countLinkFrequency(linkIndex);
 
                 //        if ((frequency > count && frequency - count > 1) || (count > frequency && count - frequency > 1))
