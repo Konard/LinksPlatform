@@ -5,7 +5,6 @@ using System.Runtime.CompilerServices;
 using Platform.Data.Core.Pairs;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Optimizations;
 
 namespace Platform.Data.Core.Sequences
 {
