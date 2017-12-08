@@ -19,7 +19,7 @@
         "dest": "doc/generated/api"
       },
       {
-        "files": [ "doc/articles/**/*.md", "*.md", "toc.yml", "restapi/**" ]
+        "files": [ "doc/articles/**/*.md", "*.md", "toc.yml" ]
       }
     ],
     "resource": [
@@ -27,7 +27,6 @@
         "files": [ "doc/articles/images/**"]
       }
     ],
-    "overwrite": "specs/*.md",
     "globalMetadata": {
       "_appTitle": "LinksPlatform",
       "_enableSearch": true
