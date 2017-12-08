@@ -3,7 +3,9 @@
     {
       "src": [
         {
-          "files": [ "Platform.dotnet.sln", "**/*.cs" ],
+          "files": [ 
+            "**/*.cs"
+          ],
           "exclude": [ "**/bin/**", "**/obj/**" ],
           "src": "Platform"
         }
