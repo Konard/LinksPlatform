@@ -463,6 +463,17 @@ namespace Platform.Tests.Data.Core
                 var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
+                
+                
+                var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+                
+                var meaningRoot = scope3.Links.CreatePoint();
+                var unaryOne = scope3.Links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var frequencyMarker = scope3.Links.CreateAndUpdate(meaningRoot, constants.Itself);
+                
+                compressor3.SetUnaryOne(unaryOne);
+                compressor3.SetFrequencyMarker(frequencyMarker);
+
 
                 var compressed1 = new ulong[arrays.Length];
                 var compressed2 = new ulong[arrays.Length];
