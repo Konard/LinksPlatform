@@ -11,3 +11,6 @@ script:
   - cd Platform.Tests
   - rm Platform.Tests.Library.csproj
   - dotnet xunit -parallel none
+after_success:
+  - unzip
+  - mono
