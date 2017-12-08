@@ -13,9 +13,9 @@ script:
   - dotnet xunit -parallel none
 after_success:
   - cd ../..
-  - mkdir docfx
-  - cd docfx
   - nuget install docfx.console
   - ls
-  - git clone https://github.com/docascode/docfx-seed.git docfx-seed
-  - mono docfx.console.2.28.2/tools/docfx.exe docfx-seed/docfx.json
+  - mono docfx.console.2.28.2/tools/docfx.exe docfx.json
+  - ls doc
+  - ls doc/generated
+  - ls doc/generated/site
