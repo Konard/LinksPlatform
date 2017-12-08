@@ -41,9 +41,7 @@ namespace Platform.Data.Core.Sequences
 
             if (firstLink != FirstCharLink)
             {
-                _links.Delete(firstLink);
-
-                ConsoleHelpers.Debug("Assume UTF16 table already created.");
+                _links.Delete(firstLink);                
             }
             else
             {
@@ -54,12 +52,8 @@ namespace Platform.Data.Core.Sequences
                     _links.Update(createdLink, firstLink, createdLink);
                     if (createdLink != i)
                         throw new Exception("Unable to initialize UTF 16 table.");
-                }
-
-                ConsoleHelpers.Debug("UTF16 table created and initialized.");
-            }
-
-            ConsoleHelpers.Debug("Total links count: {0}.", _links.Count());
+                }                
+            }            
         }
 
         // 0 - null link
