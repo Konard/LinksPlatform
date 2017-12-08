@@ -3,35 +3,35 @@
     {
       "src": [
         {
-          "files": [ "**/*.sln", "src/DotnetNew/*.csproj" ],
+          "files": [ "Platform/Platform.dotnet.sln"],
           "exclude": [ "**/bin/**", "**/obj/**" ],
-          "src": "src"
+          "src": "Platform"
         }
       ],
-      "dest": "obj/api"
+      "dest": "doc/generated/obj/api"
     }
   ],
   "build": {
     "content": [
       {
         "files": [ "**/*.yml" ],
-        "src": "obj/api",
-        "dest": "api"
+        "src": "doc/generated/obj/api",
+        "dest": "doc/generated/api"
       },
       {
-        "files": [ "articles/**/*.md", "*.md", "toc.yml", "restapi/**" ]
+        "files": [ "doc/articles/**/*.md", "*.md", "toc.yml", "restapi/**" ]
       }
     ],
     "resource": [
       {
-        "files": [ "articles/images/**"]
+        "files": [ "doc/articles/images/**"]
       }
     ],
     "overwrite": "specs/*.md",
     "globalMetadata": {
-      "_appTitle": "docfx seed website",
+      "_appTitle": "LinksPlatform",
       "_enableSearch": true
     },
-    "dest": "_site"
+    "dest": "doc/generated/site"
   }
 }
