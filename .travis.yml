@@ -14,4 +14,10 @@ script:
 after_success:
   - unzip
   - mono
-  - nuget
+  - cd ../..
+  - mkdir docfx
+  - cd docfx
+  - nuget install docfx.console
+  - ls
+  - git clone https://github.com/docascode/docfx-seed.git docfx-seed
+
