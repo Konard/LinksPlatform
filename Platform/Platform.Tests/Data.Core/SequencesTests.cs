@@ -485,6 +485,8 @@ namespace Platform.Tests.Data.Core
                 var START = 0;
                 var END = arrays.Length;
 
+                var initialCount1 = scope2.Links.Count();
+                
                 for (int i = START; i < END; i++)
                     compressed1[i] = compressor1.Compress(arrays[i]);
 
@@ -492,17 +494,23 @@ namespace Platform.Tests.Data.Core
 
                 var sw2 = Stopwatch.StartNew();
                 
+                var initialCount2 = scope2.Links.Count();
                 
                 for (int i = START; i < END; i++)
                     compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
                 
-                var sw3 = Stopwatch.StartNew();
+                
                 
                 for (int i = START; i < END; i++)
                     compressor3.IncrementPairsFrequencies(arrays[i]);
 
+                var initialCount3 = scope3.Links.Count();
+                
+                
+                var sw3 = Stopwatch.StartNew();
+                
                 for (int i = START; i < END; i++)
                     compressed3[i] = compressor3.CreateOptimalVariant(arrays[i]);
 
@@ -542,15 +550,15 @@ namespace Platform.Tests.Data.Core
                 
                 scope3.Links.Delete(meaningRoot);
 
-                Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
-                Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
-                Assert.True((int)(scope3.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
+                Assert.True((int)(scope1.Links.Count() - initialCount1) < totalCharacters);
+                Assert.True((int)(scope2.Links.Count() - initialCount2) < totalCharacters);
+                Assert.True((int)(scope3.Links.Count() - initialCount3) < totalCharacters);
 
-                Console.WriteLine($"{(double)(scope1.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope2.Links.Count() - UnicodeMap.MapSize) / totalCharacters} | {(double)(scope3.Links.Count() - UnicodeMap.MapSize) / totalCharacters}");
+                Console.WriteLine($"{(double)(scope1.Links.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Count() - initialCount3) / totalCharacters}");
                 
 
-                Assert.True(scope1.Links.Count() < scope2.Links.Count());
-                Assert.True(scope3.Links.Count() < scope2.Links.Count());
+                Assert.True(scope1.Links.Count() - initialCount1 < scope2.Links.Count() - initialCount2);
+                Assert.True(scope3.Links.Count() - initialCount3 < scope2.Links.Count() - initialCount2);
                             
                 compressor1.ValidateFrequencies();
             }
