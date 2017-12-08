@@ -538,6 +538,9 @@ namespace Platform.Tests.Data.Core
                     Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
                     Assert.True(strings[i] == decompress3 && decompress3 == decompress2);
                 }
+                
+                
+                scope3.Links.Delete(meaningRoot);
 
                 Assert.True((int)(scope1.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
                 Assert.True((int)(scope2.Links.Count() - UnicodeMap.MapSize) < totalCharacters);
