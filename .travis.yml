@@ -3,6 +3,9 @@ sudo: required
 dist: trusty  
 mono: latest
 dotnet: 1.1.5
+env:
+  global:
+  - COMMIT_AUTHOR_EMAIL: "konard@me.com"
 before_script:
   - cd Platform
   - dotnet restore Platform.dotnet.sln
