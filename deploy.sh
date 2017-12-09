@@ -46,4 +46,4 @@ git add -A .
 git commit -m "Deploy to GitHub Pages: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push $TARGET_BRANCH
+git push https://konard:02a9a5269b2a1a8a28fed6254407d19822ecffa6@github.com/konard/linksplatform.git $TARGET_BRANCH
