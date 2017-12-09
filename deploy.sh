@@ -32,7 +32,7 @@ cd out
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
 git remote rm origin
-git remote add origin https://02a9a5269b2a1a8a28fed6254407d19822ecffa6@github.com/konard/linksplatform.git
+git remote add origin https://konard:f073bd633fa5446ec14c8ff73f153be4f3d8d27d@github.com/Konard/LinksPlatform.git
 
 # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
 if git diff --quiet; then
@@ -46,4 +46,4 @@ git add -A .
 git commit -m "Deploy to GitHub Pages: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push https://02a9a5269b2a1a8a28fed6254407d19822ecffa6@github.com/konard/linksplatform.git $TARGET_BRANCH
+git push https://konard:f073bd633fa5446ec14c8ff73f153be4f3d8d27d@github.com/Konard/LinksPlatform.git $TARGET_BRANCH
