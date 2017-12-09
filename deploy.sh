@@ -13,7 +13,7 @@ fi
 # Save some useful information
 REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
-TOKEN='8c5d8d5b6ea4fcf4bf8e26f8b39a49cba80edf88'
+TOKEN="8c5d8d5b6ea4fcf4bf8e26f8b39a49cba80edf88"
 
 # Clone the existing gh-pages for this repo into out/
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
