@@ -33,6 +33,8 @@ cp -r doc/generated/site/* out
 cd out
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
+git remote rm origin
+git remote add origin https://konard:02a9a5269b2a1a8a28fed6254407d19822ecffa6@github.com/konard/linksplatform.git
 
 # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
 if git diff --quiet; then
