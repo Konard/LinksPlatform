@@ -13,6 +13,7 @@ fi
 # Save some useful information
 REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
+TOKEN='8c5d8d5b6ea4fcf4bf8e26f8b39a49cba80edf88'
 
 # Clone the existing gh-pages for this repo into out/
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
@@ -32,7 +33,7 @@ cd out
 git config user.name "Travis CI"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
 git remote rm origin
-git remote add origin https://konard:013ce67101622e7c396d49d21b36b80aa087912b@github.com/Konard/LinksPlatform.git
+git remote add origin https://konard:$TOKEN@github.com/Konard/LinksPlatform.git
 
 # If there are no changes to the compiled out (e.g. this is a README update) then just bail.
 if git diff --quiet; then
@@ -46,4 +47,4 @@ git add -A .
 git commit -m "Deploy to GitHub Pages: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push https://konard:013ce67101622e7c396d49d21b36b80aa087912b@github.com/Konard/LinksPlatform.git $TARGET_BRANCH
+git push https://konard:$TOKEN@github.com/Konard/LinksPlatform.git $TARGET_BRANCH
