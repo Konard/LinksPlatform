@@ -17,3 +17,5 @@ after_success:
   - ls
   - mono docfx.console.2.28.2/tools/docfx.exe docfx.json
   - ls doc/generated/site
+  - ls doc/generated/site/doc
+  - ./deploy.sh
