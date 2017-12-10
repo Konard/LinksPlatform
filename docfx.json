@@ -10,15 +10,15 @@
           "src": "Platform"
         }
       ],
-      "dest": "doc/generated/obj/api"
+      "dest": "obj/api"
     }
   ],
   "build": {
     "content": [
       {
         "files": [ "**/*.yml" ],
-        "src": "doc/generated/obj/api",
-        "dest": "doc/generated/api"
+        "src": "obj/api",
+        "dest": "api"
       },
       {
         "files": [ "doc/articles/**/*.md", "*.md", "toc.yml" ]
