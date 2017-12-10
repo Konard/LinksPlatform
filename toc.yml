@@ -5,3 +5,4 @@
   homepage: doc/articles/docfx_getting_started.md
 - name: API Documentation
   href: obj/api/
+  homepage: api/Platform.Data.Core.Pairs.ILinks-1.html
