@@ -30,9 +30,11 @@ namespace Platform.Tests.Data.Core
                 var meaningRoot = links.CreatePoint();
                 var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 
                 sequences.SetUnaryOne(unaryOne);
                 sequences.SetFrequencyMarker(frequencyMarker);
+                sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
 
                 var sw1 = Stopwatch.StartNew();
                 sequences.IncrementPairsFrequencies(sequence); sw1.Stop();   
