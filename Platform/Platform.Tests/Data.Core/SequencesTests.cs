@@ -463,8 +463,7 @@ namespace Platform.Tests.Data.Core
                 var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
-                
-                
+                                
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
                 
                 var links = scope3.Links;
@@ -478,12 +477,10 @@ namespace Platform.Tests.Data.Core
                 sequences.SetFrequencyMarker(frequencyMarker);
                 sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
 
-
                 var compressed1 = new ulong[arrays.Length];
                 var compressed2 = new ulong[arrays.Length];
                 var compressed3 = new ulong[arrays.Length];
            
-
                 var sw1 = Stopwatch.StartNew();
 
                 var START = 0;
@@ -504,22 +501,18 @@ namespace Platform.Tests.Data.Core
                     compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
-                
-                
-                
+                                                
                 for (int i = START; i < END; i++)
                     compressor3.IncrementPairsFrequencies(arrays[i]);
 
                 var initialCount3 = scope3.Links.Count();
-                
-                
+                                
                 var sw3 = Stopwatch.StartNew();
                 
                 for (int i = START; i < END; i++)
                     compressed3[i] = compressor3.CreateOptimalVariant(arrays[i]);
 
-                var elapsed3 = sw3.Elapsed;
-                
+                var elapsed3 = sw3.Elapsed;                
 
                 Console.WriteLine($"Compressor: {elapsed1}, Balanced variant: {elapsed2}, Optimal variant: {elapsed3}");
 
@@ -550,16 +543,12 @@ namespace Platform.Tests.Data.Core
                     Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
                     Assert.True(strings[i] == decompress3 && decompress3 == decompress2);
                 }
-                
-                
-                scope3.Links.Delete(meaningRoot);
-
+                                               
                 Assert.True((int)(scope1.Links.Count() - initialCount1) < totalCharacters);
                 Assert.True((int)(scope2.Links.Count() - initialCount2) < totalCharacters);
                 Assert.True((int)(scope3.Links.Count() - initialCount3) < totalCharacters);
 
-                Console.WriteLine($"{(double)(scope1.Links.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Count() - initialCount3) / totalCharacters}");
-                
+                Console.WriteLine($"{(double)(scope1.Links.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Count() - initialCount3) / totalCharacters}");                
 
                 Assert.True(scope1.Links.Count() - initialCount1 < scope2.Links.Count() - initialCount2);
                 Assert.True(scope3.Links.Count() - initialCount3 < scope2.Links.Count() - initialCount2);
