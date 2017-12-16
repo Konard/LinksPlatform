@@ -94,22 +94,22 @@ namespace Platform.Data.Core.Sequences
             return links.GetOrCreate(sequence[0], sequence[1]);
         }
         
-        public ulong GetGreatestNeigbourLowerThanCurrentOrCurrent(ulong previous, ulong current, ulong next)
+        private ulong GetGreatestNeigbourLowerThanCurrentOrCurrent(ulong previous, ulong current, ulong next)
         {
             if (previous > next)
-                return current < previous ? current : previous;
+                return previous < current ? previous : current;
             else
-                return current < next ? current : next;
+                return next < current ? next : current;
         }
         
-        public ulong GetNextLowerThanCurrentOrCurrent(ulong current, ulong next)
+        private ulong GetNextLowerThanCurrentOrCurrent(ulong current, ulong next)
         {            
-            return current < next ? current : next;
+            return next < current ? next : current;
         }
         
-        public ulong GetPreviousLowerThanCurrentOrCurrent(ulong previous, ulong current)
+        private ulong GetPreviousLowerThanCurrentOrCurrent(ulong previous, ulong current)
         {
-            return current < previous ? current : previous;          
+            return previous < current ? previous : current;          
         }
                         
         public ulong[] CalculateLocalElementLevels(ulong[] sequence)
