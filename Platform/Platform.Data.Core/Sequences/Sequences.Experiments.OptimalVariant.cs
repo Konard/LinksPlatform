@@ -48,10 +48,10 @@ namespace Platform.Data.Core.Sequences
                         {
                             sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);                                                                  
                             var newLevel = i >= length - 1 ? 
-                                GreatestNeigbourLowerThanCurrentOrCurrent(previousLevel, currentLevel, previousLevel) :
+                                GetPreviousLowerThanCurrentOrCurrent(previousLevel, currentLevel) :
                                 i < 2 ?
-                                GreatestNeigbourLowerThanCurrentOrCurrent(levels[i + 1], currentLevel, levels[i + 1]) :
-                                GreatestNeigbourLowerThanCurrentOrCurrent(previousLevel, currentLevel, levels[i + 1]);
+                                GetNextLowerThanCurrentOrCurrent(currentLevel, levels[i + 1]) :
+                                GetGreatestNeigbourLowerThanCurrentOrCurrent(previousLevel, currentLevel, levels[i + 1]);
                             levels[w] = newLevel;
                             previousLevel = currentLevel;
                             w++;
@@ -94,7 +94,7 @@ namespace Platform.Data.Core.Sequences
             return links.GetOrCreate(sequence[0], sequence[1]);
         }
         
-        public ulong GreatestNeigbourLowerThanCurrentOrCurrent(ulong previous, ulong current, ulong next)
+        public ulong GetGreatestNeigbourLowerThanCurrentOrCurrent(ulong previous, ulong current, ulong next)
         {
             if (previous > next)
                 return current < previous ? current : previous;
@@ -102,6 +102,16 @@ namespace Platform.Data.Core.Sequences
                 return current < next ? current : next;
         }
         
+        public ulong GetNextLowerThanCurrentOrCurrent(ulong current, ulong next)
+        {            
+            return current < next ? current : next;
+        }
+        
+        public ulong GetPreviousLowerThanCurrentOrCurrent(ulong previous, ulong current)
+        {
+            return current < previous ? current : previous;          
+        }
+                        
         public ulong[] CalculateLocalElementLevels(ulong[] sequence)
         {
             var levels = new ulong[sequence.Length];
