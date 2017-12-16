@@ -467,12 +467,14 @@ namespace Platform.Tests.Data.Core
                 
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
                 
-                var meaningRoot = scope3.Links.CreatePoint();
-                var unaryOne = scope3.Links.CreateAndUpdate(meaningRoot, constants.Itself);
-                var frequencyMarker = scope3.Links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var meaningRoot = links.CreatePoint();
+                var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 
-                compressor3.SetUnaryOne(unaryOne);
-                compressor3.SetFrequencyMarker(frequencyMarker);
+                sequences.SetUnaryOne(unaryOne);
+                sequences.SetFrequencyMarker(frequencyMarker);
+                sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
 
 
                 var compressed1 = new ulong[arrays.Length];
