@@ -467,6 +467,8 @@ namespace Platform.Tests.Data.Core
                 
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
                 
+                var links = scope3.Links;
+                var sequences = compressor3;
                 var meaningRoot = links.CreatePoint();
                 var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
