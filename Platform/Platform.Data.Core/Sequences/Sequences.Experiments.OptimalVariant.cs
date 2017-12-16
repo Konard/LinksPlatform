@@ -161,7 +161,12 @@ namespace Platform.Data.Core.Sequences
         {
             var frequencyContainer = 0UL;
             
-            Links.Each(pair, Constants.Any, candidate =>
+            var property = Links.SearchOrDefault(pair, _frequencyPropertyMarker);
+            
+            if (property == 0)
+                return frequencyContainer;
+            
+            Links.Each(property, Constants.Any, candidate =>
             {
                 var candidateTarget = Links.GetTarget(candidate);
                 var frequencyTarget = Links.GetTarget(candidateTarget);
@@ -209,7 +214,8 @@ namespace Platform.Data.Core.Sequences
         {
             if (previousFrequencyContainer != 0)
                 Links.Delete(previousFrequencyContainer);
-            Links.CreateAndUpdate(pair, frequency);            
+            var property = Links.GetOrCreate(pair, _frequencyPropertyMarker);
+            Links.CreateAndUpdate(property, frequency);            
         }
         
         private ulong _frequencyMarker;
@@ -222,6 +228,18 @@ namespace Platform.Data.Core.Sequences
         public void SetFrequencyMarker(ulong frequencyMarker)
         {
             _frequencyMarker = frequencyMarker;
+        }
+        
+        private ulong _frequencyPropertyMarker;
+        
+        public ulong GetFrequencyProperyMarker()
+        {
+            return _frequencyPropertyMarker;
+        }
+        
+        public void SetFrequencyPropertyMarker(ulong frequencyPropertyMarker)
+        {
+            _frequencyPropertyMarker = frequencyPropertyMarker;
         }
         
         private ulong _unaryOne;
