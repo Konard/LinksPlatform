@@ -2,7 +2,7 @@
   href: index.md
 - name: Articles
   href: doc/articles/
-  homepage: doc/articles/docfx_getting_started.md
+  homepage: doc/articles/links-theory.md
 - name: API Documentation
   href: obj/api/
   homepage: api/Platform.Data.Core.Pairs.ILinks-1.html
