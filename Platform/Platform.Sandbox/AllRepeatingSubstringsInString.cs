@@ -72,14 +72,21 @@ namespace Platform.Sandbox
 
         public static void Run()
         {
+            var text = ExampleText;
+
+            var iterationsCounter = new IterationsCounter();
+            iterationsCounter.Collect(text);
+            var result = iterationsCounter.IterationsCount;
+            Console.WriteLine($"TextLength: {text.Length}. Iterations: {result}.");
+
             var collector = new Collector4();
-            collector.Collect(ExampleText);
+            collector.Collect(text);
         }
     }
 
     public abstract class CollectorBase
     {
-        public abstract void Collect(string @string);
+        public virtual void Collect(string @string) => Loop(@string);
 
         protected void Loop(string @string)
         {
@@ -262,5 +269,12 @@ namespace Platform.Sandbox
             else
                 _cache.Add(key, 1);
         }
+    }
+
+    public class IterationsCounter : CollectorBase
+    {
+        public long IterationsCount;
+
+        protected override void Iteration(char[] @string, int offset, int length) => IterationsCount++;
     }
 }
