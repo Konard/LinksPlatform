@@ -15,8 +15,6 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void OptimalVariantSequenceTest()
         {
-            const long sequenceLength = 200;
-
             using (var scope = new TempLinksTestScope(useSequences: true))
             {
                 var links = scope.Links;
