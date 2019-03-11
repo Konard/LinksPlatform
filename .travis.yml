@@ -2,7 +2,7 @@ language: csharp
 sudo: required  
 dist: trusty  
 mono: latest
-dotnet: 1.1.5
+dotnet: 2.2
 env:
   global:
   - COMMIT_AUTHOR_EMAIL: "konard@me.com"
@@ -14,8 +14,5 @@ script:
 after_success:
   - cd ../..
   - nuget install docfx.console
-  - ls
-  - mono docfx.console.2.30.0/tools/docfx.exe docfx.json
-  - ls doc/generated/site
-  - ls doc/generated/site/doc
+  - mono $(ls | grep "docfx.console.")tools/docfx.exe docfx.json
   - bash ./deploy.sh
