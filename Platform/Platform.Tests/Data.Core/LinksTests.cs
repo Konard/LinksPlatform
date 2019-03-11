@@ -400,7 +400,7 @@ namespace Platform.Tests.Data.Core
             File.Delete(tempTransactionLogFilename);
         }
 
-        public void ExceptionThrower()
+        private void ExceptionThrower()
         {
             throw new Exception();
         }
@@ -458,7 +458,7 @@ namespace Platform.Tests.Data.Core
             }
         }
 
-        public void DefaultFormatter(StringBuilder sb, ulong link)
+        private void DefaultFormatter(StringBuilder sb, ulong link)
         {
             sb.Append(link.ToString());
         }
