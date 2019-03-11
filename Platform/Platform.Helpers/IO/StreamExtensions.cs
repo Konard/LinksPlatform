@@ -15,7 +15,7 @@ namespace Platform.Helpers.IO
         public static T ReadOrDefault<T>(this Stream stream)
             where T : struct
         {
-            var size = Marshal.SizeOf(typeof(T));
+            var size = Marshal.SizeOf<T>();
             var buffer = new byte[size];
             var read = stream.Read(buffer, 0, size);
             return read < size ? default(T) : To.Structure<T>(buffer);
@@ -24,7 +24,7 @@ namespace Platform.Helpers.IO
         public static T[] ReadAll<T>(this Stream stream)
             where T : struct
         {
-            var size = Marshal.SizeOf(typeof(T));
+            var size = Marshal.SizeOf<T>();
             var buffer = new byte[size];
             var elementsLength = stream.Length / size;
             var elements = new T[elementsLength];

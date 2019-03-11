@@ -41,8 +41,8 @@ namespace Platform.Sandbox
             public long FileSizeInTransactionItems;
         }
 
-        private static readonly long BasicTransactionsOffset = Marshal.SizeOf(typeof(TransactionsState));
-        private static readonly long TransactionItemSize = Marshal.SizeOf(typeof(TransactionItem));
+        private static readonly long BasicTransactionsOffset = Marshal.SizeOf<TransactionsState>();
+        private static readonly long TransactionItemSize = Marshal.SizeOf<TransactionItem>();
 
         private static long CurrentFileSizeInBytes;
         private static MemoryMappedFile Log;
@@ -65,8 +65,6 @@ namespace Platform.Sandbox
                 Linker = Net.Link.Linker,
                 Target = Net.Link.Target,
             };
-
-            //LogAccessor. += Marshal.SizeOf(typeof(TransactionItem));
 
             EnsureFileSize();
 

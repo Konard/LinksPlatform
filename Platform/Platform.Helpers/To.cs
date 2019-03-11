@@ -174,7 +174,7 @@ namespace Platform.Helpers
         public static byte[] Bytes<T>(T obj)
             where T : struct
         {
-            var structureSize = Marshal.SizeOf(obj);
+            var structureSize = Marshal.SizeOf<T>();
 
             var bytes = new byte[structureSize];
 
@@ -194,8 +194,7 @@ namespace Platform.Helpers
         {
             Ensure.ArgumentNotEmpty(bytes, nameof(bytes));
 
-            var structureType = typeof(T);
-            var structureSize = Marshal.SizeOf(structureType);
+            var structureSize = Marshal.SizeOf<T>();
 
             if (bytes.Length != structureSize)
                 throw new ArgumentOutOfRangeException(nameof(bytes), "Bytes array should be the same length as struct size.");
@@ -204,7 +203,7 @@ namespace Platform.Helpers
 
             Marshal.Copy(bytes, 0, pointer, structureSize);
 
-            var structure = (T)Marshal.PtrToStructure(pointer, structureType);
+            var structure = Marshal.PtrToStructure<T>(pointer);
 
             Marshal.FreeHGlobal(pointer);
 
