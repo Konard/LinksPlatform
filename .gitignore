@@ -207,6 +207,13 @@ Thumbs.db
 # Linux files
 *.o
 
+# Visual Studio Code
+.vscode/*
+#!.vscode/settings.json
+#!.vscode/tasks.json
+#!.vscode/launch.json
+#!.vscode/extensions.json
+
 # Platform.Data.Kernel
 Platform/Platform.Data.Kernel/test
 Platform/Platform.Data.Kernel/*.exe

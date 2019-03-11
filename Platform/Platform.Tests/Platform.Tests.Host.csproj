@@ -2,7 +2,8 @@
   
   <PropertyGroup>
     <AssemblyName>Platform.Tests</AssemblyName>
-    <TargetFramework>netcoreapp1.1.5</TargetFramework>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <IsPackable>false</IsPackable>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
@@ -11,10 +12,11 @@
   <ItemGroup>
     <ProjectReference Include="../Platform.Data.Core/Platform.Data.Core.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
-    <PackageReference Include="xunit" Version="2.3.1" />
-    <DotNetCliToolReference Include="dotnet-xunit" Version="2.3.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
+    <PackageReference Include="xunit" Version="2.4.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
   </ItemGroup>
 
 </Project>

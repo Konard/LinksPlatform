@@ -7,13 +7,10 @@ env:
   global:
   - COMMIT_AUTHOR_EMAIL: "konard@me.com"
 before_script:
-  - cd Platform
-  - dotnet restore Platform.dotnet.sln
-  - dotnet build Platform.dotnet.sln
+  - dotnet restore Platform/Platform.dotnet.sln
+  - dotnet build Platform/Platform.dotnet.sln
 script:
-  - cd Platform.Tests
-  - rm Platform.Tests.Library.csproj
-  - dotnet xunit -parallel none
+  - dotnet test Platform/Platform.dotnet.sln
 after_success:
   - cd ../..
   - nuget install docfx.console
