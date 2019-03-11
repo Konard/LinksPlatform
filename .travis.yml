@@ -1,6 +1,6 @@
 language: csharp  
 sudo: required  
-dist: trusty  
+dist: xenial
 mono: latest
 dotnet: 2.2
 env:
