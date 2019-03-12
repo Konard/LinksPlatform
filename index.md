@@ -3,7 +3,7 @@
 [github.com/Konard/LinksPlatform](https://github.com/Konard/LinksPlatform)
 
 ## Description | Описание
-Holistic system for storage and transformation of information based on associative model of data. Целостная система для хранения и обработки информации основная на ассоциативной модели данных.
+Holistic system for storage and transformation of information based on associative model of data. Целостная система для хранения и обработки информации, основанная на ассоциативной модели данных.
 
 ## How to run | Как запустить
 ### Prerequisites | Требования
