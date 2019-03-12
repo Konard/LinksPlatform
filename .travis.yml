@@ -13,5 +13,5 @@ script:
   - dotnet test Platform/Platform.dotnet.sln
 after_success:
   - nuget install docfx.console
-  - mono $(ls | grep "docfx.console.")tools/docfx.exe docfx.json
+  - mono $(ls | grep "docfx.console.")/tools/docfx.exe docfx.json
   - bash ./deploy.sh
