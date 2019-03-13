@@ -11,7 +11,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Communication", "P
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Data.Core", "Platform.Data.Core/Platform.Data.Core.csproj", "{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Tests", "Platform.Tests/Platform.Tests.Host.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "Platform.Tests", "Platform.Tests/Platform.Tests.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
