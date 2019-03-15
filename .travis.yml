@@ -6,9 +6,6 @@ dotnet: 2.2
 env:
   global:
   - COMMIT_AUTHOR_EMAIL: "konard@me.com"
-before_script:
-  - dotnet restore Platform/Platform.dotnet.sln
-  - dotnet build Platform/Platform.dotnet.sln
 script:
   - dotnet test Platform/Platform.dotnet.sln
 after_success:
