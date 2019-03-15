@@ -117,19 +117,19 @@ namespace Platform.Data.Core.Triplets
         private static extern void WalkThroughAllReferersBySource(LinkIndex root, Visitor action);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersAsSource(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersBySource(LinkIndex root, StopableVisitor func);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllReferersByLinker(LinkIndex root, Visitor action);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersAsLinker(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersByLinker(LinkIndex root, StopableVisitor func);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllReferersByTarget(LinkIndex root, Visitor action);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
-        private static extern int WalkThroughReferersAsTarget(LinkIndex root, StopableVisitor func);
+        private static extern int WalkThroughReferersByTarget(LinkIndex root, StopableVisitor func);
 
         [DllImport(DllName, CallingConvention = CallingConvention.Cdecl)]
         private static extern void WalkThroughAllLinks(Visitor action);
@@ -478,7 +478,7 @@ namespace Platform.Data.Core.Triplets
             if (referers == 1)
                 return walker(FirstRefererBySource);
             else if (referers > 1)
-                return WalkThroughReferersAsSource(this, x => walker(x) ? 1 : 0) != 0;
+                return WalkThroughReferersBySource(this, x => walker(x) ? 1 : 0) != 0;
             else
                 return true;
         }
@@ -504,7 +504,7 @@ namespace Platform.Data.Core.Triplets
             if (referers == 1)
                 return walker(FirstRefererByLinker);
             else if (referers > 1)
-                return WalkThroughReferersAsLinker(this, x => walker(x) ? 1 : 0) != 0;
+                return WalkThroughReferersByLinker(this, x => walker(x) ? 1 : 0) != 0;
             else
                 return true;
         }
@@ -530,7 +530,7 @@ namespace Platform.Data.Core.Triplets
             if (referers == 1)
                 return walker(FirstRefererByTarget);
             else if (referers > 1)
-                return WalkThroughReferersAsTarget(this, x => walker(x) ? 1 : 0) != 0;
+                return WalkThroughReferersByTarget(this, x => walker(x) ? 1 : 0) != 0;
             else
                 return true;
         }
@@ -566,9 +566,9 @@ namespace Platform.Data.Core.Triplets
 
             StopableVisitor wrapper = x => walker(x) ? 1 : 0;
 
-            WalkThroughReferersAsSource(this, wrapper);
-            WalkThroughReferersAsLinker(this, wrapper);
-            WalkThroughReferersAsTarget(this, wrapper);
+            WalkThroughReferersBySource(this, wrapper);
+            WalkThroughReferersByLinker(this, wrapper);
+            WalkThroughReferersByTarget(this, wrapper);
         }
 
         public static bool WalkThroughAllLinks(Func<Link, bool> walker) => WalkThroughLinks(x => walker(x) ? 1 : 0) != 0;

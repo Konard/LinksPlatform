@@ -1,4 +1,9 @@
-﻿using System.Web.Mvc;
+﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
 using Platform.Data.Core.Triplets;
 using Platform.Data.WebTerminal.Models;
 
@@ -7,7 +12,7 @@ namespace Platform.Data.WebTerminal.Controllers
     public class LinksController : Controller
     {
         // GET: /Links/
-        public ActionResult Index(long id = 0)
+        public IActionResult Index(long id = 0)
         {
             if (id == 0) id = Net.Link;
             var link = Link.Restore(id);
@@ -15,7 +20,7 @@ namespace Platform.Data.WebTerminal.Controllers
             return View("Index", model);
         }
 
-        public ActionResult Infinite(long id = 0)
+        public IActionResult Infinite(long id = 0)
         {
             if (id == 0) id = Net.Link;
             var link = Link.Restore(id);

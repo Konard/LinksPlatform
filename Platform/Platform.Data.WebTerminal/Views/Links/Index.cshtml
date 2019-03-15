@@ -1,11 +1,11 @@
-﻿@model Platform.Data.WebTerminal.Models.LinkModel
+﻿@model LinkModel
 
 @{
-    ViewBag.Title = Model.Link.ToString().CapitalizeFirstLetter();
+    ViewData["Title"] = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.Link.ToString());
 }
 
 <div class="link-view">
-    <h2>@ViewBag.Title</h2>
+    <h2>@ViewData["Title"]</h2>
 
     <div class="link-description">
         @Html.Partial("LinkDescription", Model.Link)

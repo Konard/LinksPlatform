@@ -1,7 +1,7 @@
-﻿@model Platform.Data.WebTerminal.Models.LinkModel
+﻿@model LinkModel
 @{
     Layout = null;
-    ViewBag.Title = Model.Link.ToString().CapitalizeFirstLetter();
+    ViewData["Title"] = System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(Model.Link.ToString());
 }
 
 <!DOCTYPE html>
@@ -10,11 +10,11 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>@ViewBag.Title</title>
+    <title>@ViewData["Title"]</title>
 
-    @Styles.Render("~/Content/infinite/style.css")
-    @Scripts.Render("~/bundles/jquery")
-    @Scripts.Render("~/Scripts/infinite/script.js")
+    <link rel="stylesheet" href="~/css/infinite/style.css">
+    <script src="~/lib/jquery/dist/jquery.js"></script>
+    <script src="~/js/infinite.js"></script>
 
     <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans&v1' rel='stylesheet' type='text/css'> -->
 </head>
