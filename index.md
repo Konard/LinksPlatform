@@ -11,6 +11,4 @@ Holistic system for storage and transformation of information based on associati
 * Установить .NET Core SDK https://www.microsoft.com/net
 
 ### Run Tests | Запустить тесты
-* `dotnet restore Platform/Platform.dotnet.sln`
-* `dotnet build Platform/Platform.dotnet.sln`
 * `dotnet test Platform/Platform.dotnet.sln`
