@@ -10,7 +10,6 @@ using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
-using Platform.Helpers.Collections.Optimizations;
 
 namespace Platform.Sandbox
 {
@@ -531,7 +530,7 @@ namespace Platform.Sandbox
             private ulong _maxFrequency;
             private UInt64Link _maxPair2;
             private ulong _maxFrequency2;
-            private UnsafeDictionary<UInt64Link, ulong> _pairsFrequencies;
+            private Dictionary<UInt64Link, ulong> _pairsFrequencies;
 
             public Compressor(SynchronizedLinks<ulong> links, Sequences sequences)
             {
@@ -541,7 +540,7 @@ namespace Platform.Sandbox
                 _maxFrequency = 1;
                 _maxPair2 = UInt64Link.Null;
                 _maxFrequency2 = 1;
-                _pairsFrequencies = new UnsafeDictionary<UInt64Link, ulong>();
+                _pairsFrequencies = new Dictionary<UInt64Link, ulong>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -1212,7 +1211,7 @@ namespace Platform.Sandbox
 
                     //ResetMaxPair();
                     set.Clear();
-                    //_pairsFrequencies = new UnsafeDictionary<Link, ulong>();
+                    //_pairsFrequencies = new Dictionary<Link, ulong>();
 
                     oldLength = newLength;
 
@@ -1549,23 +1548,21 @@ namespace Platform.Sandbox
             {
                 ResetMaxPair();
 
-                var entries = _pairsFrequencies.entries;
-                for (var i = 0; i < entries.Length; i++)
+                foreach(var entry in _pairsFrequencies)
                 {
-                    if (entries[i].hashCode >= 0)
+                    var pair = entry.Key;
+                    var frequency = entry.Value;
+                    if (frequency > 1)
                     {
-                        if (entries[i].value > 1)
+                        if (_maxFrequency < frequency)
                         {
-                            if (_maxFrequency < entries[i].value)
-                            {
-                                _maxFrequency = entries[i].value;
-                                _maxPair = entries[i].key;
-                            }
-                            else if (_maxFrequency == entries[i].value &&
-                                (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
-                            {
-                                _maxPair = entries[i].key;
-                            }
+                            _maxFrequency = frequency;
+                            _maxPair = pair;
+                        }
+                        else if (_maxFrequency == frequency &&
+                            (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                        {
+                            _maxPair = pair;
                         }
                     }
                 }
@@ -1575,27 +1572,24 @@ namespace Platform.Sandbox
             {
                 ResetMaxPair();
 
-                var entries = _pairsFrequencies.entries;
-                for (var i = 0; i < entries.Length; i++)
+                foreach(var entry in _pairsFrequencies)
                 {
-                    if (entries[i].hashCode >= 0)
+                    var pair = entry.Key;
+                    var frequency = entry.Value;
+                    if (frequency > 1)
                     {
-                        var frequency = entries[i].value;
-                        if (frequency > 1)
-                        {
-                            if (_maxFrequency > frequency)
-                                continue;
+                        if (_maxFrequency > frequency)
+                            continue;
 
-                            if (_maxFrequency < frequency)
-                            {
-                                _maxFrequency = frequency;
-                                _maxPair = entries[i].key;
-                            }
-                            else if (_maxFrequency == frequency &&
-                                (entries[i].key.Source + entries[i].key.Target) > (_maxPair.Source + _maxPair.Target))
-                            {
-                                _maxPair = entries[i].key;
-                            }
+                        if (_maxFrequency < frequency)
+                        {
+                            _maxFrequency = frequency;
+                            _maxPair = pair;
+                        }
+                        else if (_maxFrequency == frequency &&
+                            (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                        {
+                            _maxPair = pair;
                         }
                     }
                 }

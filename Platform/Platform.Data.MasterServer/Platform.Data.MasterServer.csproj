@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>Platform.Data.MasterServer</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Platform.Data.MasterServer</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.IO;
 using Platform.Examples;
-using Platform.Tests.Data.Core;
 
 namespace Platform.Sandbox
 {
@@ -10,8 +9,6 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            SequencesTests.RundomNumbersCompressionQualityTest();
-
             //new Zadacha().RunAll();
 
             //new TestsRunnerCLI().Run(args);

@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+    <AssemblyName>Platform.Data.SlaveServer</AssemblyName>
+    <OutputType>Exe</OutputType>
+    <PackageId>Platform.Data.SlaveServer</PackageId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj" />
+  </ItemGroup>
+
+</Project>
