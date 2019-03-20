@@ -26,7 +26,7 @@
     <ProjectReference Include="../Platform.Helpers/Platform.Helpers.csproj" />
   </ItemGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.5' ">
+  <ItemGroup>
     <PackageReference Include="System.IO.MemoryMappedFiles" Version="4.0.0" />
   </ItemGroup>
 
