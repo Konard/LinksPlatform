@@ -11,7 +11,7 @@ namespace Platform.Sandbox
         {
             //new Zadacha().RunAll();
 
-            //new TestsRunnerCLI().Run(args);
+            //new XUnitTestsRunnerCLI().Run(args);
 
             //new CSVExporterCLI().Run(args);
             //new FileIndexerCLI().Run(args);

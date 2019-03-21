@@ -26,7 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.abstractions" Version="2.0.1" />
     <PackageReference Include="xunit.runner.utility" Version="2.2.0" />
   </ItemGroup>
 
