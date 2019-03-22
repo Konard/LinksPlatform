@@ -5,7 +5,7 @@ using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Disposables;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <summary>
     /// Представляет объект для работы с базой данных (файлом) в формате Links (массива взаимосвязей).

@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Triplets
 {
     /// <remarks>
     /// TODO: Check that CollectMatchingSequences algorithm is working, if not throw it away.
-    /// TODO: Think of the abstraction on Sequences that can be equally usefull for triple links, pair links and so on.
+    /// TODO: Think of the abstraction on Sequences that can be equally usefull for triple links, doublet links and so on.
     /// </remarks>
     public class SequenceHelpers
     {

@@ -2,7 +2,7 @@
 using Platform.Helpers;
 using Platform.Memory;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// TODO: Возможно нужна фабрика не для самих Links, а для всего контекста работы с ними, которое собирает всё что нужно, а также предоставляет подходящие константы.

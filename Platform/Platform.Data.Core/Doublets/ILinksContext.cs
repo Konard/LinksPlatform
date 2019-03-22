@@ -1,7 +1,7 @@
 ﻿using System;
 using Platform.Memory;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public interface ILinksContext<TLink, TConstants, TMemory, TManager, TLinks> : IDisposable
         where TMemory : IMemory

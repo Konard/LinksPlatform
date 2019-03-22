@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Platform.Data.Core.Collections;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Xunit;
@@ -291,7 +291,7 @@ namespace Platform.Tests.Data.Core
                 // 3: [1,2]
                 // 4: [1,2,1,2]
 
-                var pair = links.GetSource(balancedVariant);
+                var doublet = links.GetSource(balancedVariant);
 
                 var matchedSequences1 = sequences.MatchPattern(e2, e1, zeroOrMany);
 
@@ -307,7 +307,7 @@ namespace Platform.Tests.Data.Core
 
                 var matchedSequences4 = sequences.MatchPattern(e1, zeroOrMany, e2);
 
-                Assert.True(matchedSequences4.Contains(pair));
+                Assert.True(matchedSequences4.Contains(doublet));
                 Assert.True(matchedSequences4.Contains(balancedVariant));
 
                 for (var i = 0; i < sequence.Length; i++)
@@ -421,8 +421,8 @@ namespace Platform.Tests.Data.Core
 
                 // 1: [1]       (1->1) point
                 // 2: [2]       (2->2) point
-                // 3: [1,2]     (1->2) pair
-                // 4: [1,2,1,2] (3->3) pair
+                // 3: [1,2]     (1->2) doublet
+                // 4: [1,2,1,2] (3->3) doublet
 
                 Assert.True(links.GetSource(links.GetSource(compressedVariant)) == sequence[0]);
                 Assert.True(links.GetTarget(links.GetSource(compressedVariant)) == sequence[1]);
@@ -503,7 +503,7 @@ namespace Platform.Tests.Data.Core
                 var elapsed2 = sw2.Elapsed;
                                                 
                 for (int i = START; i < END; i++)
-                    compressor3.IncrementPairsFrequencies(arrays[i]);
+                    compressor3.IncrementDoubletsFrequencies(arrays[i]);
 
                 var initialCount3 = scope3.Links.Count();
                                 
@@ -593,7 +593,7 @@ namespace Platform.Tests.Data.Core
                 var START = 0;
                 var END = arrays.Length;
 
-                // Collisions proved (cannot be solved by max pair comparison, no stable rule)
+                // Collisions proved (cannot be solved by max doublet comparison, no stable rule)
                 // Stability issue starts at 10001 or 11000
                 //for (int i = START; i < END; i++)
                 //{

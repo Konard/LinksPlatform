@@ -75,7 +75,7 @@ namespace Platform.Data.Core.Common
         /// * In(null, new[] { }) creates point (link that points to itself using minimum number of parts).
         /// * In(new[] { 4 }, null) deletes 4th link.
         /// * In(new[] { 4 }, new [] { 5 }) delete 5th link if it exists and moves 4th link to 5th index.
-        /// * In(new[] { 4 }, new [] { 0, 2, 3 }) replaces 4th link with new pair link (with 2 as source and 3 as target), 0 means it can be placed in any address.
+        /// * In(new[] { 4 }, new [] { 0, 2, 3 }) replaces 4th link with new doublet link (with 2 as source and 3 as target), 0 means it can be placed in any address.
         /// ...
         /// </remarks>
         TLink In(TLink[] before, TLink[] after);

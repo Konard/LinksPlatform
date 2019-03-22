@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// Options:

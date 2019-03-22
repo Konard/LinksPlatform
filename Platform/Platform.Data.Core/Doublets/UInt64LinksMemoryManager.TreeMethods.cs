@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Collections.Trees;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     unsafe partial class UInt64LinksMemoryManager
     {

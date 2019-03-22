@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 
@@ -23,33 +23,33 @@ namespace Platform.Data.Core.Sequences
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;
         private readonly ulong _minFrequencyToCompress;
-        private readonly Dictionary<Pair, Data> _pairsCache;
-        private Pair _maxPair;
-        private Data _maxPairData;
+        private readonly Dictionary<Doublet, Data> _doubletsCache;
+        private Doublet _maxDoublet;
+        private Data _maxDoubletData;
 
-        private struct HalfPair
+        private struct HalfDoublet
         {
             public ulong Element;
-            public Data PairData;
+            public Data DoubletData;
 
-            public HalfPair(ulong element, Data pairData)
+            public HalfDoublet(ulong element, Data doubletData)
             {
                 Element = element;
-                PairData = pairData;
+                DoubletData = doubletData;
             }
 
             public override string ToString()
             {
-                return $"{Element}: ({PairData})";
+                return $"{Element}: ({DoubletData})";
             }
         }
 
-        private struct Pair
+        private struct Doublet
         {
             public ulong Source;
             public ulong Target;
 
-            public Pair(ulong source, ulong target)
+            public Doublet(ulong source, ulong target)
             {
                 Source = source;
                 Target = target;
@@ -86,15 +86,15 @@ namespace Platform.Data.Core.Sequences
         /// TODO: Может стоит попробовать ref во всех методах (IRefEqualityComparer)
         /// 2x faster with comparer 
         /// </remarks>
-        private class PairComparer : IEqualityComparer<Pair>
+        private class DoubletComparer : IEqualityComparer<Doublet>
         {
-            public static readonly PairComparer Default = new PairComparer();
+            public static readonly DoubletComparer Default = new DoubletComparer();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(Pair x, Pair y) => x.Source == y.Source && x.Target == y.Target;
+            public bool Equals(Doublet x, Doublet y) => x.Source == y.Source && x.Target == y.Target;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(Pair obj) => (int)((obj.Source << 15) ^ obj.Target);
+            public int GetHashCode(Doublet obj) => (int)((obj.Source << 15) ^ obj.Target);
         }
 
         public Compressor(ILinks<ulong> links, Sequences sequences, ulong minFrequencyToCompress = 1)
@@ -109,46 +109,46 @@ namespace Platform.Data.Core.Sequences
 
             if (minFrequencyToCompress == 0) minFrequencyToCompress = 1;
             _minFrequencyToCompress = minFrequencyToCompress;
-            ResetMaxPair();
-            _pairsCache = new Dictionary<Pair, Data>(4096, PairComparer.Default);
+            ResetMaxDoublet();
+            _doubletsCache = new Dictionary<Doublet, Data>(4096, DoubletComparer.Default);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private Data IncrementFrequency(ulong source, ulong target)
         {
-            var pair = new Pair(source, target);
+            var doublet = new Doublet(source, target);
 
-            return IncrementFrequency(ref pair);
+            return IncrementFrequency(ref doublet);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private Data IncrementFrequency(ref Pair pair)
+        private Data IncrementFrequency(ref Doublet doublet)
         {
             Data data;
-            if (_pairsCache.TryGetValue(pair, out data))
+            if (_doubletsCache.TryGetValue(doublet, out data))
                 data.Frequency++;                  
             else
             {
-                var link = _links.SearchOrDefault(pair.Source, pair.Target);
+                var link = _links.SearchOrDefault(doublet.Source, doublet.Target);
 
                 data = new Data(1, link);
 
                 if (link != default(ulong))
                     data.Frequency += _countLinkFrequency(link);
                     
-                _pairsCache.Add(pair, data);
+                _doubletsCache.Add(doublet, data);
             }
             return data;
         }
 
         public void ResetFrequencies()
         {
-            _pairsCache.Clear();
+            _doubletsCache.Clear();
         }
 
         public void ValidateFrequencies()
         {
-            foreach(var entry in _pairsCache)
+            foreach(var entry in _doubletsCache)
             {
                 var value = entry.Value;
                    
@@ -181,7 +181,7 @@ namespace Platform.Data.Core.Sequences
 
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-        /// Faster version (pairs' frequencies dictionary is not recreated).
+        /// Faster version (doublets' frequencies dictionary is not recreated).
         /// </remarks>
         public ulong[] Precompress(ulong[] sequence)
         {
@@ -195,28 +195,28 @@ namespace Platform.Data.Core.Sequences
                 return new[] { _createLink(sequence[0], sequence[1]) };
                 
             // TODO: arraypool with min size (to improve cache locality)
-            var copy = new HalfPair[sequence.Length];
+            var copy = new HalfDoublet[sequence.Length];
 
-            var pair = new Pair();
+            var doublet = new Doublet();
 
             for (var i = 1; i < sequence.Length; i++)
             {
-                pair.Source = sequence[i - 1];
-                pair.Target = sequence[i];
+                doublet.Source = sequence[i - 1];
+                doublet.Target = sequence[i];
 
-                var data = IncrementFrequency(ref pair);
+                var data = IncrementFrequency(ref doublet);
 
                 copy[i - 1].Element = sequence[i - 1];
-                copy[i - 1].PairData = data;
+                copy[i - 1].DoubletData = data;
 
-                UpdateMaxPair(ref pair, data);
+                UpdateMaxDoublet(ref doublet, data);
             }
             copy[sequence.Length - 1].Element = sequence[sequence.Length - 1];
-            copy[sequence.Length - 1].PairData = new Data();
+            copy[sequence.Length - 1].DoubletData = new Data();
 
-            if (_maxPairData.Frequency > default(ulong))
+            if (_maxDoubletData.Frequency > default(ulong))
             {
-                var newLength = ReplacePairs(copy);
+                var newLength = ReplaceDoublets(copy);
 
                 sequence = new ulong[newLength];
 
@@ -230,20 +230,20 @@ namespace Platform.Data.Core.Sequences
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
         /// </remarks>
-        private int ReplacePairs(HalfPair[] copy)
+        private int ReplaceDoublets(HalfDoublet[] copy)
         {
             var oldLength = copy.Length;
             var newLength = copy.Length;
 
-            while (_maxPairData.Frequency > default(ulong))
+            while (_maxDoubletData.Frequency > default(ulong))
             {
-                var maxPairSource = _maxPair.Source;
-                var maxPairTarget = _maxPair.Target;
+                var maxDoubletSource = _maxDoublet.Source;
+                var maxDoubletTarget = _maxDoublet.Target;
 
-                if (_maxPairData.Link == Constants.Null)
-                    _maxPairData.Link = _createLink(maxPairSource, maxPairTarget);
+                if (_maxDoubletData.Link == Constants.Null)
+                    _maxDoubletData.Link = _createLink(maxDoubletSource, maxDoubletTarget);
 
-                var maxPairReplacementLink = _maxPairData.Link;
+                var maxDoubletReplacementLink = _maxDoubletData.Link;
 
                 oldLength--;
                 var oldLengthMinusTwo = oldLength - 1;
@@ -252,22 +252,22 @@ namespace Platform.Data.Core.Sequences
                 int w = 0, r = 0; // (r == read, w == write)
                 for (; r < oldLength; r++)
                 {
-                    if (copy[r].Element == maxPairSource && copy[r + 1].Element == maxPairTarget)
+                    if (copy[r].Element == maxDoubletSource && copy[r + 1].Element == maxDoubletTarget)
                     {
                         if (r > 0)
                         {
                             var previous = copy[w - 1].Element;
-                            copy[w - 1].PairData.Frequency--;
-                            copy[w - 1].PairData = IncrementFrequency(previous, maxPairReplacementLink);
+                            copy[w - 1].DoubletData.Frequency--;
+                            copy[w - 1].DoubletData = IncrementFrequency(previous, maxDoubletReplacementLink);
                         }
                         if (r < oldLengthMinusTwo)
                         {
                             var next = copy[r + 2].Element;
-                            copy[r + 1].PairData.Frequency--;
-                            copy[w].PairData = IncrementFrequency(maxPairReplacementLink, next);
+                            copy[r + 1].DoubletData.Frequency--;
+                            copy[w].DoubletData = IncrementFrequency(maxDoubletReplacementLink, next);
                         }
 
-                        copy[w++].Element = maxPairReplacementLink;
+                        copy[w++].Element = maxDoubletReplacementLink;
                         r++;
                         newLength--;
                     }
@@ -280,46 +280,46 @@ namespace Platform.Data.Core.Sequences
 
                 oldLength = newLength;
 
-                ResetMaxPair();
+                ResetMaxDoublet();
 
-                UpdateMaxPair(copy, newLength);
+                UpdateMaxDoublet(copy, newLength);
             }
 
             return newLength;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void ResetMaxPair()
+        private void ResetMaxDoublet()
         {
-            _maxPair = new Pair();
-            _maxPairData = new Data();
+            _maxDoublet = new Doublet();
+            _maxDoubletData = new Data();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(HalfPair[] copy, int length)
+        private void UpdateMaxDoublet(HalfDoublet[] copy, int length)
         {
-            var pair = new Pair();
+            var doublet = new Doublet();
 
             for (var i = 1; i < length; i++)
             {
-                pair.Source = copy[i - 1].Element;
-                pair.Target = copy[i].Element;
+                doublet.Source = copy[i - 1].Element;
+                doublet.Target = copy[i].Element;
 
-                UpdateMaxPair(ref pair, copy[i - 1].PairData);
+                UpdateMaxDoublet(ref doublet, copy[i - 1].DoubletData);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxPair(ref Pair pair, Data data)
+        private void UpdateMaxDoublet(ref Doublet doublet, Data data)
         {
             var frequency = data.Frequency;
-            var maxFrequency = _maxPairData.Frequency;
+            var maxFrequency = _maxDoubletData.Frequency;
 
-            //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target < /* gives better compression string data (and gives collisions quickly) */ _maxPair.Source + _maxPair.Target)) 
-            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && pair.Source + pair.Target > /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */ _maxPair.Source + _maxPair.Target)) 
+            //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target)) 
+            if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && doublet.Source + doublet.Target > /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */ _maxDoublet.Source + _maxDoublet.Target)) 
             {
-                _maxPair = pair;
-                _maxPairData = data;
+                _maxDoublet = doublet;
+                _maxDoubletData = data;
             }
         }
     }

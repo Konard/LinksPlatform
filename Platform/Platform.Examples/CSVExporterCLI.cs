@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 
 namespace Platform.Examples

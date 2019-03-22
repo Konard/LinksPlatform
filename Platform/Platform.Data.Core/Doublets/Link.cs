@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <summary>
     /// Структура описывающая уникальную связь.

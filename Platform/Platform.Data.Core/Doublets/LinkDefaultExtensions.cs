@@ -1,6 +1,6 @@
 ﻿using Platform.Data.Core.Common;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public static class LinkDefaultExtensions
     {

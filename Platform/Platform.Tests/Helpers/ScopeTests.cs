@@ -1,4 +1,4 @@
-﻿using Platform.Data.Core.Pairs;
+﻿using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Memory;
 using Xunit;

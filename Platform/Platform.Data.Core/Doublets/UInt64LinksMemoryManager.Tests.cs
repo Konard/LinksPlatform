@@ -5,7 +5,7 @@ using Platform.Data.Core.Exceptions;
 using Platform.Helpers;
 using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <summary>
     /// TODO: Make separate GEXF Exporter.

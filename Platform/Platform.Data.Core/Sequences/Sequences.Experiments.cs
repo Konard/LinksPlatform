@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using LinkIndex = System.UInt64;
@@ -169,7 +169,7 @@ namespace Platform.Data.Core.Sequences
                     var linkIndex = li;
                     ulong[] innerSequence = null;
 
-                    Links.Unsync.Each(left, right, pair =>
+                    Links.Unsync.Each(left, right, doublet =>
                     {
                         if (innerSequence == null)
                         {
@@ -182,7 +182,7 @@ namespace Platform.Data.Core.Sequences
                                 innerSequence[isi] = sequence[isi + 1];
                         }
 
-                        innerSequence[linkIndex] = pair;
+                        innerSequence[linkIndex] = doublet;
 
                         Each1(handler, innerSequence);
 
@@ -244,9 +244,9 @@ namespace Platform.Data.Core.Sequences
                 //  o_|      x_o ... 
                 // x_|        |___|
 
-                Links.Each(sequence[1], Constants.Any, pair =>
+                Links.Each(sequence[1], Constants.Any, doublet =>
                 {
-                    var match = Links.SearchOrDefault(sequence[0], pair);
+                    var match = Links.SearchOrDefault(sequence[0], doublet);
                     if (match != Constants.Null)
                         handler(match);
                     return true;
@@ -255,9 +255,9 @@ namespace Platform.Data.Core.Sequences
                 // |_x      ... x_o
                 //  |_o      |___|
 
-                Links.Each(Constants.Any, sequence[0], pair =>
+                Links.Each(Constants.Any, sequence[0], doublet =>
                 {
-                    var match = Links.SearchOrDefault(pair, sequence[1]);
+                    var match = Links.SearchOrDefault(doublet, sequence[1]);
                     if (match != 0)
                         handler(match);
                     return true;
@@ -277,12 +277,12 @@ namespace Platform.Data.Core.Sequences
 
         private void PartialStepRight(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.Unsync.Each(Constants.Any, left, pair =>
+            Links.Unsync.Each(Constants.Any, left, doublet =>
             {
-                StepRight(handler, pair, right);
+                StepRight(handler, doublet, right);
 
-                if (left != pair)
-                    PartialStepRight(handler, pair, right);
+                if (left != doublet)
+                    PartialStepRight(handler, doublet, right);
 
                 return true;
             });
@@ -314,12 +314,12 @@ namespace Platform.Data.Core.Sequences
         // TODO: Test
         private void PartialStepLeft(Action<ulong> handler, ulong left, ulong right)
         {
-            Links.Unsync.Each(right, Constants.Any, pair =>
+            Links.Unsync.Each(right, Constants.Any, doublet =>
             {
-                StepLeft(handler, left, pair);
+                StepLeft(handler, left, doublet);
 
-                if (right != pair)
-                    PartialStepLeft(handler, left, pair);
+                if (right != doublet)
+                    PartialStepLeft(handler, left, doublet);
 
                 return true;
             });
@@ -391,9 +391,9 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = Links.SearchOrDefault(firstElement, sequence[1]);
-                        if (pair != Constants.Null)
-                            results.Add(pair);
+                        var doublet = Links.SearchOrDefault(firstElement, sequence[1]);
+                        if (doublet != Constants.Null)
+                            results.Add(doublet);
                         return results;
                     }
 
@@ -463,9 +463,9 @@ namespace Platform.Data.Core.Sequences
                     }
                     if (sequence.Length == 2)
                     {
-                        var pair = Links.SearchOrDefault(firstElement, sequence[1]);
-                        if (pair != Constants.Null)
-                            results.Add(pair);
+                        var doublet = Links.SearchOrDefault(firstElement, sequence[1]);
+                        if (doublet != Constants.Null)
+                            results.Add(doublet);
                         return results;
                     }
 
@@ -814,9 +814,9 @@ namespace Platform.Data.Core.Sequences
                     //}
                     //if (sequence.Length == 2)
                     //{
-                    //    //var pair = _links.SearchCore(firstElement, sequence[1]);
-                    //    //if (pair != Pairs.Links.Null)
-                    //    //    results.Add(pair);
+                    //    //var doublet = _links.SearchCore(firstElement, sequence[1]);
+                    //    //if (doublet != Doublets.Links.Null)
+                    //    //    results.Add(doublet);
                     //    return results;
                     //}
 
@@ -928,9 +928,9 @@ namespace Platform.Data.Core.Sequences
         // причём достаточно одного бита для хранения перехода влево или вправо
         private void AllUsagesCore(ulong link, HashSet<ulong> usages)
         {
-            Func<ulong, bool> handler = pair =>
+            Func<ulong, bool> handler = doublet =>
             {
-                if (usages.Add(pair)) AllUsagesCore(pair, usages);
+                if (usages.Add(doublet)) AllUsagesCore(doublet, usages);
                 return true;
             };
             Links.Unsync.Each(link, Constants.Any, handler);
@@ -950,9 +950,9 @@ namespace Platform.Data.Core.Sequences
 
         private void AllBottomUsagesCore(ulong link, HashSet<ulong> visits, HashSet<ulong> usages)
         {
-            Func<ulong, bool> handler = pair =>
+            Func<ulong, bool> handler = doublet =>
             {
-                if (visits.Add(pair)) AllBottomUsagesCore(pair, visits, usages);
+                if (visits.Add(doublet)) AllBottomUsagesCore(doublet, visits, usages);
                 return true;
             };
 
@@ -1006,10 +1006,10 @@ namespace Platform.Data.Core.Sequences
 
             private void CalculateCore(ulong link)
             {
-                Func<ulong, bool> handler = pair =>
+                Func<ulong, bool> handler = doublet =>
                 {
-                    if (_visits.Add(pair))
-                        CalculateCore(pair);
+                    if (_visits.Add(doublet))
+                        CalculateCore(doublet);
                     return true;
                 };
 
@@ -1024,10 +1024,10 @@ namespace Platform.Data.Core.Sequences
 
             private void CalculateCoreForMarkedSequences(ulong link)
             {
-                Func<ulong, bool> handler = pair =>
+                Func<ulong, bool> handler = doublet =>
                 {
-                    if (_visits.Add(pair))
-                        CalculateCoreForMarkedSequences(pair);
+                    if (_visits.Add(doublet))
+                        CalculateCoreForMarkedSequences(doublet);
                     return true;
                 };
 
@@ -1043,14 +1043,14 @@ namespace Platform.Data.Core.Sequences
 
         private bool AllUsagesCore1(ulong link, HashSet<ulong> usages, Func<ulong, bool> outerHandler)
         {
-            Func<ulong, bool> handler = pair =>
+            Func<ulong, bool> handler = doublet =>
             {
-                if (usages.Add(pair))
+                if (usages.Add(doublet))
                 {
-                    if (!outerHandler(pair))
+                    if (!outerHandler(doublet))
                         return false;
 
-                    if (!AllUsagesCore1(pair, usages, outerHandler))
+                    if (!AllUsagesCore1(doublet, usages, outerHandler))
                         return false;
                 }
                 return true;
@@ -1282,9 +1282,9 @@ namespace Platform.Data.Core.Sequences
 
             if (left == right)
                 handler(left);
-            var pair = Links.Unsync.SearchOrDefault(left, right);
-            if (pair != Constants.Null)
-                handler(pair);
+            var doublet = Links.Unsync.SearchOrDefault(left, right);
+            if (doublet != Constants.Null)
+                handler(doublet);
 
             // Inner
 
@@ -1943,7 +1943,7 @@ namespace Platform.Data.Core.Sequences
             //    element = 0;
             //    for (; _patternPosition < _patternSequence.Length; _patternPosition++)
             //    {
-            //        if (_patternSequence[_patternPosition] == Pairs.Links.Null)
+            //        if (_patternSequence[_patternPosition] == Doublets.Links.Null)
             //            mininumGap++;
             //        else if (_patternSequence[_patternPosition] == ZeroOrMany)
             //            maximumGap = long.MaxValue;

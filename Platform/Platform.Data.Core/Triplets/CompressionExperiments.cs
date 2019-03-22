@@ -173,7 +173,7 @@ namespace Platform.Data.Core.Triplets
             //return first & second;
 
 
-            //long totalPairs = Net.And.ReferersByLinkerCount;
+            //long totalDoublets = Net.And.ReferersByLinkerCount;
 
             if (first == null || second == null)
             {
@@ -358,10 +358,10 @@ namespace Platform.Data.Core.Triplets
 
             directConnection = first & second;
 
-            //long difference = Net.And.ReferersByLinkerCount - totalPairs;
+            //long difference = Net.And.ReferersByLinkerCount - totalDoublets;
             //if (difference != 1)
             //{
-            //    Console.WriteLine(Net.And.ReferersByLinkerCount - totalPairs);
+            //    Console.WriteLine(Net.And.ReferersByLinkerCount - totalDoublets);
             //}
 
             return directConnection;
@@ -626,8 +626,8 @@ namespace Platform.Data.Core.Triplets
         //    }
         //    for (; i < links.Count; i += 2)
         //    {
-        //        Link pair = CombinedJoin(links[i], links[i + 1]);
-        //        element = CombinedJoin(ref element, ref pair);
+        //        Link doublet = CombinedJoin(links[i], links[i + 1]);
+        //        element = CombinedJoin(ref element, ref doublet);
         //    }
         //    return element;
         //}

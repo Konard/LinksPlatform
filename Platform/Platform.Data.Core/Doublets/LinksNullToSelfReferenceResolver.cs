@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public class LinksNullToSelfReferenceResolver<T> : LinksDecoratorBase<T>
     {

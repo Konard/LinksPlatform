@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using LinkIndex = System.UInt64;
@@ -115,53 +115,53 @@ namespace Platform.Data.Core.Sequences
         public ulong[] CalculateLocalElementLevels(ulong[] sequence)
         {
             var levels = new ulong[sequence.Length];
-            levels[0] = GetPairFrequencyUInt64Number(sequence[0], sequence[1]);   
+            levels[0] = GetDoubletFrequencyUInt64Number(sequence[0], sequence[1]);   
             
             for (var i = 1; i < sequence.Length - 1; i++)
             {
-                var previous = GetPairFrequencyUInt64Number(sequence[i - 1], sequence[i]);
-                var next = GetPairFrequencyUInt64Number(sequence[i], sequence[i + 1]);
+                var previous = GetDoubletFrequencyUInt64Number(sequence[i - 1], sequence[i]);
+                var next = GetDoubletFrequencyUInt64Number(sequence[i], sequence[i + 1]);
                 levels[i] = previous > next ? previous : next;
             }
             
-            levels[levels.Length - 1] = GetPairFrequencyUInt64Number(sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+            levels[levels.Length - 1] = GetDoubletFrequencyUInt64Number(sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
             return levels;
         }
         
-        public void IncrementPairsFrequencies(ulong[] sequence)
+        public void IncrementDoubletsFrequencies(ulong[] sequence)
         {
             for (var i = 1; i < sequence.Length; i++)
-                IncrementPairFrequency(sequence[i - 1], sequence[i]);
+                IncrementDoubletFrequency(sequence[i - 1], sequence[i]);
         }
         
-        public void PrintPairsFrequencies(ulong[] sequence)
+        public void PrintDoubletsFrequencies(ulong[] sequence)
         {
             for (var i = 1; i < sequence.Length; i++)
-                PrintPairFrequency(sequence[i - 1], sequence[i]);
+                PrintDoubletFrequency(sequence[i - 1], sequence[i]);
         }
         
-        public void IncrementPairFrequency(ulong source, ulong target)
+        public void IncrementDoubletFrequency(ulong source, ulong target)
         {
-            var pair = Links.GetOrCreate(source, target);
+            var doublet = Links.GetOrCreate(source, target);
             
-            var previousFrequencyContainer = GetPairFrequencyContainer(pair);
-            var previousFrequency = GetPairFrequency(previousFrequencyContainer);
+            var previousFrequencyContainer = GetDoubletFrequencyContainer(doublet);
+            var previousFrequency = GetDoubletFrequency(previousFrequencyContainer);
             var frequency = IncrementFrequency(previousFrequency);
                       
-            SetPairFrequency(pair, previousFrequencyContainer, frequency);                       
+            SetDoubletFrequency(doublet, previousFrequencyContainer, frequency);                       
         }
         
-        public void PrintPairFrequency(ulong source, ulong target)
+        public void PrintDoubletFrequency(ulong source, ulong target)
         {          
-            var number = GetPairFrequencyUInt64Number(source, target);           
+            var number = GetDoubletFrequencyUInt64Number(source, target);           
             Console.WriteLine("({0},{1}) - {2}", source, target, number);
         }
         
-        public ulong GetPairFrequencyContainer(ulong pair)
+        public ulong GetDoubletFrequencyContainer(ulong doublet)
         {
             var frequencyContainer = 0UL;
             
-            var property = Links.SearchOrDefault(pair, _frequencyPropertyMarker);
+            var property = Links.SearchOrDefault(doublet, _frequencyPropertyMarker);
             
             if (property == 0)
                 return frequencyContainer;
@@ -183,17 +183,17 @@ namespace Platform.Data.Core.Sequences
             return frequencyContainer;
         }
         
-        public ulong GetPairFrequency(ulong frequencyContainer)
+        public ulong GetDoubletFrequency(ulong frequencyContainer)
         {
             var frequency = frequencyContainer == 0 ? 0UL : Links.GetTarget(frequencyContainer);
             return frequency;
         }
             
-        public ulong GetPairFrequencyUInt64Number(ulong source, ulong target)
+        public ulong GetDoubletFrequencyUInt64Number(ulong source, ulong target)
         {
-            var pair = Links.GetOrCreate(source, target);
-            var previousFrequencyContainer = GetPairFrequencyContainer(pair);
-            var frequency = GetPairFrequency(previousFrequencyContainer);
+            var doublet = Links.GetOrCreate(source, target);
+            var previousFrequencyContainer = GetDoubletFrequencyContainer(doublet);
+            var frequency = GetDoubletFrequency(previousFrequencyContainer);
             if (frequency == 0)
                 return 0;
             var frequencyNumber = Links.GetSource(frequency);
@@ -210,11 +210,11 @@ namespace Platform.Data.Core.Sequences
             return Links.GetOrCreate(incrementedSource, _frequencyMarker);
         }
         
-        public void SetPairFrequency(ulong pair, ulong previousFrequencyContainer, ulong frequency)
+        public void SetDoubletFrequency(ulong doublet, ulong previousFrequencyContainer, ulong frequency)
         {
             if (previousFrequencyContainer != 0)
                 Links.Delete(previousFrequencyContainer);
-            var property = Links.GetOrCreate(pair, _frequencyPropertyMarker);
+            var property = Links.GetOrCreate(doublet, _frequencyPropertyMarker);
             Links.CreateAndUpdate(property, frequency);            
         }
         

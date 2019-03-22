@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Platform.Data.Core.Collections;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Xunit;
@@ -35,9 +35,9 @@ namespace Platform.Tests.Data.Core
                 sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
 
                 var sw1 = Stopwatch.StartNew();
-                sequences.IncrementPairsFrequencies(sequence); sw1.Stop();   
+                sequences.IncrementDoubletsFrequencies(sequence); sw1.Stop();   
                 
-                sequences.PrintPairsFrequencies(sequence);
+                sequences.PrintDoubletsFrequencies(sequence);
                 
                 var levels = sequences.CalculateLocalElementLevels(sequence);
                 

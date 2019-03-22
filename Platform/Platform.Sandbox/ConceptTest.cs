@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 
 namespace Platform.Sandbox
@@ -98,7 +98,7 @@ namespace Platform.Sandbox
 
                     Console.ReadKey();
 
-                    //var ps = (from Pair score in links
+                    //var ps = (from Doublet score in links
                     //          where score.Target == temp2
                     //          select score).ToArray();
 

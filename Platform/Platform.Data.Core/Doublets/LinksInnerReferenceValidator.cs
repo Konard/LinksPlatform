@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     // TODO: Make LinksExternalReferenceValidator
     public class LinksInnerReferenceValidator<T> : LinksDecoratorBase<T>

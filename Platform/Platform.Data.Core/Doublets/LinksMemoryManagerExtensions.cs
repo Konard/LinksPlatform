@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public static class LinksMemoryManagerExtensions
     {

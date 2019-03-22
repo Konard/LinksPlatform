@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <summary>
     /// Represents a link, that is attached to corresponding links storage.

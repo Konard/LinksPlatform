@@ -10,7 +10,7 @@ using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public static class LinksExtensions
     {
@@ -224,7 +224,7 @@ namespace Platform.Data.Core.Pairs
         /// А пара это тогда, когда link.Source == link.Target && link.Source != link , т.е. ссылка не на себя а во вне.
         /// 
         /// Тогда если у нас уже создана пара, но нам нужна точка, мы можем используя промежуточную связь,
-        /// например "PairOf" обозначить что является точно парой, а что точно точкой.
+        /// например "DoubletOf" обозначить что является точно парой, а что точно точкой.
         /// И наоборот этот же метод поможет, если уже существует точка, но нам нужна пара.
         /// </remarks>
         public static bool IsFullPoint<T>(this ILinks<T> links, T link)

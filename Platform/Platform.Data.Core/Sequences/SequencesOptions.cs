@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 
 namespace Platform.Data.Core.Sequences

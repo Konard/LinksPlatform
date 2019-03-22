@@ -10,7 +10,7 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Platform.Data.Core</AssemblyName>
     <PackageId>Platform.Data.Core</PackageId>
-    <PackageTags>LinksPlatform;Link;Triplet;Pair;Sequence</PackageTags>
+    <PackageTags>LinksPlatform;Link;Triplet;Doublet;Sequence</PackageTags>
     <PackageIconUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Data.Core</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE</PackageLicenseUrl>

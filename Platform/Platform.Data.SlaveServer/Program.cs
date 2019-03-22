@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Platform.Communication.Protocol.Udp;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.SlaveServer
 {

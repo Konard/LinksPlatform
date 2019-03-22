@@ -13,7 +13,7 @@ using Platform.Helpers.IO;
 
 #if LinksTransactions
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public partial class UInt64Links
     {

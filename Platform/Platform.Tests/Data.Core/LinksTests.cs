@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers.IO;
 using Platform.Helpers;
 using Platform.Helpers.Disposables;
@@ -521,8 +521,8 @@ namespace Platform.Tests.Data.Core
            const long gibibyte = 1024 * 1024 * 1024;
            const long mebibyte = 1024 * 1024;
 
-           var totalLinksToCreate = gibibyte / Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
-           var linksStep = 102 * mebibyte / Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
+           var totalLinksToCreate = gibibyte / Platform.Links.Data.Core.Doublets.Links.LinkSizeInBytes;
+           var linksStep = 102 * mebibyte / Platform.Links.Data.Core.Doublets.Links.LinkSizeInBytes;
 
            var creationMeasurements = new List<TimeSpan>();
            var searchMeasuremets = new List<TimeSpan>();
@@ -573,7 +573,7 @@ namespace Platform.Tests.Data.Core
            ConsoleHelpers.Debug("All tests done. Total links left in database: {0}.", links.Total);
        }
 
-       private static void CreatePoints(this Platform.Links.DataBase.Core.Pairs.Links links, long amountToCreate)
+       private static void CreatePoints(this Platform.Links.Data.Core.Doublets.Links links, long amountToCreate)
        {
            for (long i = 0; i < amountToCreate; i++)
                links.Create(0, 0);
@@ -734,9 +734,9 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Platform.Links.Data.Core.Doublets.Links(tempFilename, DefaultLinksSizeStep))
             {
-                long iterations = 64 * 1024 * 1024 / Platform.Links.DataBase.Core.Pairs.Links.LinkSizeInBytes;
+                long iterations = 64 * 1024 * 1024 / Platform.Links.Data.Core.Doublets.Links.LinkSizeInBytes;
 
                 ulong counter = 0;
                 var maxLink = links.Total;
@@ -826,7 +826,7 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Platform.Links.Data.Core.Doublets.Links(tempFilename, DefaultLinksSizeStep))
             {
                 ulong counter = 0;
 
@@ -856,7 +856,7 @@ namespace Platform.Tests.Data.Core
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var links = new Platform.Links.DataBase.Core.Pairs.Links(tempFilename, DefaultLinksSizeStep))
+            using (var links = new Platform.Links.Data.Core.Doublets.Links(tempFilename, DefaultLinksSizeStep))
             {
 
                 long counter = 0;

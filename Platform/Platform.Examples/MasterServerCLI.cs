@@ -3,7 +3,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using Platform.Communication.Protocol.Udp;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 

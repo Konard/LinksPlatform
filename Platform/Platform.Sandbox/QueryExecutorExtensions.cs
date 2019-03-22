@@ -2,7 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq.Expressions;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Sandbox
 {

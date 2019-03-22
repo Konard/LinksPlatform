@@ -2,7 +2,7 @@
 using Platform.Helpers.Disposables;
 using Platform.Memory;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     // Решить, нужна ли строго типизированная версия, или достаточно использование Scope?
     public static class LinksContextHelpers

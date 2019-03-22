@@ -84,7 +84,7 @@ namespace Platform.Helpers
 
         /// <remarks>
         /// TODO: Use Default[T].Instance if the only constructor object has is parameterless.
-        /// TODO: Think of interface chaining IPairLinks[T] (default) -> IPairLinks[T] (checker) -> IPairLinks[T] (synchronizer) (may be UseChain[IPairLinks[T], Types[DefaultLinks, DefaultLinksDependencyChecker, DefaultSynchronizedLinks]]
+        /// TODO: Think of interface chaining IDoubletLinks[T] (default) -> IDoubletLinks[T] (checker) -> IDoubletLinks[T] (synchronizer) (may be UseChain[IDoubletLinks[T], Types[DefaultLinks, DefaultLinksDependencyChecker, DefaultSynchronizedLinks]]
         /// TODO: Add support for factories
         /// </remarks>
         public T Use<T>()

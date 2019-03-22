@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Platform.Helpers.Disposables;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 
 namespace Platform.Tests.Data.Core

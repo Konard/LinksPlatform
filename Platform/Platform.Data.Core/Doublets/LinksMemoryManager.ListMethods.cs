@@ -2,7 +2,7 @@
 using Platform.Data.Core.Collections.Lists;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     partial class LinksMemoryManager<T>
     {

@@ -5,7 +5,7 @@ using Platform.Data.Core.Common;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// What does empty pattern (for condition or substitution) mean? Nothing or Everything?
@@ -14,7 +14,7 @@ namespace Platform.Data.Core.Pairs
     public class UniLinks<T> : LinksBase<T, T, T>, IUniLinks<T>
     {
         /// <remarks>
-        /// TODO: Decide to change to IPairLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IPairLinks and ILinksMemoryManager.)
+        /// TODO: Decide to change to IDoubletLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IDoubletLinks and ILinksMemoryManager.)
         /// </remarks>
         public UniLinks(ILinksMemoryManager<T> memory, ILinksCombinedConstants<T, T, T> constants)
             : base(memory, constants)

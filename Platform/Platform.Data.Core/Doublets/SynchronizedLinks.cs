@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// TODO: Autogeneration of synchronized wrapper (decorator).

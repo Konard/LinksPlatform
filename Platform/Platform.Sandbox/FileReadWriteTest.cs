@@ -115,7 +115,7 @@ namespace Platform.Sandbox
             Link group = null;
 
             var holder = Net.CreateThing();
-            var holderPair = holder & holder;
+            var holderDoublet = holder & holder;
 
 
             UnicodeCategory? currentUnicodeCategory = null;
@@ -135,7 +135,7 @@ namespace Platform.Sandbox
 
                         result = result == null ? group : result & group; // LinkConverter.CombinedJoin(ref result, ref group);
 
-                        Link.Update(ref holderPair, holder, Net.And, result);
+                        Link.Update(ref holderDoublet, holder, Net.And, result);
                     }
 
                     currentUnicodeCategory = charCategory;

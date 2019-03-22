@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
@@ -398,13 +398,13 @@ namespace Platform.Data.Core.Sequences
 
         private bool PartialStepRight(Func<ulong, bool> handler, ulong left, ulong right)
         {
-            return Links.Unsync.Each(Constants.Any, left, pair =>
+            return Links.Unsync.Each(Constants.Any, left, doublet =>
             {
-                if (!StepRight(handler, pair, right))
+                if (!StepRight(handler, doublet, right))
                     return false;
 
-                if (left != pair)
-                    return PartialStepRight(handler, pair, right);
+                if (left != doublet)
+                    return PartialStepRight(handler, doublet, right);
 
                 return true;
             });

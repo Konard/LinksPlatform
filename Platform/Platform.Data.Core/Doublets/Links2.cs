@@ -4,7 +4,7 @@ using System.Linq;
 using Platform.Data.Core.Exceptions;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <summary>
     /// 
@@ -122,7 +122,7 @@ namespace Platform.Data.Core.Pairs
 
         public IList<ILink> GetLink(ILink link)
         {
-            return Pairs.Link.Create(link);
+            return Doublets.Link.Create(link);
         }
 
         public ILink Update(ILink link, ILink newSource, ILink newTarget)
@@ -210,7 +210,7 @@ namespace Platform.Data.Core.Pairs
 
             public override string ToString()
             {
-                return Pairs.Link.ToString(this);
+                return Doublets.Link.ToString(this);
             }
 
             #endregion

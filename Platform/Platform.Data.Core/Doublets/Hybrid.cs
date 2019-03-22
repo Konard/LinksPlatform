@@ -3,7 +3,7 @@ using Platform.Helpers;
 using Platform.Helpers.Reflection;
 using System.Reflection;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public class Hybrid<T>
     {

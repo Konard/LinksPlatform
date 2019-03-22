@@ -1,6 +1,6 @@
 ﻿using Platform.Helpers;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     public interface ILinksDecisionConstants<TDecision>
     {

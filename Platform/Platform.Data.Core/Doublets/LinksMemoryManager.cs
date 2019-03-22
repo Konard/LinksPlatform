@@ -18,7 +18,7 @@ using static Platform.Helpers.MathHelpers;
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedMember.Local
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).

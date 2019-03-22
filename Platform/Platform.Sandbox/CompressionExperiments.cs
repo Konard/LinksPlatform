@@ -5,7 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
@@ -203,7 +203,7 @@ namespace Platform.Sandbox
 
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-        /// Slow version (pairs' frequencies dictionary is recreated).
+        /// Slow version (doublets' frequencies dictionary is recreated).
         /// </remarks>
         public static ulong[] PrecompressSequence1(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
@@ -218,13 +218,13 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             Array.Copy(sequence, copy, sequence.Length);
 
-            UInt64Link maxPair;
+            UInt64Link maxDoublet;
 
             do
             {
-                var pairsFrequencies = new Dictionary<UInt64Link, ulong>();
+                var doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
 
-                maxPair = UInt64Link.Null;
+                maxDoublet = UInt64Link.Null;
                 ulong maxFrequency = 1;
 
                 for (var i = 1; i < copy.Length; i++)
@@ -234,42 +234,42 @@ namespace Platform.Sandbox
                     while (i < copy.Length && copy[i] == 0) i++;
                     if (i == copy.Length) break;
 
-                    var pair = new UInt64Link(copy[startIndex], copy[i]);
+                    var doublet = new UInt64Link(copy[startIndex], copy[i]);
 
                     ulong frequency;
-                    if (pairsFrequencies.TryGetValue(pair, out frequency))
+                    if (doubletsFrequencies.TryGetValue(doublet, out frequency))
                     {
                         var newFrequency = frequency + 1;
 
                         if (maxFrequency < newFrequency)
                         {
                             maxFrequency = newFrequency;
-                            maxPair = pair;
+                            maxDoublet = doublet;
                         }
 
-                        pairsFrequencies[pair] = newFrequency;
+                        doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
-                        pairsFrequencies.Add(pair, 1);
+                        doubletsFrequencies.Add(doublet, 1);
                 }
 
-                if (!maxPair.IsNull())
+                if (!maxDoublet.IsNull())
                 {
-                    var maxPairLink = links.CreateAndUpdate(maxPair.Source, maxPair.Target);
+                    var maxDoubletLink = links.CreateAndUpdate(maxDoublet.Source, maxDoublet.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
                     {
-                        if (copy[i - 1] == maxPair.Source)
+                        if (copy[i - 1] == maxDoublet.Source)
                         {
                             var startIndex = i - 1;
 
                             while (i < copy.Length && copy[i] == 0) i++;
                             if (i == copy.Length) break;
 
-                            if (copy[i] == maxPair.Target)
+                            if (copy[i] == maxDoublet.Target)
                             {
-                                copy[startIndex] = maxPairLink;
+                                copy[startIndex] = maxDoubletLink;
                                 copy[i] = 0;
                                 newLength--;
                             }
@@ -277,7 +277,7 @@ namespace Platform.Sandbox
                     }
                 }
 
-            } while (!maxPair.IsNull());
+            } while (!maxDoublet.IsNull());
 
 
             var final = new ulong[newLength];
@@ -304,7 +304,7 @@ namespace Platform.Sandbox
 
         /// <remarks>
         /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-        /// Faster version (pairs' frequencies dictionary is not recreated).
+        /// Faster version (doublets' frequencies dictionary is not recreated).
         /// </remarks>
         public static ulong[] PrecompressSequence2(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
@@ -318,61 +318,61 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             copy[0] = sequence[0];
 
-            var pairsFrequencies = new Dictionary<UInt64Link, ulong>();
+            var doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
 
-            var maxPair = UInt64Link.Null;
+            var maxDoublet = UInt64Link.Null;
             ulong maxFrequency = 1;
 
             for (var i = 1; i < sequence.Length; i++)
             {
                 copy[i] = sequence[i];
 
-                var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
                 ulong frequency;
-                if (pairsFrequencies.TryGetValue(pair, out frequency))
+                if (doubletsFrequencies.TryGetValue(doublet, out frequency))
                 {
                     var newFrequency = frequency + 1;
 
                     if (maxFrequency < newFrequency)
                     {
                         maxFrequency = newFrequency;
-                        maxPair = pair;
+                        maxDoublet = doublet;
                     }
 
-                    pairsFrequencies[pair] = newFrequency;
+                    doubletsFrequencies[doublet] = newFrequency;
                 }
                 else
-                    pairsFrequencies.Add(pair, 1);
+                    doubletsFrequencies.Add(doublet, 1);
             }
 
-            while (!maxPair.IsNull())
+            while (!maxDoublet.IsNull())
             {
-                var maxPairSource = maxPair.Source;
+                var maxDoubletSource = maxDoublet.Source;
 
-                var maxPairLink = links.CreateAndUpdate(maxPairSource, maxPair.Target);
+                var maxDoubletLink = links.CreateAndUpdate(maxDoubletSource, maxDoublet.Target);
 
                 // Substitute all usages
                 for (var i = 1; i < copy.Length; i++)
                 {
                     var startIndex = i - 1;
 
-                    if (copy[startIndex] == maxPairSource)
+                    if (copy[startIndex] == maxDoubletSource)
                     {
                         while (i < copy.Length && copy[i] == 0) i++;
                         if (i == copy.Length) break;
 
-                        if (copy[i] == maxPair.Target)
+                        if (copy[i] == maxDoublet.Target)
                         {
                             var oldLeft = copy[startIndex];
                             var oldRight = copy[i];
 
-                            copy[startIndex] = maxPairLink;
+                            copy[startIndex] = maxDoubletLink;
                             copy[i] = 0; // TODO: Вместо записи нулевых дырок, можно хранить отрицательным числом размер диапазона (дырки) на которую надо прыгнуть, это дополнительно ускорило бы алгоритм.
 
                             // Требуется отдельно, так как пары могут идти подряд,
                             // например в "ааа" пара "аа" была посчитана дважды
-                            pairsFrequencies[maxPair]--;
+                            doubletsFrequencies[maxDoublet]--;
 
                             newLength--;
 
@@ -384,20 +384,20 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldPair = new UInt64Link(copy[previous], oldLeft);
-                                    //if (!nextOldPair.Equals(maxPair))
+                                    var nextOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                    //if (!nextOldDoublet.Equals(maxDoublet))
                                     {
-                                        //pairsFrequencies[nextOldPair]--;
-                                        if (pairsFrequencies.TryGetValue(nextOldPair, out frequency))
-                                            pairsFrequencies[nextOldPair] = frequency - 1;
+                                        //doubletsFrequencies[nextOldDoublet]--;
+                                        if (doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
+                                            doubletsFrequencies[nextOldDoublet] = frequency - 1;
                                     }
 
-                                    var nextNewPair = new UInt64Link(copy[previous], copy[startIndex]);
-                                    //pairsFrequencies[nextNewPair]++;
-                                    if (pairsFrequencies.TryGetValue(nextNewPair, out frequency))
-                                        pairsFrequencies[nextNewPair] = frequency + 1;
+                                    var nextNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                    //doubletsFrequencies[nextNewDoublet]++;
+                                    if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
+                                        doubletsFrequencies[nextNewDoublet] = frequency + 1;
                                     else
-                                        pairsFrequencies.Add(nextNewPair, 1);
+                                        doubletsFrequencies.Add(nextNewDoublet, 1);
                                 }
                             }
 
@@ -409,60 +409,60 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldPair = new UInt64Link(oldRight, copy[next]);
-                                    //if (!nextOldPair.Equals(maxPair))
+                                    var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                    //if (!nextOldDoublet.Equals(maxDoublet))
                                     {
-                                        //pairsFrequencies[nextOldPair]--;
-                                        if (pairsFrequencies.TryGetValue(nextOldPair, out frequency))
-                                            pairsFrequencies[nextOldPair] = frequency - 1;
+                                        //doubletsFrequencies[nextOldDoublet]--;
+                                        if (doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
+                                            doubletsFrequencies[nextOldDoublet] = frequency - 1;
                                     }
 
-                                    var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
-                                    //pairsFrequencies[nextNewPair]++;
-                                    if (pairsFrequencies.TryGetValue(nextNewPair, out frequency))
-                                        pairsFrequencies[nextNewPair] = frequency + 1;
+                                    var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                    //doubletsFrequencies[nextNewDoublet]++;
+                                    if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
+                                        doubletsFrequencies[nextNewDoublet] = frequency + 1;
                                     else
-                                        pairsFrequencies.Add(nextNewPair, 1);
+                                        doubletsFrequencies.Add(nextNewDoublet, 1);
                                 }
                             }
                         }
                     }
                 }
 
-                //pairsFrequencies[maxPair] = 0;
-                //pairsFrequencies.Remove(maxPair);
+                //doubletsFrequencies[maxDoublet] = 0;
+                //doubletsFrequencies.Remove(maxDoublet);
 
-                //if (pairsFrequencies[maxPair] > 0)
+                //if (doubletsFrequencies[maxDoublet] > 0)
                 //{
 
                 //}
 
-                maxPair = UInt64Link.Null;
+                maxDoublet = UInt64Link.Null;
                 maxFrequency = 1;
 
-                foreach (var pairsFrequency in pairsFrequencies)
+                foreach (var doubletsFrequency in doubletsFrequencies)
                 {
-                    var frequency = pairsFrequency.Value;
+                    var frequency = doubletsFrequency.Value;
                     if (frequency > 1)
                     {
-                        var pair = pairsFrequency.Key;
+                        var doublet = doubletsFrequency.Key;
 
                         if (maxFrequency < frequency)
                         {
                             maxFrequency = frequency;
-                            maxPair = pair;
+                            maxDoublet = doublet;
                         }
                         if (maxFrequency == frequency &&
-                            (pair.Source + pair.Target) > (maxPair.Source + maxPair.Target))
+                            (doublet.Source + doublet.Target) > (maxDoublet.Source + maxDoublet.Target))
                         {
-                            maxPair = pair;
+                            maxDoublet = doublet;
                         }
                     }
                 }
 
                 //{
-                //    var pairsFrequenciesCheck = new Dictionary<Link, ulong>();
-                //    var maxPairCheck = Link.Null;
+                //    var doubletsFrequenciesCheck = new Dictionary<Link, ulong>();
+                //    var maxDoubletCheck = Link.Null;
                 //    ulong maxFrequencyCheck = 1;
 
                 //    for (var i = 1; i < copy.Length; i++)
@@ -472,26 +472,26 @@ namespace Platform.Sandbox
                 //        while (i < copy.Length && copy[i] == 0) i++;
                 //        if (i == copy.Length) break;
 
-                //        var pair = new Link(copy[startIndex], copy[i]);
+                //        var doublet = new Link(copy[startIndex], copy[i]);
 
                 //        ulong frequency;
-                //        if (pairsFrequenciesCheck.TryGetValue(pair, out frequency))
+                //        if (doubletsFrequenciesCheck.TryGetValue(doublet, out frequency))
                 //        {
                 //            var newFrequency = frequency + 1;
 
                 //            if (maxFrequencyCheck < newFrequency)
                 //            {
                 //                maxFrequencyCheck = newFrequency;
-                //                maxPairCheck = pair;
+                //                maxDoubletCheck = doublet;
                 //            }
 
-                //            pairsFrequenciesCheck[pair] = newFrequency;
+                //            doubletsFrequenciesCheck[doublet] = newFrequency;
                 //        }
                 //        else
-                //            pairsFrequenciesCheck.Add(pair, 1);
+                //            doubletsFrequenciesCheck.Add(doublet, 1);
                 //    }
 
-                //    if (!maxPairCheck.Equals(maxPair) || maxFrequency != maxFrequencyCheck)
+                //    if (!maxDoubletCheck.Equals(maxDoublet) || maxFrequency != maxFrequencyCheck)
                 //    {
 
                 //    }
@@ -526,59 +526,59 @@ namespace Platform.Sandbox
         {
             private readonly SynchronizedLinks<ulong> _links;
             private readonly Sequences _sequences;
-            private UInt64Link _maxPair;
+            private UInt64Link _maxDoublet;
             private ulong _maxFrequency;
-            private UInt64Link _maxPair2;
+            private UInt64Link _maxDoublet2;
             private ulong _maxFrequency2;
-            private Dictionary<UInt64Link, ulong> _pairsFrequencies;
+            private Dictionary<UInt64Link, ulong> _doubletsFrequencies;
 
             public Compressor(SynchronizedLinks<ulong> links, Sequences sequences)
             {
                 _links = links;
                 _sequences = sequences;
-                _maxPair = UInt64Link.Null;
+                _maxDoublet = UInt64Link.Null;
                 _maxFrequency = 1;
-                _maxPair2 = UInt64Link.Null;
+                _maxDoublet2 = UInt64Link.Null;
                 _maxFrequency2 = 1;
-                _pairsFrequencies = new Dictionary<UInt64Link, ulong>();
+                _doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private ulong IncrementFrequency(UInt64Link pair)
+            private ulong IncrementFrequency(UInt64Link doublet)
             {
                 ulong frequency;
-                if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
                 {
                     frequency++;
-                    _pairsFrequencies[pair] = frequency;
+                    _doubletsFrequencies[doublet] = frequency;
                 }
                 else
                 {
                     frequency = 1;
-                    _pairsFrequencies.Add(pair, frequency);
+                    _doubletsFrequencies.Add(doublet, frequency);
                 }
                 return frequency;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void DecrementFrequency(UInt64Link pair)
+            private void DecrementFrequency(UInt64Link doublet)
             {
                 ulong frequency;
-                if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
                 {
                     frequency--;
 
                     if (frequency == 0)
-                        _pairsFrequencies.Remove(pair);
+                        _doubletsFrequencies.Remove(doublet);
                     else
-                        _pairsFrequencies[pair] = frequency;
+                        _doubletsFrequencies[doublet] = frequency;
                 }
                 //return frequency;
             }
 
             /// <remarks>
             /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// Faster version (doublets' frequencies dictionary is not recreated).
             /// </remarks>
             public ulong[] Precompress0(ulong[] sequence)
             {
@@ -599,15 +599,15 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
-                    UpdateMaxPair(pair, IncrementFrequency(pair));
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                 }
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPairSource = _maxPair.Source;
-                    var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
+                    var maxDoubletSource = _maxDoublet.Source;
+                    var maxDoubletTarget = _maxDoublet.Target;
+                    var maxDoubletResult = _links.CreateAndUpdate(maxDoubletSource, maxDoubletTarget);
 
                     oldLength--;
                     var oldLengthMinusTwo = oldLength - 1;
@@ -616,22 +616,22 @@ namespace Platform.Sandbox
                     int w = 0, r = 0; // (r == read, w == write)
                     for (; r < oldLength; r++)
                     {
-                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        if (copy[r] == maxDoubletSource && copy[r + 1] == maxDoubletTarget)
                         {
                             if (r > 0)
                             {
                                 var previous = copy[w - 1];
-                                DecrementFrequency(new UInt64Link(previous, maxPairSource));
-                                IncrementFrequency(new UInt64Link(previous, maxPairResult));
+                                DecrementFrequency(new UInt64Link(previous, maxDoubletSource));
+                                IncrementFrequency(new UInt64Link(previous, maxDoubletResult));
                             }
                             if (r < oldLengthMinusTwo)
                             {
                                 var next = copy[r + 2];
-                                DecrementFrequency(new UInt64Link(maxPairTarget, next));
-                                IncrementFrequency(new UInt64Link(maxPairResult, next));
+                                DecrementFrequency(new UInt64Link(maxDoubletTarget, next));
+                                IncrementFrequency(new UInt64Link(maxDoubletResult, next));
                             }
 
-                            copy[w++] = maxPairResult;
+                            copy[w++] = maxDoubletResult;
                             r++;
                             newLength--;
                         }
@@ -642,21 +642,21 @@ namespace Platform.Sandbox
                     }
                     copy[w] = copy[r];
 
-                    _pairsFrequencies.Remove(_maxPair);
+                    _doubletsFrequencies.Remove(_maxDoublet);
 
                     oldLength = newLength;
 
-                    // Медленный вариант UpdateMaxPair
-                    //_maxPair = Link.Null;
+                    // Медленный вариант UpdateMaxDoublet
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
-                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+                    // TODO: Разобраться почему, если переместить сюда строчку "_doubletsFrequencies.Remove(_maxDoublet);" алгоритм зацикливается
 
-                    //foreach (var pairsFrequency in _pairsFrequencies)
-                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    //foreach (var doubletsFrequency in _doubletsFrequencies)
+                    //    UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
 
                     // Быстрее
-                    UpdateMaxPair2();
+                    UpdateMaxDoublet2();
                 }
 
                 var final = new ulong[newLength];
@@ -667,7 +667,7 @@ namespace Platform.Sandbox
 
             /// <remarks>
             /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// Faster version (doublets' frequencies dictionary is not recreated).
             /// </remarks>
             public ulong[] Precompress1(ulong[] sequence)
             {
@@ -685,65 +685,65 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     ulong frequency;
-                    if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                    if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
                     {
                         var newFrequency = frequency + 1;
 
                         if (_maxFrequency < newFrequency)
                         {
                             _maxFrequency = newFrequency;
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
 
-                        _pairsFrequencies[pair] = newFrequency;
+                        _doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
-                        _pairsFrequencies.Add(pair, 1);
+                        _doubletsFrequencies.Add(doublet, 1);
                 }
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPair = _maxPair;
+                    var maxDoublet = _maxDoublet;
 
-                    //ResetMaxPair();
+                    //ResetMaxDoublet();
 
-                    var maxPairSource = maxPair.Source;
+                    var maxDoubletSource = maxDoublet.Source;
 
-                    var maxPairLink = _links.CreateAndUpdate(maxPairSource, maxPair.Target);
+                    var maxDoubletLink = _links.CreateAndUpdate(maxDoubletSource, maxDoublet.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
                     {
                         var startIndex = i - 1;
 
-                        if (copy[startIndex] == maxPairSource)
+                        if (copy[startIndex] == maxDoubletSource)
                         {
                             while (i < copy.Length && copy[i] == 0) i++;
                             if (i == copy.Length) break;
 
-                            if (copy[i] == maxPair.Target)
+                            if (copy[i] == maxDoublet.Target)
                             {
                                 var oldLeft = copy[startIndex];
                                 var oldRight = copy[i];
 
-                                copy[startIndex] = maxPairLink;
+                                copy[startIndex] = maxDoubletLink;
                                 copy[i] = 0; // TODO: Вместо записи нулевых дырок, можно хранить отрицательным числом размер диапазона (дырки) на которую надо прыгнуть, это дополнительно ускорило бы алгоритм.
 
                                 // Требуется отдельно, так как пары могут идти подряд,
                                 // например в "ааа" пара "аа" была посчитана дважды
-                                //pairsFrequencies[maxPair]--;
+                                //doubletsFrequencies[maxDoublet]--;
 
                                 ulong frequency;
-                                //ulong frequency = _pairsFrequencies[maxPair];
+                                //ulong frequency = _doubletsFrequencies[maxDoublet];
                                 //if (frequency == 1)
-                                //    _pairsFrequencies.Remove(maxPair);
+                                //    _doubletsFrequencies.Remove(maxDoublet);
                                 //else
-                                //    _pairsFrequencies[maxPair] = frequency - 1;
+                                //    _doubletsFrequencies[maxDoublet] = frequency - 1;
 
-                                //UpdateMaxPair2(maxPair, frequency);
+                                //UpdateMaxDoublet2(maxDoublet, frequency);
 
                                 newLength--;
 
@@ -753,32 +753,32 @@ namespace Platform.Sandbox
                                     while (previous >= 0 && copy[previous] == 0) previous--;
                                     if (previous >= 0)
                                     {
-                                        var previousOldPair = new UInt64Link(copy[previous], oldLeft);
-                                        //if (!nextOldPair.Equals(maxPair))
+                                        var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                        //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
-                                            //pairsFrequencies[nextOldPair]--;
-                                            if (_pairsFrequencies.TryGetValue(previousOldPair, out frequency))
+                                            //doubletsFrequencies[nextOldDoublet]--;
+                                            if (_doubletsFrequencies.TryGetValue(previousOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
-                                                    _pairsFrequencies.Remove(previousOldPair);
+                                                    _doubletsFrequencies.Remove(previousOldDoublet);
                                                 else
-                                                    _pairsFrequencies[previousOldPair] = frequency - 1;
+                                                    _doubletsFrequencies[previousOldDoublet] = frequency - 1;
 
-                                                //if(!maxPair.Equals(previousOldPair))
-                                                //    UpdateMaxPair2(previousOldPair, frequency - 1);
+                                                //if(!maxDoublet.Equals(previousOldDoublet))
+                                                //    UpdateMaxDoublet2(previousOldDoublet, frequency - 1);
                                             }
                                         }
 
-                                        var previousNewPair = new UInt64Link(copy[previous], copy[startIndex]);
-                                        //pairsFrequencies[nextNewPair]++;
-                                        if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
+                                        var previousNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                        //doubletsFrequencies[nextNewDoublet]++;
+                                        if (_doubletsFrequencies.TryGetValue(previousNewDoublet, out frequency))
                                         {
-                                            _pairsFrequencies[previousNewPair] = frequency + 1;
+                                            _doubletsFrequencies[previousNewDoublet] = frequency + 1;
 
-                                            //UpdateMaxPair(previousNewPair, frequency + 1);
+                                            //UpdateMaxDoublet(previousNewDoublet, frequency + 1);
                                         }
                                         else
-                                            _pairsFrequencies.Add(previousNewPair, 1);
+                                            _doubletsFrequencies.Add(previousNewDoublet, 1);
                                     }
                                 }
 
@@ -788,60 +788,60 @@ namespace Platform.Sandbox
                                     while (next < copy.Length && copy[next] == 0) next++;
                                     if (next < copy.Length)
                                     {
-                                        var nextOldPair = new UInt64Link(oldRight, copy[next]);
-                                        //if (!nextOldPair.Equals(maxPair))
+                                        var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                        //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
-                                            //pairsFrequencies[nextOldPair]--;
-                                            if (_pairsFrequencies.TryGetValue(nextOldPair, out frequency))
+                                            //doubletsFrequencies[nextOldDoublet]--;
+                                            if (_doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
-                                                    _pairsFrequencies.Remove(nextOldPair);
+                                                    _doubletsFrequencies.Remove(nextOldDoublet);
                                                 else
-                                                    _pairsFrequencies[nextOldPair] = frequency - 1;
+                                                    _doubletsFrequencies[nextOldDoublet] = frequency - 1;
 
-                                                //if (!maxPair.Equals(nextOldPair))
-                                                //    UpdateMaxPair2(nextOldPair, frequency - 1);
+                                                //if (!maxDoublet.Equals(nextOldDoublet))
+                                                //    UpdateMaxDoublet2(nextOldDoublet, frequency - 1);
                                             }
                                         }
 
-                                        var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
-                                        //pairsFrequencies[nextNewPair]++;
-                                        if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
+                                        var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                        //doubletsFrequencies[nextNewDoublet]++;
+                                        if (_doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                         {
-                                            _pairsFrequencies[nextNewPair] = frequency + 1;
+                                            _doubletsFrequencies[nextNewDoublet] = frequency + 1;
 
-                                            //UpdateMaxPair(nextNewPair, frequency + 1);
+                                            //UpdateMaxDoublet(nextNewDoublet, frequency + 1);
                                         }
                                         else
-                                            _pairsFrequencies.Add(nextNewPair, 1);
+                                            _doubletsFrequencies.Add(nextNewDoublet, 1);
                                     }
                                 }
                             }
                         }
                     }
 
-                    //////if (!_maxPair2.IsNull())
+                    //////if (!_maxDoublet2.IsNull())
                     //////{
-                    //////    UpdateMaxPair(_maxPair2, _maxFrequency2);
+                    //////    UpdateMaxDoublet(_maxDoublet2, _maxFrequency2);
                     //////}
 
-                    //pairsFrequencies[maxPair] = 0;
-                    //pairsFrequencies.Remove(maxPair);
+                    //doubletsFrequencies[maxDoublet] = 0;
+                    //doubletsFrequencies.Remove(maxDoublet);
 
-                    //if (pairsFrequencies[maxPair] > 0)
+                    //if (doubletsFrequencies[maxDoublet] > 0)
                     //{
 
                     //}
 
-                    _pairsFrequencies.Remove(_maxPair);
+                    _doubletsFrequencies.Remove(_maxDoublet);
 
-                    _maxPair = UInt64Link.Null;
+                    _maxDoublet = UInt64Link.Null;
                     _maxFrequency = 1;
 
-                    foreach (var pairsFrequency in _pairsFrequencies)
-                        UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    foreach (var doubletsFrequency in _doubletsFrequencies)
+                        UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
 
-                    //_maxPair = Link.Null;
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
                     //for (var i = 1; i < copy.Length; i++)
@@ -851,15 +851,15 @@ namespace Platform.Sandbox
                     //    while (i < copy.Length && copy[i] == 0) i++;
                     //    if (i == copy.Length) break;
 
-                    //    var pair = new Link(copy[startIndex], copy[i]);
+                    //    var doublet = new Link(copy[startIndex], copy[i]);
 
-                    //    var frequency = _pairsFrequencies[pair];
-                    //    UpdateMaxPair(pair, frequency);
+                    //    var frequency = _doubletsFrequencies[doublet];
+                    //    UpdateMaxDoublet(doublet, frequency);
                     //}
 
                     //{
-                    //    var pairsFrequenciesCheck = new Dictionary<Link, ulong>();
-                    //    var maxPairCheck = Link.Null;
+                    //    var doubletsFrequenciesCheck = new Dictionary<Link, ulong>();
+                    //    var maxDoubletCheck = Link.Null;
                     //    ulong maxFrequencyCheck = 1;
 
                     //    for (var i = 1; i < copy.Length; i++)
@@ -869,26 +869,26 @@ namespace Platform.Sandbox
                     //        while (i < copy.Length && copy[i] == 0) i++;
                     //        if (i == copy.Length) break;
 
-                    //        var pair = new Link(copy[startIndex], copy[i]);
+                    //        var doublet = new Link(copy[startIndex], copy[i]);
 
                     //        ulong frequency;
-                    //        if (pairsFrequenciesCheck.TryGetValue(pair, out frequency))
+                    //        if (doubletsFrequenciesCheck.TryGetValue(doublet, out frequency))
                     //        {
                     //            var newFrequency = frequency + 1;
 
                     //            if (maxFrequencyCheck < newFrequency)
                     //            {
                     //                maxFrequencyCheck = newFrequency;
-                    //                maxPairCheck = pair;
+                    //                maxDoubletCheck = doublet;
                     //            }
 
-                    //            pairsFrequenciesCheck[pair] = newFrequency;
+                    //            doubletsFrequenciesCheck[doublet] = newFrequency;
                     //        }
                     //        else
-                    //            pairsFrequenciesCheck.Add(pair, 1);
+                    //            doubletsFrequenciesCheck.Add(doublet, 1);
                     //    }
 
-                    //    if (!maxPairCheck.Equals(maxPair) || maxFrequency != maxFrequencyCheck)
+                    //    if (!maxDoubletCheck.Equals(maxDoublet) || maxFrequency != maxFrequencyCheck)
                     //    {
 
                     //    }
@@ -922,7 +922,7 @@ namespace Platform.Sandbox
 
             /// <remarks>
             /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-            /// Faster version (pairs' frequencies dictionary is not recreated).
+            /// Faster version (doublets' frequencies dictionary is not recreated).
             /// </remarks>
             public ulong[] Precompress2(ulong[] sequence)
             {
@@ -940,36 +940,36 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
                     ulong frequency;
-                    if (_pairsFrequencies.TryGetValue(pair, out frequency))
+                    if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
                     {
                         var newFrequency = frequency + 1;
 
                         if (_maxFrequency < newFrequency)
                         {
                             _maxFrequency = newFrequency;
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
 
-                        _pairsFrequencies[pair] = newFrequency;
+                        _doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
-                        _pairsFrequencies.Add(pair, 1);
+                        _doubletsFrequencies.Add(doublet, 1);
                 }
 
-                //var tempPair = new Link();
+                //var tempDoublet = new Link();
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPair = _maxPair;
+                    var maxDoublet = _maxDoublet;
 
-                    ResetMaxPair();
+                    ResetMaxDoublet();
 
-                    var maxPairSource = maxPair.Source;
+                    var maxDoubletSource = maxDoublet.Source;
 
-                    var maxPairLink = _links.CreateAndUpdate(maxPairSource, maxPair.Target);
+                    var maxDoubletLink = _links.CreateAndUpdate(maxDoubletSource, maxDoublet.Target);
 
                     // Substitute all usages
                     for (var i = 1; i < copy.Length; i++)
@@ -983,31 +983,31 @@ namespace Platform.Sandbox
                         }
                         if (startIndex == copy.Length - 1) break;
 
-                        if (copy[startIndex] == maxPairSource)
+                        if (copy[startIndex] == maxDoubletSource)
                         {
                             while (i < copy.Length && copy[i] == 0) i++;
                             if (i == copy.Length) break;
 
-                            if (copy[i] == maxPair.Target)
+                            if (copy[i] == maxDoublet.Target)
                             {
                                 var oldLeft = copy[startIndex];
                                 var oldRight = copy[i];
 
-                                copy[startIndex] = maxPairLink;
+                                copy[startIndex] = maxDoubletLink;
                                 copy[i] = 0;
                                 // TODO: Вместо записи нулевых дырок, можно хранить отрицательным числом размер диапазона (дырки) на которую надо прыгнуть, это дополнительно ускорило бы алгоритм.
 
                                 // Требуется отдельно, так как пары могут идти подряд,
                                 // например в "ааа" пара "аа" была посчитана дважды
-                                //pairsFrequencies[maxPair]--;
+                                //doubletsFrequencies[maxDoublet]--;
 
-                                var frequency = _pairsFrequencies[maxPair];
+                                var frequency = _doubletsFrequencies[maxDoublet];
                                 if (frequency == 1)
-                                    _pairsFrequencies.Remove(maxPair);
+                                    _doubletsFrequencies.Remove(maxDoublet);
                                 else
-                                    _pairsFrequencies[maxPair] = frequency - 1;
+                                    _doubletsFrequencies[maxDoublet] = frequency - 1;
 
-                                //UpdateMaxPair2(maxPair, frequency);
+                                //UpdateMaxDoublet2(maxDoublet, frequency);
 
                                 newLength--;
 
@@ -1017,33 +1017,33 @@ namespace Platform.Sandbox
                                     while (previous >= 0 && copy[previous] == 0) previous--;
                                     if (previous >= 0)
                                     {
-                                        var previousOldPair = new UInt64Link(copy[previous], oldLeft);
-                                        //if (!nextOldPair.Equals(maxPair))
+                                        var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                        //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
-                                            //pairsFrequencies[nextOldPair]--;
-                                            if (_pairsFrequencies.TryGetValue(previousOldPair, out frequency))
+                                            //doubletsFrequencies[nextOldDoublet]--;
+                                            if (_doubletsFrequencies.TryGetValue(previousOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
-                                                    _pairsFrequencies.Remove(previousOldPair);
+                                                    _doubletsFrequencies.Remove(previousOldDoublet);
                                                 else
-                                                    _pairsFrequencies[previousOldPair] = frequency - 1;
+                                                    _doubletsFrequencies[previousOldDoublet] = frequency - 1;
 
-                                                //if(!maxPair.Equals(previousOldPair))
-                                                //    UpdateMaxPair2(previousOldPair, frequency - 1);
+                                                //if(!maxDoublet.Equals(previousOldDoublet))
+                                                //    UpdateMaxDoublet2(previousOldDoublet, frequency - 1);
                                             }
                                         }
 
-                                        var previousNewPair = new UInt64Link(copy[previous], copy[startIndex]);
-                                        //pairsFrequencies[nextNewPair]++;
-                                        if (_pairsFrequencies.TryGetValue(previousNewPair, out frequency))
+                                        var previousNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                        //doubletsFrequencies[nextNewDoublet]++;
+                                        if (_doubletsFrequencies.TryGetValue(previousNewDoublet, out frequency))
                                         {
-                                            _pairsFrequencies[previousNewPair] = frequency + 1;
+                                            _doubletsFrequencies[previousNewDoublet] = frequency + 1;
 
-                                            //if (!maxPair.Equals(previousNewPair))
-                                            UpdateMaxPair(previousNewPair, frequency + 1);
+                                            //if (!maxDoublet.Equals(previousNewDoublet))
+                                            UpdateMaxDoublet(previousNewDoublet, frequency + 1);
                                         }
                                         else
-                                            _pairsFrequencies.Add(previousNewPair, 1);
+                                            _doubletsFrequencies.Add(previousNewDoublet, 1);
                                     }
                                 }
 
@@ -1053,33 +1053,33 @@ namespace Platform.Sandbox
                                     while (next < copy.Length && copy[next] == 0) next++;
                                     if (next < copy.Length)
                                     {
-                                        var nextOldPair = new UInt64Link(oldRight, copy[next]);
-                                        //if (!nextOldPair.Equals(maxPair))
+                                        var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                        //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
-                                            //pairsFrequencies[nextOldPair]--;
-                                            if (_pairsFrequencies.TryGetValue(nextOldPair, out frequency))
+                                            //doubletsFrequencies[nextOldDoublet]--;
+                                            if (_doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
-                                                    _pairsFrequencies.Remove(nextOldPair);
+                                                    _doubletsFrequencies.Remove(nextOldDoublet);
                                                 else
-                                                    _pairsFrequencies[nextOldPair] = frequency - 1;
+                                                    _doubletsFrequencies[nextOldDoublet] = frequency - 1;
 
-                                                //if (!maxPair.Equals(nextOldPair))
-                                                //    UpdateMaxPair2(nextOldPair, frequency - 1);
+                                                //if (!maxDoublet.Equals(nextOldDoublet))
+                                                //    UpdateMaxDoublet2(nextOldDoublet, frequency - 1);
                                             }
                                         }
 
-                                        var nextNewPair = new UInt64Link(copy[startIndex], copy[next]);
-                                        //pairsFrequencies[nextNewPair]++;
-                                        if (_pairsFrequencies.TryGetValue(nextNewPair, out frequency))
+                                        var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                        //doubletsFrequencies[nextNewDoublet]++;
+                                        if (_doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                         {
-                                            _pairsFrequencies[nextNewPair] = frequency + 1;
+                                            _doubletsFrequencies[nextNewDoublet] = frequency + 1;
 
-                                            //if (!maxPair.Equals(nextNewPair))
-                                            UpdateMaxPair(nextNewPair, frequency + 1);
+                                            //if (!maxDoublet.Equals(nextNewDoublet))
+                                            UpdateMaxDoublet(nextNewDoublet, frequency + 1);
                                         }
                                         else
-                                            _pairsFrequencies.Add(nextNewPair, 1);
+                                            _doubletsFrequencies.Add(nextNewDoublet, 1);
                                     }
                                 }
                             }
@@ -1089,30 +1089,30 @@ namespace Platform.Sandbox
                             while (i < copy.Length && copy[i] == 0) i++;
                             if (i == copy.Length) break;
 
-                            //tempPair.Source = copy[startIndex];
-                            //tempPair.Target = copy[i];
+                            //tempDoublet.Source = copy[startIndex];
+                            //tempDoublet.Target = copy[i];
 
-                            var pair = new UInt64Link(copy[startIndex], copy[i]);
+                            var doublet = new UInt64Link(copy[startIndex], copy[i]);
 
-                            //if (!maxPair.Equals(pair))
+                            //if (!maxDoublet.Equals(doublet))
                             //{
                             ulong frequency;
-                            if (_pairsFrequencies.TryGetValue(pair, out frequency))
-                                UpdateMaxPair(pair, frequency);
+                            if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                                UpdateMaxDoublet(doublet, frequency);
                             //}
                         }
                     }
 
-                    //////if (!_maxPair2.IsNull())
+                    //////if (!_maxDoublet2.IsNull())
                     //////{
-                    //////    UpdateMaxPair(_maxPair2, _maxFrequency2);
+                    //////    UpdateMaxDoublet(_maxDoublet2, _maxFrequency2);
                     //////}
 
-                    //_maxPair = Link.Null;
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
-                    //foreach (var pairsFrequency in _pairsFrequencies)
-                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    //foreach (var doubletsFrequency in _doubletsFrequencies)
+                    //    UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
                 }
 
                 var final = new ulong[newLength];
@@ -1131,7 +1131,7 @@ namespace Platform.Sandbox
 
             /// <remarks>
             /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-            /// If pair repeats twice it is maximum pair.
+            /// If doublet repeats twice it is maximum doublet.
             /// </remarks>
             public ulong[] Precompress3(ulong[] sequence)
             {
@@ -1152,25 +1152,25 @@ namespace Platform.Sandbox
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
-                    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                     //if(_maxFrequency >= 2)
                     //    break;
 
-                    if (!set.Add(pair))
+                    if (!set.Add(doublet))
                     {
-                        _maxPair = pair;
+                        _maxDoublet = doublet;
                         //_maxFrequency = 2;
                         break;
                     }
                 }
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPairSource = _maxPair.Source;
-                    var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
+                    var maxDoubletSource = _maxDoublet.Source;
+                    var maxDoubletTarget = _maxDoublet.Target;
+                    var maxDoubletResult = _links.CreateAndUpdate(maxDoubletSource, maxDoubletTarget);
 
                     oldLength--;
                     //var oldLengthMinusTwo = oldLength - 1;
@@ -1179,22 +1179,22 @@ namespace Platform.Sandbox
                     int w = 0, r = 0; // (r == read, w == write)
                     for (; r < oldLength; r++)
                     {
-                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        if (copy[r] == maxDoubletSource && copy[r + 1] == maxDoubletTarget)
                         {
                             //if (r > 0)
                             //{
                             //    var previous = copy[w - 1];
-                            //    DecrementFrequency(new Link(previous, maxPairSource));
-                            //    IncrementFrequency(new Link(previous, maxPairResult));
+                            //    DecrementFrequency(new Link(previous, maxDoubletSource));
+                            //    IncrementFrequency(new Link(previous, maxDoubletResult));
                             //}
                             //if (r < oldLengthMinusTwo)
                             //{
                             //    var next = copy[r + 2];
-                            //    DecrementFrequency(new Link(maxPairTarget, next));
-                            //    IncrementFrequency(new Link(maxPairResult, next));
+                            //    DecrementFrequency(new Link(maxDoubletTarget, next));
+                            //    IncrementFrequency(new Link(maxDoubletResult, next));
                             //}
 
-                            copy[w++] = maxPairResult;
+                            copy[w++] = maxDoubletResult;
                             r++;
                             newLength--;
                         }
@@ -1205,43 +1205,43 @@ namespace Platform.Sandbox
                     }
                     copy[w] = copy[r];
 
-                    //_pairsFrequencies.Remove(_maxPair);
+                    //_doubletsFrequencies.Remove(_maxDoublet);
 
-                    _maxPair = UInt64Link.Null;
+                    _maxDoublet = UInt64Link.Null;
 
-                    //ResetMaxPair();
+                    //ResetMaxDoublet();
                     set.Clear();
-                    //_pairsFrequencies = new Dictionary<Link, ulong>();
+                    //_doubletsFrequencies = new Dictionary<Link, ulong>();
 
                     oldLength = newLength;
 
                     for (var i = 1; i < newLength; i++)
                     {
-                        var pair = new UInt64Link(copy[i - 1], copy[i]);
+                        var doublet = new UInt64Link(copy[i - 1], copy[i]);
 
-                        //UpdateMaxPair(pair, IncrementFrequency(pair));
+                        //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                         //if (_maxFrequency >= 2)
                         //    break;
 
-                        if (!set.Add(pair))
+                        if (!set.Add(doublet))
                         {
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                             //_maxFrequency = 2;
                             break; ;
                         }
                     }
 
-                    // Медленный вариант UpdateMaxPair
-                    //_maxPair = Link.Null;
+                    // Медленный вариант UpdateMaxDoublet
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
-                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+                    // TODO: Разобраться почему, если переместить сюда строчку "_doubletsFrequencies.Remove(_maxDoublet);" алгоритм зацикливается
 
-                    //foreach (var pairsFrequency in _pairsFrequencies)
-                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    //foreach (var doubletsFrequency in _doubletsFrequencies)
+                    //    UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
 
                     // Быстрее
-                    //UpdateMaxPair2();
+                    //UpdateMaxDoublet2();
                 }
 
                 var final = new ulong[newLength];
@@ -1252,7 +1252,7 @@ namespace Platform.Sandbox
 
             /// <remarks>
             /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
-            /// If pair repeats twice it is maximum pair.
+            /// If doublet repeats twice it is maximum doublet.
             /// </remarks>
             public ulong[] Precompress4(ulong[] sequence)
             {
@@ -1273,127 +1273,127 @@ namespace Platform.Sandbox
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
-                    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                     //if(_maxFrequency >= 2)
                     //    break;
 
-                    if (!set.Add(pair))
+                    if (!set.Add(doublet))
                     {
-                        _maxPair = pair;
+                        _maxDoublet = doublet;
                         //_maxFrequency = 2;
                         break;
                     }
                 }
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPairSource = _maxPair.Source;
-                    var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
+                    var maxDoubletSource = _maxDoublet.Source;
+                    var maxDoubletTarget = _maxDoublet.Target;
+                    var maxDoubletResult = _links.CreateAndUpdate(maxDoubletSource, maxDoubletTarget);
 
                     oldLength--;
                     var oldLengthMinusTwo = oldLength - 1;
 
-                    _maxPair = UInt64Link.Null;
+                    _maxDoublet = UInt64Link.Null;
                     set.Clear();
 
                     // Substitute all usages
                     int w = 0, r = 0; // (r == read, w == write)
                     for (; r < oldLength; r++)
                     {
-                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        if (copy[r] == maxDoubletSource && copy[r + 1] == maxDoubletTarget)
                         {
-                            //if (_maxPair.IsNull())
+                            //if (_maxDoublet.IsNull())
                             //{
                             //    if (r > 0)
                             //    {
                             //        var previous = copy[w - 1];
-                            //        set.Remove(new Link(previous, maxPairSource));
-                            //        var pair = new Link(previous, maxPairResult);
-                            //        if (!set.Add(pair)) _maxPair = pair;
-                            //        //DecrementFrequency(new Link(previous, maxPairSource));
-                            //        //IncrementFrequency(new Link(previous, maxPairResult));
+                            //        set.Remove(new Link(previous, maxDoubletSource));
+                            //        var doublet = new Link(previous, maxDoubletResult);
+                            //        if (!set.Add(doublet)) _maxDoublet = doublet;
+                            //        //DecrementFrequency(new Link(previous, maxDoubletSource));
+                            //        //IncrementFrequency(new Link(previous, maxDoubletResult));
                             //    }
                             //    if (r < oldLengthMinusTwo)
                             //    {
                             //        var next = copy[r + 2];
-                            //        set.Remove(new Link(maxPairTarget, next));
-                            //        var pair = new Link(maxPairResult, next);
-                            //        if (!set.Add(pair)) _maxPair = pair;
-                            //        //DecrementFrequency(new Link(maxPairTarget, next));
-                            //        //IncrementFrequency(new Link(maxPairResult, next));
+                            //        set.Remove(new Link(maxDoubletTarget, next));
+                            //        var doublet = new Link(maxDoubletResult, next);
+                            //        if (!set.Add(doublet)) _maxDoublet = doublet;
+                            //        //DecrementFrequency(new Link(maxDoubletTarget, next));
+                            //        //IncrementFrequency(new Link(maxDoubletResult, next));
                             //    }
                             //}
 
-                            copy[w++] = maxPairResult;
+                            copy[w++] = maxDoubletResult;
                             r++;
                             newLength--;
                         }
                         else
                         {
-                            //if (_maxPair.IsNull() && w > 0) // 8 sec
+                            //if (_maxDoublet.IsNull() && w > 0) // 8 sec
                             //{
-                            //    var pair = new Link(copy[w - 1], copy[w]);
-                            //    if (!set.Add(pair)) _maxPair = pair;
+                            //    var doublet = new Link(copy[w - 1], copy[w]);
+                            //    if (!set.Add(doublet)) _maxDoublet = doublet;
                             //}
 
-                            if (_maxPair.IsNull()) // 4 sec
+                            if (_maxDoublet.IsNull()) // 4 sec
                             {
-                                var pair = new UInt64Link(copy[r], copy[r + 1]);
-                                if (!set.Add(pair)) _maxPair = pair;
+                                var doublet = new UInt64Link(copy[r], copy[r + 1]);
+                                if (!set.Add(doublet)) _maxDoublet = doublet;
                             }
                             copy[w++] = copy[r];
 
-                            //if (_maxPair.IsNull()) // 8 sec
+                            //if (_maxDoublet.IsNull()) // 8 sec
                             //{
-                            //    var pair = new Link(copy[w - 1], copy[w]);
-                            //    if (!set.Add(pair)) _maxPair = pair;
+                            //    var doublet = new Link(copy[w - 1], copy[w]);
+                            //    if (!set.Add(doublet)) _maxDoublet = doublet;
                             //}
                         }
                     }
-                    //if (_maxPair.IsNull()) // 8 sec
+                    //if (_maxDoublet.IsNull()) // 8 sec
                     //{
-                    //    var pair = new Link(copy[w - 1], copy[w]);
-                    //    if (!set.Add(pair)) _maxPair = pair;
+                    //    var doublet = new Link(copy[w - 1], copy[w]);
+                    //    if (!set.Add(doublet)) _maxDoublet = doublet;
                     //}
                     copy[w] = copy[r];
 
-                    //_pairsFrequencies.Remove(_maxPair);
+                    //_doubletsFrequencies.Remove(_maxDoublet);
 
-                    //_maxPair = Link.Null;
+                    //_maxDoublet = Link.Null;
                     //set.Clear();
 
                     oldLength = newLength;
 
                     //for (var i = 1; i < newLength; i++)
                     //{
-                    //    var pair = new Link(copy[i - 1], copy[i]);
+                    //    var doublet = new Link(copy[i - 1], copy[i]);
 
-                    //    //UpdateMaxPair(pair, IncrementFrequency(pair));
+                    //    //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                     //    //if (_maxFrequency >= 2)
                     //    //    break;
 
-                    //    if (!set.Add(pair))
+                    //    if (!set.Add(doublet))
                     //    {
-                    //        _maxPair = pair;
+                    //        _maxDoublet = doublet;
                     //        //_maxFrequency = 2;
                     //        break; ;
                     //    }
                     //}
 
-                    // Медленный вариант UpdateMaxPair
-                    //_maxPair = Link.Null;
+                    // Медленный вариант UpdateMaxDoublet
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
-                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+                    // TODO: Разобраться почему, если переместить сюда строчку "_doubletsFrequencies.Remove(_maxDoublet);" алгоритм зацикливается
 
-                    //foreach (var pairsFrequency in _pairsFrequencies)
-                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    //foreach (var doubletsFrequency in _doubletsFrequencies)
+                    //    UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
 
                     // Быстрее
-                    //UpdateMaxPair2();
+                    //UpdateMaxDoublet2();
                 }
 
                 var final = new ulong[newLength];
@@ -1425,15 +1425,15 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var pair = new UInt64Link(sequence[i - 1], sequence[i]);
-                    UpdateMaxPair(pair, IncrementFrequency(pair));
+                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                 }
 
-                while (!_maxPair.IsNull())
+                while (!_maxDoublet.IsNull())
                 {
-                    var maxPairSource = _maxPair.Source;
-                    var maxPairTarget = _maxPair.Target;
-                    var maxPairResult = _links.CreateAndUpdate(maxPairSource, maxPairTarget);
+                    var maxDoubletSource = _maxDoublet.Source;
+                    var maxDoubletTarget = _maxDoublet.Target;
+                    var maxDoubletResult = _links.CreateAndUpdate(maxDoubletSource, maxDoubletTarget);
 
                     oldLength--;
                     //var oldLengthMinusTwo = oldLength - 1;
@@ -1442,22 +1442,22 @@ namespace Platform.Sandbox
                     int w = 0, r = 0; // (r == read, w == write)
                     for (; r < oldLength; r++)
                     {
-                        if (copy[r] == maxPairSource && copy[r + 1] == maxPairTarget)
+                        if (copy[r] == maxDoubletSource && copy[r + 1] == maxDoubletTarget)
                         {
                             //if (r > 0)
                             //{
                             //    var previous = copy[w - 1];
-                            //    DecrementFrequency(new Link(previous, maxPairSource));
-                            //    IncrementFrequency(new Link(previous, maxPairResult));
+                            //    DecrementFrequency(new Link(previous, maxDoubletSource));
+                            //    IncrementFrequency(new Link(previous, maxDoubletResult));
                             //}
                             //if (r < oldLengthMinusTwo)
                             //{
                             //    var next = copy[r + 2];
-                            //    DecrementFrequency(new Link(maxPairTarget, next));
-                            //    IncrementFrequency(new Link(maxPairResult, next));
+                            //    DecrementFrequency(new Link(maxDoubletTarget, next));
+                            //    IncrementFrequency(new Link(maxDoubletResult, next));
                             //}
 
-                            copy[w++] = maxPairResult;
+                            copy[w++] = maxDoubletResult;
                             r++;
                             newLength--;
                         }
@@ -1468,21 +1468,21 @@ namespace Platform.Sandbox
                     }
                     copy[w] = copy[r];
 
-                    _pairsFrequencies.Remove(_maxPair);
+                    _doubletsFrequencies.Remove(_maxDoublet);
 
                     oldLength = newLength;
 
-                    // Медленный вариант UpdateMaxPair
-                    //_maxPair = Link.Null;
+                    // Медленный вариант UpdateMaxDoublet
+                    //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
 
-                    // TODO: Разобраться почему, если переместить сюда строчку "_pairsFrequencies.Remove(_maxPair);" алгоритм зацикливается
+                    // TODO: Разобраться почему, если переместить сюда строчку "_doubletsFrequencies.Remove(_maxDoublet);" алгоритм зацикливается
 
-                    //foreach (var pairsFrequency in _pairsFrequencies)
-                    //    UpdateMaxPair(pairsFrequency.Key, pairsFrequency.Value);
+                    //foreach (var doubletsFrequency in _doubletsFrequencies)
+                    //    UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
 
                     // Быстрее
-                    UpdateMaxPair2();
+                    UpdateMaxDoublet2();
                 }
 
                 var final = new ulong[newLength];
@@ -1497,84 +1497,84 @@ namespace Platform.Sandbox
                 return _sequences.CreateBalancedVariant(precompressedSequence);
             }
 
-            private void ResetMaxPair()
+            private void ResetMaxDoublet()
             {
-                _maxPair = UInt64Link.Null;
+                _maxDoublet = UInt64Link.Null;
                 _maxFrequency = 1;
-                _maxPair2 = UInt64Link.Null;
+                _maxDoublet2 = UInt64Link.Null;
                 _maxFrequency2 = 1;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void UpdateMaxPair(UInt64Link pair, ulong frequency)
+            private void UpdateMaxDoublet(UInt64Link doublet, ulong frequency)
             {
                 if (frequency > 1)
                 {
                     if (_maxFrequency < frequency)
                     {
                         _maxFrequency = frequency;
-                        _maxPair = pair;
+                        _maxDoublet = doublet;
                     }
                     else if (_maxFrequency == frequency &&
-                        (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                        (doublet.Source + doublet.Target) > (_maxDoublet.Source + _maxDoublet.Target))
                     {
-                        _maxPair = pair;
+                        _maxDoublet = doublet;
                     }
                 }
             }
 
-            private void UpdateMaxPair2(UInt64Link pair, ulong frequency)
+            private void UpdateMaxDoublet2(UInt64Link doublet, ulong frequency)
             {
-                if (!_maxPair.Equals(pair))
+                if (!_maxDoublet.Equals(doublet))
                 {
-                    if (_maxPair2.Equals(pair))
+                    if (_maxDoublet2.Equals(doublet))
                     {
                         _maxFrequency2 = frequency;
                     }
                     else if (_maxFrequency2 < frequency)
                     {
                         _maxFrequency2 = frequency;
-                        _maxPair2 = pair;
+                        _maxDoublet2 = doublet;
                     }
                     else if (_maxFrequency2 == frequency &&
-                             (pair.Source + pair.Target) > (_maxPair2.Source + _maxPair2.Target))
+                             (doublet.Source + doublet.Target) > (_maxDoublet2.Source + _maxDoublet2.Target))
                     {
-                        _maxPair = pair;
+                        _maxDoublet = doublet;
                     }
                 }
             }
 
-            private void UpdateMaxPair()
+            private void UpdateMaxDoublet()
             {
-                ResetMaxPair();
+                ResetMaxDoublet();
 
-                foreach(var entry in _pairsFrequencies)
+                foreach(var entry in _doubletsFrequencies)
                 {
-                    var pair = entry.Key;
+                    var doublet = entry.Key;
                     var frequency = entry.Value;
                     if (frequency > 1)
                     {
                         if (_maxFrequency < frequency)
                         {
                             _maxFrequency = frequency;
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
                         else if (_maxFrequency == frequency &&
-                            (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                            (doublet.Source + doublet.Target) > (_maxDoublet.Source + _maxDoublet.Target))
                         {
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
                     }
                 }
             }
 
-            private void UpdateMaxPair2()
+            private void UpdateMaxDoublet2()
             {
-                ResetMaxPair();
+                ResetMaxDoublet();
 
-                foreach(var entry in _pairsFrequencies)
+                foreach(var entry in _doubletsFrequencies)
                 {
-                    var pair = entry.Key;
+                    var doublet = entry.Key;
                     var frequency = entry.Value;
                     if (frequency > 1)
                     {
@@ -1584,12 +1584,12 @@ namespace Platform.Sandbox
                         if (_maxFrequency < frequency)
                         {
                             _maxFrequency = frequency;
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
                         else if (_maxFrequency == frequency &&
-                            (pair.Source + pair.Target) > (_maxPair.Source + _maxPair.Target))
+                            (doublet.Source + doublet.Target) > (_maxDoublet.Source + _maxDoublet.Target))
                         {
-                            _maxPair = pair;
+                            _maxDoublet = doublet;
                         }
                     }
                 }

@@ -1,12 +1,12 @@
 ﻿using Platform.Helpers;
 using Platform.Helpers.Reflection;
-using Platform.Data.Core.Pairs;
+using Platform.Data.Core.Doublets;
 using Platform.Memory;
 using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    public static class PairLinksTests
+    public static class DoubletLinksTests
     {
         [Fact]
         public static void UInt64CRUDTest()

@@ -1,6 +1,6 @@
 ﻿using Platform.Data.Core.Collections.Lists;
 
-namespace Platform.Data.Core.Pairs
+namespace Platform.Data.Core.Doublets
 {
     unsafe partial class UInt64LinksMemoryManager
     {

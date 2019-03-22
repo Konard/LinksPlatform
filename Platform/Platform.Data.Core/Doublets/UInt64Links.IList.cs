@@ -5,7 +5,7 @@
 
 //namespace Links.Core
 //{
-//    unsafe partial class Links : IList<ulong>, IList<Pair>, IList<Link>
+//    unsafe partial class Links : IList<ulong>, IList<Doublet>, IList<Link>
 //    {
 //        #region IEnumerable implementation
 
@@ -141,9 +141,9 @@
 
 //        #endregion
 
-//        #region IEnumerable<Pair> implementation
+//        #region IEnumerable<Doublet> implementation
 
-//        IEnumerator<Pair> IEnumerable<Pair>.GetEnumerator()
+//        IEnumerator<Doublet> IEnumerable<Doublet>.GetEnumerator()
 //        {
 //            try
 //            {
@@ -152,7 +152,7 @@
 //                // Часть этого кода скопирована из Each и должена соответствовать блоку из этой функции
 //                for (ulong link = 1; link <= GetEnumerator_AllocatedLinks; link++)
 //                    if (ExistsCore(link))
-//                        yield return new Pair(GetSourceCore(link), GetTargetCore(link));
+//                        yield return new Doublet(GetSourceCore(link), GetTargetCore(link));
 //            }
 //            finally
 //            {
@@ -162,24 +162,24 @@
 
 //        #endregion
 
-//        #region ICollection<Pair> implementation
+//        #region ICollection<Doublet> implementation
 
-//        public void Add(Pair item)
+//        public void Add(Doublet item)
 //        {
 //            Create(item.Source, item.Target);
 //        }
 
-//        void ICollection<Pair>.Clear()
+//        void ICollection<Doublet>.Clear()
 //        {
 //            Clear();
 //        }
 
-//        public bool Contains(Pair item)
+//        public bool Contains(Doublet item)
 //        {
 //            return Search(item.Source, item.Target) != 0;
 //        }
 
-//        public void CopyTo(Pair[] array, int arrayIndex)
+//        public void CopyTo(Doublet[] array, int arrayIndex)
 //        {
 //            try
 //            {
@@ -187,9 +187,9 @@
 
 //                for (var link = (ulong)arrayIndex + 1; link <= _header->AllocatedLinks; link++)
 //                    if (ExistsCore(link))
-//                        array[link] = new Pair(GetSourceCore(link), GetTargetCore(link));
+//                        array[link] = new Doublet(GetSourceCore(link), GetTargetCore(link));
 //                    else
-//                        array[link] = new Pair(0, 0);
+//                        array[link] = new Doublet(0, 0);
 //            }
 //            finally
 //            {
@@ -197,17 +197,17 @@
 //            }
 //        }
 
-//        int ICollection<Pair>.Total
+//        int ICollection<Doublet>.Total
 //        {
 //            get { return (int)Total; }
 //        }
 
-//        bool ICollection<Pair>.IsReadOnly
+//        bool ICollection<Doublet>.IsReadOnly
 //        {
 //            get { return false; }
 //        }
 
-//        public bool Remove(Pair item)
+//        public bool Remove(Doublet item)
 //        {
 //            try
 //            {
@@ -222,25 +222,25 @@
 
 //        #endregion
 
-//        #region IList<Pair> implementation
+//        #region IList<Doublet> implementation
 
-//        int IList<Pair>.IndexOf(Pair item)
+//        int IList<Doublet>.IndexOf(Doublet item)
 //        {
 //            return (int)Search(item.Source, item.Target);
 //        }
 
-//        void IList<Pair>.Insert(int index, Pair item)
+//        void IList<Doublet>.Insert(int index, Doublet item)
 //        {
 //            Create(item.Source, item.Target);
 //        }
 
-//        void IList<Pair>.RemoveAt(int index)
+//        void IList<Doublet>.RemoveAt(int index)
 //        {
 //            var link = (ulong)(index + 1);
 //            Delete(link);
 //        }
 
-//        Pair IList<Pair>.this[int index]
+//        Doublet IList<Doublet>.this[int index]
 //        {
 //            get
 //            {
@@ -249,7 +249,7 @@
 //                    _rwLock.EnterReadLock();
 
 //                    var link = (ulong)(index + 1);
-//                    return ExistsCore(link) ? new Pair(GetSourceCore(link), GetTargetCore(link)) : new Pair(0, 0);
+//                    return ExistsCore(link) ? new Doublet(GetSourceCore(link), GetTargetCore(link)) : new Doublet(0, 0);
 //                }
 //                finally
 //                {

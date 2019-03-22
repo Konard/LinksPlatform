@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Pairs
+﻿namespace Platform.Data.Core.Doublets
 {
     public interface ILinksOptions<TLink>
     {
