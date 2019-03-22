@@ -50,6 +50,14 @@ namespace Platform.Examples
 
                 finished.WaitOne();
                 finished.Dispose();
+
+                if (runner.Status != AssemblyRunnerStatus.Idle)
+                {
+                    Console.WriteLine("Waiting to get Idle..");
+                    while (runner.Status != AssemblyRunnerStatus.Idle)
+                        Thread.Sleep(1);
+                    Console.WriteLine("Idle status reached.");
+                }
             }
         }
 
