@@ -48,3 +48,5 @@ https://vk.com/linksplatform
 https://vk.com/konard
 
 [![Join the chat at https://gitter.im/Konard/LinksPlatform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Konard/LinksPlatform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+hello from pocket book 740
