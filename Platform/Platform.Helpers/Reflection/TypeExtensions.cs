@@ -27,8 +27,8 @@ namespace Platform.Helpers.Reflection
                              && normalParams.SequenceEqual(argumentTypes)
                           select m;
 
-            var myMethod = methods.Single();
-            return myMethod;
+            var method = methods.Single();
+            return method;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
