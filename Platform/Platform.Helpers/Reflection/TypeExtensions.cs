@@ -17,7 +17,7 @@ namespace Platform.Helpers.Reflection
         public static MethodInfo GetGenericMethod(this Type type, string name, Type[] genericParameterTypes, Type[] argumentTypes)
         {
             var methods = from m in type.GetMethods()
-                          where m.Name == "MyMethod"
+                          where m.Name == name
                                 && m.IsGenericMethodDefinition
 
                           let typeParams = m.GetGenericArguments()
