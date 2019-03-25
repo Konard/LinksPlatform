@@ -68,8 +68,8 @@ namespace Platform.Helpers.Reflection
             }
             else
             {
-                MinValue = (T)UnderlyingType.GetStaticFieldValue("MinValue");
-                MaxValue = (T)UnderlyingType.GetStaticFieldValue("MaxValue");
+                MinValue = UnderlyingType.GetStaticFieldValue<T>("MinValue");
+                MaxValue = UnderlyingType.GetStaticFieldValue<T>("MaxValue");
             }
 
             if (IsSigned)

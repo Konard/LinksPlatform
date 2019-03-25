@@ -11,7 +11,7 @@ namespace Platform.Helpers.Reflection
         public static FieldInfo GetFirstField(this Type type) => type.GetFields()[0];
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object GetStaticFieldValue(this Type type, string name) => type.GetTypeInfo().GetField(name).GetStaticValue();
+        public static T GetStaticFieldValue<T>(this Type type, string name) => type.GetTypeInfo().GetField(name).GetStaticValue<T>();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static MethodInfo GetGenericMethod(this Type type, string name, Type[] genericParameterTypes, Type[] argumentTypes)
