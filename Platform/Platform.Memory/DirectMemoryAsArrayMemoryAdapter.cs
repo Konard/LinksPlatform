@@ -4,6 +4,7 @@ using Platform.Helpers;
 namespace Platform.Memory
 {
     public class DirectMemoryAsArrayMemoryAdapter<TElement> : IArrayMemory<TElement>, IDirectMemory
+        where TElement : struct
     {
         private readonly IDirectMemory _memory;
         private readonly int _elementSize;

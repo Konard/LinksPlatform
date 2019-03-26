@@ -83,7 +83,7 @@ namespace Platform.Data.Core.Doublets
         /// </remarks>
         public struct Transition
         {
-            public static readonly long Size = Marshal.SizeOf<Transition>();
+            public static readonly long Size = UnsafeHelpers.SizeOf<Transition>();
 
             public ulong TransactionId;
             // TODO: Возможно точнее будет хранить не только Source и Target, но и Index

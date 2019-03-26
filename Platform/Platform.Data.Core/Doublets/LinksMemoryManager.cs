@@ -26,10 +26,6 @@ namespace Platform.Data.Core.Doublets
     public partial class LinksMemoryManager<T> : DisposableBase, ILinksMemoryManager<T>
     {
         /// <summary>Возвращает размер одной связи в байтах.</summary>
-        /// <remarks>
-        /// Используется только во вне класса, не рекомедуется использовать внутри.
-        /// Так как во вне не обязательно будет доступен unsafe С#.
-        /// </remarks>
         public static readonly int LinkSizeInBytes = UnsafeHelpers.SizeOf<Link>();
 
         public static readonly int LinkHeaderSizeInBytes = UnsafeHelpers.SizeOf<LinksHeader>();
