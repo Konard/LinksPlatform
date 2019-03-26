@@ -37,7 +37,7 @@ Links Platform is a [system](https://en.wikipedia.org/wiki/System_(disambiguatio
 
 [Links (doublets) API swagger connector.](https://gist.github.com/Konard/c76f9948bb25a0d7aff1)
 
-[Links (triples, micro RDF) API swagger connector.](https://gist.github.com/Konard/e6a0bff583bbca4d452b)
+[Links (triplets, micro RDF) API swagger connector.](https://gist.github.com/Konard/e6a0bff583bbca4d452b)
 
 ## [Frequently asked questions](https://github.com/Konard/LinksPlatform/wiki/FAQ)
 
