@@ -6,7 +6,7 @@
 
 [Графическое вступление](https://github.com/Konard/LinksPlatform/wiki/%D0%9E-%D1%82%D0%BE%D0%BC,-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D1%91-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D0%BB%D0%BE%D1%81%D1%8C)
 
-Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](http://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=417122527)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
+Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=888223180)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
 
 Сравнение моделей данных:
 
