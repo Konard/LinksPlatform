@@ -59,7 +59,7 @@ namespace Platform.Helpers
         /// <returns>True if range is inclusive, else false.</returns>
         public bool IsInsideRange(Range<T> range)
         {
-            return IsValid() && range.IsValid() && range.ContainsValue(Minimum) && range.ContainsValue(Maximum);
+            return range.ContainsRange(this);
         }
 
         /// <summary>
