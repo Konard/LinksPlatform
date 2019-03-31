@@ -33,7 +33,7 @@ namespace Platform.Helpers
 
         public static implicit operator Integer(bool integer) => To.UInt64(integer);
 
-        public static implicit operator ulong(Integer integer) => To.UInt64(integer.Value);
+        public static implicit operator ulong(Integer integer) => integer.Value;
 
         public static implicit operator long(Integer integer) => To.Int64(integer.Value);
 
