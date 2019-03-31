@@ -28,11 +28,11 @@ namespace Platform.Helpers.Collections
         public static async Task AwaitOne(this ConcurrentQueue<Task> queue)
         {
             Task item;
-            if(queue.TryDequeue(out item))
+            if (queue.TryDequeue(out item))
                 await item;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnqueueRunnedTask(this ConcurrentQueue<Task> queue, Action action) => queue.Enqueue(Task.Run(action));
+        public static void EnqueueAsRunnedTask(this ConcurrentQueue<Task> queue, Action action) => queue.Enqueue(Task.Run(action));
     }
 }
