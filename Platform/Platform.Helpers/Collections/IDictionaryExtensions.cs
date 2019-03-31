@@ -4,17 +4,17 @@ using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers.Collections
 {
-    public static class DictionaryExtensions
+    public static class IDictionaryExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TValue GetOrDefault<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key)
+        public static TValue GetOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             TValue value;
-            return !dictionary.TryGetValue(key, out value) ? default(TValue) : value;
+            return dictionary.TryGetValue(key, out value) ? value : default(TValue);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static TValue GetOrAdd<TKey, TValue>(this Dictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
+        public static TValue GetOrAdd<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, Func<TKey, TValue> valueFactory)
         {
             TValue value;
             if (!dictionary.TryGetValue(key, out value))
