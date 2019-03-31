@@ -9,7 +9,7 @@ namespace Platform.Helpers.Collections
         public static T PopOrDefault<T>(this ConcurrentStack<T> stack)
         {
             T value;
-            return !stack.TryPop(out value) ? default(T) : value;
+            return stack.TryPop(out value) ? value :  default(T);
         }
     }
 }
