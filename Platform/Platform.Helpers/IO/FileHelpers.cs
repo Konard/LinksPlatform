@@ -42,7 +42,7 @@ namespace Platform.Helpers.IO
             if (fileSize % elementSize != 0)
                 throw new NotSupportedException($"File is not aligned to elements with size {elementSize}.");
 
-            return fileSize != 0 ? File.OpenRead(path) : null;
+            return fileSize > 0 ? File.OpenRead(path) : null;
         }
 
         public static T ReadLastOrDefault<T>(string path)
