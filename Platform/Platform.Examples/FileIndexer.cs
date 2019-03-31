@@ -80,7 +80,7 @@ namespace Platform.Examples
                     var readCharsCopy = readChars;
                     buffer = new char[stepSize];
 
-                    tasks.EnqueueRunnedTask(() =>
+                    tasks.EnqueueAsRunnedTask(() =>
                     {
                         var linkArray = UnicodeMap.FromCharsToLinkArray(bufferCopy, readCharsCopy);
                         _sequences.BulkIndex(linkArray);
