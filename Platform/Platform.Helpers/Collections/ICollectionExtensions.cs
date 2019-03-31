@@ -3,11 +3,11 @@ using System.Linq;
 
 namespace Platform.Helpers.Collections
 {
-    public static class CollectionExtensions
+    public static class ICollectionExtensions
     {
         public static bool IsNullOrEmpty<T>(this ICollection<T> collection) => collection == null || collection.Count == 0;
 
-        public static bool IsNullOrEmptyOrDefaults<T>(this ICollection<T> collection)
+        public static bool IsNullOrEmptyOrAllEqualToDefault<T>(this ICollection<T> collection)
         {
             if (collection.IsNullOrEmpty())
                 return true;
