@@ -9,4 +9,15 @@
     <ProjectReference Include="..\Platform.Tests\Platform.Tests.csproj" />
     <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit.runner.utility" Version="2.4.1" GeneratePathProperty="true" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="xunit.runner.utility.netstandard">
+      <HintPath>$(Pkgxunit_runner_utility)\lib\netstandard1.5\xunit.runner.utility.netstandard15.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
