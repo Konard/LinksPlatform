@@ -3,12 +3,7 @@ sudo: required
 dist: xenial
 mono: latest
 dotnet: 2.2
-env:
-  global:
-  - COMMIT_AUTHOR_EMAIL: "konard@me.com"
 script:
   - dotnet run Platform/Platform.dotnet.sln -p Platform/Platform.Tests.Runner
 after_success:
-  - nuget install docfx.console
-  - mono $(ls | grep "docfx.console.")/tools/docfx.exe docfx.json
-  - bash ./deploy.sh
+  - bash ./publish-docs.sh

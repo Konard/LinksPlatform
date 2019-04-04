@@ -13,7 +13,12 @@ fi
 # Save some useful information
 REPO=`git config remote.origin.url`
 SHA=`git rev-parse --verify HEAD`
+COMMIT_AUTHOR_EMAIL="konard@me.com"
 TOKEN="013ce67101622e7c396d49d21b36b80aa087912b"
+
+# DocFX installation
+nuget install docfx.console
+mono $(ls | grep "docfx.console.")/tools/docfx.exe docfx.json
 
 # Clone the existing gh-pages for this repo into out/
 # Create a new empty branch if gh-pages doesn't exist yet (should only happen on first deply)
