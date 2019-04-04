@@ -246,11 +246,14 @@ namespace Platform.Data.Core.Sequences
                 while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
             });
 
-            Sync.ExecuteWriteOperation(() =>
+            if (indexed == false)
             {
-                for (; i >= 1; i--)
-                    links.GetOrCreate(sequence[i - 1], sequence[i]);
-            });
+                Sync.ExecuteWriteOperation(() =>
+                {
+                    for (; i >= 1; i--)
+                        links.GetOrCreate(sequence[i - 1], sequence[i]);
+                });
+            }
 
             return indexed;
         }

@@ -5,6 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Helpers.IO;
 using Platform.Helpers.Collections;
 
 namespace Platform.Examples
@@ -37,7 +38,7 @@ namespace Platform.Examples
                 while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
                 {
                     if (lastCharOfPreviousChunk != '\0')
-                        _links.CreateAndUpdate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
+                        _links.GetOrCreate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
                             UnicodeMap.FromCharToLink(buffer[0]));
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
@@ -71,7 +72,7 @@ namespace Platform.Examples
                 while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
                 {
                     if (lastCharOfPreviousChunk != '\0')
-                        _links.CreateAndUpdate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
+                        _links.GetOrCreate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
                             UnicodeMap.FromCharToLink(buffer[0]));
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
@@ -99,7 +100,14 @@ namespace Platform.Examples
 
         public async Task IndexParallelAsync(string path, CancellationToken cancellationToken)
         {
+            const int printStepSize = 1024;
+
             var partitioner = Partitioner.Create(File.ReadLines(path), EnumerablePartitionerOptions.NoBuffering);
+
+            var totalSize = FileHelpers.GetSize(path);
+
+            var totalChars = 0L;
+            var linesToPrint = 0L;
 
             // TODO: Looks like it should safely wait for each operation to finish on cancel
             Parallel.ForEach(partitioner, (line, state) =>
@@ -114,15 +122,21 @@ namespace Platform.Examples
                     return;
 
                 // NewLine -> First Character
-                _links.CreateAndUpdate(UnicodeMap.FromCharToLink('\n'), UnicodeMap.FromCharToLink(line[0]));
+                _links.GetOrCreate(UnicodeMap.FromCharToLink('\n'), UnicodeMap.FromCharToLink(line[0]));
 
                 var linkArray = UnicodeMap.FromStringToLinkArray(line);
                 _sequences.BulkIndex(linkArray);
 
                 // Last Character -> NewLine
-                _links.CreateAndUpdate(UnicodeMap.FromCharToLink(line[line.Length - 1]), UnicodeMap.FromCharToLink('\n'));
+                _links.GetOrCreate(UnicodeMap.FromCharToLink(line[line.Length - 1]), UnicodeMap.FromCharToLink('\n'));
 
-                Console.WriteLine($"parsed line of {line.Length} chars, links: {_links.Count() - UnicodeMap.MapSize}");
+                var totalLinks = _links.Count() - UnicodeMap.MapSize;
+
+                Interlocked.Add(ref totalChars, line.Length);
+                Interlocked.Increment(ref linesToPrint);
+
+                if (totalChars % printStepSize == 0)
+                    Console.WriteLine($"Parsed {totalChars}/{totalSize} chars, links: {totalLinks}");
             });
         }
     }

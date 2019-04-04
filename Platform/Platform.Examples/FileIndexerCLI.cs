@@ -13,9 +13,7 @@ namespace Platform.Examples
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var fileToIndex = ConsoleHelpers.GetOrReadArgument(1, "File to index", args);
 
-            if (!File.Exists(linksFile))
-                Console.WriteLine("Entered links file does not exists.");
-            else if (!File.Exists(fileToIndex))
+            if (!File.Exists(fileToIndex))
                 Console.WriteLine("Entered file to index does not exists.");
             else
             {
@@ -31,7 +29,8 @@ namespace Platform.Examples
                     var fileIndexer = new FileIndexer(syncLinks, sequences);
 
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
-                    fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
+                    //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
+                    fileIndexer.IndexParallelAsync(fileToIndex, cancellationSource.Token).Wait();
                 }
             }
 

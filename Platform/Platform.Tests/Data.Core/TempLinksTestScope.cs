@@ -22,7 +22,9 @@ namespace Platform.Tests.Data.Core
 
             MemoryManager = new UInt64LinksMemoryManager(TempFilename);
             //MemoryManager = new LinksMemoryManager<ulong>(TempFilename);
-            Links = new SynchronizedLinks<ulong>(useLog ? new UInt64Links(MemoryManager, TempTransactionLogFilename) : new UInt64Links(MemoryManager));
+            ILinks<ulong> coreLinks = new UInt64Links(MemoryManager);
+
+            Links = new SynchronizedLinks<ulong>(useLog ? new UInt64LinksTransactionsLayer(coreLinks, TempTransactionLogFilename) : coreLinks);
             if (useSequences)
                 Sequences = new Sequences(Links, sequencesOptions);
         }

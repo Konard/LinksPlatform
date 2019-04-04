@@ -28,7 +28,7 @@ namespace Platform.Data.Core.Doublets
     /// 
     /// Решить отключать ли проверки при компиляции под Release. Т.е. исключения будут выбрасываться только при #if DEBUG
     /// </remarks>
-    public partial class UInt64Links : DisposableBase, ILinks<ulong>
+    public class UInt64Links : DisposableBase, ILinks<ulong>
     {
         private readonly ILinksMemoryManager<ulong> _memoryManager;
 
@@ -65,7 +65,6 @@ namespace Platform.Data.Core.Doublets
         public ulong Create()
         {
             var link = _memoryManager.CreatePoint();
-            CommitCreation(GetLinkStruct(link));
             return link;
         }
 
@@ -104,8 +103,6 @@ namespace Platform.Data.Core.Doublets
                 {
                     _memoryManager.SetLinkValue(updatedLink, newSource == Constants.Itself ? updatedLink : newSource,
                                                              newTarget == Constants.Itself ? updatedLink : newTarget);
-
-                    CommitUpdate(before, GetLinkStruct(updatedLink));
                 }
 
                 return updatedLink;
@@ -122,33 +119,28 @@ namespace Platform.Data.Core.Doublets
         public void Delete(ulong link)
         {
             this.EnsureLinkExists(link);
-            var before = GetLinkStruct(link);
 
             _memoryManager.SetLinkValue(link, Constants.Null, Constants.Null);
 
             var referencesCount = _memoryManager.Count(Constants.Any, link);
-            var references = new ulong[referencesCount];
+            if (referencesCount > 0)
+            {
+                var references = new ulong[referencesCount];
 
-            var referencesFiller = new ArrayFiller<ulong>(references);
+                var referencesFiller = new ArrayFiller<ulong>(references);
 
-            _memoryManager.Each(referencesFiller.AddAndReturnTrue, Constants.Any, link);
+                _memoryManager.Each(referencesFiller.AddAndReturnTrue, Constants.Any, link);
 
-            //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
+                //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
 
-            for (var i = (long)referencesCount - 1; i >= 0; i--)
-                if (this.Exists(references[i]))
-                    Delete(references[i]);
-            //else
-            // TODO: Определить почему здесь есть связи, которых не существует  
+                for (var i = (long)referencesCount - 1; i >= 0; i--)
+                    if (this.Exists(references[i]))
+                        Delete(references[i]);
+                //else
+                // TODO: Определить почему здесь есть связи, которых не существует  
+            }
 
             _memoryManager.FreeLink(link);
-
-            CommitDeletion(before);
-        }
-
-        public ulong Trigger(IList<ulong> restriction, Func<IList<ulong>, IList<ulong>, ulong> matchedHandler, IList<ulong> substitution, Func<IList<ulong>, IList<ulong>, ulong> substitutedHandler)
-        {
-            throw new NotImplementedException();
         }
 
         #endregion
@@ -159,7 +151,6 @@ namespace Platform.Data.Core.Doublets
         {
             if (manual)
             {
-                DisposeTransitions();
                 Disposable.TryDispose(_memoryManager);
             }
         }

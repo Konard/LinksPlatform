@@ -1,6 +1,5 @@
-﻿#define LinksTransactions
-
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Collections.Concurrent;
 using System.IO;
 using System.Runtime.CompilerServices;
@@ -11,11 +10,9 @@ using Platform.Helpers;
 using Platform.Helpers.Disposables;
 using Platform.Helpers.IO;
 
-#if LinksTransactions
-
 namespace Platform.Data.Core.Doublets
 {
-    public partial class UInt64Links
+    public class UInt64LinksTransactionsLayer : LinksDisposableDecoratorBase<ulong>
     {
         /// <remarks>
         /// Альтернативные варианты хранения трансформации (элемента транзакции):
@@ -128,20 +125,20 @@ namespace Platform.Data.Core.Doublets
         /// </remarks>
         public class Transaction : DisposableBase
         {
-            private static readonly ConcurrentDictionary<UInt64Links, ReaderWriterLockSlim> TransactionLocks = new ConcurrentDictionary<UInt64Links, ReaderWriterLockSlim>();
+            private static readonly ConcurrentDictionary<UInt64LinksTransactionsLayer, ReaderWriterLockSlim> TransactionLocks = new ConcurrentDictionary<UInt64LinksTransactionsLayer, ReaderWriterLockSlim>();
 
             private readonly ConcurrentQueue<Transition> _transitions;
-            private readonly UInt64Links _links;
+            private readonly UInt64LinksTransactionsLayer _layer;
             private readonly ReaderWriterLockSlim _lock;
             private bool _commited;
             private bool _reverted;
 
-            public Transaction(UInt64Links links)
+            public Transaction(UInt64LinksTransactionsLayer layer)
             {
-                _lock = TransactionLocks.GetOrAdd(links, x => new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion));
+                _lock = TransactionLocks.GetOrAdd(layer, x => new ReaderWriterLockSlim(LockRecursionPolicy.NoRecursion));
                 _lock.EnterWriteLock(); // Самый простой случай: разрешать только 1 транзакцию базу данных
 
-                _links = links;
+                _layer = layer;
 
                 _commited = false;
                 _reverted = false;
@@ -149,8 +146,8 @@ namespace Platform.Data.Core.Doublets
                 _transitions = new ConcurrentQueue<Transition>();
 
                 // Set Current Transaction
-                _links._currentTransactionId = _links._lastCommitedTransition.TransactionId + 1;
-                _links._currentTransactionTransitions = _transitions;
+                _layer._currentTransactionId = _layer._lastCommitedTransition.TransactionId + 1;
+                _layer._currentTransactionTransitions = _transitions;
             }
 
             public void Commit()
@@ -162,7 +159,7 @@ namespace Platform.Data.Core.Doublets
                 {
                     Transition transition;
                     if (_transitions.TryDequeue(out transition))
-                        _links._transitions.Enqueue(transition);
+                        _layer._transitions.Enqueue(transition);
                 }
 
                 _commited = true;
@@ -173,19 +170,13 @@ namespace Platform.Data.Core.Doublets
                 if (_reverted) throw new InvalidOperationException("Transation already reverted.");
                 if (_commited) throw new InvalidOperationException("Transation already commited.");
 
-                if (!_commited)
-                    _links._ignoreTransitions = true;
-
-                _links.ResetCurrentTransation(); // !
+                _layer.ResetCurrentTransation(); // !
 
                 var transitionsToRevert = new Transition[_transitions.Count];
                 _transitions.CopyTo(transitionsToRevert, 0);
 
                 for (var i = transitionsToRevert.Length - 1; i >= 0; i--)
-                    _links.RevertTransition(transitionsToRevert[i]);
-
-                if (!_commited)
-                    _links._ignoreTransitions = false;
+                    _layer.RevertTransition(transitionsToRevert[i]);
 
                 _reverted = true;
             }
@@ -194,12 +185,12 @@ namespace Platform.Data.Core.Doublets
             {
                 if (manual)
                 {
-                    if (_links != null && !_links.IsDisposed)
+                    if (_layer != null && !_layer.IsDisposed)
                     {
                         if (!_commited && !_reverted)
                             Revert();
                         else
-                            _links.ResetCurrentTransation(); // !
+                            _layer.ResetCurrentTransation(); // !
                     }
 
                     _lock.ExitWriteLock();
@@ -217,43 +208,68 @@ namespace Platform.Data.Core.Doublets
         private Transition _lastCommitedTransition;
         private ulong _currentTransactionId;
         private ConcurrentQueue<Transition> _currentTransactionTransitions;
-        private bool _ignoreTransitions;
 
-        // TODO: Переосмыслить как включать/выключать транзакции
-        public UInt64Links(ILinksMemoryManager<ulong> memoryManager, string logAddress)
-            : this(memoryManager)
+        public UInt64LinksTransactionsLayer(ILinks<ulong> links, string logAddress)
+            : base(links)
         {
-            if (!string.IsNullOrWhiteSpace(logAddress))
+            if (string.IsNullOrWhiteSpace(logAddress))
+                throw new ArgumentNullException(nameof(logAddress));
+
+            // В первой строке файла хранится последняя закоммиченную транзакцию.
+            // При запуске это используется для проверки удачного закрытия файла лога.
+
+            var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
+
+            var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
+
+            if (!Equals(lastCommitedTransition, lastWrittenTransition))
             {
-                // В первой строке файла хранится последняя закоммиченную транзакцию.
-                // При запуске это используется для проверки удачного закрытия файла лога.
+                Dispose();
+                throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
+            }
 
-                var lastCommitedTransition = FileHelpers.ReadFirstOrDefault<Transition>(logAddress);
+            if (Equals(lastCommitedTransition, default(Transition)))
+                FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
 
-                var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
+            _lastCommitedTransition = lastCommitedTransition;
 
-                if (!Equals(lastCommitedTransition, lastWrittenTransition))
-                {
-                    Dispose();
-                    throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
-                }
+            _uniqueTimestampFactory = new UniqueTimestampFactory();
 
-                if (Equals(lastCommitedTransition, default(Transition)))
-                    FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
+            _logAddress = logAddress;
+            _binaryLogger = FileHelpers.Append(logAddress);
+            _transitions = new ConcurrentQueue<Transition>();
+            _transitionsPusher = new Task(TransitionsPusher);
+            _transitionsPusher.Start();
+        }
 
-                _lastCommitedTransition = lastCommitedTransition;
+        public virtual ulong Create() 
+        { 
+            var createdLinkIndex = Links.Create();
+            var createdLink = new UInt64Link(Links.GetLink(createdLinkIndex));
+            CommitTransition(new Transition { TransactionId = _currentTransactionId, After = createdLink });
+            return createdLinkIndex;
+        }
 
-                _uniqueTimestampFactory = new UniqueTimestampFactory();
-
-                _logAddress = logAddress;
-                _binaryLogger = FileHelpers.Append(logAddress);
-                _transitions = new ConcurrentQueue<Transition>();
-                _transitionsPusher = new Task(TransitionsPusher);
-                _transitionsPusher.Start();
+        public virtual ulong Update(IList<ulong> restrictions) 
+        {
+            if (restrictions.Count == 3)
+            {
+                var beforeLink = new UInt64Link(Links.GetLink(restrictions[Constants.IndexPart]));
+                var updatedLinkIndex = Links.Update(restrictions);
+                var afterLink = new UInt64Link(Links.GetLink(updatedLinkIndex));
+                CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = beforeLink, After = afterLink });
+                return updatedLinkIndex;
             }
             else
-                _ignoreTransitions = true;
-        }
+                return Links.Update(restrictions);
+        } 
+
+        public virtual void Delete(ulong link) 
+        {
+            var deletedLink = new UInt64Link(Links.GetLink(link));
+            Links.Delete(link);
+            CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = deletedLink });
+        } 
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private ConcurrentQueue<Transition> GetCurrentTransitions()
@@ -261,29 +277,8 @@ namespace Platform.Data.Core.Doublets
             return _currentTransactionTransitions ?? _transitions;
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitCreation(UInt64Link after)
-        {
-            CommitTransition(new Transition { TransactionId = _currentTransactionId, After = after });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitUpdate(UInt64Link before, UInt64Link after)
-        {
-            CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before, After = after });
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CommitDeletion(UInt64Link before)
-        {
-            CommitTransition(new Transition { TransactionId = _currentTransactionId, Before = before });
-        }
-
         private void CommitTransition(Transition transition)
         {
-            if (_ignoreTransitions)
-                return;
-
             var transitions = GetCurrentTransitions();
             if (transitions != null)
                 transitions.Enqueue(transition);
@@ -298,7 +293,7 @@ namespace Platform.Data.Core.Doublets
 
                 EnsureSelfReferencingLinkIsRestored(source, target);
 
-                this.CreateAndUpdate(source, target);
+                Links.CreateAndUpdate(source, target);
             }
             else if (transition.Before.IsNull()) // Revert Creation with Deletion
                 this.DeleteIfExists(transition.After.Source, transition.After.Target);
@@ -310,26 +305,26 @@ namespace Platform.Data.Core.Doublets
                 EnsureSelfReferencingLinkIsRestored(beforeSource, beforeTarget);
 
                 // TODO: Проверить корректно ли это теперь работает
-                this.UpdateOrCreateOrGet(transition.After.Source, transition.After.Target, beforeSource, beforeTarget);
+                Links.UpdateOrCreateOrGet(transition.After.Source, transition.After.Target, beforeSource, beforeTarget);
             }
         }
 
         private void EnsureSelfReferencingLinkIsRestored(ulong source, ulong target)
         {
             // Возможно эту логику нужно перенисти в функцию Create
-            if (_memoryManager.Count(source) == 0 && _memoryManager.Count(target) == 0 && source == target)
+            if (Links.Count(source) == 0 && Links.Count(target) == 0 && source == target)
             {
                 if (Create() != source)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (_memoryManager.Count(target) == 0)
+            else if (Links.Count(target) == 0)
             {
-                if (this.CreateAndUpdate(source, Constants.Itself) != target)
+                if (Links.CreateAndUpdate(source, Constants.Itself) != target)
                     throw new Exception("Невозможно восстановить связь");
             }
-            else if (_memoryManager.Count(source) == 0)
+            else if (Links.Count(source) == 0)
             {
-                if (this.CreateAndUpdate(Constants.Itself, target) != source)
+                if (Links.CreateAndUpdate(Constants.Itself, target) != source)
                     throw new Exception("Невозможно восстановить связь");
             }
         }
@@ -367,6 +362,11 @@ namespace Platform.Data.Core.Doublets
             }
         }
 
+        public Transaction BeginTransaction()
+        {
+            return new Transaction(this);
+        }
+
         private void DisposeTransitions()
         {
             try
@@ -390,13 +390,17 @@ namespace Platform.Data.Core.Doublets
             }
         }
 
-        public Transaction BeginTransaction()
+        #region DisposalBase
+
+        protected override void DisposeCore(bool manual)
         {
-            if(string.IsNullOrWhiteSpace(_logAddress))
-                throw new InvalidOperationException("Transaction log is not enabled.");
-            return new Transaction(this);
+            if (manual)
+            {
+                DisposeTransitions();
+                Disposable.TryDispose(Links);
+            }
         }
+
+        #endregion
     }
 }
-
-#endif

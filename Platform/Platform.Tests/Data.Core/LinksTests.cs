@@ -101,7 +101,7 @@ namespace Platform.Tests.Data.Core
 
                 Disposable.TryDispose(links.Unsync); // Close links to access log
 
-                Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
+                Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(scope.TempTransactionLogFilename);
             }
         }
 
@@ -120,7 +120,7 @@ namespace Platform.Tests.Data.Core
 
                 Disposable.TryDispose(links.Unsync); // Close links to access log
 
-                Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
+                Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(scope.TempTransactionLogFilename);
             }
         }
 
@@ -131,7 +131,7 @@ namespace Platform.Tests.Data.Core
             using (var scope = new TempLinksTestScope(useLog: true))
             {
                 var links = scope.Links;
-                var uint64Links = (UInt64Links)links.Unsync;
+                var uint64Links = (UInt64LinksTransactionsLayer)links.Unsync;
                 using (var transaction = uint64Links.BeginTransaction())
                 {
                     var l1 = links.Create();
@@ -148,7 +148,7 @@ namespace Platform.Tests.Data.Core
 
                 Disposable.TryDispose(links.Unsync);
 
-                Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
+                Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(scope.TempTransactionLogFilename);
             }
         }
 
@@ -164,7 +164,7 @@ namespace Platform.Tests.Data.Core
                 using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
                     var links = scope.Links;
-                    var uint64Links = (UInt64Links)links.Unsync;
+                    var uint64Links = (UInt64LinksTransactionsLayer)links.Unsync;
                     using (var transaction = uint64Links.BeginTransaction())
                     {
                         var l1 = links.CreateAndUpdate(itself, itself);
@@ -175,7 +175,7 @@ namespace Platform.Tests.Data.Core
                         links.CreateAndUpdate(l2, itself);
                         links.CreateAndUpdate(l2, itself);
 
-                        Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
+                        Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(scope.TempTransactionLogFilename);
 
                         l2 = links.Update(l2, l1);
 
@@ -194,7 +194,7 @@ namespace Platform.Tests.Data.Core
                 Assert.False(lastScope == null);
 
                 var transitions = FileHelpers
-                    .ReadAll<UInt64Links.Transition>(lastScope.TempTransactionLogFilename);
+                    .ReadAll<UInt64LinksTransactionsLayer.Transition>(lastScope.TempTransactionLogFilename);
 
                 Assert.True(transitions.Length == 1 && transitions[0].Before.IsNull() && transitions[0].After.IsNull());
 
@@ -227,13 +227,13 @@ namespace Platform.Tests.Data.Core
 
                     Disposable.TryDispose(links.Unsync);
 
-                    Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(scope.TempTransactionLogFilename);
+                    Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(scope.TempTransactionLogFilename);
                 }
 
                 using (var scope = lastScope = new TempLinksTestScope(deleteFiles: false, useLog: true))
                 {
                     var links = scope.Links;
-                    var uint64Links = (UInt64Links)links.Unsync;
+                    var uint64Links = (UInt64LinksTransactionsLayer)links.Unsync;
                     using (var transaction = uint64Links.BeginTransaction())
                     {
                         l2 = links.Update(l2, l1);
@@ -253,7 +253,7 @@ namespace Platform.Tests.Data.Core
                 Assert.False(lastScope == null);
 
                 Global.Trash = FileHelpers
-                    .ReadAll<UInt64Links.Transition>(lastScope.TempTransactionLogFilename);
+                    .ReadAll<UInt64LinksTransactionsLayer.Transition>(lastScope.TempTransactionLogFilename);
 
                 lastScope.DeleteFiles();
             }
@@ -269,7 +269,7 @@ namespace Platform.Tests.Data.Core
 
             // Commit
             using (var memoryManager = new UInt64LinksMemoryManager(tempDatabaseFilename))
-            using (var links = new UInt64Links(memoryManager, tempTransactionLogFilename))
+            using (var links = new UInt64LinksTransactionsLayer(new UInt64Links(memoryManager), tempTransactionLogFilename))
             {
                 using (var transaction = links.BeginTransaction())
                 {
@@ -286,7 +286,7 @@ namespace Platform.Tests.Data.Core
                 Global.Trash = links.Count();
             }
 
-            Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(tempTransactionLogFilename);
+            Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(tempTransactionLogFilename);
         }
 
         [Fact]
@@ -299,7 +299,7 @@ namespace Platform.Tests.Data.Core
 
             // Commit
             using (var memoryManager = new UInt64LinksMemoryManager(tempDatabaseFilename))
-            using (var links = new UInt64Links(memoryManager, tempTransactionLogFilename))
+            using (var links = new UInt64LinksTransactionsLayer(new UInt64Links(memoryManager), tempTransactionLogFilename))
             {
                 using (var transaction = links.BeginTransaction())
                 {
@@ -316,19 +316,19 @@ namespace Platform.Tests.Data.Core
                 Global.Trash = links.Count();
             }
 
-            Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(tempTransactionLogFilename);
+            Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(tempTransactionLogFilename);
 
             // Damage database
 
             FileHelpers
-                .WriteFirst(tempTransactionLogFilename, new UInt64Links.Transition { TransactionId = 555 });
+                .WriteFirst(tempTransactionLogFilename, new UInt64LinksTransactionsLayer.Transition { TransactionId = 555 });
 
             // Try load damaged database
             try
             {
                 // TODO: Fix
                 using (var memoryManager = new UInt64LinksMemoryManager(tempDatabaseFilename))
-                using (var links = new UInt64Links(memoryManager, tempTransactionLogFilename))
+                using (var links = new UInt64LinksTransactionsLayer(new UInt64Links(memoryManager), tempTransactionLogFilename))
                 {
                     Global.Trash = links.Count();
                 }
@@ -339,7 +339,7 @@ namespace Platform.Tests.Data.Core
             }
 
             Global.Trash = FileHelpers
-                .ReadAll<UInt64Links.Transition>(tempTransactionLogFilename);
+                .ReadAll<UInt64LinksTransactionsLayer.Transition>(tempTransactionLogFilename);
 
             File.Delete(tempDatabaseFilename);
             File.Delete(tempTransactionLogFilename);
@@ -360,7 +360,7 @@ namespace Platform.Tests.Data.Core
                 ulong l2;
 
                 using (var memoryManager = new UInt64LinksMemoryManager(tempDatabaseFilename))
-                using (var links = new UInt64Links(memoryManager, tempTransactionLogFilename))
+                using (var links = new UInt64LinksTransactionsLayer(new UInt64Links(memoryManager), tempTransactionLogFilename))
                 {
                     l1 = links.CreateAndUpdate(itself, itself);
                     l2 = links.CreateAndUpdate(itself, itself);
@@ -371,10 +371,10 @@ namespace Platform.Tests.Data.Core
                     links.CreateAndUpdate(l2, itself);
                 }
 
-                Global.Trash = FileHelpers.ReadAll<UInt64Links.Transition>(tempTransactionLogFilename);
+                Global.Trash = FileHelpers.ReadAll<UInt64LinksTransactionsLayer.Transition>(tempTransactionLogFilename);
 
                 using (var memoryManager = new UInt64LinksMemoryManager(tempDatabaseFilename))
-                using (var links = new UInt64Links(memoryManager, tempTransactionLogFilename))
+                using (var links = new UInt64LinksTransactionsLayer(new UInt64Links(memoryManager), tempTransactionLogFilename))
                 {
                     using (var transaction = links.BeginTransaction())
                     {
@@ -393,7 +393,7 @@ namespace Platform.Tests.Data.Core
             catch
             {
                 Global.Trash = FileHelpers
-                    .ReadAll<UInt64Links.Transition>(tempTransactionLogFilename);
+                    .ReadAll<UInt64LinksTransactionsLayer.Transition>(tempTransactionLogFilename);
             }
 
             File.Delete(tempDatabaseFilename);

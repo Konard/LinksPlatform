@@ -551,9 +551,6 @@ namespace Platform.Data.Core.Doublets
 
             var link = setter.Result;
 
-            if (!Equals(link, default(T)))
-                return links.Equals(link, source, target) ? link : default(T);
-
             return link;
         }
 
@@ -696,25 +693,29 @@ namespace Platform.Data.Core.Doublets
             ulong referencesAsSourceCount = (Integer<T>)links.Count(constants.Any, linkIndex, constants.Any);
             ulong referencesAsTargetCount = (Integer<T>)links.Count(constants.Any, constants.Any, linkIndex);
 
-            var references = ArrayPool.Allocate<T>(referencesAsSourceCount + referencesAsTargetCount);
-            var referencesFiller = new ArrayFiller<T>(references);
-
-            links.Each(linkIndex, constants.Any, referencesFiller.AddAndReturnTrue);
-            links.Each(constants.Any, linkIndex, referencesFiller.AddAndReturnTrue);
-
-            for (ulong i = 0; i < referencesAsSourceCount; i++)
+            var isStandalonePoint = Point<T>.IsFullPoint(links.GetLink(linkIndex)) && referencesAsSourceCount == 1 && referencesAsTargetCount == 1;
+            if (!isStandalonePoint)
             {
-                var reference = references[i];
-                if (Equals(reference, linkIndex)) continue;
-                links.Update(new[] { reference, newLink, links.GetTarget(reference) });
+                var references = ArrayPool.Allocate<T>(referencesAsSourceCount + referencesAsTargetCount);
+                var referencesFiller = new ArrayFiller<T>(references);
+
+                links.Each(linkIndex, constants.Any, referencesFiller.AddAndReturnTrue);
+                links.Each(constants.Any, linkIndex, referencesFiller.AddAndReturnTrue);
+
+                for (ulong i = 0; i < referencesAsSourceCount; i++)
+                {
+                    var reference = references[i];
+                    if (Equals(reference, linkIndex)) continue;
+                    links.Update(new[] { reference, newLink, links.GetTarget(reference) });
+                }
+                for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
+                {
+                    var reference = references[i];
+                    if (Equals(reference, linkIndex)) continue;
+                    links.Update(new[] { reference, links.GetSource(reference), newLink });
+                }
+                ArrayPool.Free(references);
             }
-            for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
-            {
-                var reference = references[i];
-                if (Equals(reference, linkIndex)) continue;
-                links.Update(new[] { reference, links.GetSource(reference), newLink });
-            }
-            ArrayPool.Free(references);
 
             links.Delete(linkIndex);
 
