@@ -50,8 +50,6 @@ namespace Platform.Data.Core.Doublets
 
         public static UInt64Link Create(ulong source, ulong target) => new UInt64Link(source, target);
 
-        public static UInt64Link Create(IAttachedLink link) => new UInt64Link((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
-
         public override int GetHashCode()
         {
             var hash = 17;
@@ -68,8 +66,6 @@ namespace Platform.Data.Core.Doublets
         public bool Equals(UInt64Link other) => Index == other.Index &&
                                                 Source == other.Source &&
                                                 Target == other.Target;
-
-        public static string ToString(IAttachedLink link) => ToString((ulong)link.Source.GetHashCode(), (ulong)link.Target.GetHashCode());
 
         public static string ToString(ulong index, ulong source, ulong target) => $"({index}: {source}->{target})";
 

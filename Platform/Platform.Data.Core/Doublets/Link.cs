@@ -50,8 +50,6 @@ namespace Platform.Data.Core.Doublets
 
         public static Link<T> Create(T source, T target) => new Link<T>(source, target);
 
-        public static Link<T> Create(IAttachedLink link) => new Link<T>((Integer<T>)(Integer)link.Source.GetHashCode(), (Integer<T>)(Integer)link.Target.GetHashCode());
-
         public override int GetHashCode()
         {
             var hash = 17;
@@ -68,8 +66,6 @@ namespace Platform.Data.Core.Doublets
         public bool Equals(Link<T> other) => Equals(Index, other.Index) &&
                                              Equals(Source, other.Source) &&
                                              Equals(Target, other.Target);
-
-        public static string ToString(IAttachedLink link) => ToString((Integer<T>)(Integer)link.Source.GetHashCode(), (Integer<T>)(Integer)link.Target.GetHashCode());
 
         public static string ToString(T index, T source, T target) => $"({index}: {source}->{target})";
 
