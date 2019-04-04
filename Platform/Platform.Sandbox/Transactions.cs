@@ -68,13 +68,9 @@ namespace Platform.Sandbox
 
             EnsureFileSize();
 
-#if NET45
-
             LogAccessor.Write(BasicTransactionsOffset, ref item);
 
             LogAccessor.Read(BasicTransactionsOffset, out item);
-
-#endif
 
 
             CloseFile();
@@ -99,11 +95,8 @@ namespace Platform.Sandbox
 
         static void LoadState()
         {
-#if NET45
-
             LogAccessor.Read(0, out CurrentState);
 
-#endif
             if (CurrentState.FileEndOffset == 0)
             {
                 CurrentState.FileEndOffset = BasicTransactionsOffset;
@@ -112,9 +105,7 @@ namespace Platform.Sandbox
 
         static void StoreState()
         {
-#if NET45
             LogAccessor.Write(0, ref CurrentState);
-#endif
         }
 
         static void EnsureFileSize()

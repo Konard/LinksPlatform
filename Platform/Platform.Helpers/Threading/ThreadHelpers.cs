@@ -1,8 +1,5 @@
 ﻿using System;
-
-#if NET45
 using System.Threading;
-#endif
 
 namespace Platform.Helpers.Threading
 {
@@ -10,7 +7,6 @@ namespace Platform.Helpers.Threading
     {
         public static void SyncInvokeWithExtendedStack<T>(T param, Action<object> action, int maxStackSize = 200 * 1024 * 1024)
         {
-#if NET45
 #if DEBUG
             var thread = new Thread(obj =>
             {
@@ -28,14 +24,10 @@ namespace Platform.Helpers.Threading
 #endif
             thread.Start(param);
             thread.Join();
-#else
-            action(param);
-#endif
         }
 
         public static void SyncInvokeWithExtendedStack(Action action, int maxStackSize = 200 * 1024 * 1024)
         {
-#if NET45
 #if DEBUG
             var thread = new Thread(() =>
             {
@@ -53,12 +45,8 @@ namespace Platform.Helpers.Threading
 #endif
             thread.Start();
             thread.Join();
-#else
-            action();
-#endif
         }
 
-#if NET45
         public static Thread StartNew<T>(T param, Action<object> action)
         {
 #if DEBUG
@@ -100,6 +88,5 @@ namespace Platform.Helpers.Threading
             thread.Start();
             return thread;
         }
-#endif
     }
 }

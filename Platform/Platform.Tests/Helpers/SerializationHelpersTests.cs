@@ -14,11 +14,7 @@ namespace Platform.Tests.Helpers
 
             SerializationHelpers.SerializeToXmlFile(Default<object>.Instance, tempFilename);
 
-#if NET45
-            Assert.Equal(File.ReadAllText(tempFilename), $"<?xml version=\"1.0\"?>{Environment.NewLine}<anyType xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />");
-#else
             Assert.Equal(File.ReadAllText(tempFilename), $"<?xml version=\"1.0\"?>{Environment.NewLine}<anyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />");
-#endif
 
             File.Delete(tempFilename);
         }
@@ -28,11 +24,7 @@ namespace Platform.Tests.Helpers
         {
             var serializedObject = SerializationHelpers.SerializeToXmlString(Default<object>.Instance);
 
-#if NET45
-            Assert.Equal(serializedObject, $"<?xml version=\"1.0\" encoding=\"utf-16\"?>{Environment.NewLine}<anyType xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" />");
-#else
             Assert.Equal(serializedObject, $"<?xml version=\"1.0\" encoding=\"utf-16\"?>{Environment.NewLine}<anyType xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\" />");
-#endif
         }
     }
 }

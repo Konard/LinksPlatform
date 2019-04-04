@@ -4,9 +4,6 @@ using System.Xml.Serialization;
 
 namespace Platform.Communication.Protocol.Gexf
 {
-#if NET45
-    [Serializable]
-#endif
     [XmlRoot(ElementName = ElementName, Namespace = Namespace)]
     public class Gexf
     {

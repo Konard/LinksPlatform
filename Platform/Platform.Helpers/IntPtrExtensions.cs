@@ -57,13 +57,7 @@ namespace Platform.Helpers
                 else
                 {
                     emiter.LoadArguments(0);
-#if NET45
-                    emiter.LoadConstant(typeof(T));
-                    emiter.Call(typeof(Marshal).GetTypeInfo().GetMethod("PtrToStructure", new[] { typeof(object), typeof(Type), typeof(bool) }));
-                    emiter.Unbox<T>();
-#else
                     emiter.Call(typeof(Marshal).GetGenericMethod("PtrToStructure", new [] { typeof(T) }, new[] { typeof(IntPtr), typeof(Type), typeof(bool) }));
-#endif
                     emiter.Return();
                 }
             });
