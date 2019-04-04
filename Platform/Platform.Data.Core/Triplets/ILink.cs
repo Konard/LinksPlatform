@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Triplets
 {
-    public partial interface ILink<TLink>
+    internal partial interface ILink<TLink>
         where TLink : ILink<TLink>
     {
         TLink Source { get; }
@@ -10,7 +10,7 @@ namespace Platform.Data.Core.Triplets
         TLink Target { get; }
     }
 
-    public partial interface ILink<TLink>
+    internal partial interface ILink<TLink>
         where TLink : ILink<TLink>
     {
         bool WalkThroughReferersAsLinker(Func<TLink, bool> walker);
@@ -19,7 +19,7 @@ namespace Platform.Data.Core.Triplets
         void WalkThroughReferers(Func<TLink, bool> walker);
     }
 
-    public partial interface ILink<TLink>
+    internal partial interface ILink<TLink>
         where TLink : ILink<TLink>
     {
         void WalkThroughReferersAsLinker(Action<TLink> walker);

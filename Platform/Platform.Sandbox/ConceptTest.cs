@@ -9,11 +9,12 @@ namespace Platform.Sandbox
         public static void TestGexf(string filename)
         {
             using (var memoryManager = new UInt64LinksMemoryManager(filename, 512 * 1024 * 1024))
+            using (var links = new UInt64Links(memoryManager))
             {
-                var options = new LinksOptions<ulong>();
-                options.MemoryManager = memoryManager;
-                var linksFactory = new LinksFactory<ulong>(options);
-                var links = linksFactory.Create();
+                //var options = new LinksOptions<ulong>();
+                //options.MemoryManager = memoryManager;
+                //var linksFactory = new LinksFactory<ulong>(options);
+                //var links = linksFactory.Create();
 
                 const int linksToCreate = 1024;
 

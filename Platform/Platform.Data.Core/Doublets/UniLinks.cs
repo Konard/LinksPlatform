@@ -11,7 +11,7 @@ namespace Platform.Data.Core.Doublets
     /// What does empty pattern (for condition or substitution) mean? Nothing or Everything?
     /// Now we go with nothing. And nothing is something one, but empty, and cannot be changed by itself. But can cause creation (update from nothing) or deletion (update to nothing).
     /// </remarks>
-    public class UniLinks<T> : LinksBase<T, T, T>, IUniLinks<T>
+    internal class UniLinks<T> : LinksBase<T, T, T>, IUniLinks<T>
     {
         /// <remarks>
         /// TODO: Decide to change to IDoubletLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IDoubletLinks and ILinksMemoryManager.)

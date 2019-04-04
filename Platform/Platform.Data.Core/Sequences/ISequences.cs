@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Sequences
 {
-    public interface ISequences<TLink>
+    internal interface ISequences<TLink>
     {
         ulong Count(params TLink[] sequence);
         bool Each(Func<TLink, bool> handler, params TLink[] sequence);

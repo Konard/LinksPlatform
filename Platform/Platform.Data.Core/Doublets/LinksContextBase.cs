@@ -5,7 +5,7 @@ using Platform.Memory;
 namespace Platform.Data.Core.Doublets
 {
     // Решить, нужна ли строго типизированная версия, или достаточно использование Scope?
-    public static class LinksContextHelpers
+    internal static class LinksContextHelpers
     {
         public static ILinksContext<TLink, TConstants, TMemory, TManager, TLinks> Create<TLink, TConstants, TMemory, TManager, TLinks>()
             where TConstants : LinksConstants<TLink>, new()
@@ -23,7 +23,7 @@ namespace Platform.Data.Core.Doublets
         //}
     }
 
-    public class DefaultLinksContext<TLink, TConstants, TMemory, TManager, TLinks> :
+    internal class DefaultLinksContext<TLink, TConstants, TMemory, TManager, TLinks> :
         LinksContextBase<TLink, TConstants, TMemory, TManager, TLinks>
         where TConstants : LinksConstants<TLink>, new()
         where TMemory : class, IMemory
@@ -33,7 +33,7 @@ namespace Platform.Data.Core.Doublets
     {
     }
 
-    public abstract class LinksContextBase<TLink, TConstants, TMemory, TManager, TLinks> : DisposableBase, ILinksContext<TLink, TConstants, TMemory, TManager, TLinks>
+    internal abstract class LinksContextBase<TLink, TConstants, TMemory, TManager, TLinks> : DisposableBase, ILinksContext<TLink, TConstants, TMemory, TManager, TLinks>
         where TConstants : LinksConstants<TLink>, new()
         where TMemory : class, IMemory
         where TManager : class, ILinksMemoryManager<TLink>
@@ -70,28 +70,28 @@ namespace Platform.Data.Core.Doublets
         }
     }
 
-    public abstract class UInt8LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<byte, LinksConstants<byte, sbyte>, TMemory, TManager, TLinks>
+    internal abstract class UInt8LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<byte, LinksConstants<byte, sbyte>, TMemory, TManager, TLinks>
         where TMemory : class, IMemory
         where TManager : class, ILinksMemoryManager<byte>
         where TLinks : class, ILinks<byte>
     {
     }
 
-    public abstract class UInt16LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<ushort, LinksConstants<ushort, short>, TMemory, TManager, TLinks>
+    internal abstract class UInt16LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<ushort, LinksConstants<ushort, short>, TMemory, TManager, TLinks>
         where TMemory : class, IMemory
         where TManager : class, ILinksMemoryManager<ushort>
         where TLinks : class, ILinks<ushort>
     {
     }
 
-    public abstract class UInt32LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<uint, LinksConstants<uint, int>, TMemory, TManager, TLinks>
+    internal abstract class UInt32LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<uint, LinksConstants<uint, int>, TMemory, TManager, TLinks>
         where TMemory : class, IMemory
         where TManager : class, ILinksMemoryManager<uint>
         where TLinks : class, ILinks<uint>
     {
     }
 
-    public abstract class UInt64LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<ulong, LinksConstants<ulong, long>, TMemory, TManager, TLinks>
+    internal abstract class UInt64LinksContextBase<TMemory, TManager, TLinks> : LinksContextBase<ulong, LinksConstants<ulong, long>, TMemory, TManager, TLinks>
         where TMemory : class, IMemory
         where TManager : class, ILinksMemoryManager<ulong>
         where TLinks : class, ILinks<ulong>

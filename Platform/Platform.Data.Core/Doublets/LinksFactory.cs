@@ -7,7 +7,7 @@ namespace Platform.Data.Core.Doublets
     /// <remarks>
     /// TODO: Возможно нужна фабрика не для самих Links, а для всего контекста работы с ними, которое собирает всё что нужно, а также предоставляет подходящие константы.
     /// </remarks>
-    public class LinksFactory<TLink> : IFactory<ILinks<TLink>>
+    internal class LinksFactory<TLink> : IFactory<ILinks<TLink>>
     {
         private LinksOptions<TLink> _options;
 

@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Triplets
 {
-    public class CompressionExperiments
+    internal class CompressionExperiments
     {
         public static void RightJoin(ref Link subject, Link @object)
         {

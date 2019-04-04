@@ -3,7 +3,7 @@ using Platform.Memory;
 
 namespace Platform.Data.Core.Doublets
 {
-    public interface ILinksContext<TLink, TConstants, TMemory, TManager, TLinks> : IDisposable
+    internal interface ILinksContext<TLink, TConstants, TMemory, TManager, TLinks> : IDisposable
         where TMemory : IMemory
         where TManager : ILinksMemoryManager<TLink>
         where TLinks : ILinks<TLink>
