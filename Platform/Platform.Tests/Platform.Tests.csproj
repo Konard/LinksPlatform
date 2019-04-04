@@ -6,7 +6,7 @@
     <AssemblyTitle>Platform.Tests</AssemblyTitle>
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Platform.Tests</AssemblyName>
     <PackageId>Platform.Tests</PackageId>
     <PackageTags>LinksPlatform;Tests</PackageTags>

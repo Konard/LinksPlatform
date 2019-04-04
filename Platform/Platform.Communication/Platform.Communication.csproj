@@ -6,7 +6,7 @@
     <AssemblyTitle>Platform.Communication</AssemblyTitle>
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AssemblyName>Platform.Communication</AssemblyName>
     <PackageId>Platform.Communication</PackageId>
     <PackageTags>Communication;Protocols;Gexf;Udp;UdpSender;UdpReceiver</PackageTags>

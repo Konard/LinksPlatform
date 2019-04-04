@@ -6,7 +6,7 @@
     <AssemblyTitle>Platform.Examples</AssemblyTitle>
     <VersionPrefix>0.0.1</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
-    <TargetFrameworks>netstandard1.5</TargetFrameworks>
+    <TargetFrameworks>netstandard2.0</TargetFrameworks>
     <AssemblyName>Platform.Examples</AssemblyName>
     <PackageId>Platform.Examples</PackageId>
     <PackageTags>LinksPlatform;Examples</PackageTags>

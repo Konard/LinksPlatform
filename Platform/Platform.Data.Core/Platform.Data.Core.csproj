@@ -6,7 +6,7 @@
     <AssemblyTitle>Platform.Data.Core</AssemblyTitle>
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
-    <TargetFramework>netstandard1.5</TargetFramework>
+    <TargetFramework>netstandard2.0</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Platform.Data.Core</AssemblyName>
     <PackageId>Platform.Data.Core</PackageId>
