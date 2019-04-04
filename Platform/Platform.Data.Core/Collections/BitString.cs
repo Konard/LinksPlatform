@@ -17,6 +17,7 @@ namespace Platform.Data.Core.Collections
     /// 
     ///     TODO: Compare what is faster to store BitSetsIn16Bits or to calculate it
     ///     TODO: Avoid int usage (replace to long)
+    ///     TODO: Synchronize with current BitArray implementation
     /// </remarks>
     public class BitString
     {
@@ -50,6 +51,11 @@ namespace Platform.Data.Core.Collections
 
                 BitSetsIn16Bits[i] = array;
             }
+        }
+
+        /// <summary>A way to trigger static constructor.</summary>
+        static public void Init()
+        {
         }
 
         #region Constructors

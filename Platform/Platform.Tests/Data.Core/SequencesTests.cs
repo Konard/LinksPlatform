@@ -14,6 +14,11 @@ namespace Platform.Tests.Data.Core
     {
         private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
 
+        static SequencesTests()
+        {
+            BitString.Init();
+        }
+
         [Fact]
         public void CreateAllVariantsTest()
         {
@@ -336,11 +341,6 @@ namespace Platform.Tests.Data.Core
 
                 Assert.True(sequences.Index(sequence));
             }
-        }
-
-        private static void InitBitString()
-        {
-            Global.Trash = new BitString(1);
         }
 
         /// <summary>Imported from https://raw.githubusercontent.com/wiki/Konard/LinksPlatform/%D0%9E-%D1%82%D0%BE%D0%BC%2C-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D1%91-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D0%BB%D0%BE%D1%81%D1%8C.md</summary>
@@ -787,8 +787,6 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void AllPossibleConnectionsTest()
         {
-            InitBitString();
-
             const long sequenceLength = 5;
 
             using (var scope = new TempLinksTestScope(useSequences: true))
@@ -844,8 +842,6 @@ namespace Platform.Tests.Data.Core
         [Fact(Skip = "Correct implementation is pending")]
         public void CalculateAllUsagesTest()
         {
-            InitBitString();
-
             const long sequenceLength = 3;
 
             using (var scope = new TempLinksTestScope(useSequences: true))

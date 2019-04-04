@@ -7,6 +7,11 @@ namespace Platform.Tests.Data.Core
 {
     public class BitStringTests
     {
+        static BitStringTests()
+        {
+            BitString.Init();
+        }
+
         [Fact]
         public void BitGetSetTest()
         {
