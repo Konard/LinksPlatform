@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Doublets
 {
-    public static class LinkDefaultExtensions
+    public static class LinkExtensions
     {
         public static bool IsFullPoint(this UInt64Link link) => Point<ulong>.IsFullPoint(link);
 
