@@ -30,7 +30,7 @@ namespace Platform.Examples
 
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
                     //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
-                    fileIndexer.IndexParallelAsync(fileToIndex, cancellationSource.Token).Wait();
+                    fileIndexer.IndexParallel(fileToIndex, cancellationSource.Token);
                 }
             }
 

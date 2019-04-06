@@ -98,7 +98,7 @@ namespace Platform.Examples
             }
         }
 
-        public async Task IndexParallelAsync(string path, CancellationToken cancellationToken)
+        public void IndexParallel(string path, CancellationToken cancellationToken)
         {
             const int printStepSize = 1024;
 
