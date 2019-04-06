@@ -1,5 +1,4 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 
 using Platform.Examples;
 
@@ -9,15 +8,13 @@ namespace Platform.Data.Tests.Runner
     {
         private const string DefaultTestsAssembly = "Platform.Tests.dll";
 
-        static int Main(string[] args)
+        static int Main()
         {
             var directory = Path.GetDirectoryName(System.Reflection.Assembly.GetEntryAssembly().Location);
             var testsAssembly = Path.Combine(directory, DefaultTestsAssembly);
 
-            args = new string[] { testsAssembly };
-
             var runner = new XUnitTestsRunnerCLI();
-            runner.Run(args);
+            runner.Run(new string[] { testsAssembly });
             return runner.Succeed ? 0 : 1;
         }
     }

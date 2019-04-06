@@ -12,7 +12,7 @@ namespace Platform.Examples
     {
         // We use consoleLock because messages can arrive in parallel, so we want to make sure we get
         // consistent console output.
-        private object consoleLock = new object();
+        private readonly object consoleLock = new object();
 
         public bool Succeed { get; private set; }
 

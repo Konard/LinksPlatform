@@ -272,8 +272,6 @@ namespace Platform.Tests.Data.Core
         [Fact(Skip = "Correct implementation is pending")]
         public void PatternMatchTest()
         {
-            var itself = Constants.Itself;
-            var one = Constants.Any;
             var zeroOrMany = Sequences.ZeroOrMany;
 
             using (var scope = new TempLinksTestScope(useSequences: true))
@@ -312,8 +310,8 @@ namespace Platform.Tests.Data.Core
 
                 var matchedSequences4 = sequences.MatchPattern(e1, zeroOrMany, e2);
 
-                Assert.True(matchedSequences4.Contains(doublet));
-                Assert.True(matchedSequences4.Contains(balancedVariant));
+                Assert.Contains(doublet, matchedSequences4);
+                Assert.Contains(balancedVariant, matchedSequences4);
 
                 for (var i = 0; i < sequence.Length; i++)
                     links.Delete(sequence[i]);
