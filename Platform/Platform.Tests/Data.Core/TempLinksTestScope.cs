@@ -20,11 +20,11 @@ namespace Platform.Tests.Data.Core
             TempFilename = Path.GetTempFileName();
             TempTransactionLogFilename = Path.GetTempFileName();
 
-            MemoryManager = new UInt64LinksMemoryManager(TempFilename);
-            //MemoryManager = new LinksMemoryManager<ulong>(TempFilename);
-            ILinks<ulong> coreLinks = new UInt64Links(MemoryManager);
+            var coreMemoryManager = new UInt64LinksMemoryManager(TempFilename);
 
-            Links = new SynchronizedLinks<ulong>(useLog ? new UInt64LinksTransactionsLayer(coreLinks, TempTransactionLogFilename) : coreLinks);
+            MemoryManager = useLog ? (ILinksMemoryManager<ulong>)new UInt64LinksMemoryMenagerTransactionsLayer(coreMemoryManager, TempTransactionLogFilename) : coreMemoryManager;
+
+            Links = new SynchronizedLinks<ulong>(new UInt64Links(MemoryManager));
             if (useSequences)
                 Sequences = new Sequences(Links, sequencesOptions);
         }

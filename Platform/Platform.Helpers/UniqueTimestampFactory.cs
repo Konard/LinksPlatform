@@ -7,23 +7,18 @@ namespace Platform.Helpers
     /// </summary>
     public class UniqueTimestampFactory : IFactory<UniqueTimestamp>
     {
-        private UniqueTimestamp _lastTimestamp;
+        private ulong _lastTicks = 0;
 
         /// <summary>
         /// Создаёт отмеку времени соответствующую текущей дате и времени по UTC.
         /// </summary>
         public UniqueTimestamp Create()
         {
-            var utcNow = DateTime.UtcNow;
-            var utcTicks = (ulong)utcNow.Ticks;
-
-            if (utcTicks <= _lastTimestamp.Ticks)
-            {
-                _lastTimestamp.Ticks++;
-                return _lastTimestamp;
-            }
-
-            return _lastTimestamp = new UniqueTimestamp(utcTicks);
+            var utcTicks = (ulong)DateTime.UtcNow.Ticks;
+            if (utcTicks <= _lastTicks)
+                return new UniqueTimestamp(_lastTicks++);
+            else
+                return new UniqueTimestamp(utcTicks);
         }
     }
 }

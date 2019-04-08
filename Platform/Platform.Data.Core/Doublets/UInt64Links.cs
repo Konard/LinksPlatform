@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Disposables;
@@ -51,15 +50,12 @@ namespace Platform.Data.Core.Doublets
         {
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public unsafe UInt64Link GetLinkStruct(ulong link) => *((UInt64LinksMemoryManager)_memoryManager).GetLinkStruct(link);
-
         public ulong Count(params ulong[] restriction) => _memoryManager.Count(restriction);
 
         public ulong Each(Func<IList<ulong>, ulong> handler, IList<ulong> restrictions)
         {
             this.EnsureLinkIsAnyOrExists(restrictions);
-            return _memoryManager.Each(link => handler(GetLinkStruct(link)) == Constants.Continue, restrictions) ? Constants.Continue : Constants.Break;
+            return _memoryManager.Each(link => handler(_memoryManager.GetLinkValue(link)) == Constants.Continue, restrictions) ? Constants.Continue : Constants.Break;
         }
 
         public ulong Create()
@@ -97,12 +93,13 @@ namespace Platform.Data.Core.Doublets
 
             if (existedLink == Constants.Null)
             {
-                var before = GetLinkStruct(updatedLink);
+                var before = _memoryManager.GetLinkValue(updatedLink);
 
-                if (before.Source != newSource || before.Target != newSource)
+                if (before[Constants.SourcePart] != newSource || before[Constants.TargetPart] != newTarget)
                 {
-                    _memoryManager.SetLinkValue(updatedLink, newSource == Constants.Itself ? updatedLink : newSource,
-                                                             newTarget == Constants.Itself ? updatedLink : newTarget);
+                    _memoryManager.SetLinkValue(updatedLink,
+                        newSource == Constants.Itself ? updatedLink : newSource,
+                        newTarget == Constants.Itself ? updatedLink : newTarget);
                 }
 
                 return updatedLink;

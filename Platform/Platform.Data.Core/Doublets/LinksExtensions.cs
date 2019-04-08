@@ -355,7 +355,7 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<TLink> GetLink<TLink>(this ILinks<TLink> links, TLink link)
         {
-            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue,  links.Constants.Break);
+            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue, links.Constants.Break);
             links.Each(linkPartsSetter.SetAndReturnTrue, link);
             return linkPartsSetter.Result;
         }
@@ -588,7 +588,12 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TLink Update<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
         {
-            return links.Update(restrictions);
+            if (restrictions.Length == 2)
+                return links.Merge(restrictions[0], restrictions[1]);
+            if (restrictions.Length == 4)
+                return links.UpdateOrCreateOrGet(restrictions[0], restrictions[1], restrictions[2], restrictions[3]);
+            else
+                return links.Update(restrictions);
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -696,25 +701,29 @@ namespace Platform.Data.Core.Doublets
             var isStandalonePoint = Point<T>.IsFullPoint(links.GetLink(linkIndex)) && referencesAsSourceCount == 1 && referencesAsTargetCount == 1;
             if (!isStandalonePoint)
             {
-                var references = ArrayPool.Allocate<T>(referencesAsSourceCount + referencesAsTargetCount);
-                var referencesFiller = new ArrayFiller<T>(references);
-
-                links.Each(linkIndex, constants.Any, referencesFiller.AddAndReturnTrue);
-                links.Each(constants.Any, linkIndex, referencesFiller.AddAndReturnTrue);
-
-                for (ulong i = 0; i < referencesAsSourceCount; i++)
+                var totalReferences = referencesAsSourceCount + referencesAsTargetCount;
+                if (totalReferences > 0)
                 {
-                    var reference = references[i];
-                    if (Equals(reference, linkIndex)) continue;
-                    links.Update(new[] { reference, newLink, links.GetTarget(reference) });
+                    var references = ArrayPool.Allocate<T>(totalReferences);
+                    var referencesFiller = new ArrayFiller<T>(references);
+
+                    links.Each(linkIndex, constants.Any, referencesFiller.AddAndReturnTrue);
+                    links.Each(constants.Any, linkIndex, referencesFiller.AddAndReturnTrue);
+
+                    for (ulong i = 0; i < referencesAsSourceCount; i++)
+                    {
+                        var reference = references[i];
+                        if (Equals(reference, linkIndex)) continue;
+                        links.Update(reference, newLink, links.GetTarget(reference));
+                    }
+                    for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
+                    {
+                        var reference = references[i];
+                        if (Equals(reference, linkIndex)) continue;
+                        links.Update(reference, links.GetSource(reference), newLink);
+                    }
+                    ArrayPool.Free(references);
                 }
-                for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
-                {
-                    var reference = references[i];
-                    if (Equals(reference, linkIndex)) continue;
-                    links.Update(new[] { reference, links.GetSource(reference), newLink });
-                }
-                ArrayPool.Free(references);
             }
 
             links.Delete(linkIndex);

@@ -351,14 +351,10 @@ namespace Platform.Data.Core.Doublets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IList<id> GetLinkValue(id linkIndex) => *GetLinkStruct(linkIndex);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public UInt64Link* GetLinkStruct(id linkIndex)
+        public IList<id> GetLinkValue(id linkIndex)
         {
             var link = GetLinkUnsafe(linkIndex);
-            var linkCopy = new UInt64Link(linkIndex, link->Source, link->Target);
-            return &linkCopy;
+            return new UInt64Link(linkIndex, link->Source, link->Target);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
