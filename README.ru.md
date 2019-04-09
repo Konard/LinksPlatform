@@ -10,7 +10,7 @@
 
 Сравнение моделей данных:
 
-![Comparison of models](https://github.com/Konard/LinksPlatform/raw/master/doc/relational_model_vs_associative_model_vs_links.png)
+![Comparison of models](https://github.com/Konard/LinksPlatform/raw/master/doc/relational_model_vs_associative_model_vs_links_ru.png)
 
 Эта платформа использует объединённый тип данных — связь, который является комбинацией Элемента и Связи из оригинальной работы Симона Вильямса. Таким образом Элемент или Точка являются частным случаем связи, которая ссылается сама на себя.
 
