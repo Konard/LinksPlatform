@@ -688,6 +688,16 @@ namespace Platform.Data.Core.Doublets
             return default(T);
         }
 
+        /// <summary>Удаляет несколько связей.</summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="deletedLinks">Список адресов связей к удалению.</param>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static void DeleteMany<T>(this ILinks<T> links, IList<T> deletedLinks)
+        {
+            for (int i = 0; i < deletedLinks.Count; i++)
+                links.Delete(deletedLinks[i]);
+        }
+
         // Replace one link with another (replaced link is deleted, children are updated or deleted)
         public static T Merge<T>(this ILinks<T> links, T linkIndex, T newLink)
         {

@@ -1,7 +1,7 @@
 ﻿namespace Platform.Helpers
 {
-    public interface IFactory<T>
+    public interface IFactory<TProduct>
     {
-        T Create();
+        TProduct Create();
     }
 }
