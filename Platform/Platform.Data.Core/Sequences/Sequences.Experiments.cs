@@ -8,6 +8,7 @@ using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using LinkIndex = System.UInt64;
+using Stack = System.Collections.Generic.Stack<ulong>;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -1155,7 +1156,7 @@ namespace Platform.Data.Core.Sequences
                         _totals[parent]++;
                 };
 
-                var stack = new Stack<ulong>();
+                var stack = new Stack();
                 var element = link;
 
                 if (isElement(element))
