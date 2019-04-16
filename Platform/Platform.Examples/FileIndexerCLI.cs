@@ -19,8 +19,8 @@ namespace Platform.Examples
             {
                 var cancellationSource = ConsoleHelpers.HandleCancellation();
 
-                using (var memoryManager = new UInt64LinksMemoryManager(linksFile, UInt64LinksMemoryManager.DefaultLinksSizeStep * 16))
-                using (var links = new UInt64Links(memoryManager))
+                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep * 16))
+                using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     UnicodeMap.InitNew(syncLinks);

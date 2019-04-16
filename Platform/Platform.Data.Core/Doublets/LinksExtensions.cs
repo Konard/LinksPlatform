@@ -60,7 +60,7 @@ namespace Platform.Data.Core.Doublets
         /// TODO: Возможно есть очень простой способ это сделать.
         /// (Например просто удалить файл, или изменить его размер таким образом,
         /// чтобы удалился весь контент)
-        /// Например через _header->AllocatedLinks в LinksMemoryManager
+        /// Например через _header->AllocatedLinks в ResizableDirectMemoryLinks
         /// </remarks>
         public static void DeleteAll(this ILinks<ulong> links)
         {
@@ -360,6 +360,11 @@ namespace Platform.Data.Core.Doublets
             return linkPartsSetter.Result;
         }
 
+        public static TLink Count<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
+        {
+            return links.Count(restrictions);
+        }
+
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
         /// </summary>
@@ -372,7 +377,7 @@ namespace Platform.Data.Core.Doublets
         public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<TLink, bool> handler)
         {
             var constants = links.Constants;
-            return links.Each(link => handler(link[constants.IndexPart]) ? (TLink)constants.Continue : (TLink)constants.Break, constants.Any, source, target);
+            return links.Each(link => handler(link[constants.IndexPart]) ? constants.Continue : constants.Break, constants.Any, source, target);
         }
 
         /// <summary>
@@ -548,10 +553,7 @@ namespace Platform.Data.Core.Doublets
         {
             var setter = new Setter<T>();
             links.Each(source, target, setter.SetAndReturnFalse);
-
-            var link = setter.Result;
-
-            return link;
+            return setter.Result;
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -715,10 +717,10 @@ namespace Platform.Data.Core.Doublets
                 if (totalReferences > 0)
                 {
                     var references = ArrayPool.Allocate<T>(totalReferences);
-                    var referencesFiller = new ArrayFiller<T>(references);
+                    var referencesFiller = new ArrayFiller<T, T>(references, links.Constants.Continue);
 
-                    links.Each(linkIndex, constants.Any, referencesFiller.AddAndReturnTrue);
-                    links.Each(constants.Any, linkIndex, referencesFiller.AddAndReturnTrue);
+                    links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, linkIndex, constants.Any);
+                    links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, constants.Any, linkIndex);
 
                     for (ulong i = 0; i < referencesAsSourceCount; i++)
                     {

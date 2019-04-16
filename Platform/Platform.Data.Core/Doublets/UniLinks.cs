@@ -10,19 +10,13 @@ namespace Platform.Data.Core.Doublets
     /// <remarks>
     /// What does empty pattern (for condition or substitution) mean? Nothing or Everything?
     /// Now we go with nothing. And nothing is something one, but empty, and cannot be changed by itself. But can cause creation (update from nothing) or deletion (update to nothing).
+    /// 
+    /// TODO: Decide to change to IDoubletLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IDoubletLinks and ILinks.)
     /// </remarks>
-    internal class UniLinks<T> : LinksBase<T, T, T>, IUniLinks<T>
+    internal class UniLinks<T> : LinksDecoratorBase<T>, IUniLinks<T>
     {
-        /// <remarks>
-        /// TODO: Decide to change to IDoubletLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IDoubletLinks and ILinksMemoryManager.)
-        /// </remarks>
-        public UniLinks(ILinksMemoryManager<T> memory, ILinksCombinedConstants<T, T, T> constants)
-            : base(memory, constants)
-        {
-        }
-
-        public UniLinks(ILinksMemoryManager<T> memory)
-            : base(memory)
+        public UniLinks(ILinks<T> links)
+            : base(links)
         {
         }
 
@@ -40,6 +34,8 @@ namespace Platform.Data.Core.Doublets
 
         private static readonly T NullConstant = Use<ILinksCombinedConstants<T, T, int>>.Single.Null;
         private static readonly IList<T> NullLink = new List<T> { NullConstant, NullConstant, NullConstant };
+
+
 
         // TODO: Подумать о том, как реализовать древовидный Restriction и Substitution (Links-Expression)
 
@@ -265,14 +261,14 @@ namespace Platform.Data.Core.Doublets
 
                 if (Equals(after[0], default(T)))
                 {
-                    var newLink = Memory.AllocateLink();
+                    var newLink = Links.Create();
                     after[0] = newLink;
                 }
 
                 if (substitution.Count == 1)
-                    after = Memory.GetLinkValue(substitution[0]);
+                    after = Links.GetLink(substitution[0]);
                 else if (substitution.Count == 3)
-                    Memory.SetLinkValue(after);
+                    Links.Update(after);
                 else
                     throw new NotSupportedException();
 
@@ -285,15 +281,15 @@ namespace Platform.Data.Core.Doublets
                 if (patternOrCondition.Count == 1)
                 {
                     var linkToDelete = patternOrCondition[0];
-                    var before = Memory.GetLinkValue(linkToDelete);
+                    var before = Links.GetLink(linkToDelete);
 
                     if (matchHandler != null && Equals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
                     var after = ArrayPool<T>.Empty;
 
-                    Memory.SetLinkValue(linkToDelete, Constants.Null, Constants.Null);
-                    Memory.FreeLink(linkToDelete);
+                    Links.Update(linkToDelete, Constants.Null, Constants.Null);
+                    Links.Delete(linkToDelete);
 
                     if (matchHandler != null)
                         return substitutionHandler(before, after);
@@ -307,7 +303,7 @@ namespace Platform.Data.Core.Doublets
                 if (patternOrCondition.Count == 1)
                 {
                     var linkToUpdate = patternOrCondition[0];
-                    var before = Memory.GetLinkValue(linkToUpdate);
+                    var before = Links.GetLink(linkToUpdate);
 
                     if (matchHandler != null && Equals(matchHandler(before), Constants.Break))
                         return Constants.Break;
@@ -321,15 +317,15 @@ namespace Platform.Data.Core.Doublets
                     {
                         if (!Equals(substitution[0], linkToUpdate))
                         {
-                            after = Memory.GetLinkValue(substitution[0]);
+                            after = Links.GetLink(substitution[0]);
 
-                            Memory.SetLinkValue(linkToUpdate, Constants.Null, Constants.Null);
-                            Memory.FreeLink(linkToUpdate);
+                            Links.Update(linkToUpdate, Constants.Null, Constants.Null);
+                            Links.Delete(linkToUpdate);
                         }
                     }
                     else if (substitution.Count == 3)
                     {
-                        Memory.SetLinkValue(after);
+                        Links.Update(after);
                     }
                     else
                         throw new NotSupportedException();
@@ -369,11 +365,6 @@ namespace Platform.Data.Core.Doublets
         }
 
         private T AlwaysContinue(IList<T> linkToMatch) => Constants.Continue;
-
-        public T Count(IList<T> restrictions)
-        {
-            throw new NotImplementedException();
-        }
     }
 }
 

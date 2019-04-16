@@ -11,28 +11,28 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public static void UInt64CRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<ulong>, Links<ulong>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<ulong>>>())
                 scope.Use<ILinks<ulong>>().TestCRUDOperations();
         }
 
         [Fact]
         public static void UInt32CRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<uint>, Links<uint>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<uint>>>())
                 scope.Use<ILinks<uint>>().TestCRUDOperations();
         }
 
         [Fact]
         public static void UInt16CRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<ushort>, Links<ushort>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<ushort>>>())
                 scope.Use<ILinks<ushort>>().TestCRUDOperations();
         }
 
         [Fact]
         public static void UInt8CRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<byte>, Links<byte>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<byte>>>())
                 scope.Use<ILinks<byte>>().TestCRUDOperations();
         }
 
@@ -97,28 +97,28 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public static void UInt64RawNumbersCRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<ulong>, Links<ulong>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<ulong>>>())
                 scope.Use<ILinks<ulong>>().TestRawNumbersCRUDOperations();
         }
 
         [Fact]
         public static void UInt32RawNumbersCRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<uint>, Links<uint>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<uint>>>())
                 scope.Use<ILinks<uint>>().TestRawNumbersCRUDOperations();
         }
 
         [Fact]
         public static void UInt16RawNumbersCRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<ushort>, Links<ushort>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<ushort>>>())
                 scope.Use<ILinks<ushort>>().TestRawNumbersCRUDOperations();
         }
 
         [Fact]
         public static void UInt8RawNumbersCRUDTest()
         {
-            using (var scope = new Scope<Types<HeapResizableDirectMemory, LinksMemoryManager<byte>, Links<byte>>>())
+            using (var scope = new Scope<Types<HeapResizableDirectMemory, ResizableDirectMemoryLinks<byte>>>())
                 scope.Use<ILinks<byte>>().TestRawNumbersCRUDOperations();
         }
 

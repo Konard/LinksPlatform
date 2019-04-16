@@ -2,6 +2,5 @@
 {
     public interface ILinksOptions<TLink>
     {
-        ILinksMemoryManager<TLink> MemoryManager { get; set; }
     }
 }

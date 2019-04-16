@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Platform.Data.Core.Doublets
 {
-    // TODO: Make LinksExternalReferenceValidator
+    // TODO: Make LinksExternalReferenceValidator. A layer that checks each link to exist or to be external (hybrid link's raw number).
     public class LinksInnerReferenceValidator<T> : LinksDecoratorBase<T>
     {
         public LinksInnerReferenceValidator(ILinks<T> links) : base(links) {}
@@ -14,7 +14,7 @@ namespace Platform.Data.Core.Doublets
             return base.Each(handler, restrictions);
         }
 
-        public override T Count(params T[] restriction)
+        public override T Count(IList<T> restriction)
         {
             Links.EnsureInnerReferenceExists(restriction, nameof(restriction));
             return base.Count(restriction);

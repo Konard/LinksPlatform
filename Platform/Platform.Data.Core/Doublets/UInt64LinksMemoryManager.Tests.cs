@@ -10,7 +10,7 @@ namespace Platform.Data.Core.Doublets
     /// <summary>
     /// TODO: Make separate GEXF Exporter.
     /// </summary>
-    unsafe partial class UInt64LinksMemoryManager
+    unsafe partial class UInt64ResizableDirectMemoryLinks
     {
         public void ExportSourcesTree(string outputFilename)
         {

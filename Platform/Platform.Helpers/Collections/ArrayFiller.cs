@@ -3,21 +3,22 @@ using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers.Collections
 {
-    public class ArrayFiller<TElement>
+    public class ArrayFiller<TElement, TReturnConstant>
     {
-        private readonly TElement[] _array;
-        private long _position;
+        private readonly TReturnConstant _returnConstant;
+        protected readonly TElement[] _array;
+        protected long _position;
 
-        public ArrayFiller(TElement[] array)
-        {
-            _array = array;
-            _position = 0;
-        }
-
-        public ArrayFiller(TElement[] array, long offset)
+        public ArrayFiller(TElement[] array, long offset, TReturnConstant returnConstant)
         {
             _array = array;
             _position = offset;
+            _returnConstant = returnConstant;
+        }
+
+        public ArrayFiller(TElement[] array, TReturnConstant returnConstant)
+            : this(array, 0, returnConstant)
+        {
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -38,6 +39,13 @@ namespace Platform.Helpers.Collections
         {
             _array[_position++] = collection[0];
             return true;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TReturnConstant AddFirstAndReturnConstant(IList<TElement> collection)
+        {
+            _array[_position++] = collection[0];
+            return _returnConstant;
         }
     }
 }

@@ -25,8 +25,8 @@ namespace Platform.Examples
                 File.Delete(DefaultDatabaseFilename);
 #endif
 
-                using (var memoryManager = new UInt64LinksMemoryManager(DefaultDatabaseFilename, 8 * 1024 * 1024))
-                using (var links = new UInt64Links(memoryManager))
+                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(DefaultDatabaseFilename, 8 * 1024 * 1024))
+                using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     var unicodeMap = new UnicodeMap(syncLinks);

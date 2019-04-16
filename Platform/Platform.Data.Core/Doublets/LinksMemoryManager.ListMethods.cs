@@ -4,7 +4,7 @@ using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
-    partial class LinksMemoryManager<T>
+    partial class ResizableDirectMemoryLinks<T>
     {
         private class UnusedLinksListMethods : CircularDoublyLinkedListMethods<T>
         {

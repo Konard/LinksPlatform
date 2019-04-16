@@ -19,10 +19,9 @@ namespace Platform.Data.Core.Doublets
 
             var references = ArrayPool.Allocate<T>(referencesCount);
 
-            var referencesFiller = new ArrayFiller<T>(references);
+            var referencesFiller = new ArrayFiller<T, T>(references, Constants.Continue);
 
-            Links.Each(link, Constants.Any, referencesFiller.AddAndReturnTrue);
-            Links.Each(Constants.Any, link, referencesFiller.AddAndReturnTrue);
+            Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, link);
 
             //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
 

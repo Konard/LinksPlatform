@@ -24,10 +24,9 @@ namespace Platform.Tests.Helpers
             using (var scope = new Scope())
             {
                 scope.Include<TemporaryFileMappedResizableDirectMemory>();
-                scope.Include<UInt64LinksMemoryManager>();
-                scope.Include<UInt64Links>();
+                scope.Include<UInt64ResizableDirectMemoryLinks>();
                 var instance = scope.Use<ILinks<ulong>>();
-                Assert.IsType<UInt64Links>(instance);
+                Assert.IsType<UInt64ResizableDirectMemoryLinks>(instance);
             }
         }
 

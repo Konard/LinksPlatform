@@ -23,8 +23,8 @@ namespace Platform.Examples
             {
                 var cancellationSource = ConsoleHelpers.HandleCancellation();
 
-                using (var memoryManager = new UInt64LinksMemoryManager(linksFile))
-                using (var links = new UInt64Links(memoryManager))
+                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile))
+                using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     bool isUnicodeMapped;

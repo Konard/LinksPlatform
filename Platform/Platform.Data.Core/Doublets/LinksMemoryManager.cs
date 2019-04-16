@@ -23,7 +23,7 @@ namespace Platform.Data.Core.Doublets
     /// <remarks>
     /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).
     /// </remarks>
-    public partial class LinksMemoryManager<T> : DisposableBase, ILinksMemoryManager<T>
+    public partial class ResizableDirectMemoryLinks<T> : DisposableBase, ILinks<T>
     {
         /// <summary>Возвращает размер одной связи в байтах.</summary>
         public static readonly int LinkSizeInBytes = UnsafeHelpers.SizeOf<Link>();
@@ -159,7 +159,7 @@ namespace Platform.Data.Core.Doublets
         /// </summary>
         private T Total => Subtract(LinksHeader.GetAllocatedLinks(_header), LinksHeader.GetFreeLinks(_header));
 
-        public LinksMemoryManager(string address)
+        public ResizableDirectMemoryLinks(string address)
             : this(address, DefaultLinksSizeStep)
         {
         }
@@ -169,18 +169,20 @@ namespace Platform.Data.Core.Doublets
         /// </summary>
         /// <param name="address">Полный пусть к файлу базы данных.</param>
         /// <param name="memoryReservationStep">Минимальный шаг расширения базы данных в байтах.</param>
-        public LinksMemoryManager(string address, long memoryReservationStep)
+        public ResizableDirectMemoryLinks(string address, long memoryReservationStep)
             : this(new FileMappedResizableDirectMemory(address, memoryReservationStep), memoryReservationStep)
         {
         }
 
-        public LinksMemoryManager(IResizableDirectMemory memory)
+        public ResizableDirectMemoryLinks(IResizableDirectMemory memory)
             : this(memory, DefaultLinksSizeStep)
         {
         }
 
-        public LinksMemoryManager(IResizableDirectMemory memory, long memoryReservationStep)
+        public ResizableDirectMemoryLinks(IResizableDirectMemory memory, long memoryReservationStep)
         {
+            Constants = Default<LinksConstants<T, T, int>>.Instance;
+
             _memory = memory;
             _memoryReservationStep = memoryReservationStep;
 
@@ -196,8 +198,7 @@ namespace Platform.Data.Core.Doublets
             LinksHeader.SetReservedLinks(_header, (Integer<T>)((_memory.ReservedCapacity - LinkHeaderSizeInBytes) / LinkSizeInBytes));
         }
 
-        // TODO: Дать возможность переопределять в конструкторе
-        public ILinksCombinedConstants<bool, T, int> Constants { get; } = Default<LinksConstants<bool, T, int>>.Instance;
+        public ILinksCombinedConstants<T, T, int> Constants { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public T Count(IList<T> restrictions)
@@ -294,13 +295,13 @@ namespace Platform.Data.Core.Doublets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Each(Func<T, bool> handler, IList<T> restrictions)
+        public T Each(Func<IList<T>, T> handler, IList<T> restrictions)
         {
             if (restrictions.Count == 0)
             {
                 for (T link = (Integer<T>)1; LessOrEqualThan(link, (T)(Integer<T>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
                     if (Exists(link))
-                        if (handler(link) == Constants.Break)
+                        if (Equals(handler(GetLinkStruct(link)), Constants.Break))
                             return Constants.Break;
 
                 return Constants.Continue;
@@ -315,7 +316,7 @@ namespace Platform.Data.Core.Doublets
                 if (!Exists(index))
                     return Constants.Continue;
 
-                return handler(index);
+                return handler(GetLinkStruct(index));
             }
             if (restrictions.Count == 2)
             {
@@ -327,7 +328,7 @@ namespace Platform.Data.Core.Doublets
                     if (Equals(value, Constants.Any))
                         return Each(handler, ArrayPool<T>.Empty);
 
-                    if (Each(handler, new[] { index, value, Constants.Any }) == Constants.Break)
+                    if (Equals(Each(handler, new[] { index, value, Constants.Any }), Constants.Break))
                         return Constants.Break;
 
                     return Each(handler, new[] { index, Constants.Any, value });
@@ -338,12 +339,12 @@ namespace Platform.Data.Core.Doublets
                         return Constants.Continue;
 
                     if (Equals(value, Constants.Any))
-                        return handler(index);
+                        return handler(GetLinkStruct(index));
 
                     var storedLinkValue = GetLinkUnsafe(index);
                     if (Equals(Link.GetSource(storedLinkValue), value) ||
                         Equals(Link.GetTarget(storedLinkValue), value))
-                        return handler(index);
+                        return handler(GetLinkStruct(index));
                     return Constants.Continue;
                 }
             }
@@ -365,7 +366,7 @@ namespace Platform.Data.Core.Doublets
                     {
                         var link = _sourcesTreeMethods.Search(source, target);
 
-                        return Equals(link, Constants.Null) ? Constants.Continue : handler(link);
+                        return Equals(link, Constants.Null) ? Constants.Continue : handler(GetLinkStruct(link));
                     }
                 }
                 else
@@ -374,7 +375,7 @@ namespace Platform.Data.Core.Doublets
                         return Constants.Continue;
 
                     if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
-                        return handler(index);
+                        return handler(GetLinkStruct(index));
 
                     var storedLinkValue = GetLinkUnsafe(index);
 
@@ -382,7 +383,7 @@ namespace Platform.Data.Core.Doublets
                     {
                         if (Equals(Link.GetSource(storedLinkValue), source) &&
                             Equals(Link.GetTarget(storedLinkValue), target))
-                            return handler(index);
+                            return handler(GetLinkStruct(index));
                         return Constants.Continue;
                     }
 
@@ -392,7 +393,7 @@ namespace Platform.Data.Core.Doublets
 
                     if (Equals(Link.GetSource(storedLinkValue), value) ||
                         Equals(Link.GetTarget(storedLinkValue), value))
-                        return handler(index);
+                        return handler(GetLinkStruct(index));
                     return Constants.Continue;
                 }
             }
@@ -403,7 +404,7 @@ namespace Platform.Data.Core.Doublets
         /// TODO: Возможно можно перемещать значения, если указан индекс, но значение существует в другом месте (но не в менеджере памяти, а в логике Links)
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void SetLinkValue(IList<T> values)
+        public T Update(IList<T> values)
         {
             var linkIndex = values[Constants.IndexPart];
             var link = GetLinkUnsafe(linkIndex);
@@ -417,12 +418,8 @@ namespace Platform.Data.Core.Doublets
 
             if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
             if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
-        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public IList<T> GetLinkValue(T linkIndex)
-        {
-            return GetLinkStruct(linkIndex);
+            return linkIndex;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -441,7 +438,7 @@ namespace Platform.Data.Core.Doublets
         /// <remarks>
         /// TODO: Возможно нужно будет заполнение нулями, если внешнее API ими не заполняет пространство
         /// </remarks>
-        public T AllocateLink()
+        public T Create()
         {
             var freeLink = LinksHeader.GetFirstFreeLink(_header);
 
@@ -467,7 +464,7 @@ namespace Platform.Data.Core.Doublets
             return freeLink;
         }
 
-        public void FreeLink(T link)
+        public void Delete(T link)
         {
             if (LessThan(link, LinksHeader.GetAllocatedLinks(_header)))
                 _unusedLinksListMethods.AttachAsFirst(link);
@@ -509,8 +506,8 @@ namespace Platform.Data.Core.Doublets
             {
                 _header = _links = memory.Pointer;
 
-                _sourcesTreeMethods = new LinksSourcesTreeMethods(_links, _header, Constants);
-                _targetsTreeMethods = new LinksTargetsTreeMethods(_links, _header, Constants);
+                _sourcesTreeMethods = new LinksSourcesTreeMethods(this);
+                _targetsTreeMethods = new LinksTargetsTreeMethods(this);
                 _unusedLinksListMethods = new UnusedLinksListMethods(_links, _header);
             }
         }

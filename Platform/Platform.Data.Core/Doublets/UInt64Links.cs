@@ -1,8 +1,6 @@
 using System;
 using System.Collections.Generic;
-using Platform.Helpers;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Disposables;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -27,44 +25,26 @@ namespace Platform.Data.Core.Doublets
     /// 
     /// Решить отключать ли проверки при компиляции под Release. Т.е. исключения будут выбрасываться только при #if DEBUG
     /// </remarks>
-    public class UInt64Links : DisposableBase, ILinks<ulong>
+    public class UInt64Links : LinksDisposableDecoratorBase<ulong>
     {
-        private readonly ILinksMemoryManager<ulong> _memoryManager;
-
-        public ILinksCombinedConstants<ulong, ulong, int> Constants { get; } = Default<LinksConstants<ulong, ulong, int>>.Instance;
-
-        #region Links Logic
-
-        public UInt64Links(string address)
-            : this(new UInt64LinksMemoryManager(address))
+        public UInt64Links(ILinks<ulong> links)
+            : base(links)
         {
         }
 
-        public UInt64Links(ILinksMemoryManager<ulong> memoryManager)
-        {
-            _memoryManager = memoryManager;
-        }
-
-        public UInt64Links(ILinksOptions<ulong> linksOptions)
-            : this(linksOptions.MemoryManager)
-        {
-        }
-
-        public ulong Count(params ulong[] restriction) => _memoryManager.Count(restriction);
-
-        public ulong Each(Func<IList<ulong>, ulong> handler, IList<ulong> restrictions)
+        public override ulong Each(Func<IList<ulong>, ulong> handler, IList<ulong> restrictions)
         {
             this.EnsureLinkIsAnyOrExists(restrictions);
-            return _memoryManager.Each(link => handler(_memoryManager.GetLinkValue(link)) == Constants.Continue, restrictions) ? Constants.Continue : Constants.Break;
+            return Links.Each(handler, restrictions);
         }
 
-        public ulong Create()
+        public override ulong Create()
         {
-            var link = _memoryManager.CreatePoint();
+            var link = Links.CreatePoint();
             return link;
         }
 
-        public ulong Update(IList<ulong> restrictions)
+        public override ulong Update(IList<ulong> restrictions)
         {
             if (restrictions.IsNullOrEmpty())
                 return Constants.Null;
@@ -93,11 +73,11 @@ namespace Platform.Data.Core.Doublets
 
             if (existedLink == Constants.Null)
             {
-                var before = _memoryManager.GetLinkValue(updatedLink);
+                var before = Links.GetLink(updatedLink);
 
                 if (before[Constants.SourcePart] != newSource || before[Constants.TargetPart] != newTarget)
                 {
-                    _memoryManager.SetLinkValue(updatedLink,
+                    Links.Update(updatedLink,
                         newSource == Constants.Itself ? updatedLink : newSource,
                         newTarget == Constants.Itself ? updatedLink : newTarget);
                 }
@@ -113,20 +93,20 @@ namespace Platform.Data.Core.Doublets
 
         /// <summary>Удаляет связь с указанным индексом.</summary>
         /// <param name="link">Индекс удаляемой связи.</param>
-        public void Delete(ulong link)
+        public override void Delete(ulong link)
         {
             this.EnsureLinkExists(link);
 
-            _memoryManager.SetLinkValue(link, Constants.Null, Constants.Null);
+            Links.Update(link, Constants.Null, Constants.Null);
 
-            var referencesCount = _memoryManager.Count(Constants.Any, link);
+            var referencesCount = Links.Count(Constants.Any, link);
             if (referencesCount > 0)
             {
                 var references = new ulong[referencesCount];
 
-                var referencesFiller = new ArrayFiller<ulong>(references);
+                var referencesFiller = new ArrayFiller<ulong, ulong>(references, Constants.Continue);
 
-                _memoryManager.Each(referencesFiller.AddAndReturnTrue, Constants.Any, link);
+                Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, link);
 
                 //references.Sort(); // TODO: Решить необходимо ли для корректного порядка отмены операций в транзакциях
 
@@ -137,21 +117,7 @@ namespace Platform.Data.Core.Doublets
                 // TODO: Определить почему здесь есть связи, которых не существует  
             }
 
-            _memoryManager.FreeLink(link);
+            Links.Delete(link);
         }
-
-        #endregion
-
-        #region DisposalBase
-
-        protected override void DisposeCore(bool manual)
-        {
-            if (manual)
-            {
-                Disposable.TryDispose(_memoryManager);
-            }
-        }
-
-        #endregion
     }
 }

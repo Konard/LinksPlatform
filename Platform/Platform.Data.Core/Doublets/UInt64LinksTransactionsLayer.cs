@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class UInt64LinksMemoryMenagerTransactionsLayer : DisposableBase, ILinksMemoryManager<ulong>
+    public class UInt64LinksTransactionsLayer : LinksDisposableDecoratorBase<ulong>
     {
         /// <remarks>
         /// Альтернативные варианты хранения трансформации (элемента транзакции):
@@ -132,11 +132,11 @@ namespace Platform.Data.Core.Doublets
         public class Transaction : DisposableBase
         {
             private readonly Queue<Transition> _transitions;
-            private readonly UInt64LinksMemoryMenagerTransactionsLayer _layer;
+            private readonly UInt64LinksTransactionsLayer _layer;
             public bool IsCommitted { get; private set; }
             public bool IsReverted { get; private set; }
 
-            public Transaction(UInt64LinksMemoryMenagerTransactionsLayer layer)
+            public Transaction(UInt64LinksTransactionsLayer layer)
             {
                 _layer = layer;
 
@@ -179,7 +179,7 @@ namespace Platform.Data.Core.Doublets
                 IsReverted = true;
             }
 
-            public static void SetCurrentTransaction(UInt64LinksMemoryMenagerTransactionsLayer layer, Transaction transaction)
+            public static void SetCurrentTransaction(UInt64LinksTransactionsLayer layer, Transaction transaction)
             {
                 layer._currentTransactionId = layer._lastCommitedTransactionId + 1;
                 layer._currentTransactionTransitions = transaction._transitions;
@@ -213,7 +213,6 @@ namespace Platform.Data.Core.Doublets
         private readonly FileStream _log;
         private readonly Queue<Transition> _transitions;
         private readonly UniqueTimestampFactory _uniqueTimestampFactory;
-        private readonly ILinksMemoryManager<ulong> _linksMemoryManager;
         private Task _transitionsPusher;
         private Transition _lastCommitedTransition;
         private ulong _currentTransactionId;
@@ -221,14 +220,11 @@ namespace Platform.Data.Core.Doublets
         private Transaction _currentTransaction;
         private ulong _lastCommitedTransactionId;
 
-        public ILinksCombinedConstants<bool, ulong, int> Constants => _linksMemoryManager.Constants;
-
-        public UInt64LinksMemoryMenagerTransactionsLayer(ILinksMemoryManager<ulong> linksMemoryManager, string logAddress)
+        public UInt64LinksTransactionsLayer(ILinks<ulong> links, string logAddress)
+            : base(links)
         {
             if (string.IsNullOrWhiteSpace(logAddress))
                 throw new ArgumentNullException(nameof(logAddress));
-
-            _linksMemoryManager = linksMemoryManager;
 
             // В первой строке файла хранится последняя закоммиченную транзакцию.
             // При запуске это используется для проверки удачного закрытия файла лога.
@@ -262,32 +258,29 @@ namespace Platform.Data.Core.Doublets
             _transitionsPusher.Start();
         }
 
-        public ulong Count(IList<ulong> restrictions) => _linksMemoryManager.Count(restrictions);
+        public IList<ulong> GetLinkValue(ulong link) => Links.GetLink(link);
 
-        public bool Each(Func<ulong, bool> handler, IList<ulong> restrictions) => _linksMemoryManager.Each(handler, restrictions);
-
-        public IList<ulong> GetLinkValue(ulong link) => _linksMemoryManager.GetLinkValue(link);
-
-        public ulong AllocateLink()
+        public override ulong Create()
         {
-            var createdLinkIndex = _linksMemoryManager.AllocateLink();
-            var createdLink = new UInt64Link(_linksMemoryManager.GetLinkValue(createdLinkIndex));
+            var createdLinkIndex = Links.Create();
+            var createdLink = new UInt64Link(Links.GetLink(createdLinkIndex));
             CommitTransition(new Transition(_uniqueTimestampFactory, _currentTransactionId, after: createdLink));
             return createdLinkIndex;
         }
 
-        public void SetLinkValue(IList<ulong> parts)
+        public override ulong Update(IList<ulong> parts)
         {
-            var beforeLink = new UInt64Link(_linksMemoryManager.GetLinkValue(parts[Constants.IndexPart]));
-            _linksMemoryManager.SetLinkValue(parts);
-            var afterLink = new UInt64Link(_linksMemoryManager.GetLinkValue(parts[Constants.IndexPart]));
+            var beforeLink = new UInt64Link(Links.GetLink(parts[Constants.IndexPart]));
+            parts[Constants.IndexPart] = Links.Update(parts);
+            var afterLink = new UInt64Link(Links.GetLink(parts[Constants.IndexPart]));
             CommitTransition(new Transition(_uniqueTimestampFactory, _currentTransactionId, before: beforeLink, after: afterLink));
+            return parts[Constants.IndexPart];
         }
 
-        public void FreeLink(ulong link)
+        public override void Delete(ulong link)
         {
-            var deletedLink = new UInt64Link(_linksMemoryManager.GetLinkValue(link));
-            _linksMemoryManager.FreeLink(link);
+            var deletedLink = new UInt64Link(Links.GetLink(link));
+            Links.Delete(link);
             CommitTransition(new Transition(_uniqueTimestampFactory, _currentTransactionId, before: deletedLink));
         }
 
@@ -307,11 +300,11 @@ namespace Platform.Data.Core.Doublets
         private void RevertTransition(Transition transition)
         {
             if (transition.After.IsNull()) // Revert Deletion with Creation
-                _linksMemoryManager.AllocateLink();
+                Links.Create();
             else if (transition.Before.IsNull()) // Revert Creation with Deletion
-                _linksMemoryManager.FreeLink(transition.After.Index);
+                Links.Delete(transition.After.Index);
             else // Revert Update
-                _linksMemoryManager.SetLinkValue(new[] { transition.After.Index, transition.Before.Source, transition.Before.Target });
+                Links.Update(new[] { transition.After.Index, transition.Before.Source, transition.Before.Target });
         }
 
         private void ResetCurrentTransation()
@@ -372,15 +365,12 @@ namespace Platform.Data.Core.Doublets
 
         #region DisposalBase
 
-        protected override bool AllowMultipleDisposeCalls => true;
-
         protected override void DisposeCore(bool manual)
         {
             if (manual)
-            {
                 DisposeTransitions();
-                Disposable.TryDispose(_linksMemoryManager);
-            }
+
+            base.DisposeCore(manual);
         }
 
         #endregion

@@ -7,7 +7,7 @@ namespace Platform.Tests.Data.Core
 {
     public class TempLinksTestScope : DisposableBase
     {
-        public readonly ILinksMemoryManager<ulong> MemoryManager;
+        public readonly ILinks<ulong> MemoryAdapter;
         public readonly SynchronizedLinks<ulong> Links;
         public readonly Sequences Sequences;
         public readonly string TempFilename;
@@ -20,11 +20,11 @@ namespace Platform.Tests.Data.Core
             TempFilename = Path.GetTempFileName();
             TempTransactionLogFilename = Path.GetTempFileName();
 
-            var coreMemoryManager = new UInt64LinksMemoryManager(TempFilename);
+            var coreMemoryAdapter = new UInt64ResizableDirectMemoryLinks(TempFilename);
 
-            MemoryManager = useLog ? (ILinksMemoryManager<ulong>)new UInt64LinksMemoryMenagerTransactionsLayer(coreMemoryManager, TempTransactionLogFilename) : coreMemoryManager;
+            MemoryAdapter = useLog ? (ILinks<ulong>)new UInt64LinksTransactionsLayer(coreMemoryAdapter, TempTransactionLogFilename) : coreMemoryAdapter;
 
-            Links = new SynchronizedLinks<ulong>(new UInt64Links(MemoryManager));
+            Links = new SynchronizedLinks<ulong>(new UInt64Links(MemoryAdapter));
             if (useSequences)
                 Sequences = new Sequences(Links, sequencesOptions);
         }

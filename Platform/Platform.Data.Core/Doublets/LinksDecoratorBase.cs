@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Doublets
             Constants = links.Constants;
         }
 
-        public virtual T Count(params T[] restriction) => Links.Count(restriction);
+        public virtual T Count(IList<T> restriction) => Links.Count(restriction);
 
         public virtual T Each(Func<IList<T>, T> handler, IList<T> restrictions) => Links.Each(handler, restrictions);
 

@@ -58,8 +58,8 @@ namespace Platform.Tests.Data.Core
 
         //    const ulong itself = LinksConstants.Itself;
 
-        //    using (var memoryManager = new LinksMemoryManager(tempFilename, DefaultLinksSizeStep))
-        //    using (var links = new Links(memoryManager))
+        //    using (var memoryAdapter = new ResizableDirectMemoryLinks(tempFilename, DefaultLinksSizeStep))
+        //    using (var links = new Links(memoryAdapter))
         //    {
         //        var sequence = new ulong[sequenceLength];
         //        for (var i = 0; i < sequenceLength; i++)

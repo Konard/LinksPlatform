@@ -16,7 +16,7 @@ namespace Platform.Data.Core.Doublets
             Constants = links.Constants;
         }
 
-        public virtual T Count(params T[] restriction) => Links.Count(restriction);
+        public virtual T Count(IList<T> restriction) => Links.Count(restriction);
 
         public virtual T Each(Func<IList<T>, T> handler, IList<T> restrictions) => Links.Each(handler, restrictions);
 
@@ -26,8 +26,12 @@ namespace Platform.Data.Core.Doublets
 
         public virtual void Delete(T link) => Links.Delete(link);
 
+        protected override bool AllowMultipleDisposeCalls => true;
+
         protected override void DisposeCore(bool manual)
         {
+            if (manual)
+                Disposable.TryDispose(Links);
         }
     }
 }

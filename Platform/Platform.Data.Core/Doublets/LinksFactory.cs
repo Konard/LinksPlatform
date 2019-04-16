@@ -23,10 +23,9 @@ namespace Platform.Data.Core.Doublets
 
             if (typeof(TLink) == typeof(ulong))
             {
-                if (_options.MemoryManager == null)
-                    _options.MemoryManager = new UInt64LinksMemoryManager(new HeapResizableDirectMemory(UInt64LinksMemoryManager.DefaultLinksSizeStep)) as ILinksMemoryManager<TLink>;
+                var memoryAdapter = new UInt64ResizableDirectMemoryLinks(new HeapResizableDirectMemory(UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep)) as ILinks<TLink>;
 
-                return new SynchronizedLinks<ulong>(new UInt64Links(_options as ILinksOptions<ulong>)) as ILinks<TLink>;
+                return new SynchronizedLinks<ulong>(new UInt64Links(memoryAdapter as ILinks<ulong>)) as ILinks<TLink>;
             }
 
             throw new NotImplementedException();

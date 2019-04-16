@@ -15,10 +15,10 @@ namespace Platform.Data.Core.Doublets
 
             var references = ArrayPool.Allocate<T>(referencesAsSourceCount + referencesAsTargetCount);
 
-            var referencesFiller = new ArrayFiller<T>(references);
+            var referencesFiller = new ArrayFiller<T, T>(references, Constants.Continue);
 
-            Links.Each(oldLinkAddress, Constants.Any, referencesFiller.AddAndReturnTrue);
-            Links.Each(Constants.Any, oldLinkAddress, referencesFiller.AddAndReturnTrue);
+            Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, oldLinkAddress, Constants.Any);
+            Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, Constants.Any, oldLinkAddress);
 
             for (ulong i = 0; i < referencesAsSourceCount; i++)
             {

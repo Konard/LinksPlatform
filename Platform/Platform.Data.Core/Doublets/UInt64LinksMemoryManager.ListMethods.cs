@@ -2,7 +2,7 @@
 
 namespace Platform.Data.Core.Doublets
 {
-    unsafe partial class UInt64LinksMemoryManager
+    unsafe partial class UInt64ResizableDirectMemoryLinks
     {
         private class UnusedLinksListMethods : CircularDoublyLinkedListMethods<ulong>
         {

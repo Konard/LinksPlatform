@@ -30,7 +30,7 @@ namespace Platform.Data.Core.Doublets
             Constants = links.Constants;
         }
 
-        public T Count(params T[] restriction) => SyncRoot.ExecuteReadOperation(restriction, Unsync.Count);
+        public T Count(IList<T> restriction) => SyncRoot.ExecuteReadOperation(restriction, Unsync.Count);
         public T Each(Func<IList<T>, T> handler, IList<T> restrictions) => SyncRoot.ExecuteReadOperation(handler, restrictions, (handler1, restrictions1) => Unsync.Each(handler1, restrictions1));
         public T Create() => SyncRoot.ExecuteWriteOperation(Unsync.Create);
         public T Update(IList<T> restrictions) => SyncRoot.ExecuteWriteOperation(restrictions, Unsync.Update);

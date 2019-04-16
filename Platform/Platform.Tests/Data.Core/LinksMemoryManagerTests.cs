@@ -6,17 +6,17 @@ using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
-    public static class LinksMemoryManagerTests
+    public static class ResizableDirectMemoryLinksTests
     {
-        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksConstants<ulong, ulong, int> Constants = Default<LinksConstants<ulong, ulong, int>>.Instance;
 
         [Fact]
         public static void BasicFileMappedMemoryTest()
         {
             var tempFilename = Path.GetTempFileName();
 
-            using (var memoryManager = new UInt64LinksMemoryManager(tempFilename))
-                memoryManager.TestBasicMemoryOperations();
+            using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(tempFilename))
+                memoryAdapter.TestBasicMemoryOperations();
 
             File.Delete(tempFilename);
         }
@@ -24,44 +24,44 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public static void BasicHeapMemoryTest()
         {
-            using (var memory = new HeapResizableDirectMemory(UInt64LinksMemoryManager.DefaultLinksSizeStep))
-            using (var memoryManager = new UInt64LinksMemoryManager(memory, UInt64LinksMemoryManager.DefaultLinksSizeStep))
-                memoryManager.TestBasicMemoryOperations();
+            using (var memory = new HeapResizableDirectMemory(UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+            using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(memory, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+                memoryAdapter.TestBasicMemoryOperations();
         }
 
-        private static void TestBasicMemoryOperations(this ILinksMemoryManager<ulong> memoryManager)
+        private static void TestBasicMemoryOperations(this ILinks<ulong> memoryAdapter)
         {
-            var link = memoryManager.AllocateLink();
-            memoryManager.FreeLink(link);
+            var link = memoryAdapter.Create();
+            memoryAdapter.Delete(link);
         }
 
         [Fact]
         public static void NonexistentReferencesHeapMemoryTest()
         {
-            using (var memory = new HeapResizableDirectMemory(UInt64LinksMemoryManager.DefaultLinksSizeStep))
-            using (var memoryManager = new UInt64LinksMemoryManager(memory, UInt64LinksMemoryManager.DefaultLinksSizeStep))
-                memoryManager.TestNonexistentReferences();
+            using (var memory = new HeapResizableDirectMemory(UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+            using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(memory, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+                memoryAdapter.TestNonexistentReferences();
         }
 
-        private static void TestNonexistentReferences(this ILinksMemoryManager<ulong> memoryManager)
+        private static void TestNonexistentReferences(this ILinks<ulong> memoryAdapter)
         {
-            var link = memoryManager.AllocateLink();
+            var link = memoryAdapter.Create();
 
-            memoryManager.SetLinkValue(link, ulong.MaxValue, ulong.MaxValue);
+            memoryAdapter.Update(link, ulong.MaxValue, ulong.MaxValue);
 
             var resultLink = Constants.Null;
 
-            memoryManager.Each(foundLink =>
+            memoryAdapter.Each(foundLink =>
             {
-                resultLink = foundLink;
+                resultLink = foundLink[Constants.IndexPart];
                 return Constants.Break;
             }, Constants.Any, ulong.MaxValue, ulong.MaxValue);
 
             Assert.True(resultLink == link);
 
-            Assert.True(memoryManager.Count(ulong.MaxValue) == 0);
+            Assert.True(memoryAdapter.Count(ulong.MaxValue) == 0);
 
-            memoryManager.FreeLink(link);
+            memoryAdapter.Delete(link);
         }
     }
 }

@@ -1,23 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Collections.Trees;
 using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
-    partial class LinksMemoryManager<T>
+    partial class ResizableDirectMemoryLinks<T>
     {
         private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<T>
         {
-            private readonly ILinksCombinedConstants<bool, T, int> _constants;
+            private readonly ResizableDirectMemoryLinks<T> _memory;
+            private readonly ILinksCombinedConstants<T, T, int> _constants;
             protected readonly IntPtr Links;
             protected readonly IntPtr Header;
 
-            protected LinksTreeMethodsBase(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
+            protected LinksTreeMethodsBase(ResizableDirectMemoryLinks<T> memory)
             {
-                Links = links;
-                Header = header;
-                _constants = constants;
+                Links = memory._links;
+                Header = memory._header;
+                _memory = memory;
+                _constants = memory.Constants;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -97,12 +100,12 @@ namespace Platform.Data.Core.Doublets
                 return Subtract(Subtract(total, totalRightIgnore), totalLeftIgnore);
             }
 
-            public bool EachReference(T link, Func<T, bool> handler)
+            public T EachReference(T link, Func<IList<T>, T> handler)
             {
                 var root = GetTreeRoot();
 
                 if (EqualToZero(root))
-                    return true;
+                    return _constants.Continue;
 
                 T first = GetZero(), current = root;
                 while (!EqualToZero(current))
@@ -120,20 +123,18 @@ namespace Platform.Data.Core.Doublets
 
                 if (!EqualToZero(first))
                 {
-                    var breakConstant = _constants.Break;
-
                     current = first;
                     while (true)
                     {
-                        if (handler(current) == breakConstant)
-                            return false;
+                        if (Equals(handler(_memory.GetLinkStruct(current)), _constants.Break))
+                            return _constants.Break;
                         current = GetNext(current);
                         if (EqualToZero(current) || !Equals(GetBasePartValue(current), link))
                             break;
                     }
                 }
 
-                return true;
+                return _constants.Continue;
             }
 
             //[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -179,8 +180,8 @@ namespace Platform.Data.Core.Doublets
 
         private class LinksSourcesTreeMethods : LinksTreeMethodsBase
         {
-            public LinksSourcesTreeMethods(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
-                : base(links, header, constants)
+            public LinksSourcesTreeMethods(ResizableDirectMemoryLinks<T> memory)
+                : base(memory)
             {
             }
 
@@ -332,8 +333,8 @@ namespace Platform.Data.Core.Doublets
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
         {
-            public LinksTargetsTreeMethods(IntPtr links, IntPtr header, ILinksCombinedConstants<bool, T, int> constants)
-                : base(links, header, constants)
+            public LinksTargetsTreeMethods(ResizableDirectMemoryLinks<T> memory)
+                : base(memory)
             {
             }
 

@@ -23,8 +23,8 @@ namespace Platform.Examples
 
                 const long gb32 = 34359738368;
 
-                using (var memoryManager = new UInt64LinksMemoryManager(linksFile, gb32))
-                using (var links = new UInt64Links(memoryManager))
+                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, gb32))
+                using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     UnicodeMap.InitNew(links);

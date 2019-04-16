@@ -4,7 +4,7 @@ namespace Platform.Data.Core.Doublets
 {
     /// <remarks>
     /// Not practical if newSource and newTarget are too big.
-    /// To be able to use practical version we should allow to create link at any specific location inside LinksMemoryManager.
+    /// To be able to use practical version we should allow to create link at any specific location inside ResizableDirectMemoryLinks.
     /// This in turn will require to implement not a list of empty links, but a list of ranges to store it more efficiently.
     /// </remarks>
     public class LinksNonExistentReferencesCreator<T> : LinksDecoratorBase<T>
