@@ -2,6 +2,7 @@
 using System.IO;
 using System.Xml;
 using Platform.Communication.Protocol.Gexf;
+using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 
 namespace Platform.Examples
