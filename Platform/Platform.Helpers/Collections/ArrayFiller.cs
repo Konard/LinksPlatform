@@ -35,6 +35,13 @@ namespace Platform.Helpers.Collections
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TReturnConstant AddAndReturnConstant(TElement element)
+        {
+            _array[_position++] = element;
+            return _returnConstant;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AddFirstAndReturnTrue(IList<TElement> collection)
         {
             _array[_position++] = collection[0];

@@ -46,7 +46,7 @@ namespace Platform.Sandbox
             const int mb4 = 4 * 1024 * 1024;
 
             using (var memory = new HeapResizableDirectMemory(mb4))
-            using (var memoryManager = new UInt64LinksMemoryManager(memory))
+            using (var memoryManager = new UInt64ResizableDirectMemoryLinks(memory))
             using (var links = new UInt64Links(memoryManager))
             {
                 ulong[] digits = new ulong[10];

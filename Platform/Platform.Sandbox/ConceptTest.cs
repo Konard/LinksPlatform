@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 
@@ -8,7 +9,7 @@ namespace Platform.Sandbox
     {
         public static void TestGexf(string filename)
         {
-            using (var memoryManager = new UInt64LinksMemoryManager(filename, 512 * 1024 * 1024))
+            using (var memoryManager = new UInt64ResizableDirectMemoryLinks(filename, 512 * 1024 * 1024))
             using (var links = new UInt64Links(memoryManager))
             {
                 //var options = new LinksOptions<ulong>();
@@ -20,7 +21,7 @@ namespace Platform.Sandbox
 
                 links.RunRandomCreations(linksToCreate);
 
-                memoryManager.ExportSourcesTree(filename + ".gexf");
+                //memoryManager.ExportSourcesTree(filename + ".gexf");
 
                 Console.ReadKey();
             }
@@ -30,14 +31,14 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var memoryManager = new UInt64LinksMemoryManager(filename, 512 * 1024 * 1024))
+                using (var memoryManager = new UInt64ResizableDirectMemoryLinks(filename, 512 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     //links.EnterTransaction();
 
-                    var link = memoryManager.AllocateLink();
-                    memoryManager.FreeLink(link);
+                    var link = memoryManager.Create();
+                    memoryManager.Delete(link);
 
                     Console.ReadKey();
 
@@ -140,9 +141,16 @@ namespace Platform.Sandbox
             Console.ReadKey();
         }
 
-        private static void PrintLink(this UInt64LinksMemoryManager links, ulong link)
+        private static void PrintLink(this UInt64ResizableDirectMemoryLinks links, ulong link)
         {
-            Console.WriteLine(links.FormatLink(link));
+            Console.WriteLine(links.FormatLink(links.GetLink(link)));
+        }
+
+        private static string FormatLink(this UInt64ResizableDirectMemoryLinks links, IList<ulong> link)
+        {
+            const string format = "{1} {0} {2}"; // "{0}: {1} -> {2}"
+
+            return string.Format(format, link[links.Constants.IndexPart], link[links.Constants.SourcePart], link[links.Constants.TargetPart]);
         }
 
         private class User

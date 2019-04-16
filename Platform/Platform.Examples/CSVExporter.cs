@@ -12,8 +12,6 @@ namespace Platform.Examples
     /// </remarks>
     public class CSVExporter
     {
-        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
-
         private readonly bool _unicodeMapped;
         private readonly SynchronizedLinks<ulong> _links;
 
@@ -31,24 +29,24 @@ namespace Platform.Examples
                 var links = 1;
                 var lines = 0;
 
-                _links.Each(Constants.Any, Constants.Any, linkId =>
+                var constants = _links.Constants;
+
+                _links.Each(link =>
                 {
                     if (cancellationToken.IsCancellationRequested)
-                        return Constants.Break;
+                        return constants.Break;
 
                     if (!_unicodeMapped || links > UnicodeMap.MapSize)
                     {
                         if (lines > 0)
                             writer.WriteLine();
 
-                        var link = new UInt64Link(_links.Unsync.GetLink(linkId)); // Use GetLinkCore only inside each (it is not thread safe).
-
-                        writer.Write("{0},{1}", FormatLink(link.Source), FormatLink(link.Target));
+                        writer.Write("{0},{1}", FormatLink(link[constants.SourcePart]), FormatLink(link[constants.TargetPart]));
                         lines++;
                     }
 
                     links++;
-                    return Constants.Continue;
+                    return constants.Continue;
                 });
             }
         }

@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers
 {
@@ -9,7 +10,7 @@ namespace Platform.Helpers
     {
         public TResult Result;
 
-        protected SetterBase(TResult defaultValue = default(TResult))
+        protected SetterBase(TResult defaultValue = default)
         {
             Result = defaultValue;
         }
@@ -20,7 +21,7 @@ namespace Platform.Helpers
 
     public class Setter<TResult> : SetterBase<TResult>
     {
-        public Setter(TResult defaultValue = default(TResult))
+        public Setter(TResult defaultValue = default)
             : base(defaultValue)
         {
         }
@@ -45,7 +46,7 @@ namespace Platform.Helpers
         private readonly TDecision _trueValue;
         private readonly TDecision _falseValue;
 
-        public Setter(TDecision trueValue = default(TDecision), TDecision falseValue = default(TDecision), TResult defaultValue = default(TResult))
+        public Setter(TDecision trueValue = default, TDecision falseValue = default, TResult defaultValue = default)
             : base(defaultValue)
         {
             _trueValue = trueValue;
@@ -63,6 +64,20 @@ namespace Platform.Helpers
         public TDecision SetAndReturnFalse(TResult value)
         {
             Result = value;
+            return _falseValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TDecision SetFirstAndReturnTrue(IList<TResult> list)
+        {
+            Result = list[0];
+            return _trueValue;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public TDecision SetFirstAndReturnFalse(IList<TResult> list)
+        {
+            Result = list[0];
             return _falseValue;
         }
     }

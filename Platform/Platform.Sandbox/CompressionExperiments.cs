@@ -19,7 +19,7 @@ namespace Platform.Sandbox
         {
             File.Delete("web.links");
 
-            using (var memoryManager = new UInt64LinksMemoryManager("web.links", 8 * 1024 * 1024))
+            using (var memoryManager = new UInt64ResizableDirectMemoryLinks("web.links", 8 * 1024 * 1024))
             using (var links = new UInt64Links(memoryManager))
             {
                 var syncLinks = new SynchronizedLinks<ulong>(links);
@@ -138,7 +138,7 @@ namespace Platform.Sandbox
             {
                 File.Delete("stats.links");
 
-                using (var memoryManager = new UInt64LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var memoryManager = new UInt64ResizableDirectMemoryLinks("stats.links", 8 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
@@ -162,7 +162,7 @@ namespace Platform.Sandbox
 
                 File.Delete("stats.links");
 
-                using (var memoryManager = new UInt64LinksMemoryManager("stats.links", 8 * 1024 * 1024))
+                using (var memoryManager = new UInt64ResizableDirectMemoryLinks("stats.links", 8 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);

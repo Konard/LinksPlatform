@@ -3,19 +3,29 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28729.10
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{5398318a-18ea-488f-92d7-785d8a78dc19}") = "Platform.Memory", "Platform.Memory\Platform.Memory.csproj", "{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Memory", "Platform.Memory\Platform.Memory.csproj", "{DA0C0D80-9821-48CA-A498-C3BCF8A3DB0E}"
 EndProject
-Project("{f1f71b32-173a-44a0-8b31-27ae0f930435}") = "Platform.Helpers", "Platform.Helpers\Platform.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Helpers", "Platform.Helpers\Platform.Helpers.csproj", "{70AF2122-82E4-43D1-9EEB-99C4E6FA5A49}"
 EndProject
-Project("{7cabf249-4205-4439-b265-e7e7246a7dfe}") = "Platform.Communication", "Platform.Communication\Platform.Communication.csproj", "{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Communication", "Platform.Communication\Platform.Communication.csproj", "{8EA1CE07-B711-48CB-8280-6B5CADBDB6FD}"
 EndProject
-Project("{2dad3cfa-c027-4c54-8e0a-21602fd28460}") = "Platform.Data.Core", "Platform.Data.Core\Platform.Data.Core.csproj", "{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.Core", "Platform.Data.Core\Platform.Data.Core.csproj", "{8BD910B1-E2B9-4DDD-9248-99E83EF8F401}"
 EndProject
-Project("{dce3e946-5def-4760-a9e8-f2ca01066a28}") = "Platform.Examples", "Platform.Examples\Platform.Examples.csproj", "{E24E42B2-09F8-4456-929C-FC9DD593A06E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Examples", "Platform.Examples\Platform.Examples.csproj", "{E24E42B2-09F8-4456-929C-FC9DD593A06E}"
 EndProject
-Project("{2c8bc237-bbd7-4edc-bf7e-27678eb9ae0a}") = "Platform.Tests", "Platform.Tests\Platform.Tests.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Tests", "Platform.Tests\Platform.Tests.csproj", "{F35569FF-CECE-4141-BA02-DF7F46053095}"
 EndProject
-Project("{0444b203-6952-4fd8-bc15-c7f28c26117d}") = "Platform.Tests.Runner", "Platform.Tests.Runner\Platform.Tests.Runner.csproj", "{C6A78058-0F42-47DB-980C-0B633E8C6F31}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Tests.Runner", "Platform.Tests.Runner\Platform.Tests.Runner.csproj", "{C6A78058-0F42-47DB-980C-0B633E8C6F31}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Sandbox", "Platform.Sandbox\Platform.Sandbox.csproj", "{A056541D-CBA1-41FC-9DF8-271CAA391A77}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.WebTerminal", "Platform.Data.WebTerminal\Platform.Data.WebTerminal.csproj", "{CD0A265B-A3C4-4A91-AB47-F06BF4A39FD3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.SlaveServer", "Platform.Data.SlaveServer\Platform.Data.SlaveServer.csproj", "{D49FC0F2-87F5-4B1D-944B-C4B54EE147FE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.MasterServer", "Platform.Data.MasterServer\Platform.Data.MasterServer.csproj", "{5A19D1FB-94D4-4C4B-94DC-7A45E849758A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.ConsoleTerminal", "Platform.Data.ConsoleTerminal\Platform.Data.ConsoleTerminal.csproj", "{85D097CE-614E-4351-920B-45BD35AE5A84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -51,6 +61,26 @@ Global
 		{C6A78058-0F42-47DB-980C-0B633E8C6F31}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C6A78058-0F42-47DB-980C-0B633E8C6F31}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C6A78058-0F42-47DB-980C-0B633E8C6F31}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A056541D-CBA1-41FC-9DF8-271CAA391A77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A056541D-CBA1-41FC-9DF8-271CAA391A77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A056541D-CBA1-41FC-9DF8-271CAA391A77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A056541D-CBA1-41FC-9DF8-271CAA391A77}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD0A265B-A3C4-4A91-AB47-F06BF4A39FD3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD0A265B-A3C4-4A91-AB47-F06BF4A39FD3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD0A265B-A3C4-4A91-AB47-F06BF4A39FD3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD0A265B-A3C4-4A91-AB47-F06BF4A39FD3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D49FC0F2-87F5-4B1D-944B-C4B54EE147FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D49FC0F2-87F5-4B1D-944B-C4B54EE147FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D49FC0F2-87F5-4B1D-944B-C4B54EE147FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D49FC0F2-87F5-4B1D-944B-C4B54EE147FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5A19D1FB-94D4-4C4B-94DC-7A45E849758A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5A19D1FB-94D4-4C4B-94DC-7A45E849758A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5A19D1FB-94D4-4C4B-94DC-7A45E849758A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5A19D1FB-94D4-4C4B-94DC-7A45E849758A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85D097CE-614E-4351-920B-45BD35AE5A84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85D097CE-614E-4351-920B-45BD35AE5A84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85D097CE-614E-4351-920B-45BD35AE5A84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85D097CE-614E-4351-920B-45BD35AE5A84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

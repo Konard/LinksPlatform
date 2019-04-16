@@ -62,30 +62,30 @@ namespace Platform.Data.Core.Doublets
         /// чтобы удалился весь контент)
         /// Например через _header->AllocatedLinks в ResizableDirectMemoryLinks
         /// </remarks>
-        public static void DeleteAll(this ILinks<ulong> links)
+        public static void DeleteAll<TLink>(this ILinks<TLink> links)
         {
-            for (var i = links.Count(); i > 0; i--)
+            for (var i = links.Count(); MathHelpers.GreaterThan(i, default); i = MathHelpers.Decrement(i))
             {
                 links.Delete(i);
-                if (links.Count() != i - 1)
+                if (!Equals(links.Count(), MathHelpers.Decrement(i)))
                     i = links.Count();
             }
         }
 
-        public static ulong First(this ILinks<ulong> links)
+        public static TLink First<TLink>(this ILinks<TLink> links)
         {
-            ulong firstLink = 0;
+            TLink firstLink = default;
 
-            if (links.Count() == 0)
+            if (Equals(links.Count(), default(TLink)))
                 throw new Exception("В базе данных нет связей.");
 
-            links.Each(Constants.Any, Constants.Any, x =>
+            links.Each(links.Constants.Any, links.Constants.Any, link =>
             {
-                firstLink = x;
-                return false;
+                firstLink = link[links.Constants.IndexPart];
+                return links.Constants.Break;
             });
 
-            if (firstLink == 0)
+            if (Equals(firstLink, default(TLink)))
                 throw new Exception("В процессе поиска по базе данных не было найдено связей.");
 
             return firstLink;
@@ -408,15 +408,16 @@ namespace Platform.Data.Core.Doublets
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<TLink> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
+        public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
         {
-            var list = new List<TLink>();
             var constants = links.Constants;
-            links.Each(link =>
-                       {
-                           list.Add(link[constants.IndexPart]);
-                           return constants.Continue;
-                       }, restrictions);
+
+            var list = new IList<TLink>[(Integer<TLink>)links.Count()];
+
+            var filler = new ArrayFiller<IList<TLink>, TLink>(list, links.Constants.Continue);
+
+            links.Each(filler.AddAndReturnConstant, restrictions);
+
             return list;
         }
 
@@ -551,8 +552,8 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T SearchOrDefault<T>(this ILinks<T> links, T source, T target)
         {
-            var setter = new Setter<T>();
-            links.Each(source, target, setter.SetAndReturnFalse);
+            var setter = new Setter<T, T>(falseValue: links.Constants.Break);
+            links.Each(setter.SetFirstAndReturnFalse, links.Constants.Any, source, target);
             return setter.Result;
         }
 

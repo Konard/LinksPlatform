@@ -13,6 +13,8 @@ namespace Platform.Sandbox
 
             //new XUnitTestsRunnerCLI().Run(args);
 
+            //new GEXFCSVExporterCLI().Run(args);
+
             //new CSVExporterCLI().Run(args);
             //new FileIndexerCLI().Run(args);
             //new WikipediaImporterCLI().Run(args);
