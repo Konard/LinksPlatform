@@ -4,7 +4,7 @@ using System.Xml;
 using Platform.Communication.Protocol.Gexf;
 using Platform.Helpers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Examples
 {
     public class GEXFExporter<TLink>
     {
