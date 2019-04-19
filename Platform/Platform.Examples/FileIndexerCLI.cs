@@ -1,8 +1,8 @@
 ﻿using System;
 using System.IO;
+using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
 
 namespace Platform.Examples
 {
@@ -23,10 +23,11 @@ namespace Platform.Examples
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
+                    links.UseUnicode();
                     UnicodeMap.InitNew(syncLinks);
-                    var sequences = new Sequences(syncLinks);
+                    var indexer = new SequencesIndexer<ulong>(syncLinks);
 
-                    var fileIndexer = new FileIndexer(syncLinks, sequences);
+                    var fileIndexer = new FileIndexer(syncLinks, indexer);
 
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
                     //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);

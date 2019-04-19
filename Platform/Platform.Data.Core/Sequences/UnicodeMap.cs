@@ -4,7 +4,6 @@ using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Doublets;
-using Platform.Helpers;
 
 namespace Platform.Data.Core.Sequences
 {

@@ -16,10 +16,7 @@ namespace Platform.Data.Core.Doublets
     {
         public static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
 
-        public static void UseUnicode(this ILinks<ulong> links)
-        {
-            new UnicodeMap(links).Init();
-        }
+        public static void UseUnicode(this ILinks<ulong> links) => UnicodeMap.InitNew(links);
 
         public static void RunRandomCreations<T>(this ILinks<T> links, long amountOfCreations)
         {
@@ -77,7 +74,7 @@ namespace Platform.Data.Core.Doublets
             TLink firstLink = default;
 
             if (Equals(links.Count(), default(TLink)))
-                throw new Exception("В базе данных нет связей.");
+                throw new Exception("В хранилище нет связей.");
 
             links.Each(links.Constants.Any, links.Constants.Any, link =>
             {
@@ -86,7 +83,7 @@ namespace Platform.Data.Core.Doublets
             });
 
             if (Equals(firstLink, default(TLink)))
-                throw new Exception("В процессе поиска по базе данных не было найдено связей.");
+                throw new Exception("В процессе поиска по храналищу не было найдено связей.");
 
             return firstLink;
         }
@@ -323,16 +320,31 @@ namespace Platform.Data.Core.Doublets
         #endregion
 
         /// <summary>
+        /// Возвращает индекс указанной связи.
+        /// </summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
+        /// <returns>Индекс начальной связи для указанной связи.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetIndex<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.IndexPart];
+
+        /// <summary>
         /// Возвращает индекс начальной (Source) связи для указанной связи.
         /// </summary>
         /// <param name="links">Хранилище связей.</param>
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс начальной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetSource<T>(this ILinks<T> links, T link)
-        {
-            return links.GetLink(link)[Constants.SourcePart];
-        }
+        public static T GetSource<T>(this ILinks<T> links, T link) => links.GetLink(link)[links.Constants.SourcePart];
+
+        /// <summary>
+        /// Возвращает индекс начальной (Source) связи для указанной связи.
+        /// </summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
+        /// <returns>Индекс начальной связи для указанной связи.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetSource<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.SourcePart];
 
         /// <summary>
         /// Возвращает индекс конечной (Target) связи для указанной связи.
@@ -341,10 +353,16 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс конечной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetTarget<T>(this ILinks<T> links, T link)
-        {
-            return links.GetLink(link)[Constants.TargetPart];
-        }
+        public static T GetTarget<T>(this ILinks<T> links, T link) => links.GetLink(link)[links.Constants.TargetPart];
+
+        /// <summary>
+        /// Возвращает индекс конечной (Target) связи для указанной связи.
+        /// </summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
+        /// <returns>Индекс конечной связи для указанной связи.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static T GetTarget<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.TargetPart];
 
         /// <summary>
         /// Возвращает части-значения для связи с указанным индексом.
@@ -360,10 +378,7 @@ namespace Platform.Data.Core.Doublets
             return linkPartsSetter.Result;
         }
 
-        public static TLink Count<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
-        {
-            return links.Count(restrictions);
-        }
+        public static TLink Count<TLink>(this ILinks<TLink> links, params TLink[] restrictions) => links.Count(restrictions);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
@@ -422,16 +437,23 @@ namespace Platform.Data.Core.Doublets
         }
 
         /// <summary>
-        /// Возвращает значение, определяющее существует ли связь с указанным индексом в базе данных.
+        /// Возвращает значение, определяющее существует ли связь с указанным индексом в хранилище связей.
         /// </summary>
         /// <param name="links">Хранилище связей.</param>
         /// <param name="link">Индекс проверяемой на существование связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<T>(this ILinks<T> links, T link)
-        {
-            return (Integer<T>)links.Count(link) > 0;
-        }
+        public static bool Exists<T>(this ILinks<T> links, T link) => MathHelpers.GreaterThan(links.Count(link), default);
+
+        /// <summary>
+        /// Возвращает значение, определяющее существует ли связь с указанными началом и концом в хранилище связей.
+        /// </summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="source">Начало связи.</param>
+        /// <param name="target">Конец связи.</param>
+        /// <returns>Значение, определяющее существует ли связь.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Exists<T>(this ILinks<T> links, T source, T target) => MathHelpers.GreaterThan(links.Count(links.Constants.Any, source, target), default);
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -482,14 +504,6 @@ namespace Platform.Data.Core.Doublets
         {
             if (!Equals(link, links.Constants.Itself) && !links.Exists(link))
                 throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
-        }
-
-        /// <param name="links">Хранилище связей.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<T>(this ILinks<T> links, T source, T target)
-        {
-            var constants = Default<LinksConstants<bool, T, int>>.Instance;
-            return (Integer<T>)links.Count(constants.Any, source, target) > 0;
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -600,16 +614,10 @@ namespace Platform.Data.Core.Doublets
         }
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsureCreated<T>(this ILinks<T> links, params T[] addresses)
-        {
-            links.EnsureCreated(links.Create, addresses);
-        }
+        public static void EnsureCreated<T>(this ILinks<T> links, params T[] addresses) => links.EnsureCreated(links.Create, addresses);
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsurePointsCreated<T>(this ILinks<T> links, params T[] addresses)
-        {
-            links.EnsureCreated(links.CreatePoint, addresses);
-        }
+        public static void EnsurePointsCreated<T>(this ILinks<T> links, params T[] addresses) => links.EnsureCreated(links.CreatePoint, addresses);
 
         /// <param name="links">Хранилище связей.</param>
         public static void EnsureCreated<T>(this ILinks<T> links, Func<T> creator, params T[] addresses)
@@ -688,7 +696,7 @@ namespace Platform.Data.Core.Doublets
                 links.Delete(link);
                 return link;
             }
-            return default(T);
+            return default;
         }
 
         /// <summary>Удаляет несколько связей.</summary>

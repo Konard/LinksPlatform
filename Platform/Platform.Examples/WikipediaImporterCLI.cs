@@ -1,8 +1,9 @@
 ﻿using System;
 using System.IO;
+using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
+using Platform.Data.Core.Sequences.FrequencyCounters;
 
 namespace Platform.Examples
 {
@@ -27,8 +28,9 @@ namespace Platform.Examples
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
-                    UnicodeMap.InitNew(links);
-                    var sequences = new Sequences(syncLinks, new SequencesOptions { UseCompression = true });
+                    links.UseUnicode();
+
+                    var sequences = new Sequences(syncLinks, new SequencesOptions<ulong> { UseCompression = true });
                     var wikipediaStorage = new WikipediaLinksStorage(sequences);
                     var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
 

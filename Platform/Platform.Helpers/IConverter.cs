@@ -4,4 +4,8 @@
     {
         TTarget Convert(TSource source);
     }
+
+    public interface IConverter<T> : IConverter<T, T>
+    {
+    }
 }

@@ -2,10 +2,11 @@
 using System.IO;
 using System.Net.Sockets;
 using System.Threading;
+using Platform.Helpers;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
+using Platform.Data.Core.Sequences.FrequencyCounters;
 
 namespace Platform.Examples
 {
@@ -32,7 +33,7 @@ namespace Platform.Examples
                     var unicodeMap = new UnicodeMap(syncLinks);
                     unicodeMap.Init();
 
-                    var sequences = new Sequences(syncLinks, new SequencesOptions { UseSequenceMarker = true, SequenceMarkerLink = 65537, UseCompression = true });
+                    var sequences = new Sequences(syncLinks, new SequencesOptions<ulong> { UseSequenceMarker = true, SequenceMarkerLink = 65537, UseCompression = true });
 
                     Console.WriteLine("Links server started.");
                     Console.WriteLine("Press CTRL+C or ESC to stop server.");
@@ -43,7 +44,7 @@ namespace Platform.Examples
 
                         masterServer.PrintContents(Console.WriteLine);
 
-                        MessageHandlerCallback handleMessage = message =>
+                        void handleMessage(string message)
                         {
                             if (!string.IsNullOrWhiteSpace(message))
                             {
@@ -56,7 +57,7 @@ namespace Platform.Examples
                                 else
                                     masterServer.Create(message);
                             }
-                        };
+                        }
 
                         //using (var receiver = new UdpReceiver(7777, handleMessage))
                         using (var receiver = new UdpClient(7777))

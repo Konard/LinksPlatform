@@ -51,17 +51,17 @@ namespace Platform.Data.Core.Sequences
         /// <summary>Возвращает значение ulong, обозначающее любое количество связей.</summary>
         public const ulong ZeroOrMany = ulong.MaxValue;
 
-        public SequencesOptions Options;
+        public SequencesOptions<ulong> Options;
         public readonly SynchronizedLinks<ulong> Links;
         public readonly ISynchronization Sync;
-        private readonly Compressor _compressor;
 
         public Sequences(SynchronizedLinks<ulong> links)
-            : this(links, new SequencesOptions())
+            : this(links, new SequencesOptions<ulong>())
         {
         }
 
-        public Sequences(SynchronizedLinks<ulong> links, SequencesOptions options)
+
+        public Sequences(SynchronizedLinks<ulong> links, SequencesOptions<ulong> options)
         {
             Links = links;
             Sync = links.SyncRoot;
@@ -69,15 +69,6 @@ namespace Platform.Data.Core.Sequences
 
             Options.ValidateOptions();
             Options.InitOptions(Links);
-
-            if (Options.UseCompression)
-                _compressor = new Compressor(links.Unsync, this);
-        }
-
-        private bool IsMarkedSequence(ulong sequenceCandidate)
-        {
-            var links = Links.Unsync;
-            return links.GetSource(sequenceCandidate) == Options.SequenceMarkerLink || links.SearchOrDefault(Options.SequenceMarkerLink, sequenceCandidate) != Constants.Null;
         }
 
         public bool IsSequence(ulong sequence)
@@ -85,7 +76,7 @@ namespace Platform.Data.Core.Sequences
             return Sync.ExecuteReadOperation(() =>
             {
                 if (Options.UseSequenceMarker)
-                    return IsMarkedSequence(sequence);
+                    return Options.MarkedSequenceMatcher.IsMatched(sequence);
 
                 return !Links.Unsync.IsPartialPoint(sequence);
             });
@@ -184,7 +175,7 @@ namespace Platform.Data.Core.Sequences
         private ulong CreateCore(params ulong[] sequence)
         {
             if (Options.UseIndex)
-                Index(sequence);
+                Options.Indexer.Index(sequence);
 
             var sequenceRoot = default(ulong);
 
@@ -197,13 +188,8 @@ namespace Platform.Data.Core.Sequences
             else if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew)
                 return CompactCore(sequence);
 
-            if (sequenceRoot == default(ulong))
-            {
-                if (Options.UseCompression)
-                    sequenceRoot = _compressor.Compress(sequence);
-                else
-                    sequenceRoot = CreateBalancedVariantCore(sequence);
-            }
+            if (sequenceRoot == default)
+                sequenceRoot = Options.LinksToSequenceConverter.Convert(sequence);
 
             if (Options.UseSequenceMarker)
                 Links.Unsync.CreateAndUpdate(Options.SequenceMarkerLink, sequenceRoot);
@@ -211,129 +197,7 @@ namespace Platform.Data.Core.Sequences
             return sequenceRoot; // Возвращаем корень последовательности (т.е. сами элементы)
         }
 
-        /// <summary>
-        /// Индексирует последовательность глобально, и возвращает значение,
-        /// определяющие была ли запрошенная последовательность проиндексирована ранее. 
-        /// </summary>
-        /// <param name="sequence">Последовательность для индексации.</param>
-        /// <returns>
-        /// True если последовательность уже была проиндексирована ранее и
-        /// False если последовательность была проиндексирована только что.
-        /// </returns>
-        public bool Index(ulong[] sequence)
-        {
-            var indexed = true;
-
-            var i = sequence.Length;
-            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
-
-            for (; i >= 1; i--)
-                Links.GetOrCreate(sequence[i - 1], sequence[i]);
-
-            return indexed;
-        }
-
-        public bool BulkIndex(ulong[] sequence)
-        {
-            var indexed = true;
-
-            var i = sequence.Length;
-
-            var links = Links.Unsync;
-
-            Sync.ExecuteReadOperation(() =>
-            {
-                while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
-            });
-
-            if (indexed == false)
-            {
-                Sync.ExecuteWriteOperation(() =>
-                {
-                    for (; i >= 1; i--)
-                        links.GetOrCreate(sequence[i - 1], sequence[i]);
-                });
-            }
-
-            return indexed;
-        }
-
-        public bool BulkIndexUnsync(ulong[] sequence)
-        {
-            var indexed = true;
-
-            var i = sequence.Length;
-
-            var links = Links.Unsync;
-
-            while (--i >= 1 && (indexed = links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
-
-            for (; i >= 1; i--)
-                links.GetOrCreate(sequence[i - 1], sequence[i]);
-
-            return indexed;
-        }
-
-        public bool CheckIndex(ulong[] sequence)
-        {
-            var indexed = true;
-
-            var i = sequence.Length;
-            while (--i >= 1 && (indexed = Links.SearchOrDefault(sequence[i - 1], sequence[i]) != Constants.Null)) { }
-
-            return indexed;
-        }
-
-        public ulong CreateBalancedVariant(params ulong[] sequence)
-        {
-            return Sync.ExecuteWriteOperation(() =>
-            {
-                if (sequence.IsNullOrEmpty())
-                    return Constants.Null;
-
-                Links.EnsureEachLinkExists(sequence);
-
-                return CreateBalancedVariantCore(sequence);
-            });
-        }
-
-        public ulong CreateBalancedVariantCore(params ulong[] sequence)
-        {
-            var length = sequence.Length;
-
-            if (length == 1)
-                return sequence[0];
-
-            var links = Links.Unsync;
-
-            // TODO: Replace CreateAndUpdate with GetOrCreate
-            if (length == 2)
-                return links.GetOrCreate(sequence[0], sequence[1]);
-
-            // Needed only if we not allowed to change sequence itself (so it makes copy)
-            // Нужно только если исходный массив последовательности изменять нельзя (тогда делается его копия)
-            if (length > 2)
-            {
-                // TODO: Try to use ArrayPool
-                var innerSequence = new ulong[length / 2 + length % 2];
-
-                for (var i = 0; i < length; i += 2)
-                    innerSequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
-
-                sequence = innerSequence;
-                length = innerSequence.Length;
-            }
-
-            while (length > 2)
-            {
-                for (var i = 0; i < length; i += 2)
-                    sequence[i / 2] = i + 1 == length ? sequence[i] : links.GetOrCreate(sequence[i], sequence[i + 1]);
-
-                length = length / 2 + length % 2;
-            }
-
-            return links.GetOrCreate(sequence[0], sequence[1]);
-        }
+        
 
         #endregion
 
@@ -369,7 +233,7 @@ namespace Platform.Data.Core.Sequences
                     return Links.Unsync.Each(sequence[0], sequence[1], handler);
                 }
 
-                if (Options.UseIndex && !CheckIndex(sequence))
+                if (Options.UseIndex && !Options.Indexer.CheckIndex(sequence))
                     return false;
 
                 return EachCore(handler, sequence);

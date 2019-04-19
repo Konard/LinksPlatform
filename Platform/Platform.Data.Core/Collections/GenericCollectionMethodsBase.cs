@@ -6,18 +6,14 @@ namespace Platform.Data.Core.Collections
 {
     public abstract class GenericCollectionMethodsBase<TElement>
     {
-        private static readonly TElement Zero = default(TElement);
-        private static readonly TElement One = MathHelpers.Increment(Zero);
-        private static readonly TElement Two = MathHelpers.Increment(One);
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        protected virtual TElement GetZero() => Integer<TElement>.Zero;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetZero() => Zero;
+        protected virtual TElement GetOne() => Integer<TElement>.One;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetOne() => One;
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetTwo() => Two;
+        protected virtual TElement GetTwo() => Integer<TElement>.Two;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual bool ValueEqualToZero(IntPtr pointer) => MathHelpers<TElement>.CompiledOperations.Equals(pointer.GetValue<TElement>(), GetZero());

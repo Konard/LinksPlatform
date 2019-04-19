@@ -283,26 +283,16 @@ namespace Platform.Data.Core.Doublets
             }
 
             protected override bool FirstIsToTheLeftOfSecond(ulong first, ulong second)
-            {
-                return Links[first].Source < Links[second].Source ||
-                       (Links[first].Source == Links[second].Source && Links[first].Target < Links[second].Target);
-            }
+                => Links[first].Source < Links[second].Source ||
+                  (Links[first].Source == Links[second].Source && Links[first].Target < Links[second].Target);
 
             protected override bool FirstIsToTheRightOfSecond(ulong first, ulong second)
-            {
-                return Links[first].Source > Links[second].Source ||
-                       (Links[first].Source == Links[second].Source && Links[first].Target > Links[second].Target);
-            }
+                => Links[first].Source > Links[second].Source ||
+                  (Links[first].Source == Links[second].Source && Links[first].Target > Links[second].Target);
 
-            protected override ulong GetTreeRoot()
-            {
-                return Header->FirstAsSource;
-            }
+            protected override ulong GetTreeRoot() => Header->FirstAsSource;
 
-            protected override ulong GetBasePartValue(ulong link)
-            {
-                return Links[link].Source;
-            }
+            protected override ulong GetBasePartValue(ulong link) => Links[link].Source;
 
             /// <summary>
             /// Выполняет поиск и возвращает индекс связи с указанными Source (началом) и Target (концом)
@@ -332,18 +322,12 @@ namespace Platform.Data.Core.Doublets
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
-            {
-                return firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
-            }
+            private static bool FirstIsToTheLeftOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource, ulong secondTarget)
+                => firstSource < secondSource || (firstSource == secondSource && firstTarget < secondTarget);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private static bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource,
-                ulong secondTarget)
-            {
-                return firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
-            }
+            private static bool FirstIsToTheRightOfSecond(ulong firstSource, ulong firstTarget, ulong secondSource, ulong secondTarget)
+                => firstSource > secondSource || (firstSource == secondSource && firstTarget > secondTarget);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void ClearNode(ulong node)
@@ -354,112 +338,58 @@ namespace Platform.Data.Core.Doublets
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong GetZero()
-            {
-                return 0UL;
-            }
+            protected override ulong GetZero() => 0UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong GetOne()
-            {
-                return 1UL;
-            }
+            protected override ulong GetOne() => 1UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong GetTwo()
-            {
-                return 2UL;
-            }
+            protected override ulong GetTwo() => 2UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool ValueEqualToZero(IntPtr pointer)
-            {
-                return *(ulong*)pointer.ToPointer() == 0UL;
-            }
+            protected override bool ValueEqualToZero(IntPtr pointer) => *(ulong*)pointer.ToPointer() == 0UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool EqualToZero(ulong value)
-            {
-                return value == 0UL;
-            }
+            protected override bool EqualToZero(ulong value) => value == 0UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool Equals(ulong first, ulong second)
-            {
-                return first == second;
-            }
+            protected override bool Equals(ulong first, ulong second) => first == second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool GreaterThanZero(ulong value)
-            {
-                return value > 0UL;
-            }
+            protected override bool GreaterThanZero(ulong value) => value > 0UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool GreaterThan(ulong first, ulong second)
-            {
-                return first > second;
-            }
+            protected override bool GreaterThan(ulong first, ulong second) => first > second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool GreaterOrEqualThan(ulong first, ulong second)
-            {
-                return first >= second;
-            }
+            protected override bool GreaterOrEqualThan(ulong first, ulong second) => first >= second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool GreaterOrEqualThanZero(ulong value)
-            {
-                return true; // value >= 0 is always true for ulong
-            }
+            protected override bool GreaterOrEqualThanZero(ulong value) => true; // value >= 0 is always true for ulong
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool LessOrEqualThanZero(ulong value)
-            {
-                return value == 0; // value is always >= 0 for ulong
-            }
+            protected override bool LessOrEqualThanZero(ulong value) => value == 0; // value is always >= 0 for ulong
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool LessOrEqualThan(ulong first, ulong second)
-            {
-                return first <= second;
-            }
+            protected override bool LessOrEqualThan(ulong first, ulong second) => first <= second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool LessThanZero(ulong value)
-            {
-                return false; // value < 0 is always false for ulong
-            }
+            protected override bool LessThanZero(ulong value) => false; // value < 0 is always false for ulong
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool LessThan(ulong first, ulong second)
-            {
-                return first < second;
-            }
+            protected override bool LessThan(ulong first, ulong second) => first < second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong Increment(ulong value)
-            {
-                return ++value;
-            }
+            protected override ulong Increment(ulong value) => ++value;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong Decrement(ulong value)
-            {
-                return --value;
-            }
+            protected override ulong Decrement(ulong value) => --value;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong Add(ulong first, ulong second)
-            {
-                return first + second;
-            }
+            protected override ulong Add(ulong first, ulong second) => first + second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override ulong Subtract(ulong first, ulong second)
-            {
-                return first - second;
-            }
+            protected override ulong Subtract(ulong first, ulong second) => first - second;
         }
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
@@ -580,15 +510,9 @@ namespace Platform.Data.Core.Doublets
                        (Links[first].Target == Links[second].Target && Links[first].Source > Links[second].Source);
             }
 
-            protected override ulong GetTreeRoot()
-            {
-                return Header->FirstAsTarget;
-            }
+            protected override ulong GetTreeRoot() => Header->FirstAsTarget;
 
-            protected override ulong GetBasePartValue(ulong link)
-            {
-                return Links[link].Target;
-            }
+            protected override ulong GetBasePartValue(ulong link) => Links[link].Target;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override void ClearNode(ulong node)

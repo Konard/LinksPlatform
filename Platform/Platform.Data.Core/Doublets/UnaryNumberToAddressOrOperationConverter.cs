@@ -4,12 +4,12 @@ using Platform.Helpers.Reflection;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class UnaryNumberToAddressConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink, TLink>
+    public class UnaryNumberToAddressOrOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
-        private static readonly TLink One = MathHelpers.Increment(default(TLink));
         private readonly IDictionary<TLink, int> _unaryNumberPowerOf2Indicies;
 
-        public UnaryNumberToAddressConverter(ILinks<TLink> links, IConverter<int, TLink> powerOf2ToUnaryNumberConverter) : base(links)
+        public UnaryNumberToAddressOrOperationConverter(ILinks<TLink> links, IConverter<int, TLink> powerOf2ToUnaryNumberConverter)
+            : base(links)
         {
             _unaryNumberPowerOf2Indicies = new Dictionary<TLink, int>();
             for (int i = 0; i < CachedTypeInfo<TLink>.BitsLength; i++)
@@ -29,7 +29,7 @@ namespace Platform.Data.Core.Doublets
                     powerOf2Index = _unaryNumberPowerOf2Indicies[Links.GetSource(source)];
                     source = Links.GetTarget(source);
                 }
-                target = (Integer<TLink>)(((ulong)(Integer<TLink>)target) | (((ulong)(Integer<TLink>)One) << powerOf2Index)); // MathHelpers.Or(target, MathHelpers.ShiftLeft(One, powerOf2Index));
+                target = (Integer<TLink>)(((ulong)(Integer<TLink>)target) | (1UL << powerOf2Index)); // MathHelpers.Or(target, MathHelpers.ShiftLeft(One, powerOf2Index));
             }
             return target;
         }

@@ -14,7 +14,7 @@ namespace Platform.Tests.Data.Core
         public readonly string TempTransactionLogFilename;
         private readonly bool _deleteFiles;
 
-        public TempLinksTestScope(bool deleteFiles = true, bool useSequences = false, SequencesOptions sequencesOptions = new SequencesOptions(), bool useLog = false)
+        public TempLinksTestScope(bool deleteFiles = true, bool useSequences = false, SequencesOptions<ulong> sequencesOptions = new SequencesOptions<ulong>(), bool useLog = false)
         {
             _deleteFiles = deleteFiles;
             TempFilename = Path.GetTempFileName();

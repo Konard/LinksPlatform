@@ -7,15 +7,15 @@ namespace Platform.Data.Core.Sequences
     {
         private readonly TLink _heightPropertyMarker;
         private readonly ISequenceHeightProvider<TLink> _baseHeightProvider;
-        private readonly IConverter<TLink, TLink> _addressToUnaryNumberConverter;
-        private readonly IConverter<TLink, TLink> _unaryNumberToAddressConverter;
+        private readonly IConverter<TLink> _addressToUnaryNumberConverter;
+        private readonly IConverter<TLink> _unaryNumberToAddressConverter;
         private readonly IPropertyOperator<TLink, TLink, TLink> _propertyOperator;
 
         public CachedSequenceHeightProvider(
             ILinks<TLink> links,
             ISequenceHeightProvider<TLink> baseHeightProvider,
-            IConverter<TLink, TLink> addressToUnaryNumberConverter,
-            IConverter<TLink, TLink> unaryNumberToAddressConverter,
+            IConverter<TLink> addressToUnaryNumberConverter,
+            IConverter<TLink> unaryNumberToAddressConverter,
             TLink heightPropertyMarker,
             IPropertyOperator<TLink, TLink, TLink> propertyOperator)
             : base(links)

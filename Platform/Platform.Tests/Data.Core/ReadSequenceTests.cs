@@ -2,11 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Platform.Data.Core.Collections;
+using Xunit;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
-using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
@@ -26,8 +24,10 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create();
 
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
+
                 var sw1 = Stopwatch.StartNew();
-                var balancedVariant = sequences.CreateBalancedVariant(sequence); sw1.Stop();
+                var balancedVariant = balancedVariantConverter.Convert(sequence); sw1.Stop();
 
                 var sw2 = Stopwatch.StartNew();
                 var readSequence1 = sequences.ReadSequenceCore(balancedVariant, links.IsPartialPoint); sw2.Stop();

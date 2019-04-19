@@ -1,12 +1,10 @@
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using Platform.Data.Core.Collections;
+using Xunit;
+using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
-using Xunit;
 
 namespace Platform.Tests.Data.Core
 {
@@ -29,25 +27,30 @@ namespace Platform.Tests.Data.Core
                 var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
-                
-                sequences.SetUnaryOne(unaryOne);
-                sequences.SetFrequencyMarker(frequencyMarker);
-                sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
 
+                var unaryNumberToAddressConveter = new UnaryNumberToAddressAddOperationConverter<ulong>(links, unaryOne);
+                var unaryNumberIncrementer = new UnaryNumberIncrementer<ulong>(links, unaryOne);
+                var frequencyIncrementer = new FrequencyIncrementer<ulong>(links, frequencyMarker, unaryOne, unaryNumberIncrementer);
+                var frequencyPropertyOperator = new FrequencyPropertyOperator<ulong>(links, frequencyPropertyMarker, frequencyMarker);
+                var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
+                var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
+                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
+                var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
+                
                 var sw1 = Stopwatch.StartNew();
-                sequences.IncrementDoubletsFrequencies(sequence); sw1.Stop();   
+                sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(sequence); sw1.Stop();
+
+                sequenceToItsLocalElementLevelsConverter.PrintDoubletsFrequencies(sequence);
                 
-                sequences.PrintDoubletsFrequencies(sequence);
-                
-                var levels = sequences.CalculateLocalElementLevels(sequence);
+                var levels = sequenceToItsLocalElementLevelsConverter.Convert(sequence);
                 
                 for (var i = 0; i < sequence.Length; i++)
                     Console.WriteLine("sequence[{0}] = {1}({2})", i, sequence[i], UnicodeMap.FromLinkToChar(sequence[i]));
                 
-                for (var i = 0; i < levels.Length; i++)
+                for (var i = 0; i < levels.Count; i++)
                     Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
                 
-                var optimalVariant = sequences.CreateOptimalVariant(sequence);
+                var optimalVariant = optimalVariantConverter.Convert(sequence);
                 
                 Console.WriteLine("optimalVariant = {0}", optimalVariant);
                 

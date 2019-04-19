@@ -7,6 +7,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Data.Core.Sequences.FrequencyCounters;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
@@ -23,7 +24,7 @@ namespace Platform.Sandbox
             using (var links = new UInt64Links(memoryManager))
             {
                 var syncLinks = new SynchronizedLinks<ulong>(links);
-                UnicodeMap.InitNew(syncLinks);
+                links.UseUnicode();
 
                 var sequences = new Sequences(syncLinks);
 
@@ -35,7 +36,9 @@ namespace Platform.Sandbox
 
                 Global.Trash = totalChars;
 
-                var urlLink = sequences.CreateBalancedVariant(UnicodeMap.FromStringToLinkArray(url));
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(syncLinks);
+
+                var urlLink = balancedVariantConverter.Convert(UnicodeMap.FromStringToLinkArray(url));
 
                 var responseSourceArray = UnicodeMap.FromStringToLinkArray(pageContents);
 
@@ -61,13 +64,15 @@ namespace Platform.Sandbox
                 // [+] Или использовать не локальный словарь, а глобальный (т.е. считать один раз, потом только делать замены) - быстро, но качество низкое
                 // Precompress0 - лучшее соотношение скорость / качество. (тоже что и Data.Core.Sequences.Compressor.Precompress)
 
-                ulong[] responseCompressedArray3 = null;
+                ulong responseLink2 = syncLinks.Constants.Null;
 
                 for (var i = 0; i < 1; i++)
                 {
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Data.Core.Sequences.Compressor(syncLinks, sequences, 1);
-                    responseCompressedArray3 = compressor.Precompress(responseSourceArray); sw3.Stop();
+                    var frequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(syncLinks);
+                    var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(syncLinks, frequencyCounter);
+                    var compressingConvertor = new CompressingConverter<ulong>(syncLinks, balancedVariantConverter, doubletFrequenciesCache);
+                    responseLink2 = compressingConvertor.Convert(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
                 }
 
@@ -87,7 +92,7 @@ namespace Platform.Sandbox
                 //}
 
                 //var responseLink1 = sequences.CreateBalancedVariant(responseCompressedArray1);
-                var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);
+                //var responseLink2 = sequences.CreateBalancedVariant(responseCompressedArray3);
 
                 //var decompress1 = sequences.FormatSequence(responseLink1);
                 var decompress2 = sequences.FormatSequence(responseLink2);
@@ -142,11 +147,13 @@ namespace Platform.Sandbox
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
-                    UnicodeMap.InitNew(syncLinks);
+                    links.UseUnicode();
 
                     var sequences = new Sequences(syncLinks);
 
-                    var sw3 = Stopwatch.StartNew(); sequences.CreateBalancedVariant(responseSourceArray); sw3.Stop();
+                    var balancedVariantConverter = new BalancedVariantConverter<ulong>(syncLinks);
+
+                    var sw3 = Stopwatch.StartNew(); balancedVariantConverter.Convert(responseSourceArray); sw3.Stop();
 
                     var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
@@ -166,14 +173,18 @@ namespace Platform.Sandbox
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
-                    UnicodeMap.InitNew(syncLinks);
+                    links.UseUnicode();
 
                     var sequences = new Sequences(syncLinks);
 
                     var sw3 = Stopwatch.StartNew();
-                    var compressor = new Data.Core.Sequences.Compressor(syncLinks, sequences, minFrequency);
-                    var responseCompressedArray3 = compressor.Precompress(responseSourceArray);
-                    sequences.CreateBalancedVariant(responseCompressedArray3); sw3.Stop();
+
+                    var frequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(syncLinks);
+                    var balancedVariantConverter = new BalancedVariantConverter<ulong>(syncLinks);
+                    var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(syncLinks, frequencyCounter);
+                    var compressingConvertor = new CompressingConverter<ulong>(syncLinks, balancedVariantConverter, doubletFrequenciesCache);
+
+                    compressingConvertor.Convert(responseSourceArray); sw3.Stop();
 
                     var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
@@ -236,8 +247,7 @@ namespace Platform.Sandbox
 
                     var doublet = new UInt64Link(copy[startIndex], copy[i]);
 
-                    ulong frequency;
-                    if (doubletsFrequencies.TryGetValue(doublet, out frequency))
+                    if (doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
                         var newFrequency = frequency + 1;
 
@@ -329,8 +339,7 @@ namespace Platform.Sandbox
 
                 var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
-                ulong frequency;
-                if (doubletsFrequencies.TryGetValue(doublet, out frequency))
+                if (doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
                     var newFrequency = frequency + 1;
 
@@ -525,17 +534,15 @@ namespace Platform.Sandbox
         public struct Compressor
         {
             private readonly SynchronizedLinks<ulong> _links;
-            private readonly Sequences _sequences;
             private UInt64Link _maxDoublet;
             private ulong _maxFrequency;
             private UInt64Link _maxDoublet2;
             private ulong _maxFrequency2;
-            private Dictionary<UInt64Link, ulong> _doubletsFrequencies;
+            private readonly Dictionary<UInt64Link, ulong> _doubletsFrequencies;
 
-            public Compressor(SynchronizedLinks<ulong> links, Sequences sequences)
+            public Compressor(SynchronizedLinks<ulong> links)
             {
                 _links = links;
-                _sequences = sequences;
                 _maxDoublet = UInt64Link.Null;
                 _maxFrequency = 1;
                 _maxDoublet2 = UInt64Link.Null;
@@ -546,8 +553,7 @@ namespace Platform.Sandbox
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private ulong IncrementFrequency(UInt64Link doublet)
             {
-                ulong frequency;
-                if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
                     frequency++;
                     _doubletsFrequencies[doublet] = frequency;
@@ -563,8 +569,7 @@ namespace Platform.Sandbox
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private void DecrementFrequency(UInt64Link doublet)
             {
-                ulong frequency;
-                if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
                     frequency--;
 
@@ -687,8 +692,7 @@ namespace Platform.Sandbox
 
                     var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
-                    ulong frequency;
-                    if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                    if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
                         var newFrequency = frequency + 1;
 
@@ -942,8 +946,7 @@ namespace Platform.Sandbox
 
                     var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
 
-                    ulong frequency;
-                    if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                    if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
                         var newFrequency = frequency + 1;
 
@@ -1096,8 +1099,7 @@ namespace Platform.Sandbox
 
                             //if (!maxDoublet.Equals(doublet))
                             //{
-                            ulong frequency;
-                            if (_doubletsFrequencies.TryGetValue(doublet, out frequency))
+                            if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                                 UpdateMaxDoublet(doublet, frequency);
                             //}
                         }
@@ -1294,7 +1296,6 @@ namespace Platform.Sandbox
                     var maxDoubletResult = _links.CreateAndUpdate(maxDoubletSource, maxDoubletTarget);
 
                     oldLength--;
-                    var oldLengthMinusTwo = oldLength - 1;
 
                     _maxDoublet = UInt64Link.Null;
                     set.Clear();
@@ -1494,7 +1495,8 @@ namespace Platform.Sandbox
             public ulong Compress(ulong[] sequence)
             {
                 var precompressedSequence = Precompress1(sequence);
-                return _sequences.CreateBalancedVariant(precompressedSequence);
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(_links);
+                return balancedVariantConverter.Convert(precompressedSequence);
             }
 
             private void ResetMaxDoublet()

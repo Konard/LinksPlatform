@@ -4,9 +4,9 @@ namespace Platform.Data.Core.Sequences
 {
     public static class SequencesExtensions
     {
-        public static ulong Create(this Sequences sequences, IList<ulong[]> groupedSequence)
+        public static TLink Create<TLink>(this ISequences<TLink> sequences, IList<TLink[]> groupedSequence)
         {
-            var finalSequence = new ulong[groupedSequence.Count];
+            var finalSequence = new TLink[groupedSequence.Count];
 
             for (var i = 0; i < finalSequence.Length; i++)
             {

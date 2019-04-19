@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using Platform.Helpers;
+using Platform.Helpers.Collections;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Doublets;
-using Platform.Helpers;
-using Platform.Helpers.Collections;
+using Platform.Data.Core.Sequences.FrequencyCounters;
 using LinkIndex = System.UInt64;
 using Stack = System.Collections.Generic.Stack<ulong>;
 
@@ -120,22 +121,6 @@ namespace Platform.Data.Core.Sequences
         }
 
         #endregion
-
-        private ulong CreateBalancedVariantCore0(params ulong[] sequence)
-        {
-            do
-            {
-                if (sequence.Length == 2)
-                    return Links.Unsync.CreateAndUpdate(sequence[0], sequence[1]);
-
-                var innerSequence = new ulong[sequence.Length / 2 + sequence.Length % 2];
-
-                for (var i = 0; i < sequence.Length; i += 2)
-                    innerSequence[i / 2] = i + 1 == sequence.Length ? sequence[i] : Links.Unsync.CreateAndUpdate(sequence[i], sequence[i + 1]);
-
-                sequence = innerSequence;
-            } while (true);
-        }
 
         public HashSet<ulong> Each1(params ulong[] sequence)
         {
@@ -587,52 +572,6 @@ namespace Platform.Data.Core.Sequences
             return sb.ToString();
         }
 
-        public ulong CalculateSymbolFrequency(LinkIndex sequenceLink, LinkIndex symbolLink)
-        {
-            return Links.SyncRoot.ExecuteReadOperation(() =>
-            {
-                var links = Links.Unsync;
-                if (!links.Exists(sequenceLink))
-                    return 0UL;
-                if (Options.UseSequenceMarker)
-                    return CalculateSymbolFrequencyForMarkedSequences(links, sequenceLink, symbolLink);
-                return CalculateSymbolFrequency(links, sequenceLink, symbolLink);
-            });
-        }
-
-        private ulong CalculateSymbolFrequency(ILinks<LinkIndex> links, LinkIndex sequenceLink, LinkIndex symbolLink)
-        {
-            var total = 0UL;
-
-            StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
-                                             x => x == symbolLink || links.IsPartialPoint(x), element =>
-                                             {
-                                                 if (element == symbolLink)
-                                                     total++;
-                                                 return true;
-                                             });
-
-            return total;
-        }
-
-        private ulong CalculateSymbolFrequencyForMarkedSequences(ILinks<LinkIndex> links, LinkIndex sequenceLink, LinkIndex symbolLink)
-        {
-            var total = 0UL;
-
-            if (!IsMarkedSequence(sequenceLink))
-                return total;
-
-            StopableSequenceWalker.WalkRight(sequenceLink, links.GetSource, links.GetTarget,
-                                             x => x == symbolLink || links.IsPartialPoint(x), element =>
-                                             {
-                                                 if (element == symbolLink)
-                                                     total++;
-                                                 return true;
-                                             });
-
-            return total;
-        }
-
         public List<ulong> GetAllPartiallyMatchingSequences0(params ulong[] sequence)
         {
             return Sync.ExecuteReadOperation(() =>
@@ -966,79 +905,18 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
-        public ulong CalculateTotalSymbolFrequency(ulong symbol)
-        {
-            return Sync.ExecuteReadOperation(() => CalculateTotalSymbolFrequencyCore(symbol));
-        }
 
         public ulong CalculateTotalSymbolFrequencyCore(ulong symbol)
         {
-            var calculator = new TotalSymbolFrequencyCalculator(this, Links.Unsync, symbol);
-            calculator.Calculate();
-            return calculator.Total;
-        }
-
-        private class TotalSymbolFrequencyCalculator
-        {
-            private readonly Sequences _sequences;
-            private readonly ILinks<ulong> _links;
-            private readonly ulong _symbol;
-            private readonly HashSet<ulong> _visits;
-            public ulong Total;
-
-            public TotalSymbolFrequencyCalculator(Sequences sequences, ILinks<ulong> links, ulong symbol)
+            if (Options.UseSequenceMarker)
             {
-                _sequences = sequences;
-                _links = links;
-                _symbol = symbol;
-                _visits = new HashSet<ulong>();
+                var counter = new TotalMarkedSequenceSymbolFrequencyOneOffCounter<ulong>(Links, Options.MarkedSequenceMatcher, symbol);
+                return counter.Count();
             }
-
-            public void Calculate()
+            else
             {
-                if (Total > 0 || _visits.Count > 0)
-                    throw new InvalidOperationException("Calculation is finished already.");
-
-                if (_sequences.Options.UseSequenceMarker)
-                    CalculateCoreForMarkedSequences(_symbol);
-                else
-                    CalculateCore(_symbol);
-            }
-
-            private void CalculateCore(ulong link)
-            {
-                Func<ulong, bool> handler = doublet =>
-                {
-                    if (_visits.Add(doublet))
-                        CalculateCore(doublet);
-                    return true;
-                };
-
-                if (_links.Count(Constants.Any, link) == 0)
-                    Total += _sequences.CalculateSymbolFrequency(_links, link, _symbol);
-                else
-                {
-                    _links.Each(link, Constants.Any, handler);
-                    _links.Each(Constants.Any, link, handler);
-                }
-            }
-
-            private void CalculateCoreForMarkedSequences(ulong link)
-            {
-                Func<ulong, bool> handler = doublet =>
-                {
-                    if (_visits.Add(doublet))
-                        CalculateCoreForMarkedSequences(doublet);
-                    return true;
-                };
-
-                if (_links.Count(Constants.Any, link) == 0)
-                    Total += _sequences.CalculateSymbolFrequencyForMarkedSequences(_links, link, _symbol);
-                else
-                {
-                    _links.Each(link, Constants.Any, handler);
-                    _links.Each(Constants.Any, link, handler);
-                }
+                var counter = new TotalSequenceSymbolFrequencyOneOffCounter<ulong>(Links, symbol);
+                return counter.Count();
             }
         }
 

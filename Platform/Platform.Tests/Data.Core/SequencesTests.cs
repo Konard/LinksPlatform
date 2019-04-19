@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using Xunit;
+using Platform.Helpers;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
-using Xunit;
+using Platform.Data.Core.Sequences.FrequencyCounters;
 
 namespace Platform.Tests.Data.Core
 {
@@ -156,8 +157,10 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create();
 
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
+
                 var sw1 = Stopwatch.StartNew();
-                var balancedVariant = sequences.CreateBalancedVariant(sequence); sw1.Stop();
+                var balancedVariant = balancedVariantConverter.Convert(sequence); sw1.Stop();
 
                 var sw2 = Stopwatch.StartNew();
                 var searchResults2 = sequences.GetAllMatchingSequences0(sequence); sw2.Stop();
@@ -248,7 +251,9 @@ namespace Platform.Tests.Data.Core
                 for (var i = 0; i < sequenceLength; i++)
                     sequence[i] = links.Create();
 
-                var balancedVariant = sequences.CreateBalancedVariant(sequence);
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
+
+                var balancedVariant = balancedVariantConverter.Convert(sequence);
 
                 var partialSequence = new ulong[sequenceLength - 2];
 
@@ -287,7 +292,9 @@ namespace Platform.Tests.Data.Core
                     e1, e2, e1, e2 // mama / papa
                 };
 
-                var balancedVariant = sequences.CreateBalancedVariant(sequence);
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
+
+                var balancedVariant = balancedVariantConverter.Convert(sequence);
 
                 // 1: [1]
                 // 2: [2]
@@ -322,10 +329,11 @@ namespace Platform.Tests.Data.Core
         public void IndexTest()
         {
             using (var scope = new TempLinksTestScope(useSequences: true,
-                sequencesOptions: new SequencesOptions { UseIndex = true }))
+                sequencesOptions: new SequencesOptions<ulong> { UseIndex = true }))
             {
                 var links = scope.Links;
                 var sequences = scope.Sequences;
+                var indexer = sequences.Options.Indexer;
 
                 var e1 = links.Create();
                 var e2 = links.Create();
@@ -335,9 +343,9 @@ namespace Platform.Tests.Data.Core
                     e1, e2, e1, e2 // mama / papa
                 };
 
-                Assert.False(sequences.Index(sequence));
+                Assert.False(indexer.Index(sequence));
 
-                Assert.True(sequences.Index(sequence));
+                Assert.True(indexer.Index(sequence));
             }
         }
 
@@ -413,9 +421,12 @@ namespace Platform.Tests.Data.Core
                     e1, e2, e1, e2 // mama / papa / template [(m/p), a] { [1] [2] [1] [2] }
                 };
 
-                var compressor = new Compressor(links.Unsync, sequences);
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(links.Unsync);
+                var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(links.Unsync);
+                var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(links.Unsync, totalSequenceSymbolFrequencyCounter);
+                var compressingConverter = new CompressingConverter<ulong>(links.Unsync, balancedVariantConverter, doubletFrequenciesCache);
 
-                var compressedVariant = compressor.Compress(sequence);
+                var compressedVariant = compressingConverter.Convert(sequence);
 
                 // 1: [1]       (1->1) point
                 // 2: [2]       (2->2) point
@@ -458,7 +469,11 @@ namespace Platform.Tests.Data.Core
                 scope2.Links.UseUnicode();
                 scope3.Links.UseUnicode();
 
-                var compressor1 = new Compressor(scope1.Links.Unsync, scope1.Sequences);
+                var balancedVariantConverter1 = new BalancedVariantConverter<ulong>(scope1.Links.Unsync);
+                var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(scope1.Links.Unsync);
+                var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(scope1.Links.Unsync, totalSequenceSymbolFrequencyCounter);
+                var compressor1 = new CompressingConverter<ulong>(scope1.Links.Unsync, balancedVariantConverter1, doubletFrequenciesCache);
+
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
                                 
@@ -470,10 +485,15 @@ namespace Platform.Tests.Data.Core
                 var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
                 var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
-                
-                sequences.SetUnaryOne(unaryOne);
-                sequences.SetFrequencyMarker(frequencyMarker);
-                sequences.SetFrequencyPropertyMarker(frequencyPropertyMarker);
+
+                var unaryNumberToAddressConveter = new UnaryNumberToAddressAddOperationConverter<ulong>(links, unaryOne);
+                var unaryNumberIncrementer = new UnaryNumberIncrementer<ulong>(links, unaryOne);
+                var frequencyIncrementer = new FrequencyIncrementer<ulong>(links, frequencyMarker, unaryOne, unaryNumberIncrementer);
+                var frequencyPropertyOperator = new FrequencyPropertyOperator<ulong>(links, frequencyPropertyMarker, frequencyMarker);
+                var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
+                var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
+                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
+                var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
 
                 var compressed1 = new ulong[arrays.Length];
                 var compressed2 = new ulong[arrays.Length];
@@ -487,28 +507,30 @@ namespace Platform.Tests.Data.Core
                 var initialCount1 = scope2.Links.Count();
                 
                 for (int i = START; i < END; i++)
-                    compressed1[i] = compressor1.Compress(arrays[i]);
+                    compressed1[i] = compressor1.Convert(arrays[i]);
 
                 var elapsed1 = sw1.Elapsed;
+
+                var balancedVariantConverter2 = new BalancedVariantConverter<ulong>(scope2.Links.Unsync);
 
                 var sw2 = Stopwatch.StartNew();
                 
                 var initialCount2 = scope2.Links.Count();
                 
                 for (int i = START; i < END; i++)
-                    compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
+                    compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
                                                 
                 for (int i = START; i < END; i++)
-                    compressor3.IncrementDoubletsFrequencies(arrays[i]);
+                    sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(arrays[i]);
 
                 var initialCount3 = scope3.Links.Count();
                                 
                 var sw3 = Stopwatch.StartNew();
                 
                 for (int i = START; i < END; i++)
-                    compressed3[i] = compressor3.CreateOptimalVariant(arrays[i]);
+                    compressed3[i] = optimalVariantConverter.Convert(arrays[i]);
 
                 var elapsed3 = sw3.Elapsed;                
 
@@ -550,8 +572,8 @@ namespace Platform.Tests.Data.Core
 
                 Assert.True(scope1.Links.Count() - initialCount1 < scope2.Links.Count() - initialCount2);
                 Assert.True(scope3.Links.Count() - initialCount3 < scope2.Links.Count() - initialCount2);
-                            
-                compressor1.ValidateFrequencies();
+
+                doubletFrequenciesCache.ValidateFrequencies();
             }
         }
 
@@ -573,7 +595,7 @@ namespace Platform.Tests.Data.Core
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
             var totalCharacters = arrays.Select(x => x.Length).Sum();
 
-            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
+            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions<ulong> { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
             using (var scope2 = new TempLinksTestScope(useSequences: true))
             {
                 scope1.Links.UseUnicode();
@@ -621,12 +643,14 @@ namespace Platform.Tests.Data.Core
 
                 var elapsed1 = sw1.Elapsed;
 
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(scope2.Links);
+
                 var sw2 = Stopwatch.StartNew();
 
                 for (int i = START; i < END; i++)
                 {
-                    var first = compressor2.CreateBalancedVariantCore(arrays[i]);
-                    var second = compressor2.CreateBalancedVariantCore(arrays[i]);
+                    var first = balancedVariantConverter.Convert(arrays[i]);
+                    var second = balancedVariantConverter.Convert(arrays[i]);
 
                     if (first == second)
                         compressed2[i] = first;
@@ -694,7 +718,7 @@ namespace Platform.Tests.Data.Core
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
             var totalCharacters = arrays.Select(x => x.Length).Sum();
 
-            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
+            using (var scope1 = new TempLinksTestScope(useSequences: true, sequencesOptions: new SequencesOptions<ulong> { UseCompression = true, EnforceSingleSequenceVersionOnWriteBasedOnExisting = true }))
             using (var scope2 = new TempLinksTestScope(useSequences: true))
             {
                 scope1.Links.UseUnicode();
@@ -716,10 +740,12 @@ namespace Platform.Tests.Data.Core
 
                 var elapsed1 = sw1.Elapsed;
 
+                var balancedVariantConverter = new BalancedVariantConverter<ulong>(scope2.Links);
+
                 var sw2 = Stopwatch.StartNew();
 
                 for (int i = START; i < END; i++)
-                    compressed2[i] = compressor2.CreateBalancedVariantCore(arrays[i]);
+                    compressed2[i] = balancedVariantConverter.Convert(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
 
