@@ -56,7 +56,7 @@ namespace Platform.Data.Core.Sequences
 
                 data = new FrequencyAndLink<TLink>(Integer<TLink>.One, link);
 
-                if (link != default)
+                if (!Equals(link, default(TLink)))
                     data.Frequency = MathHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
 
                 _doubletsCache.Add(doublet, data);
