@@ -4,11 +4,11 @@ using System.Diagnostics;
 using System.Linq;
 using Xunit;
 using Platform.Helpers;
+using Platform.Data.Core.Common;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.FrequencyCounters;
-using Platform.Data.Core.Common;
 
 namespace Platform.Tests.Data.Core
 {

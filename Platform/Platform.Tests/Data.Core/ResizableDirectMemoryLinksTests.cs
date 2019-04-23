@@ -1,8 +1,8 @@
 ﻿using System.IO;
-using Platform.Data.Core.Doublets;
+using Xunit;
 using Platform.Helpers;
 using Platform.Memory;
-using Xunit;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core
 {

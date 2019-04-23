@@ -1,7 +1,7 @@
 ﻿using System.Collections;
+using Xunit;
 using Platform.Data.Core.Collections;
 using Platform.Helpers;
-using Xunit;
 
 namespace Platform.Tests.Data.Core
 {

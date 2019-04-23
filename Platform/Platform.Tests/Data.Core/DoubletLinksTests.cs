@@ -1,8 +1,8 @@
-﻿using Platform.Helpers;
+﻿using Xunit;
+using Platform.Helpers;
 using Platform.Helpers.Reflection;
-using Platform.Data.Core.Doublets;
 using Platform.Memory;
-using Xunit;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core
 {

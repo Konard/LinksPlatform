@@ -1,6 +1,6 @@
 ﻿using System;
-using Platform.Helpers;
 using Xunit;
+using Platform.Helpers;
 
 namespace Platform.Tests.Helpers
 {

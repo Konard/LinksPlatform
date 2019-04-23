@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using Platform.Helpers;
 using Xunit;
+using Platform.Helpers;
 
 namespace Platform.Tests.Helpers
 {

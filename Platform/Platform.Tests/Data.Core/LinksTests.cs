@@ -5,11 +5,11 @@ using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Platform.Data.Core.Doublets;
-using Platform.Helpers.IO;
-using Platform.Helpers;
-using Platform.Helpers.Disposables;
 using Xunit;
+using Platform.Helpers;
+using Platform.Helpers.IO;
+using Platform.Helpers.Disposables;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core
 {
