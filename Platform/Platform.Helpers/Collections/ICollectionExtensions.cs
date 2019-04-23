@@ -10,7 +10,7 @@ namespace Platform.Helpers.Collections
         public static bool AllEqualToDefault<T>(this ICollection<T> collection)
         {
             var comparer = EqualityComparer<T>.Default;
-            return collection.All(item => comparer.Equals(item, default(T)));
+            return collection.All(item => comparer.Equals(item, default));
         }
     }
 }

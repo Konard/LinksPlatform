@@ -8,6 +8,7 @@ using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.FrequencyCounters;
+using Platform.Data.Core.Common;
 
 namespace Platform.Tests.Data.Core
 {
@@ -481,17 +482,23 @@ namespace Platform.Tests.Data.Core
                 
                 var links = scope3.Links;
                 var sequences = compressor3;
-                var meaningRoot = links.CreatePoint();
-                var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
-                var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
-                var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                //var meaningRoot = links.CreatePoint();
+                //var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                //var frequencyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
+                //var frequencyPropertyMarker = links.CreateAndUpdate(meaningRoot, constants.Itself);
 
-                var unaryNumberToAddressConveter = new UnaryNumberToAddressAddOperationConverter<ulong>(links, unaryOne);
-                var unaryNumberIncrementer = new UnaryNumberIncrementer<ulong>(links, unaryOne);
-                var frequencyIncrementer = new FrequencyIncrementer<ulong>(links, frequencyMarker, unaryOne, unaryNumberIncrementer);
-                var frequencyPropertyOperator = new FrequencyPropertyOperator<ulong>(links, frequencyPropertyMarker, frequencyMarker);
-                var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
-                var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
+                //var unaryNumberToAddressConveter = new UnaryNumberToAddressAddOperationConverter<ulong>(links, unaryOne);
+                //var unaryNumberIncrementer = new UnaryNumberIncrementer<ulong>(links, unaryOne);
+                //var frequencyIncrementer = new FrequencyIncrementer<ulong>(links, frequencyMarker, unaryOne, unaryNumberIncrementer);
+                //var frequencyPropertyOperator = new FrequencyPropertyOperator<ulong>(links, frequencyPropertyMarker, frequencyMarker);
+                //var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
+                //var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
+
+                var linksToFrequencies = new Dictionary<ulong, ulong>();
+
+                var linkFrequencyIncrementer = new DictionaryBasedLinkFrequencyIncrementer<ulong>(linksToFrequencies);
+                var linkToItsFrequencyNumberConverter = new DictionaryBasedLinkToItsFrequencyNumberConveter<ulong>(linksToFrequencies);
+                
                 var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
                 var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
 
