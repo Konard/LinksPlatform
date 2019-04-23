@@ -1,8 +1,7 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
-using Xunit;
 using System.Collections.Generic;
+using Xunit;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
@@ -69,26 +68,15 @@ namespace Platform.Tests.Data.Core
 
         private static void ExecuteTest(SynchronizedLinks<ulong> links, Sequences sequences, ulong[] sequence, SequenceToItsLocalElementLevelsConverter<ulong> sequenceToItsLocalElementLevelsConverter, OptimalVariantConverter<ulong> optimalVariantConverter)
         {
-            var sw1 = Stopwatch.StartNew();
-            sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(sequence); sw1.Stop();
+            sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(sequence);
 
             sequenceToItsLocalElementLevelsConverter.PrintDoubletsFrequencies(sequence);
 
             var levels = sequenceToItsLocalElementLevelsConverter.Convert(sequence);
 
-            for (var i = 0; i < sequence.Length; i++)
-                Console.WriteLine("sequence[{0}] = {1}({2})", i, sequence[i], UnicodeMap.FromLinkToChar(sequence[i]));
+            var optimalVariant = optimalVariantConverter.Convert(sequence);
 
-            for (var i = 0; i < levels.Count; i++)
-                Console.WriteLine("levels[{0}] = {1}", i, levels[i]);
-
-            var sw2 = Stopwatch.StartNew();
-            var optimalVariant = optimalVariantConverter.Convert(sequence); sw2.Stop();
-
-            Console.WriteLine("optimalVariant = {0}", optimalVariant);
-
-            var sw3 = Stopwatch.StartNew();
-            var readSequence1 = sequences.ReadSequenceCore(optimalVariant, links.IsPartialPoint); sw3.Stop();
+            var readSequence1 = sequences.ReadSequenceCore(optimalVariant, links.IsPartialPoint);
 
             Assert.True(sequence.SequenceEqual(readSequence1));
         }
