@@ -83,7 +83,7 @@ namespace Platform.Data.Core.Doublets
             });
 
             if (Equals(firstLink, default(TLink)))
-                throw new Exception("В процессе поиска по храналищу не было найдено связей.");
+                throw new Exception("В процессе поиска по хранилищу не было найдено связей.");
 
             return firstLink;
         }

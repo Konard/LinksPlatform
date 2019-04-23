@@ -8,9 +8,7 @@ namespace Platform.Data.Core.Doublets
 
         public UnaryNumberIncrementer(ILinks<TLink> links, TLink unaryOne)
             : base(links)
-        {
-            _unaryOne = unaryOne;
-        }
+            => _unaryOne = unaryOne;
 
         public TLink Increment(TLink unaryNumber)
         {

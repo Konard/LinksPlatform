@@ -1,8 +1,8 @@
-﻿using Platform.Data.Core.Doublets;
-using Platform.Helpers;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Platform.Helpers;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -64,10 +64,7 @@ namespace Platform.Data.Core.Sequences
             return data;
         }
 
-        public void ResetFrequencies()
-        {
-            _doubletsCache.Clear();
-        }
+        public void ResetFrequencies() => _doubletsCache.Clear();
 
         public void ValidateFrequencies()
         {
