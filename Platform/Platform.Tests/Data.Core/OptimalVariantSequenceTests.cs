@@ -70,8 +70,6 @@ namespace Platform.Tests.Data.Core
         {
             sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(sequence);
 
-            sequenceToItsLocalElementLevelsConverter.PrintDoubletsFrequencies(sequence);
-
             var levels = sequenceToItsLocalElementLevelsConverter.Convert(sequence);
 
             var optimalVariant = optimalVariantConverter.Convert(sequence);
