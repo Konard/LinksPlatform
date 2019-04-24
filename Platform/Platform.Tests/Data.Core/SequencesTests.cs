@@ -466,9 +466,9 @@ namespace Platform.Tests.Data.Core
             using (var scope2 = new TempLinksTestScope(useSequences: true))
             using (var scope3 = new TempLinksTestScope(useSequences: true))
             {
-                scope1.Links.UseUnicode();
-                scope2.Links.UseUnicode();
-                scope3.Links.UseUnicode();
+                scope1.Links.Unsync.UseUnicode();
+                scope2.Links.Unsync.UseUnicode();
+                scope3.Links.Unsync.UseUnicode();
 
                 var balancedVariantConverter1 = new BalancedVariantConverter<ulong>(scope1.Links.Unsync);
                 var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(scope1.Links.Unsync);
@@ -480,7 +480,7 @@ namespace Platform.Tests.Data.Core
                                 
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
                 
-                var links = scope3.Links;
+                var links = scope3.Links.Unsync;
                 var sequences = compressor3;
                 //var meaningRoot = links.CreatePoint();
                 //var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
@@ -511,7 +511,7 @@ namespace Platform.Tests.Data.Core
                 var START = 0;
                 var END = arrays.Length;
 
-                var initialCount1 = scope2.Links.Count();
+                var initialCount1 = scope2.Links.Unsync.Count();
                 
                 for (int i = START; i < END; i++)
                     compressed1[i] = compressor1.Convert(arrays[i]);
@@ -522,7 +522,7 @@ namespace Platform.Tests.Data.Core
 
                 var sw2 = Stopwatch.StartNew();
                 
-                var initialCount2 = scope2.Links.Count();
+                var initialCount2 = scope2.Links.Unsync.Count();
                 
                 for (int i = START; i < END; i++)
                     compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);
@@ -532,7 +532,7 @@ namespace Platform.Tests.Data.Core
                 for (int i = START; i < END; i++)
                     sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(arrays[i]);
 
-                var initialCount3 = scope3.Links.Count();
+                var initialCount3 = scope3.Links.Unsync.Count();
                                 
                 var sw3 = Stopwatch.StartNew();
                 
@@ -552,15 +552,15 @@ namespace Platform.Tests.Data.Core
                     var sequence2 = compressed2[i];
                     var sequence3 = compressed3[i];
 
-                    var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
+                    var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links.Unsync);
 
-                    var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links);
+                    var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links.Unsync);
                     
-                    var decompress3 = UnicodeMap.FromSequenceLinkToString(sequence3, scope3.Links);
+                    var decompress3 = UnicodeMap.FromSequenceLinkToString(sequence3, scope3.Links.Unsync);
 
-                    var structure1 = scope1.Links.FormatStructure(sequence1, link => link.IsPartialPoint());
-                    var structure2 = scope2.Links.FormatStructure(sequence2, link => link.IsPartialPoint());
-                    var structure3 = scope3.Links.FormatStructure(sequence3, link => link.IsPartialPoint());
+                    var structure1 = scope1.Links.Unsync.FormatStructure(sequence1, link => link.IsPartialPoint());
+                    var structure2 = scope2.Links.Unsync.FormatStructure(sequence2, link => link.IsPartialPoint());
+                    var structure3 = scope3.Links.Unsync.FormatStructure(sequence3, link => link.IsPartialPoint());
 
                     if (sequence1 != Constants.Null && sequence2 != Constants.Null && arrays[i].Length > 3)
                         Assert.False(structure1 == structure2);
@@ -571,14 +571,24 @@ namespace Platform.Tests.Data.Core
                     Assert.True(strings[i] == decompress3 && decompress3 == decompress2);
                 }
                                                
-                Assert.True((int)(scope1.Links.Count() - initialCount1) < totalCharacters);
-                Assert.True((int)(scope2.Links.Count() - initialCount2) < totalCharacters);
-                Assert.True((int)(scope3.Links.Count() - initialCount3) < totalCharacters);
+                Assert.True((int)(scope1.Links.Unsync.Count() - initialCount1) < totalCharacters);
+                Assert.True((int)(scope2.Links.Unsync.Count() - initialCount2) < totalCharacters);
+                Assert.True((int)(scope3.Links.Unsync.Count() - initialCount3) < totalCharacters);
 
-                Console.WriteLine($"{(double)(scope1.Links.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Count() - initialCount3) / totalCharacters}");                
+                Console.WriteLine($"{(double)(scope1.Links.Unsync.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Unsync.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Unsync.Count() - initialCount3) / totalCharacters}");                
 
-                Assert.True(scope1.Links.Count() - initialCount1 < scope2.Links.Count() - initialCount2);
-                Assert.True(scope3.Links.Count() - initialCount3 < scope2.Links.Count() - initialCount2);
+                Assert.True(scope1.Links.Unsync.Count() - initialCount1 < scope2.Links.Unsync.Count() - initialCount2);
+                Assert.True(scope3.Links.Unsync.Count() - initialCount3 < scope2.Links.Unsync.Count() - initialCount2);
+
+                var duplicateCounter1 = new DuplicateFragmentsCounter<ulong>(scope1.Links.Unsync, scope1.Sequences);
+                var duplicateCounter2 = new DuplicateFragmentsCounter<ulong>(scope2.Links.Unsync, scope2.Sequences);
+                var duplicateCounter3 = new DuplicateFragmentsCounter<ulong>(scope3.Links.Unsync, scope3.Sequences);
+
+                var duplicates1 = duplicateCounter1.Count();
+                var duplicates2 = duplicateCounter2.Count();
+                var duplicates3 = duplicateCounter3.Count();
+
+                Console.WriteLine($"{duplicates1} | {duplicates2} | {duplicates3}");
 
                 doubletFrequenciesCache.ValidateFrequencies();
             }

@@ -60,7 +60,6 @@ namespace Platform.Data.Core.Sequences
         {
         }
 
-
         public Sequences(SynchronizedLinks<ulong> links, SequencesOptions<ulong> options)
         {
             Links = links;
@@ -188,7 +187,7 @@ namespace Platform.Data.Core.Sequences
             else if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew)
                 return CompactCore(sequence);
 
-            if (sequenceRoot == default)
+            if (sequenceRoot == default(LinkIndex))
                 sequenceRoot = Options.LinksToSequenceConverter.Convert(sequence);
 
             if (Options.UseSequenceMarker)
