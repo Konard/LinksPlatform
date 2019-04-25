@@ -353,7 +353,7 @@ namespace Platform.Data.Core.Doublets
             protected override bool EqualToZero(ulong value) => value == 0UL;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected override bool Equals(ulong first, ulong second) => first == second;
+            protected override bool IsEquals(ulong first, ulong second) => first == second;
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             protected override bool GreaterThanZero(ulong value) => value > 0UL;

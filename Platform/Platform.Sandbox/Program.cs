@@ -2,6 +2,8 @@
 using System.Diagnostics;
 using System.IO;
 using Platform.Examples;
+using Platform.Tests;
+using Platform.Tests.Data.Core;
 
 namespace Platform.Sandbox
 {
@@ -9,6 +11,10 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
+            SystemTests.EqualsPerfomanceTest();
+
+            //SequencesTests.CompressionEfficiencyTest();
+
             //new Zadacha().RunAll();
 
             //new XUnitTestsRunnerCLI().Run(args);

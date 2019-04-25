@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -10,7 +11,7 @@ namespace Platform.Data.Core.Doublets
         {
             var newLinkAddress = Links.SearchOrDefault(restrictions[Constants.SourcePart], restrictions[Constants.TargetPart]);
 
-            if (Equals(newLinkAddress, default(T)))
+            if (MathHelpers<T>.IsEquals(newLinkAddress, default))
                 return base.Update(restrictions);
 
             return ResolveAddressChangeConflict(restrictions[Constants.IndexPart], newLinkAddress);

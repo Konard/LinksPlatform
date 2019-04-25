@@ -31,7 +31,7 @@ namespace Platform.Data.Core.Sequences
         {
             TLink height;
             var heightValue = _propertyOperator.GetValue(sequence, _heightPropertyMarker);
-            if (Equals(heightValue, default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(heightValue, default))
             {
                 height = _baseHeightProvider.GetHeight(sequence);
                 heightValue = _addressToUnaryNumberConverter.Convert(height);

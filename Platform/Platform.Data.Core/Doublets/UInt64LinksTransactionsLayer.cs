@@ -234,13 +234,13 @@ namespace Platform.Data.Core.Doublets
 
             var lastWrittenTransition = FileHelpers.ReadLastOrDefault<Transition>(logAddress);
 
-            if (!Equals(lastCommitedTransition, lastWrittenTransition))
+            if (!lastCommitedTransition.Equals(lastWrittenTransition))
             {
                 Dispose();
                 throw new NotSupportedException("Database is damaged, autorecovery is not supported yet.");
             }
 
-            if (Equals(lastCommitedTransition, default(Transition)))
+            if (lastCommitedTransition.Equals(default(Transition)))
                 FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
 
             _lastCommitedTransition = lastCommitedTransition;

@@ -41,7 +41,7 @@ namespace Platform.Data.Core.Sequences
                 var w = 0;
                 for (var i = 1; i < length; i++)
                 {
-                    if (Equals(currentLevel, levels[i]))
+                    if (MathHelpers<TLink>.IsEquals(currentLevel, levels[i]))
                     {
                         levelRepeat++;
 

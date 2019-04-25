@@ -95,7 +95,7 @@ namespace Platform.Helpers
         public static T Decrement<T>(T x) => MathHelpers<T>.Decrement(x);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals<T>(T x, T y) => MathHelpers<T>.Equals(x, y);
+        public static bool IsEquals<T>(T x, T y) => MathHelpers<T>.IsEquals(x, y);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool GreaterThan<T>(T x, T y) => MathHelpers<T>.GreaterThan(x, y);
@@ -129,336 +129,294 @@ namespace Platform.Helpers
         /// TODO: Возможно использовать ссылку на существующий метод - оператор, а не компилировать новый (http://stackoverflow.com/questions/11113259/how-to-call-custom-operator-with-reflection)
         /// TODO: Решить что лучше dynamic operator или Auto&lt;T&gt; c заранее созданными операторами и возможность расширения через статические методы
         /// </remarks>
-        public static class CompiledOperations
+        public static readonly Func<T, T, T> Add;
+        public static readonly Func<T, T> Increment;
+        public static readonly Func<T, T, T> Subtract;
+        public static readonly Func<T, T> Decrement;
+        public static readonly Func<T, T, bool> IsEquals;
+        public static readonly Func<T, T, bool> GreaterThan;
+        public static readonly Func<T, T, bool> GreaterOrEqualThan;
+        public static readonly Func<T, T, bool> LessThan;
+        public static readonly Func<T, T, bool> LessOrEqualThan;
+        public static readonly Func<T, T> Abs;
+        public static readonly Func<T, T> Negate;
+        public static readonly Func<T, T, int, int, T> PartialWrite;
+        public static readonly Func<T, int, int, T> PartialRead;
+
+        static MathHelpers()
         {
-            public static readonly Func<T, T, T> Add;
-            public static readonly Func<T, T> Increment;
-            public static readonly Func<T, T, T> Subtract;
-            public static readonly Func<T, T> Decrement;
-            public new static readonly Func<T, T, bool> Equals;
-            public static readonly Func<T, T, bool> Greater;
-            public static readonly Func<T, T, bool> GreaterOrEqual;
-            public static readonly Func<T, T, bool> Less;
-            public static readonly Func<T, T, bool> LessOrEqual;
-            public static readonly Func<T, T> Abs;
-            public static readonly Func<T, T> Negate;
-            public static readonly Func<T, T, int, int, T> PartialWrite;
-            public static readonly Func<T, int, int, T> PartialRead;
-
-            static CompiledOperations()
+            DelegateHelpers.Compile(out Add, emiter =>
             {
-                DelegateHelpers.Compile(out Add, emiter =>
-                {
-                    EnsureNumeric();
+                EnsureNumeric();
 
-                    emiter.LoadArguments(0, 1);
-                    emiter.Add();
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.Add();
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Increment, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out Increment, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArgument(0);
-                    emiter.Increment(typeof(T));
-                    emiter.Return();
-                });
+                emiter.LoadArgument(0);
+                emiter.Increment(typeof(T));
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Subtract, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out Subtract, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArguments(0, 1);
-                    emiter.Subtract();
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.Subtract();
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Decrement, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out Decrement, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArgument(0);
-                    emiter.Decrement(typeof(T));
-                    emiter.Return();
-                });
+                emiter.LoadArgument(0);
+                emiter.Decrement(typeof(T));
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Equals, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out IsEquals, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArguments(0, 1);
-                    emiter.CompareEqual();
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.CompareEqual();
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Greater, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out GreaterThan, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArguments(0, 1);
-                    emiter.CompareGreaterThan(CachedTypeInfo<T>.IsSigned);
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.CompareGreaterThan(CachedTypeInfo<T>.IsSigned);
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out GreaterOrEqual, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out GreaterOrEqualThan, emiter =>
+            {
+                EnsureNumeric();
 
-                    var secondIsGreaterOrEqual = emiter.DefineLabel();
-                    var theEnd = emiter.DefineLabel();
+                var secondIsGreaterOrEqual = emiter.DefineLabel();
+                var theEnd = emiter.DefineLabel();
 
-                    emiter.LoadArguments(1, 0);
-                    emiter.BranchIfGreaterOrEqual(CachedTypeInfo<T>.IsSigned, secondIsGreaterOrEqual);
-                    emiter.LoadConstant(false);
-                    emiter.Branch(theEnd);
-                    emiter.MarkLabel(secondIsGreaterOrEqual);
-                    emiter.LoadConstant(true);
-                    emiter.MarkLabel(theEnd);
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.BranchIfGreaterOrEqual(CachedTypeInfo<T>.IsSigned, secondIsGreaterOrEqual);
+                emiter.LoadConstant(false);
+                emiter.Branch(theEnd);
+                emiter.MarkLabel(secondIsGreaterOrEqual);
+                emiter.LoadConstant(true);
+                emiter.MarkLabel(theEnd);
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Less, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out LessThan, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArguments(0, 1);
-                    emiter.CompareLessThan(CachedTypeInfo<T>.IsSigned);
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.CompareLessThan(CachedTypeInfo<T>.IsSigned);
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out LessOrEqual, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out LessOrEqualThan, emiter =>
+            {
+                EnsureNumeric();
 
-                    var secondIsLessOrEqual = emiter.DefineLabel();
-                    var theEnd = emiter.DefineLabel();
+                var secondIsLessOrEqual = emiter.DefineLabel();
+                var theEnd = emiter.DefineLabel();
 
-                    emiter.LoadArguments(1, 0);
-                    emiter.BranchIfLessOrEqual(CachedTypeInfo<T>.IsSigned, secondIsLessOrEqual);
-                    emiter.LoadConstant(false);
-                    emiter.Branch(theEnd);
-                    emiter.MarkLabel(secondIsLessOrEqual);
-                    emiter.LoadConstant(true);
-                    emiter.MarkLabel(theEnd);
-                    emiter.Return();
-                });
+                emiter.LoadArguments(0, 1);
+                emiter.BranchIfLessOrEqual(CachedTypeInfo<T>.IsSigned, secondIsLessOrEqual);
+                emiter.LoadConstant(false);
+                emiter.Branch(theEnd);
+                emiter.MarkLabel(secondIsLessOrEqual);
+                emiter.LoadConstant(true);
+                emiter.MarkLabel(theEnd);
+                emiter.Return();
+            });
 
-                DelegateHelpers.Compile(out Abs, emiter =>
-                {
-                    EnsureNumeric();
+            DelegateHelpers.Compile(out Abs, emiter =>
+            {
+                EnsureNumeric();
 
-                    emiter.LoadArgument(0);
+                emiter.LoadArgument(0);
 
-                    if (CachedTypeInfo<T>.IsSigned)
-                        emiter.Call(typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(T) }));
-                   
-                    emiter.Return();
-                });
+                if (CachedTypeInfo<T>.IsSigned)
+                    emiter.Call(typeof(Math).GetTypeInfo().GetMethod("Abs", new[] { typeof(T) }));
 
-                DelegateHelpers.Compile(out Negate, emiter =>
-                {
-                    EnsureNumeric();
+                emiter.Return();
+            });
 
-                    emiter.LoadArgument(0);
-                    emiter.Negate();
-                    emiter.Return();
-                });
+            DelegateHelpers.Compile(out Negate, emiter =>
+            {
+                EnsureNumeric();
 
-                DelegateHelpers.Compile(out PartialWrite, emiter =>
-                {
-                    EnsureNumeric();
+                emiter.LoadArgument(0);
+                emiter.Negate();
+                emiter.Return();
+            });
 
-                    var constants = GetConstants<T>();
-                    var bitsNumber = constants.Item1;
-                    var numberFilledWithOnes = constants.Item2;
+            DelegateHelpers.Compile(out PartialWrite, emiter =>
+            {
+                EnsureNumeric();
 
-                    ushort shiftArgument = 2;
-                    ushort limitArgument = 3;
+                var constants = GetConstants<T>();
+                var bitsNumber = constants.Item1;
+                var numberFilledWithOnes = constants.Item2;
 
-                    var checkLimit = emiter.DefineLabel();
-                    var calculateSourceMask = emiter.DefineLabel();
+                ushort shiftArgument = 2;
+                ushort limitArgument = 3;
+
+                var checkLimit = emiter.DefineLabel();
+                var calculateSourceMask = emiter.DefineLabel();
 
                     // Check shift
                     emiter.LoadArgument(shiftArgument);
-                    emiter.LoadConstant(0);
-                    emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
+                emiter.LoadConstant(0);
+                emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
 
                     // Fix shift
                     emiter.LoadConstant(bitsNumber);
-                    emiter.LoadArgument(shiftArgument);
-                    emiter.Add();
-                    emiter.StoreArgument(shiftArgument);
+                emiter.LoadArgument(shiftArgument);
+                emiter.Add();
+                emiter.StoreArgument(shiftArgument);
 
-                    emiter.MarkLabel(checkLimit);
+                emiter.MarkLabel(checkLimit);
                     // Check limit
                     emiter.LoadArgument(limitArgument);
-                    emiter.LoadConstant(0);
-                    emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
+                emiter.LoadConstant(0);
+                emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
 
                     // Fix limit
                     emiter.LoadConstant(bitsNumber);
-                    emiter.LoadArgument(limitArgument);
-                    emiter.Add();
-                    emiter.StoreArgument(limitArgument);
+                emiter.LoadArgument(limitArgument);
+                emiter.Add();
+                emiter.StoreArgument(limitArgument);
 
-                    emiter.MarkLabel(calculateSourceMask);
+                emiter.MarkLabel(calculateSourceMask);
 
-                    using (var sourceMask = emiter.DeclareLocal<T>())
-                    using (var targetMask = emiter.DeclareLocal<T>())
-                    {
-                        emiter.LoadConstant(typeof(T), numberFilledWithOnes);
-                        emiter.LoadArgument(limitArgument);
-                        emiter.ShiftLeft();
-                        emiter.Not();
-                        emiter.LoadConstant(typeof(T), numberFilledWithOnes);
-                        emiter.And();
-                        emiter.StoreLocal(sourceMask);
-
-                        emiter.LoadLocal(sourceMask);
-                        emiter.LoadArgument(shiftArgument);
-                        emiter.ShiftLeft();
-                        emiter.Not();
-                        emiter.StoreLocal(targetMask);
-
-                        emiter.LoadArgument(0); // target
-                        emiter.LoadLocal(targetMask);
-                        emiter.And();
-                        emiter.LoadArgument(1); // source
-                        emiter.LoadLocal(sourceMask);
-                        emiter.And();
-                        emiter.LoadArgument(shiftArgument);
-                        emiter.ShiftLeft();
-                        emiter.Or();
-                    }
-
-                    emiter.Return();
-                });
-
-                DelegateHelpers.Compile(out PartialRead, emiter =>
+                using (var sourceMask = emiter.DeclareLocal<T>())
+                using (var targetMask = emiter.DeclareLocal<T>())
                 {
-                    EnsureNumeric();
+                    emiter.LoadConstant(typeof(T), numberFilledWithOnes);
+                    emiter.LoadArgument(limitArgument);
+                    emiter.ShiftLeft();
+                    emiter.Not();
+                    emiter.LoadConstant(typeof(T), numberFilledWithOnes);
+                    emiter.And();
+                    emiter.StoreLocal(sourceMask);
 
-                    var constants = GetConstants<T>();
-                    var bitsNumber = constants.Item1;
-                    var numberFilledWithOnes = constants.Item2;
+                    emiter.LoadLocal(sourceMask);
+                    emiter.LoadArgument(shiftArgument);
+                    emiter.ShiftLeft();
+                    emiter.Not();
+                    emiter.StoreLocal(targetMask);
 
-                    ushort shiftArgument = 1;
-                    ushort limitArgument = 2;
+                    emiter.LoadArgument(0); // target
+                        emiter.LoadLocal(targetMask);
+                    emiter.And();
+                    emiter.LoadArgument(1); // source
+                        emiter.LoadLocal(sourceMask);
+                    emiter.And();
+                    emiter.LoadArgument(shiftArgument);
+                    emiter.ShiftLeft();
+                    emiter.Or();
+                }
 
-                    var checkLimit = emiter.DefineLabel();
-                    var calculateSourceMask = emiter.DefineLabel();
+                emiter.Return();
+            });
+
+            DelegateHelpers.Compile(out PartialRead, emiter =>
+            {
+                EnsureNumeric();
+
+                var constants = GetConstants<T>();
+                var bitsNumber = constants.Item1;
+                var numberFilledWithOnes = constants.Item2;
+
+                ushort shiftArgument = 1;
+                ushort limitArgument = 2;
+
+                var checkLimit = emiter.DefineLabel();
+                var calculateSourceMask = emiter.DefineLabel();
 
                     // Check shift
                     emiter.LoadArgument(shiftArgument);
-                    emiter.LoadConstant(0);
-                    emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
+                emiter.LoadConstant(0);
+                emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
 
                     // Fix shift
                     emiter.LoadConstant(bitsNumber);
-                    emiter.LoadArgument(shiftArgument);
-                    emiter.Add();
-                    emiter.StoreArgument(shiftArgument);
+                emiter.LoadArgument(shiftArgument);
+                emiter.Add();
+                emiter.StoreArgument(shiftArgument);
 
-                    emiter.MarkLabel(checkLimit);
+                emiter.MarkLabel(checkLimit);
                     // Check limit
                     emiter.LoadArgument(limitArgument);
-                    emiter.LoadConstant(0);
-                    emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
+                emiter.LoadConstant(0);
+                emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
 
                     // Fix limit
                     emiter.LoadConstant(bitsNumber);
-                    emiter.LoadArgument(limitArgument);
-                    emiter.Add();
-                    emiter.StoreArgument(limitArgument);
+                emiter.LoadArgument(limitArgument);
+                emiter.Add();
+                emiter.StoreArgument(limitArgument);
 
-                    emiter.MarkLabel(calculateSourceMask);
+                emiter.MarkLabel(calculateSourceMask);
 
-                    using (var sourceMask = emiter.DeclareLocal<T>())
-                    using (var targetMask = emiter.DeclareLocal<T>())
-                    {
-                        emiter.LoadConstant(typeof(T), numberFilledWithOnes);
-                        emiter.LoadArgument(limitArgument); // limit
+                using (var sourceMask = emiter.DeclareLocal<T>())
+                using (var targetMask = emiter.DeclareLocal<T>())
+                {
+                    emiter.LoadConstant(typeof(T), numberFilledWithOnes);
+                    emiter.LoadArgument(limitArgument); // limit
                         emiter.ShiftLeft();
-                        emiter.Not();
-                        emiter.LoadConstant(typeof(T), numberFilledWithOnes);
-                        emiter.And();
-                        emiter.StoreLocal(sourceMask);
+                    emiter.Not();
+                    emiter.LoadConstant(typeof(T), numberFilledWithOnes);
+                    emiter.And();
+                    emiter.StoreLocal(sourceMask);
 
-                        emiter.LoadLocal(sourceMask);
-                        emiter.LoadArgument(shiftArgument);
-                        emiter.ShiftLeft();
-                        emiter.StoreLocal(targetMask);
+                    emiter.LoadLocal(sourceMask);
+                    emiter.LoadArgument(shiftArgument);
+                    emiter.ShiftLeft();
+                    emiter.StoreLocal(targetMask);
 
-                        emiter.LoadArgument(0); // target
+                    emiter.LoadArgument(0); // target
                         emiter.LoadLocal(targetMask);
-                        emiter.And();
-                        emiter.LoadArgument(shiftArgument);
-                        emiter.ShiftRight();
-                    }
+                    emiter.And();
+                    emiter.LoadArgument(shiftArgument);
+                    emiter.ShiftRight();
+                }
 
-                    emiter.Return();
-                });
-            }
-
-            private static void EnsureNumeric()
-            {
-                if (!CachedTypeInfo<T>.IsNumeric)
-                    throw new NotSupportedException();
-            }
-
-            private static Tuple<int, TElement> GetConstants<TElement>()
-            {
-                var type = typeof(T);
-                if (type == typeof(ulong))
-                    return new Tuple<int, TElement>(64, (TElement)(object)ulong.MaxValue);
-                if(type == typeof(uint))
-                    return new Tuple<int, TElement>(32, (TElement)(object)uint.MaxValue);
-                if (type == typeof(ushort))
-                    return new Tuple<int, TElement>(16, (TElement)(object)ushort.MaxValue);
-                if (type == typeof(byte))
-                    return new Tuple<int, TElement>(8, (TElement)(object)byte.MaxValue);
-                throw new NotSupportedException();
-            }
+                emiter.Return();
+            });
         }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Add(T x, T y) => CompiledOperations.Add(x, y);
+        private static void EnsureNumeric()
+        {
+            if (!CachedTypeInfo<T>.IsNumeric)
+                throw new NotSupportedException();
+        }
 
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Increment(T x) => CompiledOperations.Increment(x);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Subtract(T x, T y) => CompiledOperations.Subtract(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Decrement(T x) => CompiledOperations.Decrement(x);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals(T x, T y) => CompiledOperations.Equals(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GreaterThan(T x, T y) => CompiledOperations.Greater(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GreaterOrEqualThan(T x, T y) => Equals(x, y) || GreaterThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool LessThan(T x, T y) => CompiledOperations.Less(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool LessOrEqualThan(T x, T y) => Equals(x, y) || LessThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Abs(T x) => CompiledOperations.Abs(x);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Negate(T x) => CompiledOperations.Negate(x);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T PartialWrite(T target, T source, int shift, int limit) => CompiledOperations.PartialWrite(target, source, shift, limit);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T PartialRead(T target, int shift, int limit) => CompiledOperations.PartialRead(target, shift, limit);
+        private static Tuple<int, TElement> GetConstants<TElement>()
+        {
+            var type = typeof(T);
+            if (type == typeof(ulong))
+                return new Tuple<int, TElement>(64, (TElement)(object)ulong.MaxValue);
+            if (type == typeof(uint))
+                return new Tuple<int, TElement>(32, (TElement)(object)uint.MaxValue);
+            if (type == typeof(ushort))
+                return new Tuple<int, TElement>(16, (TElement)(object)ushort.MaxValue);
+            if (type == typeof(byte))
+                return new Tuple<int, TElement>(8, (TElement)(object)byte.MaxValue);
+            throw new NotSupportedException();
+        }
     }
 }

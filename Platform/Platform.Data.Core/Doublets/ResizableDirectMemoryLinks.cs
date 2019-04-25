@@ -210,7 +210,7 @@ namespace Platform.Data.Core.Doublets
             {
                 var index = restrictions[Constants.IndexPart];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                     return Total;
 
                 return Exists(index) ? (Integer<T>)1 : (Integer<T>)0;
@@ -220,9 +220,9 @@ namespace Platform.Data.Core.Doublets
                 var index = restrictions[Constants.IndexPart];
                 var value = restrictions[1];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                 {
-                    if (Equals(value, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(value, Constants.Any))
                         return Total; // Any - как отсутствие ограничения
 
                     return Add(_sourcesTreeMethods.CalculateReferences(value), _targetsTreeMethods.CalculateReferences(value));
@@ -232,12 +232,12 @@ namespace Platform.Data.Core.Doublets
                     if (!Exists(index))
                         return (Integer<T>)0;
 
-                    if (Equals(value, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(value, Constants.Any))
                         return (Integer<T>)1;
 
                     var storedLinkValue = GetLinkUnsafe(index);
-                    if (Equals(Link.GetSource(storedLinkValue), value) ||
-                        Equals(Link.GetTarget(storedLinkValue), value))
+                    if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
+                        MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
                         return (Integer<T>)1;
                     return (Integer<T>)0;
                 }
@@ -248,19 +248,19 @@ namespace Platform.Data.Core.Doublets
                 var source = restrictions[Constants.SourcePart];
                 var target = restrictions[Constants.TargetPart];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                 {
-                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any) && MathHelpers<T>.IsEquals(target, Constants.Any))
                         return Total;
-                    else if (Equals(source, Constants.Any))
+                    else if (MathHelpers<T>.IsEquals(source, Constants.Any))
                         return _targetsTreeMethods.CalculateReferences(target);
-                    else if (Equals(target, Constants.Any))
+                    else if (MathHelpers<T>.IsEquals(target, Constants.Any))
                         return _sourcesTreeMethods.CalculateReferences(source);
                     else //if(source != Any && target != Any)
                     {
                         // Эквивалент Exists(source, target) => Count(Any, source, target) > 0
                         var link = _sourcesTreeMethods.Search(source, target);
-                        return Equals(link, Constants.Null) ? (Integer<T>)0 : (Integer<T>)1;
+                        return MathHelpers<T>.IsEquals(link, Constants.Null) ? (Integer<T>)0 : (Integer<T>)1;
                     }
                 }
                 else
@@ -268,25 +268,25 @@ namespace Platform.Data.Core.Doublets
                     if (!Exists(index))
                         return (Integer<T>)0;
 
-                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any) && MathHelpers<T>.IsEquals(target, Constants.Any))
                         return (Integer<T>)1;
 
                     var storedLinkValue = GetLinkUnsafe(index);
 
-                    if (!Equals(source, Constants.Any) && !Equals(target, Constants.Any))
+                    if (!MathHelpers<T>.IsEquals(source, Constants.Any) && !MathHelpers<T>.IsEquals(target, Constants.Any))
                     {
-                        if (Equals(Link.GetSource(storedLinkValue), source) &&
-                            Equals(Link.GetTarget(storedLinkValue), target))
+                        if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), source) &&
+                            MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), target))
                             return (Integer<T>)1;
                         return (Integer<T>)0;
                     }
 
                     var value = default(T);
-                    if (Equals(source, Constants.Any)) value = target;
-                    if (Equals(target, Constants.Any)) value = source;
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any)) value = target;
+                    if (MathHelpers<T>.IsEquals(target, Constants.Any)) value = source;
 
-                    if (Equals(Link.GetSource(storedLinkValue), value) ||
-                        Equals(Link.GetTarget(storedLinkValue), value))
+                    if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
+                        MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
                         return (Integer<T>)1;
                     return (Integer<T>)0;
                 }
@@ -301,7 +301,7 @@ namespace Platform.Data.Core.Doublets
             {
                 for (T link = (Integer<T>)1; LessOrEqualThan(link, (T)(Integer<T>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
                     if (Exists(link))
-                        if (Equals(handler(GetLinkStruct(link)), Constants.Break))
+                        if (MathHelpers<T>.IsEquals(handler(GetLinkStruct(link)), Constants.Break))
                             return Constants.Break;
 
                 return Constants.Continue;
@@ -310,7 +310,7 @@ namespace Platform.Data.Core.Doublets
             {
                 var index = restrictions[Constants.IndexPart];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                     return Each(handler, ArrayPool<T>.Empty);
 
                 if (!Exists(index))
@@ -323,12 +323,12 @@ namespace Platform.Data.Core.Doublets
                 var index = restrictions[Constants.IndexPart];
                 var value = restrictions[1];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                 {
-                    if (Equals(value, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(value, Constants.Any))
                         return Each(handler, ArrayPool<T>.Empty);
 
-                    if (Equals(Each(handler, new[] { index, value, Constants.Any }), Constants.Break))
+                    if (MathHelpers<T>.IsEquals(Each(handler, new[] { index, value, Constants.Any }), Constants.Break))
                         return Constants.Break;
 
                     return Each(handler, new[] { index, Constants.Any, value });
@@ -338,12 +338,12 @@ namespace Platform.Data.Core.Doublets
                     if (!Exists(index))
                         return Constants.Continue;
 
-                    if (Equals(value, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(value, Constants.Any))
                         return handler(GetLinkStruct(index));
 
                     var storedLinkValue = GetLinkUnsafe(index);
-                    if (Equals(Link.GetSource(storedLinkValue), value) ||
-                        Equals(Link.GetTarget(storedLinkValue), value))
+                    if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
+                        MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
                         return handler(GetLinkStruct(index));
                     return Constants.Continue;
                 }
@@ -354,19 +354,19 @@ namespace Platform.Data.Core.Doublets
                 var source = restrictions[Constants.SourcePart];
                 var target = restrictions[Constants.TargetPart];
 
-                if (Equals(index, Constants.Any))
+                if (MathHelpers<T>.IsEquals(index, Constants.Any))
                 {
-                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any) && MathHelpers<T>.IsEquals(target, Constants.Any))
                         return Each(handler, ArrayPool<T>.Empty);
-                    else if (Equals(source, Constants.Any))
+                    else if (MathHelpers<T>.IsEquals(source, Constants.Any))
                         return _targetsTreeMethods.EachReference(target, handler);
-                    else if (Equals(target, Constants.Any))
+                    else if (MathHelpers<T>.IsEquals(target, Constants.Any))
                         return _sourcesTreeMethods.EachReference(source, handler);
                     else //if(source != Any && target != Any)
                     {
                         var link = _sourcesTreeMethods.Search(source, target);
 
-                        return Equals(link, Constants.Null) ? Constants.Continue : handler(GetLinkStruct(link));
+                        return MathHelpers<T>.IsEquals(link, Constants.Null) ? Constants.Continue : handler(GetLinkStruct(link));
                     }
                 }
                 else
@@ -374,25 +374,25 @@ namespace Platform.Data.Core.Doublets
                     if (!Exists(index))
                         return Constants.Continue;
 
-                    if (Equals(source, Constants.Any) && Equals(target, Constants.Any))
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any) && MathHelpers<T>.IsEquals(target, Constants.Any))
                         return handler(GetLinkStruct(index));
 
                     var storedLinkValue = GetLinkUnsafe(index);
 
-                    if (!Equals(source, Constants.Any) && !Equals(target, Constants.Any))
+                    if (!MathHelpers<T>.IsEquals(source, Constants.Any) && !MathHelpers<T>.IsEquals(target, Constants.Any))
                     {
-                        if (Equals(Link.GetSource(storedLinkValue), source) &&
-                            Equals(Link.GetTarget(storedLinkValue), target))
+                        if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), source) &&
+                            MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), target))
                             return handler(GetLinkStruct(index));
                         return Constants.Continue;
                     }
 
                     var value = default(T);
-                    if (Equals(source, Constants.Any)) value = target;
-                    if (Equals(target, Constants.Any)) value = source;
+                    if (MathHelpers<T>.IsEquals(source, Constants.Any)) value = target;
+                    if (MathHelpers<T>.IsEquals(target, Constants.Any)) value = source;
 
-                    if (Equals(Link.GetSource(storedLinkValue), value) ||
-                        Equals(Link.GetTarget(storedLinkValue), value))
+                    if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
+                        MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
                         return handler(GetLinkStruct(index));
                     return Constants.Continue;
                 }
@@ -410,14 +410,14 @@ namespace Platform.Data.Core.Doublets
             var link = GetLinkUnsafe(linkIndex);
 
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
-            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Detach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
-            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Detach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
+            if (!MathHelpers<T>.IsEquals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Detach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            if (!MathHelpers<T>.IsEquals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Detach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
 
             Link.SetSource(link, values[Constants.SourcePart]);
             Link.SetTarget(link, values[Constants.TargetPart]);
 
-            if (!Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
-            if (!Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
+            if (!MathHelpers<T>.IsEquals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            if (!MathHelpers<T>.IsEquals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
 
             return linkIndex;
         }
@@ -442,7 +442,7 @@ namespace Platform.Data.Core.Doublets
         {
             var freeLink = LinksHeader.GetFirstFreeLink(_header);
 
-            if (!Equals(freeLink, Constants.Null))
+            if (!MathHelpers<T>.IsEquals(freeLink, Constants.Null))
                 _unusedLinksListMethods.Detach(freeLink);
             else
             {
@@ -468,7 +468,7 @@ namespace Platform.Data.Core.Doublets
         {
             if (LessThan(link, LinksHeader.GetAllocatedLinks(_header)))
                 _unusedLinksListMethods.AttachAsFirst(link);
-            else if (Equals(link, LinksHeader.GetAllocatedLinks(_header)))
+            else if (MathHelpers<T>.IsEquals(link, LinksHeader.GetAllocatedLinks(_header)))
             {
                 LinksHeader.SetAllocatedLinks(_header, Decrement(LinksHeader.GetAllocatedLinks(_header)));
                 _memory.UsedCapacity -= LinkSizeInBytes;
@@ -521,8 +521,8 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsUnusedLink(T link)
         {
-            return Equals(LinksHeader.GetFirstFreeLink(_header), link)
-                   || (Equals(Link.GetSizeAsSource(GetLinkUnsafe(link)), Constants.Null) && !Equals(Link.GetSource(GetLinkUnsafe(link)), Constants.Null));
+            return MathHelpers<T>.IsEquals(LinksHeader.GetFirstFreeLink(_header), link)
+                   || (MathHelpers<T>.IsEquals(Link.GetSizeAsSource(GetLinkUnsafe(link)), Constants.Null) && !MathHelpers<T>.IsEquals(Link.GetSource(GetLinkUnsafe(link)), Constants.Null));
         }
 
         #region Disposable

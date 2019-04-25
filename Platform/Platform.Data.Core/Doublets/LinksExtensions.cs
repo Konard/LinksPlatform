@@ -64,7 +64,7 @@ namespace Platform.Data.Core.Doublets
             for (var i = links.Count(); MathHelpers.GreaterThan(i, default); i = MathHelpers.Decrement(i))
             {
                 links.Delete(i);
-                if (!Equals(links.Count(), MathHelpers.Decrement(i)))
+                if (!MathHelpers<TLink>.IsEquals(links.Count(), MathHelpers.Decrement(i)))
                     i = links.Count();
             }
         }
@@ -73,7 +73,7 @@ namespace Platform.Data.Core.Doublets
         {
             TLink firstLink = default;
 
-            if (Equals(links.Count(), default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(links.Count(), default))
                 throw new Exception("В хранилище нет связей.");
 
             links.Each(links.Constants.Any, links.Constants.Any, link =>
@@ -82,7 +82,7 @@ namespace Platform.Data.Core.Doublets
                 return links.Constants.Break;
             });
 
-            if (Equals(firstLink, default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(firstLink, default))
                 throw new Exception("В процессе поиска по хранилищу не было найдено связей.");
 
             return firstLink;
@@ -272,10 +272,10 @@ namespace Platform.Data.Core.Doublets
                 var source = values[Constants.SourcePart];
                 var target = values[Constants.TargetPart];
 
-                if (Equals(source, target) && Equals(source, next))
+                if (MathHelpers<T>.IsEquals(source, target) && MathHelpers<T>.IsEquals(source, next))
                     //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
                     return false;
-                if (!Equals(next, source) && !Equals(next, target))
+                if (!MathHelpers<T>.IsEquals(next, source) && !MathHelpers<T>.IsEquals(next, target))
                     //throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
                     return false;
 
@@ -419,7 +419,7 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
         {
-            return !Equals(links.Each(handler, restrictions), links.Constants.Break);
+            return !MathHelpers<TLink>.IsEquals(links.Each(handler, restrictions), links.Constants.Break);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -495,14 +495,14 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureLinkIsAnyOrExists<T>(this ILinks<T> links, T link, string argumentName)
         {
-            if (!Equals(link, links.Constants.Any) && !links.Exists(link))
+            if (!MathHelpers<T>.IsEquals(link, links.Constants.Any) && !links.Exists(link))
                 throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureLinkIsItselfOrExists<T>(this ILinks<T> links, T link, string argumentName)
         {
-            if (!Equals(link, links.Constants.Itself) && !links.Exists(link))
+            if (!MathHelpers<T>.IsEquals(link, links.Constants.Itself) && !links.Exists(link))
                 throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
         }
 
@@ -523,12 +523,12 @@ namespace Platform.Data.Core.Doublets
 
             ulong referencesAsSource = (Integer<T>)links.Count(constants.Any, link, constants.Any);
 
-            if (Equals(values[Constants.SourcePart], link))
+            if (MathHelpers<T>.IsEquals(values[Constants.SourcePart], link))
                 referencesAsSource--;
 
             ulong referencesAsTarget = (Integer<T>)links.Count(constants.Any, constants.Any, link);
 
-            if (Equals(values[Constants.TargetPart], link))
+            if (MathHelpers<T>.IsEquals(values[Constants.TargetPart], link))
                 referencesAsTarget--;
 
             return referencesAsSource + referencesAsTarget;
@@ -553,7 +553,7 @@ namespace Platform.Data.Core.Doublets
         public static bool Equals<T>(this ILinks<T> links, T link, T source, T target)
         {
             var values = links.GetLink(link);
-            return Equals(values[Constants.SourcePart], source) && Equals(values[Constants.TargetPart], target);
+            return MathHelpers<T>.IsEquals(values[Constants.SourcePart], source) && MathHelpers<T>.IsEquals(values[Constants.TargetPart], target);
         }
 
         /// <summary>
@@ -635,7 +635,7 @@ namespace Platform.Data.Core.Doublets
                 var createdLinks = new List<T>();
 
                 T createdLink;
-                while (!Equals(createdLink = creator(), (T)(Integer<T>)max))
+                while (!MathHelpers<T>.IsEquals(createdLink = creator(), (T)(Integer<T>)max))
                     createdLinks.Add(createdLink);
 
                 for (var i = 0; i < createdLinks.Count; i++)
@@ -657,7 +657,7 @@ namespace Platform.Data.Core.Doublets
         public static T GetOrCreate<T>(this ILinks<T> links, T source, T target)
         {
             var link = links.SearchOrDefault(source, target);
-            if (Equals(link, default(T)))
+            if (MathHelpers<T>.IsEquals(link, default))
                 link = links.CreateAndUpdate(source, target);
             return link;
         }
@@ -676,9 +676,9 @@ namespace Platform.Data.Core.Doublets
         public static T UpdateOrCreateOrGet<T>(this ILinks<T> links, T source, T target, T newSource, T newTarget)
         {
             var link = links.SearchOrDefault(source, target);
-            if (Equals(link, default(T)))
+            if (MathHelpers<T>.IsEquals(link, default))
                 return links.CreateAndUpdate(newSource, newTarget);
-            if (Equals(newSource, source) && Equals(newTarget, target))
+            if (MathHelpers<T>.IsEquals(newSource, source) && MathHelpers<T>.IsEquals(newTarget, target))
                 return link;
             return links.Update(link, newSource, newTarget);
         }
@@ -691,7 +691,7 @@ namespace Platform.Data.Core.Doublets
         public static T DeleteIfExists<T>(this ILinks<T> links, T source, T target)
         {
             var link = links.SearchOrDefault(source, target);
-            if (!Equals(link, default(T)))
+            if (!MathHelpers<T>.IsEquals(link, default))
             {
                 links.Delete(link);
                 return link;
@@ -712,7 +712,7 @@ namespace Platform.Data.Core.Doublets
         // Replace one link with another (replaced link is deleted, children are updated or deleted)
         public static T Merge<T>(this ILinks<T> links, T linkIndex, T newLink)
         {
-            if (Equals(linkIndex, newLink))
+            if (MathHelpers<T>.IsEquals(linkIndex, newLink))
                 return newLink;
 
             var constants = links.Constants;
@@ -734,13 +734,13 @@ namespace Platform.Data.Core.Doublets
                     for (ulong i = 0; i < referencesAsSourceCount; i++)
                     {
                         var reference = references[i];
-                        if (Equals(reference, linkIndex)) continue;
+                        if (MathHelpers<T>.IsEquals(reference, linkIndex)) continue;
                         links.Update(reference, newLink, links.GetTarget(reference));
                     }
                     for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
                     {
                         var reference = references[i];
-                        if (Equals(reference, linkIndex)) continue;
+                        if (MathHelpers<T>.IsEquals(reference, linkIndex)) continue;
                         links.Update(reference, links.GetSource(reference), newLink);
                     }
                     ArrayPool.Free(references);

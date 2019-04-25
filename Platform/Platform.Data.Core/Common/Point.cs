@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Common
 {
@@ -16,7 +17,7 @@ namespace Platform.Data.Core.Common
 
             for (var i = 1; i < link.Count; i++)
             {
-                result = Equals(link[0], link[i]);
+                result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
                 if (!result) break;
             }
 
@@ -34,7 +35,7 @@ namespace Platform.Data.Core.Common
 
             for (var i = 1; i < link.Count; i++)
             {
-                result = Equals(link[0], link[i]);
+                result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
                 if (result) break;
             }
 

@@ -146,7 +146,7 @@ namespace Platform.Data.Core.Collections.Trees
 
             var sizeAfter = GetSize(root);
 
-            if (!Equals(MathHelpers.Increment(sizeBefore), sizeAfter))
+            if (!IsEquals(MathHelpers.Increment(sizeBefore), sizeAfter))
                 throw new Exception("Tree was broken after attach.");
 #endif
         }
@@ -179,7 +179,7 @@ namespace Platform.Data.Core.Collections.Trees
 
             var sizeAfter = GetSize(root);
 
-            if (!Equals(MathHelpers.Decrement(sizeBefore), sizeAfter))
+            if (!IsEquals(MathHelpers.Decrement(sizeBefore), sizeAfter))
                 throw new Exception("Tree was broken after detach.");
 #endif
         }
@@ -199,7 +199,7 @@ namespace Platform.Data.Core.Collections.Trees
 
         public void FixSizes(TElement node)
         {
-            if (Equals(node, default(TElement)))
+            if (IsEquals(node, default))
                 return;
 
             FixSizes(GetLeftOrDefault(node));
@@ -216,7 +216,7 @@ namespace Platform.Data.Core.Collections.Trees
 
         public void ValidateSizes(TElement node)
         {
-            if (Equals(node, default(TElement)))
+            if (IsEquals(node, default))
                 return;
 
             var size = GetSize(node);
@@ -225,7 +225,7 @@ namespace Platform.Data.Core.Collections.Trees
 
             var expectedSize = MathHelpers.Increment(MathHelpers.Add(leftSize, rightSize));
 
-            if (!Equals(size, expectedSize))
+            if (!IsEquals(size, expectedSize))
                 throw new Exception($"Size of {node} is not valid. Expected size: {expectedSize}, actual size: {size}.");
 
             ValidateSizes(GetLeftOrDefault(node));
@@ -240,7 +240,7 @@ namespace Platform.Data.Core.Collections.Trees
 
             var expectedSize = MathHelpers.Increment(MathHelpers.Add(leftSize, rightSize));
 
-            if (!Equals(size, expectedSize))
+            if (!IsEquals(size, expectedSize))
                 throw new Exception($"Size of {node} is not valid. Expected size: {expectedSize}, actual size: {size}.");
         }
 
@@ -265,7 +265,7 @@ namespace Platform.Data.Core.Collections.Trees
 
         public void PrintNodes(TElement node, StringBuilder sb, int level = 0)
         {
-            if (Equals(node, default(TElement)))
+            if (IsEquals(node, default))
                 return;
 
             PrintNodes(GetLeftOrDefault(node), sb, level + 1);

@@ -26,11 +26,11 @@ namespace Platform.Data.Core.Sequences.FrequencyCounters
             return _total;
         }
 
-        private bool IsElement(TLink x) => Equals(x, _symbol) || _links.IsPartialPoint(x); // TODO: Use SequenceElementCreteriaMatcher instead of IsPartialPoint
+        private bool IsElement(TLink x) => MathHelpers<TLink>.IsEquals(x, _symbol) || _links.IsPartialPoint(x); // TODO: Use SequenceElementCreteriaMatcher instead of IsPartialPoint
 
         private bool VisitElement(TLink element)
         {
-            if (Equals(element, _symbol))
+            if (MathHelpers<TLink>.IsEquals(element, _symbol))
                 _total = MathHelpers.Increment(_total);
             return true;
         }

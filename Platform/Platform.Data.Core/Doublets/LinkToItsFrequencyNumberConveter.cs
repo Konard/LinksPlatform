@@ -20,7 +20,7 @@ namespace Platform.Data.Core.Doublets
         public TLink Convert(TLink link)
         {
             var frequency = _frequencyPropertyOperator.GetValue(link);
-            if (Equals(frequency, default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(frequency, default))
                 return default;
             var frequencyNumber = Links.GetSource(frequency);
             var number = _unaryNumberToAddressConverter.Convert(frequencyNumber);

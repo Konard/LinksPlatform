@@ -12,7 +12,7 @@
             SetPrevious(newElement, baseElementPrevious);
             SetNext(newElement, baseElement);
 
-            if (Equals(baseElement, GetFirst()))
+            if (IsEquals(baseElement, GetFirst()))
                 SetFirst(newElement);
 
             SetNext(baseElementPrevious, newElement);
@@ -28,7 +28,7 @@
             SetPrevious(newElement, baseElement);
             SetNext(newElement, baseElementNext);
 
-            if (Equals(baseElement, GetLast()))
+            if (IsEquals(baseElement, GetLast()))
                 SetLast(newElement);
 
             SetPrevious(baseElementNext, newElement);
@@ -67,7 +67,7 @@
             var elementPrevious = GetPrevious(element);
             var elementNext = GetNext(element);
 
-            if (Equals(elementNext, element))
+            if (IsEquals(elementNext, element))
             {
                 SetFirst(GetZero());
                 SetLast(GetZero());
@@ -77,9 +77,9 @@
                 SetNext(elementPrevious, elementNext);
                 SetPrevious(elementNext, elementPrevious);
 
-                if (Equals(element, GetFirst()))
+                if (IsEquals(element, GetFirst()))
                     SetFirst(elementNext);
-                if (Equals(element, GetLast()))
+                if (IsEquals(element, GetLast()))
                     SetLast(elementPrevious);
             }
 

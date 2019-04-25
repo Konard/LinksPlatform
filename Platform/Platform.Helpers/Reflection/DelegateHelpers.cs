@@ -7,7 +7,7 @@ namespace Platform.Helpers.Reflection
     {
         public static void Compile<TDelegate>(out TDelegate @delegate, Action<Emit<TDelegate>> emitCode)
         {
-            @delegate = default(TDelegate);
+            @delegate = default;
 
             try
             {

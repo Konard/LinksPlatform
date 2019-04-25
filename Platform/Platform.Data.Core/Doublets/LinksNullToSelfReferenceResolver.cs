@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -14,8 +15,8 @@ namespace Platform.Data.Core.Doublets
 
         public override T Update(IList<T> restrictions)
         {
-            restrictions[Constants.SourcePart] = Equals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
-            restrictions[Constants.TargetPart] = Equals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
+            restrictions[Constants.SourcePart] = MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
+            restrictions[Constants.TargetPart] = MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
 
             return base.Update(restrictions);
         }

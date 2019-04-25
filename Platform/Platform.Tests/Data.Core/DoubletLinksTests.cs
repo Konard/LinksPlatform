@@ -41,57 +41,57 @@ namespace Platform.Tests.Data.Core
             var constants = links.Constants;
             
             // Create Link
-            Assert.True(MathHelpers.Equals(links.Count(), (T)(Integer<T>) 0));
+            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>) 0));
 
             var setter = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter.SetAndReturnTrue);
 
-            Assert.True(MathHelpers.Equals(setter.Result, constants.Null));
+            Assert.True(MathHelpers.IsEquals(setter.Result, constants.Null));
 
             var linkAddress = links.Create();
 
             var link = new Link<T>(links.GetLink(linkAddress));
 
             Assert.True(link.Count == 3);
-            Assert.True(MathHelpers.Equals(link.Index, linkAddress));
-            Assert.True(MathHelpers.Equals(link.Source, constants.Null));
-            Assert.True(MathHelpers.Equals(link.Target, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link.Index, linkAddress));
+            Assert.True(MathHelpers.IsEquals(link.Source, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link.Target, constants.Null));
 
-            Assert.True(MathHelpers.Equals(links.Count(), (T)(Integer<T>)1));
+            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)1));
 
             // Get first link
             setter = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter.SetAndReturnFalse);
 
-            Assert.True(MathHelpers.Equals(setter.Result, linkAddress));
+            Assert.True(MathHelpers.IsEquals(setter.Result, linkAddress));
 
             // Update link to reference itself
             links.Update(linkAddress, linkAddress, linkAddress);
 
             link = new Link<T>(links.GetLink(linkAddress));
 
-            Assert.True(MathHelpers.Equals(link.Source, linkAddress));
-            Assert.True(MathHelpers.Equals(link.Target, linkAddress));
+            Assert.True(MathHelpers.IsEquals(link.Source, linkAddress));
+            Assert.True(MathHelpers.IsEquals(link.Target, linkAddress));
 
             // Update link to reference null (prepare for delete)
             var updated = links.Update(linkAddress, constants.Null, constants.Null);
 
-            Assert.True(MathHelpers.Equals(updated, linkAddress));
+            Assert.True(MathHelpers.IsEquals(updated, linkAddress));
 
             link = new Link<T>(links.GetLink(linkAddress));
 
-            Assert.True(MathHelpers.Equals(link.Source, constants.Null));
-            Assert.True(MathHelpers.Equals(link.Target, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link.Source, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link.Target, constants.Null));
 
             // Delete link
             links.Delete(linkAddress);
 
-            Assert.True(MathHelpers.Equals(links.Count(), (T)(Integer<T>)0));
+            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)0));
 
             setter = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter.SetAndReturnTrue);
 
-            Assert.True(MathHelpers.Equals(setter.Result, constants.Null));
+            Assert.True(MathHelpers.IsEquals(setter.Result, constants.Null));
         }
 
         [Fact]
@@ -131,9 +131,9 @@ namespace Platform.Tests.Data.Core
             var h107E = new Hybrid<T>(-char.ConvertFromUtf32(107)[0]);
             var h108E = new Hybrid<T>(-108L);
 
-            Assert.True(Equals(h106E.AbsoluteValue, 106L));
-            Assert.True(Equals(h107E.AbsoluteValue, 107L));
-            Assert.True(Equals(h108E.AbsoluteValue, 108L));
+            Assert.Equal(106L, h106E.AbsoluteValue);
+            Assert.Equal(107L, h107E.AbsoluteValue);
+            Assert.Equal(108L, h108E.AbsoluteValue);
 
             // Create Link (External -> External)
             var linkAddress1 = links.Create();
@@ -142,8 +142,8 @@ namespace Platform.Tests.Data.Core
 
             var link1 = new Link<T>(links.GetLink(linkAddress1));
 
-            Assert.True(MathHelpers.Equals(link1.Source, (T)h106E));
-            Assert.True(MathHelpers.Equals(link1.Target, (T)h108E));
+            Assert.True(MathHelpers.IsEquals(link1.Source, (T)h106E));
+            Assert.True(MathHelpers.IsEquals(link1.Target, (T)h108E));
 
             // Create Link (Internal -> External)
             var linkAddress2 = links.Create();
@@ -152,8 +152,8 @@ namespace Platform.Tests.Data.Core
 
             var link2 = new Link<T>(links.GetLink(linkAddress2));
 
-            Assert.True(MathHelpers.Equals(link2.Source, linkAddress1));
-            Assert.True(MathHelpers.Equals(link2.Target, (T)h108E));
+            Assert.True(MathHelpers.IsEquals(link2.Source, linkAddress1));
+            Assert.True(MathHelpers.IsEquals(link2.Target, (T)h108E));
 
             // Create Link (Internal -> Internal)
             var linkAddress3 = links.Create();
@@ -162,40 +162,40 @@ namespace Platform.Tests.Data.Core
 
             var link3 = new Link<T>(links.GetLink(linkAddress3));
 
-            Assert.True(MathHelpers.Equals(link3.Source, linkAddress1));
-            Assert.True(MathHelpers.Equals(link3.Target, linkAddress2));
+            Assert.True(MathHelpers.IsEquals(link3.Source, linkAddress1));
+            Assert.True(MathHelpers.IsEquals(link3.Target, linkAddress2));
 
             // Search for created link
             var setter1 = new Setter<T>(constants.Null);
             links.Each(h106E, h108E, setter1.SetAndReturnFalse);
 
-            Assert.True(MathHelpers.Equals(setter1.Result, linkAddress1));
+            Assert.True(MathHelpers.IsEquals(setter1.Result, linkAddress1));
 
             // Search for nonexistent link
             var setter2 = new Setter<T>(constants.Null);
             links.Each(h106E, h107E, setter2.SetAndReturnFalse);
 
-            Assert.True(MathHelpers.Equals(setter2.Result, constants.Null));
+            Assert.True(MathHelpers.IsEquals(setter2.Result, constants.Null));
 
             // Update link to reference null (prepare for delete)
             var updated = links.Update(linkAddress3, constants.Null, constants.Null);
 
-            Assert.True(MathHelpers.Equals(updated, linkAddress3));
+            Assert.True(MathHelpers.IsEquals(updated, linkAddress3));
 
             link3 = new Link<T>(links.GetLink(linkAddress3));
 
-            Assert.True(MathHelpers.Equals(link3.Source, constants.Null));
-            Assert.True(MathHelpers.Equals(link3.Target, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link3.Source, constants.Null));
+            Assert.True(MathHelpers.IsEquals(link3.Target, constants.Null));
 
             // Delete link
             links.Delete(linkAddress3);
 
-            Assert.True(MathHelpers.Equals(links.Count(), (T)(Integer<T>)2));
+            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)2));
 
             var setter3 = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter3.SetAndReturnTrue);
 
-            Assert.True(MathHelpers.Equals(setter3.Result, linkAddress2));
+            Assert.True(MathHelpers.IsEquals(setter3.Result, linkAddress2));
         }
 
         // TODO: Test layers

@@ -20,7 +20,7 @@ namespace Platform.Data.Core.Doublets
         {
             var source = sourceNumber;
             var target = Links.Constants.Null;
-            while (!Equals(source, Links.Constants.Null))
+            while (!MathHelpers<TLink>.IsEquals(source, Links.Constants.Null))
             {
                 if (_unaryNumberPowerOf2Indicies.TryGetValue(source, out int powerOf2Index))
                     source = Links.Constants.Null;

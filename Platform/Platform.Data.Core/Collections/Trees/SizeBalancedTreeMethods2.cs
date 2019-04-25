@@ -42,7 +42,7 @@ namespace Platform.Data.Core.Collections.Trees
             var parent = IntPtr.Zero; /* Изначально зануление, так как родителя может и не быть (Корень дерева). */
             var replacementNode = GetZero();
 
-            while (!Equals(currentNode.GetValue<TElement>(), nodeToDetach))
+            while (!IsEquals(currentNode.GetValue<TElement>(), nodeToDetach))
             {
                 SetSize(currentNode.GetValue<TElement>(), Decrement(GetSize(currentNode.GetValue<TElement>())));
                 if (FirstIsToTheLeftOfSecond(nodeToDetach, currentNode.GetValue<TElement>()))
@@ -85,9 +85,9 @@ namespace Platform.Data.Core.Collections.Trees
 
             if (parent == IntPtr.Zero)
                 root.SetValue(replacementNode);
-            else if (Equals(GetLeftValue(parent.GetValue<TElement>()), nodeToDetach))
+            else if (IsEquals(GetLeftValue(parent.GetValue<TElement>()), nodeToDetach))
                 SetLeft(parent.GetValue<TElement>(), replacementNode);
-            else if (Equals(GetRightValue(parent.GetValue<TElement>()), nodeToDetach))
+            else if (IsEquals(GetRightValue(parent.GetValue<TElement>()), nodeToDetach))
                 SetRight(parent.GetValue<TElement>(), replacementNode);
 
             ClearNode(nodeToDetach);

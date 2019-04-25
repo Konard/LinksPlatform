@@ -23,7 +23,7 @@ namespace Platform.Tests.Helpers
             Assert.True(MathHelpers<byte>.Increment(1) == 2);
             Assert.True(MathHelpers<ulong>.Decrement(2) == 1);
             Assert.True(Math.Abs(MathHelpers<double>.Subtract(3D, 2D) - 1D) < 0.01);
-            Assert.True(MathHelpers<sbyte>.Equals(2, 2));
+            Assert.True(MathHelpers<sbyte>.IsEquals(2, 2));
             Assert.True(MathHelpers<sbyte>.GreaterThan(3, 2));
             Assert.True(MathHelpers<sbyte>.GreaterOrEqualThan(5, 5));
             Assert.True(MathHelpers<sbyte>.GreaterOrEqualThan(5, 1));

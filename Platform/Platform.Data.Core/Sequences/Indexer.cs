@@ -1,4 +1,5 @@
-﻿using Platform.Data.Core.Doublets;
+﻿using Platform.Helpers;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -27,7 +28,7 @@ namespace Platform.Data.Core.Sequences
             var indexed = true;
 
             var i = sequence.Length;
-            while (--i >= 1 && (indexed = !Equals(_links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
+            while (--i >= 1 && (indexed = !MathHelpers<TLink>.IsEquals(_links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
 
             for (; i >= 1; i--)
                 _links.GetOrCreate(sequence[i - 1], sequence[i]);
@@ -45,7 +46,7 @@ namespace Platform.Data.Core.Sequences
 
             _links.SyncRoot.ExecuteReadOperation(() =>
             {
-                while (--i >= 1 && (indexed = !Equals(links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
+                while (--i >= 1 && (indexed = !MathHelpers<TLink>.IsEquals(links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
             });
 
             if (indexed == false)
@@ -68,7 +69,7 @@ namespace Platform.Data.Core.Sequences
 
             var links = _links.Unsync;
 
-            while (--i >= 1 && (indexed = !Equals(links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
+            while (--i >= 1 && (indexed = !MathHelpers<TLink>.IsEquals(links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
 
             for (; i >= 1; i--)
                 links.GetOrCreate(sequence[i - 1], sequence[i]);
@@ -81,7 +82,7 @@ namespace Platform.Data.Core.Sequences
             var indexed = true;
 
             var i = sequence.Length;
-            while (--i >= 1 && (indexed = !Equals(_links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
+            while (--i >= 1 && (indexed = !MathHelpers<TLink>.IsEquals(_links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
 
             return indexed;
         }

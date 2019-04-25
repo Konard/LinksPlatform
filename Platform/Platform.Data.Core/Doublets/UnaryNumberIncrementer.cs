@@ -12,13 +12,13 @@ namespace Platform.Data.Core.Doublets
 
         public TLink Increment(TLink unaryNumber)
         {
-            if (Equals(unaryNumber, _unaryOne))
+            if (MathHelpers<TLink>.IsEquals(unaryNumber, _unaryOne))
                 return Links.GetOrCreate(_unaryOne, _unaryOne);
 
             var source = Links.GetSource(unaryNumber);
             var target = Links.GetTarget(unaryNumber);
 
-            if (Equals(source, target))
+            if (MathHelpers<TLink>.IsEquals(source, target))
                 return Links.GetOrCreate(unaryNumber, _unaryOne);
             else
                 return Links.GetOrCreate(source, Increment(target));

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -11,6 +11,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj" />
     <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
+    <ProjectReference Include="..\Platform.Tests\Platform.Tests.csproj" />
   </ItemGroup>
 
 </Project>

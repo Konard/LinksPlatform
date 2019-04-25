@@ -21,9 +21,8 @@ namespace Platform.Helpers.Collections
                 return false;
             if (list.Count != other.Count)
                 return false;
-            var comparer = EqualityComparer<T>.Default;
             for (var i = list.Count - 1; i >= 0; --i)
-                if (!comparer.Equals(list[i], other[i]))
+                if (!Equals(list[i], other[i]))
                     return false;
             return true;
         }

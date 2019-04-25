@@ -1,4 +1,5 @@
-﻿using Platform.Helpers.Collections;
+﻿using Platform.Helpers;
+using Platform.Helpers.Collections;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -22,7 +23,7 @@ namespace Platform.Data.Core.Doublets
         public TLink Pop()
         {
             var element = Peek();
-            if (!Equals(element, _stack))
+            if (!MathHelpers<TLink>.IsEquals(element, _stack))
             {
                 var top = GetTopDoublet();
                 var previousTop = _links.GetSource(top);

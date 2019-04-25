@@ -1,5 +1,6 @@
-﻿using Platform.Helpers.Collections;
-using Platform.Data.Core.Doublets;
+﻿using Platform.Data.Core.Doublets;
+using Platform.Helpers;
+using Platform.Helpers.Collections;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -18,11 +19,11 @@ namespace Platform.Data.Core.Sequences
         public TLink Append(TLink sequence, TLink appendant)
         {
             var cursor = sequence;
-            while (!Equals(_heightProvider.GetHeight(cursor), default(TLink)))
+            while (!MathHelpers<TLink>.IsEquals(_heightProvider.GetHeight(cursor), default))
             {
                 var source = Links.GetSource(cursor);
                 var target = Links.GetTarget(cursor);
-                if (Equals(_heightProvider.GetHeight(source), _heightProvider.GetHeight(target)))
+                if (MathHelpers<TLink>.IsEquals(_heightProvider.GetHeight(source), _heightProvider.GetHeight(target)))
                     break;
                 else
                 {
@@ -33,7 +34,7 @@ namespace Platform.Data.Core.Sequences
 
             var left = cursor;
             var right = appendant;
-            while (!Equals(cursor = _stack.Pop(), Links.Constants.Null))
+            while (!MathHelpers<TLink>.IsEquals(cursor = _stack.Pop(), Links.Constants.Null))
             {
                 right = Links.GetOrCreate(left, right);
                 left = cursor;

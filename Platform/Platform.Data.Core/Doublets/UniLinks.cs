@@ -254,12 +254,12 @@ namespace Platform.Data.Core.Doublets
                 var before = ArrayPool<T>.Empty;
 
                 // Что должно означать False здесь? Остановиться (перестать идти) или пропустить (пройти мимо) или пустить (взять)?
-                if (matchHandler != null && Equals(matchHandler(before), Constants.Break))
+                if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
                     return Constants.Break;
 
                 var after = (IList<T>)substitution.ToArray();
 
-                if (Equals(after[0], default(T)))
+                if (MathHelpers<T>.IsEquals(after[0], default))
                 {
                     var newLink = Links.Create();
                     after[0] = newLink;
@@ -283,7 +283,7 @@ namespace Platform.Data.Core.Doublets
                     var linkToDelete = patternOrCondition[0];
                     var before = Links.GetLink(linkToDelete);
 
-                    if (matchHandler != null && Equals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
                     var after = ArrayPool<T>.Empty;
@@ -305,17 +305,17 @@ namespace Platform.Data.Core.Doublets
                     var linkToUpdate = patternOrCondition[0];
                     var before = Links.GetLink(linkToUpdate);
 
-                    if (matchHandler != null && Equals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
                     var after = (IList<T>)substitution.ToArray();
 
-                    if (Equals(after[0], default(T)))
+                    if (MathHelpers<T>.IsEquals(after[0], default))
                         after[0] = linkToUpdate;
 
                     if (substitution.Count == 1)
                     {
-                        if (!Equals(substitution[0], linkToUpdate))
+                        if (!MathHelpers<T>.IsEquals(substitution[0], linkToUpdate))
                         {
                             after = Links.GetLink(substitution[0]);
 

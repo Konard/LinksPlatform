@@ -47,7 +47,7 @@ namespace Platform.Data.Core.Doublets
                             continue;
                         }
 
-                        if (Equals(index, leftSize))
+                        if (IsEquals(index, leftSize))
                             return root;
 
                         root = GetRightOrDefault(root);
@@ -113,7 +113,7 @@ namespace Platform.Data.Core.Doublets
                     var @base = GetBasePartValue(current);
                     if (MathHelpers.GreaterOrEqualThan(@base, link))
                     {
-                        if (Equals(@base, link))
+                        if (IsEquals(@base, link))
                             first = current;
                         current = GetLeftOrDefault(current);
                     }
@@ -126,10 +126,10 @@ namespace Platform.Data.Core.Doublets
                     current = first;
                     while (true)
                     {
-                        if (Equals(handler(_memory.GetLinkStruct(current)), _constants.Break))
+                        if (IsEquals(handler(_memory.GetLinkStruct(current)), _constants.Break))
                             return _constants.Break;
                         current = GetNext(current);
-                        if (EqualToZero(current) || !Equals(GetBasePartValue(current), link))
+                        if (EqualToZero(current) || !IsEquals(GetBasePartValue(current), link))
                             break;
                     }
                 }
@@ -269,7 +269,7 @@ namespace Platform.Data.Core.Doublets
                 var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
 
                 return LessThan(firstSource, secondSource) ||
-                       (Equals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
+                       (IsEquals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
             }
 
             protected override bool FirstIsToTheRightOfSecond(T first, T second)
@@ -278,7 +278,7 @@ namespace Platform.Data.Core.Doublets
                 var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
 
                 return GreaterThan(firstSource, secondSource) ||
-                       (Equals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
+                       (IsEquals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
             }
 
             protected override T GetTreeRoot()
@@ -321,13 +321,13 @@ namespace Platform.Data.Core.Doublets
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool FirstIsToTheLeftOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
             {
-                return LessThan(firstSource, secondSource) || (Equals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
+                return LessThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             private bool FirstIsToTheRightOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
             {
-                return GreaterThan(firstSource, secondSource) || (Equals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
+                return GreaterThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
             }
         }
 
@@ -422,7 +422,7 @@ namespace Platform.Data.Core.Doublets
                 var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
 
                 return LessThan(firstTarget, secondTarget) ||
-                       (Equals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
+                       (IsEquals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
             }
 
             protected override bool FirstIsToTheRightOfSecond(T first, T second)
@@ -431,7 +431,7 @@ namespace Platform.Data.Core.Doublets
                 var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
 
                 return GreaterThan(firstTarget, secondTarget) ||
-                       (Equals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
+                       (IsEquals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
             }
 
             protected override T GetTreeRoot()

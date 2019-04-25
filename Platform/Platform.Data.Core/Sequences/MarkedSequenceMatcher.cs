@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Sequences
         }
 
         public bool IsMatched(TLink sequenceCandidate) =>
-            Equals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
-        || !Equals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
+            MathHelpers<TLink>.IsEquals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
+        || !MathHelpers<TLink>.IsEquals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
     }
 }

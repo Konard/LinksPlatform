@@ -32,7 +32,7 @@ namespace Platform.Data.Core.Sequences.FrequencyCounters
         {
             var any = _links.Constants.Any;
 
-            if (Equals(_links.Count(any, link), default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(_links.Count(any, link), default))
                 CountSequenceSymbolFrequency(link);
             else
                 _links.Each(EachElementHandler, any, link);

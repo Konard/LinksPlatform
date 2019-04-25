@@ -33,14 +33,14 @@ namespace Platform.Data.Core.Sequences
         {
             if (UseSequenceMarker)
             {
-                if (Equals(SequenceMarkerLink, Constants.Null))
+                if (MathHelpers<TLink>.IsEquals(SequenceMarkerLink, links.Constants.Null))
                     SequenceMarkerLink = links.CreatePoint();
                 else
                 {
                     if (!links.Exists(SequenceMarkerLink))
                     {
                         var link = links.CreatePoint();
-                        if (!Equals(link, SequenceMarkerLink))
+                        if (!MathHelpers<TLink>.IsEquals(link, SequenceMarkerLink))
                             throw new Exception("Cannot recreate sequence marker link.");
                     }
                 }

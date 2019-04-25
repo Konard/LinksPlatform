@@ -120,14 +120,14 @@ namespace Platform.Data.Core.Collections.Trees
                 while (true)
                 {
                     var parent = path[--pathPosition];
-                    var isLeftNode = !Equals(parent, default(TElement)) && Equals(currentNode, GetLeftValue(parent));
+                    var isLeftNode = !IsEquals(parent, default) && IsEquals(currentNode, GetLeftValue(parent));
 
                     var currentNodeBalance = GetBalance(currentNode);
 
                     if ((currentNodeBalance < -1) || (currentNodeBalance > 1))
                     {
                         currentNode = Balance(currentNode);
-                        if (Equals(parent, default(TElement)))
+                        if (IsEquals(parent, default))
                             root.SetValue(currentNode);
                         else if (isLeftNode)
                         {
@@ -142,7 +142,7 @@ namespace Platform.Data.Core.Collections.Trees
                     }
 
                     currentNodeBalance = GetBalance(currentNode);
-                    if ((currentNodeBalance == 0) || Equals(parent, default(TElement)))
+                    if ((currentNodeBalance == 0) || IsEquals(parent, default))
                         break;
 
                     if (isLeftNode)
@@ -341,13 +341,13 @@ namespace Platform.Data.Core.Collections.Trees
                 var parent = path[--pathPosition];
                 var balanceNode = parent;
 
-                var isLeftNode = !Equals(parent, default(TElement)) && Equals(currentNode, GetLeftValue(parent));
+                var isLeftNode = !IsEquals(parent, default) && IsEquals(currentNode, GetLeftValue(parent));
 
                 if (!GetLeftIsChild(currentNode))
                 {
                     if (!GetRightIsChild(currentNode)) // node has no children
                     {
-                        if (Equals(parent, default(TElement)))
+                        if (IsEquals(parent, default))
                             root.SetValue(GetZero());
                         else if (isLeftNode)
                         {
@@ -368,7 +368,7 @@ namespace Platform.Data.Core.Collections.Trees
                         SetLeft(successor, GetLeftValue(currentNode));
 
                         var right = GetRightValue(currentNode);
-                        if (Equals(parent, default(TElement)))
+                        if (IsEquals(parent, default))
                             root.SetValue(right);
                         else if (isLeftNode)
                         {
@@ -390,7 +390,7 @@ namespace Platform.Data.Core.Collections.Trees
                         SetRight(predecessor, GetRightValue(currentNode));
 
                         var leftValue = GetLeftValue(currentNode);
-                        if (Equals(parent, default(TElement)))
+                        if (IsEquals(parent, default))
                             root.SetValue(leftValue);
                         else if (isLeftNode)
                         {
@@ -417,7 +417,7 @@ namespace Platform.Data.Core.Collections.Trees
                         {
                             path[++pathPosition] = successorParent = successor;
                             successor = GetLeftValue(successor);
-                            if (!Equals(successorParent, currentNode))
+                            if (!IsEquals(successorParent, currentNode))
                                 DecrementSize(successorParent);
                         }
 
@@ -425,7 +425,7 @@ namespace Platform.Data.Core.Collections.Trees
                         balanceNode = path[pathPosition];
 
                         // remove 'successor' from the tree
-                        if (!Equals(successorParent, currentNode))
+                        if (!IsEquals(successorParent, currentNode))
                         {
                             if (!GetRightIsChild(successor))
                                 SetLeftIsChild(successorParent, false);
@@ -452,7 +452,7 @@ namespace Platform.Data.Core.Collections.Trees
 
                         FixSize(successor);
 
-                        if (Equals(parent, default(TElement)))
+                        if (IsEquals(parent, default))
                             root.SetValue(successor);
                         else if (isLeftNode)
                             SetLeft(parent, successor);
@@ -462,19 +462,19 @@ namespace Platform.Data.Core.Collections.Trees
                 }
 
                 // restore balance
-                if (!Equals(balanceNode, default(TElement)))
+                if (!IsEquals(balanceNode, default))
                 {
                     while (true)
                     {
                         var balanceParent = path[--pathPosition];
-                        isLeftNode = !Equals(balanceParent, default(TElement)) && Equals(balanceNode, GetLeftValue(balanceParent));
+                        isLeftNode = !IsEquals(balanceParent, default) && IsEquals(balanceNode, GetLeftValue(balanceParent));
 
                         var currentNodeBalance = GetBalance(balanceNode);
 
                         if ((currentNodeBalance < -1) || (currentNodeBalance > 1))
                         {
                             balanceNode = Balance(balanceNode);
-                            if (Equals(balanceParent, default(TElement)))
+                            if (IsEquals(balanceParent, default))
                                 root.SetValue(balanceNode);
                             else if (isLeftNode)
                                 SetLeft(balanceParent, balanceNode);
@@ -483,7 +483,7 @@ namespace Platform.Data.Core.Collections.Trees
                         }
 
                         currentNodeBalance = GetBalance(balanceNode);
-                        if ((currentNodeBalance != 0) || Equals(balanceParent, default(TElement)))
+                        if ((currentNodeBalance != 0) || IsEquals(balanceParent, default))
                             break;
 
                         if (isLeftNode)

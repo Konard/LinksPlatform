@@ -112,7 +112,7 @@ namespace Platform.Data.Core.Sequences
                 var maxDoubletSource = _maxDoublet.Source;
                 var maxDoubletTarget = _maxDoublet.Target;
 
-                if (Equals(_maxDoubletData.Link, Constants.Null))
+                if (MathHelpers<TLink>.IsEquals(_maxDoubletData.Link, Constants.Null))
                     _maxDoubletData.Link = Links.GetOrCreate(maxDoubletSource, maxDoubletTarget);
 
                 var maxDoubletReplacementLink = _maxDoubletData.Link;
@@ -124,7 +124,7 @@ namespace Platform.Data.Core.Sequences
                 int w = 0, r = 0; // (r == read, w == write)
                 for (; r < oldLength; r++)
                 {
-                    if (Equals(copy[r].Element, maxDoubletSource) && Equals(copy[r + 1].Element, maxDoubletTarget))
+                    if (MathHelpers<TLink>.IsEquals(copy[r].Element, maxDoubletSource) && MathHelpers<TLink>.IsEquals(copy[r + 1].Element, maxDoubletTarget))
                     {
                         if (r > 0)
                         {
@@ -184,7 +184,7 @@ namespace Platform.Data.Core.Sequences
             var maxFrequency = _maxDoubletData.Frequency;
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target)) 
-            if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) && (MathHelpers.LessThan(maxFrequency, frequency) || Equals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+            if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) && (MathHelpers.LessThan(maxFrequency, frequency) || MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

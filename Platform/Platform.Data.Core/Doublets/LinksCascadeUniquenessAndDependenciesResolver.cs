@@ -23,13 +23,13 @@ namespace Platform.Data.Core.Doublets
             for (ulong i = 0; i < referencesAsSourceCount; i++)
             {
                 var reference = references[i];
-                if (Equals(reference, oldLinkAddress)) continue;
+                if (MathHelpers<T>.IsEquals(reference, oldLinkAddress)) continue;
                 Links.Update(reference, newLinkAddress, Links.GetTarget(reference));
             }
             for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
             {
                 var reference = references[i];
-                if (Equals(reference, oldLinkAddress)) continue;
+                if (MathHelpers<T>.IsEquals(reference, oldLinkAddress)) continue;
                 Links.Update(reference, Links.GetSource(reference), newLinkAddress);
             }
 

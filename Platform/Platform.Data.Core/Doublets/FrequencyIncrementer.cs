@@ -18,7 +18,7 @@ namespace Platform.Data.Core.Doublets
 
         public TLink Increment(TLink frequency)
         {
-            if (Equals(frequency, default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(frequency, default))
                 return Links.GetOrCreate(_unaryOne, _frequencyMarker);
             var source = Links.GetSource(frequency);
             var incrementedSource = _unaryNumberIncrementer.Increment(source);

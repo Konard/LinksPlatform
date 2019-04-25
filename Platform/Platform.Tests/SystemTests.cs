@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Diagnostics;
 using Xunit;
+using Platform.Helpers;
 
 namespace Platform.Tests
 {
@@ -14,6 +16,60 @@ namespace Platform.Tests
             using (var disposable = null as IDisposable)
                 Assert.True(disposable == null);
         }
+
+        [Fact]
+        public static void EqualsPerfomanceTest()
+        {
+            const int N = 1000000;
+
+            ulong x = 10;
+            ulong y = 500;
+
+            bool result = false;
+
+            var sw1 = Stopwatch.StartNew();
+
+            for (int i = 0; i < N; i++)
+                result = Equals1(x, y);
+
+            sw1.Stop();
+
+            var sw2 = Stopwatch.StartNew();
+
+            for (int i = 0; i < N; i++)
+                result = Equals2(x, y);
+
+            sw2.Stop();
+
+            var sw3 = Stopwatch.StartNew();
+
+            for (int i = 0; i < N; i++)
+                result = Equals3(x, y);
+
+            sw3.Stop();
+
+            if (!result)
+                result = MathHelpers<ulong>.IsEquals(x, y); // Ensure precompiled
+
+            var sw4 = Stopwatch.StartNew();
+
+            for (int i = 0; i < N; i++)
+                result = MathHelpers<ulong>.IsEquals(x, y);
+
+            sw4.Stop();
+
+            Assert.True(sw2.Elapsed < sw1.Elapsed);
+            Assert.True(sw3.Elapsed < sw2.Elapsed);
+            Assert.True(sw4.Elapsed < sw2.Elapsed);
+
+            Console.WriteLine($"{sw1.Elapsed} {sw2.Elapsed} {sw3.Elapsed} {sw4.Elapsed} {result}");
+        }
+
+        private static bool Equals1<T>(T x, T y) => Equals(x, y);
+
+        private static bool Equals2<T>(T x, T y) => x.Equals(y);
+
+        private static bool Equals3(ulong x, ulong y) => x == y;
 
         [Fact]
         public void PossiblePackTwoValuesIntoOneTest()

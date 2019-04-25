@@ -27,7 +27,7 @@ namespace Platform.Data.Core.Doublets
 
             for (var i = (long)referencesCount - 1; i >= 0; i--)
             {
-                if (Equals(references[i], link)) continue;
+                if (MathHelpers<T>.IsEquals(references[i], link)) continue;
                 Links.Delete(references[i]);
             }
 

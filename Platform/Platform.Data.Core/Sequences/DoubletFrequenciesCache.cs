@@ -24,7 +24,7 @@ namespace Platform.Data.Core.Sequences
             public static readonly DoubletComparer Default = new DoubletComparer();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(Link<TLink> x, Link<TLink> y) => Equals(x.Source, y.Source) && Equals(x.Target, y.Target);
+            public bool Equals(Link<TLink> x, Link<TLink> y) => MathHelpers<TLink>.IsEquals(x.Source, y.Source) && MathHelpers<TLink>.IsEquals(x.Target, y.Target);
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
             public int GetHashCode(Link<TLink> obj) => (int)(((ulong)(Integer<TLink>)obj.Source << 15) ^ (ulong)(Integer<TLink>)obj.Target);
@@ -56,7 +56,7 @@ namespace Platform.Data.Core.Sequences
 
                 data = new FrequencyAndLink<TLink>(Integer<TLink>.One, link);
 
-                if (!Equals(link, default(TLink)))
+                if (!MathHelpers<TLink>.IsEquals(link, default))
                     data.Frequency = MathHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
 
                 _doubletsCache.Add(doublet, data);
@@ -74,7 +74,7 @@ namespace Platform.Data.Core.Sequences
 
                 var linkIndex = value.Link;
 
-                if (!Equals(linkIndex, default(TLink)))
+                if (!MathHelpers<TLink>.IsEquals(linkIndex, default))
                 {
                     var frequency = value.Frequency;
                     var count = _frequencyCounter.Count(linkIndex);

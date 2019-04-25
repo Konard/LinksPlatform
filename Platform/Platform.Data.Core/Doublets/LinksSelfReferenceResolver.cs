@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -9,7 +10,7 @@ namespace Platform.Data.Core.Doublets
 
         public override T Each(Func<IList<T>, T> handler, IList<T> restrictions)
         {
-            if (!Equals(Constants.Any, Constants.Itself) && (Equals(restrictions[Constants.SourcePart], Constants.Itself) || Equals(restrictions[Constants.TargetPart], Constants.Itself)))
+            if (!MathHelpers<T>.IsEquals(Constants.Any, Constants.Itself) && (MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Itself) || MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Itself)))
                 return Constants.Continue;
 
             return base.Each(handler, restrictions);
@@ -17,8 +18,8 @@ namespace Platform.Data.Core.Doublets
 
         public override T Update(IList<T> restrictions)
         {
-            restrictions[Constants.SourcePart] = Equals(restrictions[Constants.SourcePart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
-            restrictions[Constants.TargetPart] = Equals(restrictions[Constants.TargetPart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
+            restrictions[Constants.SourcePart] = MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
+            restrictions[Constants.TargetPart] = MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
 
             return base.Update(restrictions);
         }

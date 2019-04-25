@@ -12,7 +12,7 @@ namespace Platform.Data.Core.Doublets
         public TLink GetValue(TLink @object, TLink property)
         {
             var objectProperty = Links.SearchOrDefault(@object, property);
-            if (Equals(objectProperty, default(TLink)))
+            if (MathHelpers<TLink>.IsEquals(objectProperty, default))
                 return default;
             var valueLink = Links.All(Links.Constants.Any, objectProperty).SingleOrDefault();
             if (valueLink == null)

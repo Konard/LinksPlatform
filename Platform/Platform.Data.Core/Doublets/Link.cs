@@ -59,13 +59,13 @@ namespace Platform.Data.Core.Doublets
             return hash;
         }
 
-        public bool IsNull() => Equals(Index, Constants.Null) && Equals(Source, Constants.Null) && Equals(Target, Constants.Null);
+        public bool IsNull() => MathHelpers<T>.IsEquals(Index, Constants.Null) && MathHelpers<T>.IsEquals(Source, Constants.Null) && MathHelpers<T>.IsEquals(Target, Constants.Null);
 
         public override bool Equals(object other) => other is Link<T> && Equals((Link<T>)other);
 
-        public bool Equals(Link<T> other) => Equals(Index, other.Index) &&
-                                             Equals(Source, other.Source) &&
-                                             Equals(Target, other.Target);
+        public bool Equals(Link<T> other) => MathHelpers<T>.IsEquals(Index, other.Index) &&
+                                             MathHelpers<T>.IsEquals(Source, other.Source) &&
+                                             MathHelpers<T>.IsEquals(Target, other.Target);
 
         public static string ToString(T index, T source, T target) => $"({index}: {source}->{target})";
 
@@ -77,7 +77,7 @@ namespace Platform.Data.Core.Doublets
 
         #region IList
 
-        public override string ToString() => Equals(Index, Constants.Null) ? ToString(Source, Target) : ToString(Index, Source, Target);
+        public override string ToString() => MathHelpers<T>.IsEquals(Index, Constants.Null) ? ToString(Source, Target) : ToString(Index, Source, Target);
 
         public T[] ToArray()
         {
@@ -119,9 +119,9 @@ namespace Platform.Data.Core.Doublets
 
         public int IndexOf(T item)
         {
-            if (Equals(Index, item)) return Constants.IndexPart;
-            if (Equals(Source, item)) return Constants.SourcePart;
-            if (Equals(Target, item)) return Constants.TargetPart;
+            if (MathHelpers<T>.IsEquals(Index, item)) return Constants.IndexPart;
+            if (MathHelpers<T>.IsEquals(Source, item)) return Constants.SourcePart;
+            if (MathHelpers<T>.IsEquals(Target, item)) return Constants.TargetPart;
             return -1;
         }
 

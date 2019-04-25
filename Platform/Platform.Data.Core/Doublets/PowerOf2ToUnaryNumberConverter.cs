@@ -17,7 +17,7 @@ namespace Platform.Data.Core.Doublets
         {
             if (power < 0 || power >= _unaryNumberPowersOf2.Length)
                 throw new ArgumentOutOfRangeException(nameof(power));
-            if (!Equals(_unaryNumberPowersOf2[power], default(TLink)))
+            if (!MathHelpers<TLink>.IsEquals(_unaryNumberPowersOf2[power], default))
                 return _unaryNumberPowersOf2[power];
 
             var previousPowerOf2 = Convert(power - 1);
