@@ -2,7 +2,7 @@
 using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences.FrequencyCounters
+namespace Platform.Data.Core.Sequences.Frequencies.Counters
 {
     public class TotalSequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {
