@@ -1,8 +1,9 @@
-﻿using Platform.Helpers;
+﻿using System.Collections.Generic;
+using Platform.Helpers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinkFrequencyIncrementer<TLink> : LinksOperatorBase<TLink>, IIncrementer<TLink>
+    public class LinkFrequencyIncrementer<TLink> : LinksOperatorBase<TLink>, IIncrementer<IList<TLink>>
     {
         private readonly ISpecificPropertyOperator<TLink, TLink> _frequencyPropertyOperator;
         private readonly IIncrementer<TLink> _frequencyIncrementer;
@@ -14,13 +15,19 @@ namespace Platform.Data.Core.Doublets
             _frequencyIncrementer = frequencyIncrementer;
         }
 
-        /// <remarks>Link itseft is not changed, only it's frequency property is incremented.</remarks>
-        public TLink Increment(TLink link)
+        /// <remarks>Sequence itseft is not changed, only frequency of its doublets is incremented.</remarks>
+        public IList<TLink> Increment(IList<TLink> sequence)
+        {
+            for (var i = 1; i < sequence.Count; i++)
+                Increment(Links.GetOrCreate(sequence[i - 1], sequence[i]));
+            return sequence;
+        }
+
+        public void Increment(TLink link)
         {
             var previousFrequency = _frequencyPropertyOperator.GetValue(link);
             var frequency = _frequencyIncrementer.Increment(previousFrequency);
             _frequencyPropertyOperator.SetValue(link, frequency);
-            return link;
         }
     }
 }

@@ -1,8 +1,10 @@
-﻿using Platform.Helpers;
+﻿using System;
+using Platform.Helpers;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinkToItsFrequencyNumberConveter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
+    public class LinkToItsFrequencyNumberConveter<TLink> : LinksOperatorBase<TLink>, IConverter<Doublet<TLink>, TLink>
     {
         private readonly ISpecificPropertyOperator<TLink, TLink> _frequencyPropertyOperator;
         private readonly IConverter<TLink> _unaryNumberToAddressConverter;
@@ -17,8 +19,12 @@ namespace Platform.Data.Core.Doublets
             _unaryNumberToAddressConverter = unaryNumberToAddressConverter;
         }
 
-        public TLink Convert(TLink link)
+        public TLink Convert(Doublet<TLink> doublet)
         {
+            var link = Links.SearchOrDefault(doublet.Source, doublet.Target);
+            if (MathHelpers<TLink>.IsEquals(link, Links.Constants.Null))
+                throw new ArgumentException($"Link with {doublet.Source} source and {doublet.Target} target not found.", nameof(doublet));
+
             var frequency = _frequencyPropertyOperator.GetValue(link);
             if (MathHelpers<TLink>.IsEquals(frequency, default))
                 return default;

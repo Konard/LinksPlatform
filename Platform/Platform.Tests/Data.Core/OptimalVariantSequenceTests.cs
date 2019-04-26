@@ -2,9 +2,11 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Xunit;
-using Platform.Data.Core.Common;
+using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Core.Sequences.Frequencies.Counters;
 
 namespace Platform.Tests.Data.Core
 {
@@ -36,10 +38,10 @@ namespace Platform.Tests.Data.Core
                 var frequencyPropertyOperator = new FrequencyPropertyOperator<ulong>(links, frequencyPropertyMarker, frequencyMarker);
                 var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
                 var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
-                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
+                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkToItsFrequencyNumberConverter);
                 var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
 
-                ExecuteTest(links, sequences, sequence, sequenceToItsLocalElementLevelsConverter, optimalVariantConverter);
+                ExecuteTest(links, sequences, sequence, sequenceToItsLocalElementLevelsConverter, linkFrequencyIncrementer, optimalVariantConverter);
             }
         }
 
@@ -57,18 +59,23 @@ namespace Platform.Tests.Data.Core
 
                 var linksToFrequencies = new Dictionary<ulong, ulong>();
 
-                var linkFrequencyIncrementer = new DictionaryBasedLinkFrequencyIncrementer<ulong>(linksToFrequencies);
-                var linkToItsFrequencyNumberConverter = new DictionaryBasedLinkToItsFrequencyNumberConveter<ulong>(linksToFrequencies);
-                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
+                var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(links);
+
+                var linkFrequenciesCache = new LinkFrequenciesCache<ulong>(links, totalSequenceSymbolFrequencyCounter);
+
+                var linkFrequencyIncrementer = new FrequenciesCacheBasedLinkFrequencyIncrementer<ulong>(linkFrequenciesCache);
+                var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<ulong>(linkFrequenciesCache);
+
+                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkToItsFrequencyNumberConverter);
                 var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
 
-                ExecuteTest(links, sequences, sequence, sequenceToItsLocalElementLevelsConverter, optimalVariantConverter);
+                ExecuteTest(links, sequences, sequence, sequenceToItsLocalElementLevelsConverter, linkFrequencyIncrementer, optimalVariantConverter);
             }
         }
 
-        private static void ExecuteTest(SynchronizedLinks<ulong> links, Sequences sequences, ulong[] sequence, SequenceToItsLocalElementLevelsConverter<ulong> sequenceToItsLocalElementLevelsConverter, OptimalVariantConverter<ulong> optimalVariantConverter)
+        private static void ExecuteTest(SynchronizedLinks<ulong> links, Sequences sequences, ulong[] sequence, SequenceToItsLocalElementLevelsConverter<ulong> sequenceToItsLocalElementLevelsConverter, IIncrementer<IList<ulong>> linkFrequencyIncrementer, OptimalVariantConverter<ulong> optimalVariantConverter)
         {
-            sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(sequence);
+            linkFrequencyIncrementer.Increment(sequence);
 
             var levels = sequenceToItsLocalElementLevelsConverter.Convert(sequence);
 

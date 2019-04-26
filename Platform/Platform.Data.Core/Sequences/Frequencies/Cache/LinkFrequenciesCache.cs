@@ -37,9 +37,9 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
             return data;
         }
 
-        public void IncrementFrequencies(TLink[] sequence)
+        public void IncrementFrequencies(IList<TLink> sequence)
         {
-            for (var i = 1; i < sequence.Length; i++)
+            for (var i = 1; i < sequence.Count; i++)
                 IncrementFrequency(sequence[i - 1], sequence[i]);
         }
 
@@ -49,6 +49,18 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
             var doublet = new Doublet<TLink>(source, target);
 
             return IncrementFrequency(ref doublet);
+        }
+
+        public void PrintFrequencies(IList<TLink> sequence)
+        {
+            for (var i = 1; i < sequence.Count; i++)
+                PrintFrequency(sequence[i - 1], sequence[i]);
+        }
+
+        public void PrintFrequency(TLink source, TLink target)
+        {
+            var number = GetFrequency(source, target).Frequency;
+            Console.WriteLine("({0},{1}) - {2}", source, target, number);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

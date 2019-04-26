@@ -473,15 +473,14 @@ namespace Platform.Tests.Data.Core
 
                 var balancedVariantConverter1 = new BalancedVariantConverter<ulong>(scope1.Links.Unsync);
                 var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(scope1.Links.Unsync);
-                var doubletFrequenciesCache = new LinkFrequenciesCache<ulong>(scope1.Links.Unsync, totalSequenceSymbolFrequencyCounter);
-                var compressor1 = new CompressingConverter<ulong>(scope1.Links.Unsync, balancedVariantConverter1, doubletFrequenciesCache, doInitialFrequenciesIncrement: false);
+                var linkFrequenciesCache1 = new LinkFrequenciesCache<ulong>(scope1.Links.Unsync, totalSequenceSymbolFrequencyCounter);
+                var compressor1 = new CompressingConverter<ulong>(scope1.Links.Unsync, balancedVariantConverter1, linkFrequenciesCache1, doInitialFrequenciesIncrement: false);
 
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
                                 
                 var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
                 
-                var links = scope3.Links.Unsync;
                 var sequences = compressor3;
                 //var meaningRoot = links.CreatePoint();
                 //var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
@@ -495,13 +494,12 @@ namespace Platform.Tests.Data.Core
                 //var linkFrequencyIncrementer = new LinkFrequencyIncrementer<ulong>(links, frequencyPropertyOperator, frequencyIncrementer);
                 //var linkToItsFrequencyNumberConverter = new LinkToItsFrequencyNumberConveter<ulong>(links, frequencyPropertyOperator, unaryNumberToAddressConveter);
 
-                var linksToFrequencies = new Dictionary<ulong, ulong>();
+                var linkFrequenciesCache3 = new LinkFrequenciesCache<ulong>(scope3.Links.Unsync, totalSequenceSymbolFrequencyCounter);
 
-                var linkFrequencyIncrementer = new DictionaryBasedLinkFrequencyIncrementer<ulong>(linksToFrequencies);
-                var linkToItsFrequencyNumberConverter = new DictionaryBasedLinkToItsFrequencyNumberConveter<ulong>(linksToFrequencies);
+                var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<ulong>(linkFrequenciesCache3);
                 
-                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkFrequencyIncrementer, linkToItsFrequencyNumberConverter);
-                var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
+                var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(scope3.Links.Unsync, linkToItsFrequencyNumberConverter);
+                var optimalVariantConverter = new OptimalVariantConverter<ulong>(scope3.Links.Unsync, sequenceToItsLocalElementLevelsConverter);
 
                 var compressed1 = new ulong[arrays.Length];
                 var compressed2 = new ulong[arrays.Length];
@@ -510,15 +508,18 @@ namespace Platform.Tests.Data.Core
                 var START = 0;
                 var END = arrays.Length;
 
-                for (int i = START; i < END; i++)
-                    doubletFrequenciesCache.IncrementFrequencies(arrays[i]);
+                //for (int i = START; i < END; i++)
+                //    linkFrequenciesCache1.IncrementFrequencies(arrays[i]);
 
                 var initialCount1 = scope2.Links.Unsync.Count();
 
                 var sw1 = Stopwatch.StartNew();
 
                 for (int i = START; i < END; i++)
+                {
+                    linkFrequenciesCache1.IncrementFrequencies(arrays[i]);
                     compressed1[i] = compressor1.Convert(arrays[i]);
+                }
 
                 var elapsed1 = sw1.Elapsed;
 
@@ -532,16 +533,19 @@ namespace Platform.Tests.Data.Core
                     compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);
 
                 var elapsed2 = sw2.Elapsed;
-                                                
+
                 for (int i = START; i < END; i++)
-                    sequenceToItsLocalElementLevelsConverter.IncrementDoubletsFrequencies(arrays[i]);
+                    linkFrequenciesCache3.IncrementFrequencies(arrays[i]);
 
                 var initialCount3 = scope3.Links.Unsync.Count();
                                 
                 var sw3 = Stopwatch.StartNew();
-                
+
                 for (int i = START; i < END; i++)
+                {
+                    //linkFrequenciesCache3.IncrementFrequencies(arrays[i]);
                     compressed3[i] = optimalVariantConverter.Convert(arrays[i]);
+                }
 
                 var elapsed3 = sw3.Elapsed;                
 
@@ -594,7 +598,8 @@ namespace Platform.Tests.Data.Core
 
                 Console.WriteLine($"{duplicates1} | {duplicates2} | {duplicates3}");
 
-                doubletFrequenciesCache.ValidateFrequencies();
+                linkFrequenciesCache1.ValidateFrequencies();
+                linkFrequenciesCache3.ValidateFrequencies();
             }
         }
 
