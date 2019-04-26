@@ -11,9 +11,9 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            SystemTests.EqualsPerfomanceTest();
+            //SystemTests.EqualsPerfomanceTest();
 
-            //SequencesTests.CompressionEfficiencyTest();
+            SequencesTests.CompressionEfficiencyTest();
 
             //new Zadacha().RunAll();
 

@@ -8,7 +8,8 @@ using Platform.Data.Core.Common;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.FrequencyCounters;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Core.Sequences.Frequencies.Counters;
 
 namespace Platform.Tests.Data.Core
 {
@@ -424,7 +425,7 @@ namespace Platform.Tests.Data.Core
 
                 var balancedVariantConverter = new BalancedVariantConverter<ulong>(links.Unsync);
                 var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(links.Unsync);
-                var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(links.Unsync, totalSequenceSymbolFrequencyCounter);
+                var doubletFrequenciesCache = new LinkFrequenciesCache<ulong>(links.Unsync, totalSequenceSymbolFrequencyCounter);
                 var compressingConverter = new CompressingConverter<ulong>(links.Unsync, balancedVariantConverter, doubletFrequenciesCache);
 
                 var compressedVariant = compressingConverter.Convert(sequence);
@@ -472,8 +473,8 @@ namespace Platform.Tests.Data.Core
 
                 var balancedVariantConverter1 = new BalancedVariantConverter<ulong>(scope1.Links.Unsync);
                 var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(scope1.Links.Unsync);
-                var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(scope1.Links.Unsync, totalSequenceSymbolFrequencyCounter);
-                var compressor1 = new CompressingConverter<ulong>(scope1.Links.Unsync, balancedVariantConverter1, doubletFrequenciesCache);
+                var doubletFrequenciesCache = new LinkFrequenciesCache<ulong>(scope1.Links.Unsync, totalSequenceSymbolFrequencyCounter);
+                var compressor1 = new CompressingConverter<ulong>(scope1.Links.Unsync, balancedVariantConverter1, doubletFrequenciesCache, doInitialFrequenciesIncrement: false);
 
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
@@ -505,14 +506,17 @@ namespace Platform.Tests.Data.Core
                 var compressed1 = new ulong[arrays.Length];
                 var compressed2 = new ulong[arrays.Length];
                 var compressed3 = new ulong[arrays.Length];
-           
-                var sw1 = Stopwatch.StartNew();
 
                 var START = 0;
                 var END = arrays.Length;
 
+                for (int i = START; i < END; i++)
+                    doubletFrequenciesCache.IncrementFrequencies(arrays[i]);
+
                 var initialCount1 = scope2.Links.Unsync.Count();
-                
+
+                var sw1 = Stopwatch.StartNew();
+
                 for (int i = START; i < END; i++)
                     compressed1[i] = compressor1.Convert(arrays[i]);
 
@@ -520,9 +524,9 @@ namespace Platform.Tests.Data.Core
 
                 var balancedVariantConverter2 = new BalancedVariantConverter<ulong>(scope2.Links.Unsync);
 
-                var sw2 = Stopwatch.StartNew();
-                
                 var initialCount2 = scope2.Links.Unsync.Count();
+
+                var sw2 = Stopwatch.StartNew();
                 
                 for (int i = START; i < END; i++)
                     compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);

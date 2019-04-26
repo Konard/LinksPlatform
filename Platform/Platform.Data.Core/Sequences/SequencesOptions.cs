@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using Platform.Helpers;
 using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences.FrequencyCounters;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Core.Sequences.Frequencies.Counters;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -61,7 +62,7 @@ namespace Platform.Data.Core.Sequences
                     else
                         totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<TLink>(links);
 
-                    var doubletFrequenciesCache = new DoubletFrequenciesCache<TLink>(links, totalSequenceSymbolFrequencyCounter);
+                    var doubletFrequenciesCache = new LinkFrequenciesCache<TLink>(links, totalSequenceSymbolFrequencyCounter);
 
                     var compressingConverter = new CompressingConverter<TLink>(links, balancedVariantConverter, doubletFrequenciesCache);
                     LinksToSequenceConverter = compressingConverter;

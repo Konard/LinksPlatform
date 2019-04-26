@@ -1,19 +1,28 @@
-﻿namespace Platform.Data.Core.Sequences
+﻿using Platform.Helpers;
+using System.Runtime.CompilerServices;
+
+namespace Platform.Data.Core.Sequences.Frequencies.Cache
 {
-    public class FrequencyAndLink<TLink>
+    public class LinkFrequency<TLink>
     {
         public TLink Frequency;
         public TLink Link;
 
-        public FrequencyAndLink(TLink frequency, TLink link)
+        public LinkFrequency(TLink frequency, TLink link)
         {
             Frequency = frequency;
             Link = link;
         }
 
-        public FrequencyAndLink()
+        public LinkFrequency()
         {
         }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void IncrementFrequency() => Frequency = MathHelpers<TLink>.Increment(Frequency);
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public void DecrementFrequency() => Frequency = MathHelpers<TLink>.Decrement(Frequency);
 
         public override string ToString() => $"F: {Frequency}, L: {Link}";
     }

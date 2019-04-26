@@ -3,6 +3,8 @@ using System.Runtime.CompilerServices;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Data.Core.Doublets;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
+using System;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -16,17 +18,18 @@ namespace Platform.Data.Core.Sequences
         private static readonly LinksConstants<bool, TLink, long> Constants = Default<LinksConstants<bool, TLink, long>>.Instance;
 
         private readonly IConverter<IList<TLink>, TLink> _baseConverter;
-        private readonly DoubletFrequenciesCache<TLink> _doubletFrequenciesCache;
+        private readonly LinkFrequenciesCache<TLink> _doubletFrequenciesCache;
         private readonly TLink _minFrequencyToCompress;
-        private Link<TLink> _maxDoublet;
-        private FrequencyAndLink<TLink> _maxDoubletData;
+        private readonly bool _doInitialFrequenciesIncrement;
+        private Doublet<TLink> _maxDoublet;
+        private LinkFrequency<TLink> _maxDoubletData;
 
         private struct HalfDoublet
         {
             public TLink Element;
-            public FrequencyAndLink<TLink> DoubletData;
+            public LinkFrequency<TLink> DoubletData;
 
-            public HalfDoublet(TLink element, FrequencyAndLink<TLink> doubletData)
+            public HalfDoublet(TLink element, LinkFrequency<TLink> doubletData)
             {
                 Element = element;
                 DoubletData = doubletData;
@@ -35,12 +38,17 @@ namespace Platform.Data.Core.Sequences
             public override string ToString() => $"{Element}: ({DoubletData})";
         }
 
-        public CompressingConverter(ILinks<TLink> links, IConverter<IList<TLink>, TLink> baseConverter, DoubletFrequenciesCache<TLink> doubletFrequenciesCache)
-            : this(links, baseConverter, doubletFrequenciesCache, Integer<TLink>.One)
+        public CompressingConverter(ILinks<TLink> links, IConverter<IList<TLink>, TLink> baseConverter, LinkFrequenciesCache<TLink> doubletFrequenciesCache)
+            : this(links, baseConverter, doubletFrequenciesCache, Integer<TLink>.One, true)
         {
         }
 
-        public CompressingConverter(ILinks<TLink> links, IConverter<IList<TLink>, TLink> baseConverter, DoubletFrequenciesCache<TLink> doubletFrequenciesCache, TLink minFrequencyToCompress)
+        public CompressingConverter(ILinks<TLink> links, IConverter<IList<TLink>, TLink> baseConverter, LinkFrequenciesCache<TLink> doubletFrequenciesCache, bool doInitialFrequenciesIncrement)
+            : this(links, baseConverter, doubletFrequenciesCache, Integer<TLink>.One, doInitialFrequenciesIncrement)
+        {
+        }
+
+        public CompressingConverter(ILinks<TLink> links, IConverter<IList<TLink>, TLink> baseConverter, LinkFrequenciesCache<TLink> doubletFrequenciesCache, TLink minFrequencyToCompress, bool doInitialFrequenciesIncrement)
             : base(links)
         {
             _baseConverter = baseConverter;
@@ -48,6 +56,8 @@ namespace Platform.Data.Core.Sequences
 
             if (MathHelpers.LessThan(minFrequencyToCompress, Integer<TLink>.One)) minFrequencyToCompress = Integer<TLink>.One;
             _minFrequencyToCompress = minFrequencyToCompress;
+
+            _doInitialFrequenciesIncrement = doInitialFrequenciesIncrement;
 
             ResetMaxDoublet();
         }
@@ -72,11 +82,23 @@ namespace Platform.Data.Core.Sequences
             // TODO: arraypool with min size (to improve cache locality)
             var copy = new HalfDoublet[sequence.Count];
 
+            Doublet<TLink> doublet;
+
             for (var i = 1; i < sequence.Count; i++)
             {
-                var doublet = new Link<TLink>(sequence[i - 1], sequence[i]);
+                doublet.Source = sequence[i - 1];
+                doublet.Target = sequence[i];
 
-                var data = _doubletFrequenciesCache.IncrementFrequency(ref doublet);
+                LinkFrequency<TLink> data;
+
+                if (_doInitialFrequenciesIncrement)
+                    data = _doubletFrequenciesCache.IncrementFrequency(ref doublet);
+                else
+                {
+                    data = _doubletFrequenciesCache.GetFrequency(ref doublet);
+                    if (data == null)
+                        throw new NotSupportedException("If you ask not to increment frequencies, it is expected that all frequencies for the sequence are prepared.");
+                }
 
                 copy[i - 1].Element = sequence[i - 1];
                 copy[i - 1].DoubletData = data;
@@ -84,7 +106,7 @@ namespace Platform.Data.Core.Sequences
                 UpdateMaxDoublet(ref doublet, data);
             }
             copy[sequence.Count - 1].Element = sequence[sequence.Count - 1];
-            copy[sequence.Count - 1].DoubletData = new FrequencyAndLink<TLink>();
+            copy[sequence.Count - 1].DoubletData = new LinkFrequency<TLink>();
 
             if (MathHelpers.GreaterThan(_maxDoubletData.Frequency, default))
             {
@@ -129,13 +151,13 @@ namespace Platform.Data.Core.Sequences
                         if (r > 0)
                         {
                             var previous = copy[w - 1].Element;
-                            copy[w - 1].DoubletData.Frequency = MathHelpers.Decrement(copy[w - 1].DoubletData.Frequency);
+                            copy[w - 1].DoubletData.DecrementFrequency();
                             copy[w - 1].DoubletData = _doubletFrequenciesCache.IncrementFrequency(previous, maxDoubletReplacementLink);
                         }
                         if (r < oldLengthMinusTwo)
                         {
                             var next = copy[r + 2].Element;
-                            copy[r + 1].DoubletData.Frequency = MathHelpers.Decrement(copy[r + 1].DoubletData.Frequency);
+                            copy[r + 1].DoubletData.DecrementFrequency();
                             copy[w].DoubletData = _doubletFrequenciesCache.IncrementFrequency(maxDoubletReplacementLink, next);
                         }
 
@@ -163,28 +185,33 @@ namespace Platform.Data.Core.Sequences
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void ResetMaxDoublet()
         {
-            _maxDoublet = new Link<TLink>();
-            _maxDoubletData = new FrequencyAndLink<TLink>();
+            _maxDoublet = new Doublet<TLink>();
+            _maxDoubletData = new LinkFrequency<TLink>();
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void UpdateMaxDoublet(HalfDoublet[] copy, int length)
         {
+            Doublet<TLink> doublet;
+
             for (var i = 1; i < length; i++)
             {
-                var doublet = new Link<TLink>(copy[i - 1].Element, copy[i].Element);
+                doublet.Source = copy[i - 1].Element;
+                doublet.Target = copy[i].Element;
+
                 UpdateMaxDoublet(ref doublet, copy[i - 1].DoubletData);
             }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void UpdateMaxDoublet(ref Link<TLink> doublet, FrequencyAndLink<TLink> data)
+        private void UpdateMaxDoublet(ref Doublet<TLink> doublet, LinkFrequency<TLink> data)
         {
             var frequency = data.Frequency;
             var maxFrequency = _maxDoubletData.Frequency;
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target)) 
-            if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) && (MathHelpers.LessThan(maxFrequency, frequency) || MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+            if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) &&
+               (MathHelpers.LessThan(maxFrequency, frequency) || MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

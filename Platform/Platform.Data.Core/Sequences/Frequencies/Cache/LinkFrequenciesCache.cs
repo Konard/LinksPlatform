@@ -4,57 +4,63 @@ using System.Runtime.CompilerServices;
 using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Core.Sequences.Frequencies.Cache
 {
     /// <remarks>
     /// Can be used to operate with many CompressingConverters (to keep global frequencies data between them).
     /// TODO: Extract interface to implement frequencies storage inside Links storage
     /// </remarks>
-    public class DoubletFrequenciesCache<TLink> : LinksOperatorBase<TLink>
+    public class LinkFrequenciesCache<TLink> : LinksOperatorBase<TLink>
     {
-        private readonly Dictionary<Link<TLink>, FrequencyAndLink<TLink>> _doubletsCache;
+        private readonly Dictionary<Doublet<TLink>, LinkFrequency<TLink>> _doubletsCache;
         private readonly ICounter<TLink, TLink> _frequencyCounter;
 
-        /// <remarks>
-        /// TODO: Может стоит попробовать ref во всех методах (IRefEqualityComparer)
-        /// 2x faster with comparer 
-        /// </remarks>
-        private class DoubletComparer : IEqualityComparer<Link<TLink>>
-        {
-            public static readonly DoubletComparer Default = new DoubletComparer();
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public bool Equals(Link<TLink> x, Link<TLink> y) => MathHelpers<TLink>.IsEquals(x.Source, y.Source) && MathHelpers<TLink>.IsEquals(x.Target, y.Target);
-
-            [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            public int GetHashCode(Link<TLink> obj) => (int)(((ulong)(Integer<TLink>)obj.Source << 15) ^ (ulong)(Integer<TLink>)obj.Target);
-        }
-
-        public DoubletFrequenciesCache(ILinks<TLink> links, ICounter<TLink, TLink> frequencyCounter)
+        public LinkFrequenciesCache(ILinks<TLink> links, ICounter<TLink, TLink> frequencyCounter)
             : base(links)
         {
-            _doubletsCache = new Dictionary<Link<TLink>, FrequencyAndLink<TLink>>(4096, DoubletComparer.Default);
+            _doubletsCache = new Dictionary<Doublet<TLink>, LinkFrequency<TLink>>(4096, DoubletComparer<TLink>.Default);
             _frequencyCounter = frequencyCounter;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FrequencyAndLink<TLink> IncrementFrequency(TLink source, TLink target)
+        public LinkFrequency<TLink> GetFrequency(TLink source, TLink target)
         {
-            var doublet = new Link<TLink>(source, target);
+            var doublet = new Doublet<TLink>(source, target);
+
+            return GetFrequency(ref doublet);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LinkFrequency<TLink> GetFrequency(ref Doublet<TLink> doublet)
+        {
+            _doubletsCache.TryGetValue(doublet, out LinkFrequency<TLink> data);
+            return data;
+        }
+
+        public void IncrementFrequencies(TLink[] sequence)
+        {
+            for (var i = 1; i < sequence.Length; i++)
+                IncrementFrequency(sequence[i - 1], sequence[i]);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public LinkFrequency<TLink> IncrementFrequency(TLink source, TLink target)
+        {
+            var doublet = new Doublet<TLink>(source, target);
 
             return IncrementFrequency(ref doublet);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public FrequencyAndLink<TLink> IncrementFrequency(ref Link<TLink> doublet)
+        public LinkFrequency<TLink> IncrementFrequency(ref Doublet<TLink> doublet)
         {
-            if (_doubletsCache.TryGetValue(doublet, out FrequencyAndLink<TLink> data))
-                data.Frequency = MathHelpers.Increment(data.Frequency);
+            if (_doubletsCache.TryGetValue(doublet, out LinkFrequency<TLink> data))
+                data.IncrementFrequency();
             else
             {
                 var link = Links.SearchOrDefault(doublet.Source, doublet.Target);
 
-                data = new FrequencyAndLink<TLink>(Integer<TLink>.One, link);
+                data = new LinkFrequency<TLink>(Integer<TLink>.One, link);
 
                 if (!MathHelpers<TLink>.IsEquals(link, default))
                     data.Frequency = MathHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
@@ -63,8 +69,6 @@ namespace Platform.Data.Core.Sequences
             }
             return data;
         }
-
-        public void ResetFrequencies() => _doubletsCache.Clear();
 
         public void ValidateFrequencies()
         {

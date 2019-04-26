@@ -7,7 +7,8 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.FrequencyCounters;
+using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Core.Sequences.Frequencies.Counters;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Threading;
@@ -70,7 +71,7 @@ namespace Platform.Sandbox
                 {
                     var sw3 = Stopwatch.StartNew();
                     var frequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(syncLinks);
-                    var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(syncLinks, frequencyCounter);
+                    var doubletFrequenciesCache = new LinkFrequenciesCache<ulong>(syncLinks, frequencyCounter);
                     var compressingConvertor = new CompressingConverter<ulong>(syncLinks, balancedVariantConverter, doubletFrequenciesCache);
                     responseLink2 = compressingConvertor.Convert(responseSourceArray); sw3.Stop();
                     Console.WriteLine(sw3.Elapsed);
@@ -181,7 +182,7 @@ namespace Platform.Sandbox
 
                     var frequencyCounter = new TotalSequenceSymbolFrequencyCounter<ulong>(syncLinks);
                     var balancedVariantConverter = new BalancedVariantConverter<ulong>(syncLinks);
-                    var doubletFrequenciesCache = new DoubletFrequenciesCache<ulong>(syncLinks, frequencyCounter);
+                    var doubletFrequenciesCache = new LinkFrequenciesCache<ulong>(syncLinks, frequencyCounter);
                     var compressingConvertor = new CompressingConverter<ulong>(syncLinks, balancedVariantConverter, doubletFrequenciesCache);
 
                     compressingConvertor.Convert(responseSourceArray); sw3.Stop();
