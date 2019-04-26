@@ -1,12 +1,10 @@
 ﻿using System;
-using System.IO;
 using System.Net.Sockets;
 using System.Threading;
 using Platform.Helpers;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.FrequencyCounters;
 
 namespace Platform.Examples
 {

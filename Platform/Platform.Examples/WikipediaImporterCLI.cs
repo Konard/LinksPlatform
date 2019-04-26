@@ -3,7 +3,6 @@ using System.IO;
 using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.FrequencyCounters;
 
 namespace Platform.Examples
 {

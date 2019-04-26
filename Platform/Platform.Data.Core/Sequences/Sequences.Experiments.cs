@@ -7,9 +7,9 @@ using Platform.Helpers.Collections;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences.FrequencyCounters;
 using LinkIndex = System.UInt64;
 using Stack = System.Collections.Generic.Stack<ulong>;
+using Platform.Data.Core.Sequences.Frequencies.Counters;
 
 namespace Platform.Data.Core.Sequences
 {
