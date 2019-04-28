@@ -257,6 +257,7 @@ namespace Platform.Helpers
             DelegateHelpers.Compile(out Negate, emiter =>
             {
                 EnsureNumeric();
+                EnsureSigned();
 
                 emiter.LoadArgument(0);
                 emiter.Negate();
@@ -402,6 +403,12 @@ namespace Platform.Helpers
         private static void EnsureNumeric()
         {
             if (!CachedTypeInfo<T>.IsNumeric)
+                throw new NotSupportedException();
+        }
+
+        private static void EnsureSigned()
+        {
+            if (!CachedTypeInfo<T>.IsSigned)
                 throw new NotSupportedException();
         }
 
