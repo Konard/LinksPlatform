@@ -404,10 +404,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="handler">Обработчик каждой подходящей связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler)
-        {
-            return links.Each(handler, links.Constants.Any, source, target);
-        }
+        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler) => links.Each(handler, links.Constants.Any, source, target);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
@@ -417,10 +414,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
-        {
-            return !MathHelpers<TLink>.IsEquals(links.Each(handler, restrictions), links.Constants.Break);
-        }
+        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions) => !MathHelpers<TLink>.IsEquals(links.Each(handler, restrictions), links.Constants.Break);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
@@ -536,10 +530,7 @@ namespace Platform.Data.Core.Doublets
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool DependenciesExist<T>(this ILinks<T> links, T link)
-        {
-            return links.DependenciesCount(link) > 0;
-        }
+        public static bool DependenciesExist<T>(this ILinks<T> links, T link) => links.DependenciesCount(link) > 0;
 
         /// <param name="links">Хранилище связей.</param>
         public static void EnsureNoDependencies<T>(this ILinks<T> links, T link)
