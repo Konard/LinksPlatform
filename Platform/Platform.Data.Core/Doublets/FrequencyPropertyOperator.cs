@@ -13,7 +13,7 @@ namespace Platform.Data.Core.Doublets
             _frequencyMarker = frequencyMarker;
         }
 
-        public TLink GetValue(TLink link)
+        public TLink Get(TLink link)
         {
             var property = Links.SearchOrDefault(link, _frequencyPropertyMarker);
             var container = GetContainer(property);
@@ -47,7 +47,7 @@ namespace Platform.Data.Core.Doublets
 
         private TLink GetFrequency(TLink container) => MathHelpers<TLink>.IsEquals(container, default) ? default : Links.GetTarget(container);
 
-        public void SetValue(TLink link, TLink frequency)
+        public void Set(TLink link, TLink frequency)
         {
             var property = Links.GetOrCreate(link, _frequencyPropertyMarker);
             var container = GetContainer(property);

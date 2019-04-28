@@ -25,9 +25,9 @@ namespace Platform.Data.Core.Doublets
 
         public void Increment(TLink link)
         {
-            var previousFrequency = _frequencyPropertyOperator.GetValue(link);
+            var previousFrequency = _frequencyPropertyOperator.Get(link);
             var frequency = _frequencyIncrementer.Increment(previousFrequency);
-            _frequencyPropertyOperator.SetValue(link, frequency);
+            _frequencyPropertyOperator.Set(link, frequency);
         }
     }
 }

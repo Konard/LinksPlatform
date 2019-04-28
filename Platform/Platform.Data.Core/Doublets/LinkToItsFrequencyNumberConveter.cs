@@ -25,7 +25,7 @@ namespace Platform.Data.Core.Doublets
             if (MathHelpers<TLink>.IsEquals(link, Links.Constants.Null))
                 throw new ArgumentException($"Link with {doublet.Source} source and {doublet.Target} target not found.", nameof(doublet));
 
-            var frequency = _frequencyPropertyOperator.GetValue(link);
+            var frequency = _frequencyPropertyOperator.Get(link);
             if (MathHelpers<TLink>.IsEquals(frequency, default))
                 return default;
             var frequencyNumber = Links.GetSource(frequency);

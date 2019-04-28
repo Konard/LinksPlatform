@@ -19,11 +19,11 @@ namespace Platform.Data.Core.Sequences
         public TLink Append(TLink sequence, TLink appendant)
         {
             var cursor = sequence;
-            while (!MathHelpers<TLink>.IsEquals(_heightProvider.GetHeight(cursor), default))
+            while (!MathHelpers<TLink>.IsEquals(_heightProvider.Get(cursor), default))
             {
                 var source = Links.GetSource(cursor);
                 var target = Links.GetTarget(cursor);
-                if (MathHelpers<TLink>.IsEquals(_heightProvider.GetHeight(source), _heightProvider.GetHeight(target)))
+                if (MathHelpers<TLink>.IsEquals(_heightProvider.Get(source), _heightProvider.Get(target)))
                     break;
                 else
                 {

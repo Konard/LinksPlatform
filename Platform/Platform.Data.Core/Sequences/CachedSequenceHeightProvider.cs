@@ -27,13 +27,13 @@ namespace Platform.Data.Core.Sequences
             _propertyOperator = propertyOperator;
         }
 
-        public TLink GetHeight(TLink sequence)
+        public TLink Get(TLink sequence)
         {
             TLink height;
             var heightValue = _propertyOperator.GetValue(sequence, _heightPropertyMarker);
             if (MathHelpers<TLink>.IsEquals(heightValue, default))
             {
-                height = _baseHeightProvider.GetHeight(sequence);
+                height = _baseHeightProvider.Get(sequence);
                 heightValue = _addressToUnaryNumberConverter.Convert(height);
                 _propertyOperator.SetValue(sequence, _heightPropertyMarker, heightValue);
             }

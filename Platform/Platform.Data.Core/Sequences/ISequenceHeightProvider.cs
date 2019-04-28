@@ -1,7 +1,8 @@
-﻿namespace Platform.Data.Core.Sequences
+﻿using Platform.Helpers;
+
+namespace Platform.Data.Core.Sequences
 {
-    public interface ISequenceHeightProvider<TLink>
+    public interface ISequenceHeightProvider<TLink> : IProvider<TLink, TLink>
     {
-        TLink GetHeight(TLink sequence);
     }
 }

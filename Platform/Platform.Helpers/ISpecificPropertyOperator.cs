@@ -1,8 +1,7 @@
 ﻿namespace Platform.Helpers
 {
-    public interface ISpecificPropertyOperator<TObject, TValue>
+    public interface ISpecificPropertyOperator<TObject, TValue> : IProvider<TValue, TObject>
     {
-        TValue GetValue(TObject @object);
-        void SetValue(TObject @object, TValue value);
+        void Set(TObject @object, TValue value);
     }
 }

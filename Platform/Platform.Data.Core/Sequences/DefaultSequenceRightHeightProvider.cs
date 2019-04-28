@@ -12,7 +12,7 @@ namespace Platform.Data.Core.Sequences
             _elementMatcher = elementMatcher;
         }
 
-        public TLink GetHeight(TLink sequence)
+        public TLink Get(TLink sequence)
         {
             var height = default(TLink);
             var pairOrElement = sequence;
