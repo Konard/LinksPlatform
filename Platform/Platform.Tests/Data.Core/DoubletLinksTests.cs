@@ -39,9 +39,9 @@ namespace Platform.Tests.Data.Core
         private static void TestCRUDOperations<T>(this ILinks<T> links)
         {
             var constants = links.Constants;
-            
+
             // Create Link
-            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>) 0));
+            Assert.True(MathHelpers.IsEquals(links.Count(), Integer<T>.Zero));
 
             var setter = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter.SetAndReturnTrue);
@@ -57,7 +57,7 @@ namespace Platform.Tests.Data.Core
             Assert.True(MathHelpers.IsEquals(link.Source, constants.Null));
             Assert.True(MathHelpers.IsEquals(link.Target, constants.Null));
 
-            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)1));
+            Assert.True(MathHelpers.IsEquals(links.Count(), Integer<T>.One));
 
             // Get first link
             setter = new Setter<T>(constants.Null);
@@ -86,7 +86,7 @@ namespace Platform.Tests.Data.Core
             // Delete link
             links.Delete(linkAddress);
 
-            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)0));
+            Assert.True(MathHelpers.IsEquals(links.Count(), Integer<T>.Zero));
 
             setter = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter.SetAndReturnTrue);
@@ -190,7 +190,7 @@ namespace Platform.Tests.Data.Core
             // Delete link
             links.Delete(linkAddress3);
 
-            Assert.True(MathHelpers.IsEquals(links.Count(), (T)(Integer<T>)2));
+            Assert.True(MathHelpers.IsEquals(links.Count(), Integer<T>.Two));
 
             var setter3 = new Setter<T>(constants.Null);
             links.Each(constants.Any, constants.Any, setter3.SetAndReturnTrue);

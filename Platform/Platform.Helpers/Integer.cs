@@ -88,9 +88,23 @@ namespace Platform.Helpers
             }
         }
 
-        public static readonly T Zero = default;
-        public static readonly T One = MathHelpers.Increment(Zero);
-        public static readonly T Two = MathHelpers.Increment(One);
+        public static readonly T Zero;
+        public static readonly T One;
+        public static readonly T Two;
+
+        static Integer()
+        {
+            try
+            {
+                Zero = default;
+                One = MathHelpers.Increment(Zero);
+                Two = MathHelpers.Increment(One);
+            }
+            catch (Exception exception)
+            {
+                Global.OnIgnoredException(exception);
+            }
+        }
 
         public readonly T Value;
 

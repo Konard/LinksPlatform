@@ -213,7 +213,7 @@ namespace Platform.Data.Core.Doublets
                 if (MathHelpers<T>.IsEquals(index, Constants.Any))
                     return Total;
 
-                return Exists(index) ? (Integer<T>)1 : (Integer<T>)0;
+                return Exists(index) ? Integer<T>.One : Integer<T>.Zero;
             }
             if (restrictions.Count == 2)
             {
@@ -230,16 +230,16 @@ namespace Platform.Data.Core.Doublets
                 else
                 {
                     if (!Exists(index))
-                        return (Integer<T>)0;
+                        return Integer<T>.Zero;
 
                     if (MathHelpers<T>.IsEquals(value, Constants.Any))
-                        return (Integer<T>)1;
+                        return Integer<T>.One;
 
                     var storedLinkValue = GetLinkUnsafe(index);
                     if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
                         MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
-                        return (Integer<T>)1;
-                    return (Integer<T>)0;
+                        return Integer<T>.One;
+                    return Integer<T>.Zero;
                 }
             }
             if (restrictions.Count == 3)
@@ -260,16 +260,16 @@ namespace Platform.Data.Core.Doublets
                     {
                         // Эквивалент Exists(source, target) => Count(Any, source, target) > 0
                         var link = _sourcesTreeMethods.Search(source, target);
-                        return MathHelpers<T>.IsEquals(link, Constants.Null) ? (Integer<T>)0 : (Integer<T>)1;
+                        return MathHelpers<T>.IsEquals(link, Constants.Null) ? Integer<T>.Zero : Integer<T>.One;
                     }
                 }
                 else
                 {
                     if (!Exists(index))
-                        return (Integer<T>)0;
+                        return Integer<T>.Zero;
 
                     if (MathHelpers<T>.IsEquals(source, Constants.Any) && MathHelpers<T>.IsEquals(target, Constants.Any))
-                        return (Integer<T>)1;
+                        return Integer<T>.One;
 
                     var storedLinkValue = GetLinkUnsafe(index);
 
@@ -277,8 +277,8 @@ namespace Platform.Data.Core.Doublets
                     {
                         if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), source) &&
                             MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), target))
-                            return (Integer<T>)1;
-                        return (Integer<T>)0;
+                            return Integer<T>.One;
+                        return Integer<T>.Zero;
                     }
 
                     var value = default(T);
@@ -287,8 +287,8 @@ namespace Platform.Data.Core.Doublets
 
                     if (MathHelpers<T>.IsEquals(Link.GetSource(storedLinkValue), value) ||
                         MathHelpers<T>.IsEquals(Link.GetTarget(storedLinkValue), value))
-                        return (Integer<T>)1;
-                    return (Integer<T>)0;
+                        return Integer<T>.One;
+                    return Integer<T>.Zero;
                 }
             }
             throw new NotSupportedException("Другие размеры и способы ограничений не поддерживаются.");
@@ -299,7 +299,7 @@ namespace Platform.Data.Core.Doublets
         {
             if (restrictions.Count == 0)
             {
-                for (T link = (Integer<T>)1; LessOrEqualThan(link, (T)(Integer<T>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
+                for (T link = Integer<T>.One; LessOrEqualThan(link, (T)(Integer<T>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
                     if (Exists(link))
                         if (MathHelpers<T>.IsEquals(handler(GetLinkStruct(link)), Constants.Break))
                             return Constants.Break;
@@ -475,7 +475,7 @@ namespace Platform.Data.Core.Doublets
 
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
-                while (GreaterThan(LinksHeader.GetAllocatedLinks(_header), (T)(Integer<T>)0) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
+                while (GreaterThan(LinksHeader.GetAllocatedLinks(_header), Integer<T>.Zero) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
                 {
                     _unusedLinksListMethods.Detach(LinksHeader.GetAllocatedLinks(_header));
 

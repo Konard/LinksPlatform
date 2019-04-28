@@ -12,7 +12,7 @@ namespace Platform.Data.Core.Doublets
         /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
         TDecision Break { get; }
 
-        TDecision Skip { get; }
+        //TDecision Skip { get; }
     }
 
     /// <remarks>
@@ -32,9 +32,9 @@ namespace Platform.Data.Core.Doublets
 
         /// <summary>Возвращает булевское значение, обозначающее остановку прохода по связям.</summary>
         /// <remarks>Используется в функции обработчике, который передаётся в функцию Each.</remarks>
-        public TDecision Break { get; } = (Integer<TDecision>)0; // The same as Null
+        public TDecision Break { get; } = default; // The same as Null
 
-        public TDecision Skip { get; } = (Integer<TDecision>) 1; // TODO: Подумать над корректной константой
+        //public TDecision Skip { get; } = Integer<TDecision>.One; // TODO: Подумать над корректной константой
     }
 
     public interface ILinksAddressConstants<TAddress>
@@ -84,8 +84,8 @@ namespace Platform.Data.Core.Doublets
 
         public LinksConstants()
         {
-            Null = (Integer<TAddress>)0;
-            MinPossibleIndex = (Integer<TAddress>)1;
+            Null = Integer<TAddress>.Zero;
+            MinPossibleIndex = Integer<TAddress>.One;
             MaxPossibleIndex = MathHelpers.Subtract<TAddress>(ulong.MaxValue, 3);
 
             Itself = MathHelpers.Subtract<TAddress>(ulong.MaxValue, 2);
@@ -108,11 +108,11 @@ namespace Platform.Data.Core.Doublets
 
     public class LinksConstants<TDecision, TAddress, TPartIndex> : LinksConstants<TDecision, TAddress>, ILinksCombinedConstants<TDecision, TAddress, TPartIndex>
     {
-        public TPartIndex IndexPart { get; } = (Integer<TPartIndex>)0;
+        public TPartIndex IndexPart { get; } = Integer<TPartIndex>.Zero;
 
-        public TPartIndex SourcePart { get; } = (Integer<TPartIndex>)1;
+        public TPartIndex SourcePart { get; } = Integer<TPartIndex>.One;
 
-        public TPartIndex TargetPart { get; } = (Integer<TPartIndex>)2;
+        public TPartIndex TargetPart { get; } = Integer<TPartIndex>.Two;
     }
 
     public interface ILinksCombinedConstants<TDecision, TAddress, TPartIndex> :
