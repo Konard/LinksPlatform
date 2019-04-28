@@ -228,9 +228,7 @@ namespace Platform.Data.Core.Sequences
                     return handler(link);
                 }
                 if (sequence.Length == 2)
-                {
                     return Links.Unsync.Each(sequence[0], sequence[1], handler);
-                }
 
                 if (Options.UseIndex && !Options.Indexer.CheckIndex(sequence))
                     return false;
@@ -241,22 +239,23 @@ namespace Platform.Data.Core.Sequences
 
         private bool EachCore(Func<ulong, bool> handler, params ulong[] sequence)
         {
-            var matcher = new Matcher(this, sequence, null, handler);
+            var matcher = new Matcher(this, sequence, new HashSet<LinkIndex>(), handler);
 
-            // Временно возвращаем только фактические варианты последовательностей, а не связи с маркером.
-            // Чтобы возвращать сами последовательности нужна функция HandleFullMatchedSequence
+            // TODO: Find out why matcher.HandleFullMatched executed twice for the same sequence Id.
+
+            Func<ulong, bool> innerHandler = Options.UseSequenceMarker ? (Func<ulong, bool>)matcher.HandleFullMatchedSequence : matcher.HandleFullMatched;
 
             //if (sequence.Length >= 2)
-            if (!StepRight(matcher.HandleFullMatched, sequence[0], sequence[1]))
+            if (!StepRight(innerHandler, sequence[0], sequence[1]))
                 return false;
 
             var last = sequence.Length - 2;
             for (var i = 1; i < last; i++)
-                if (!PartialStepRight(matcher.HandleFullMatched, sequence[i], sequence[i + 1]))
+                if (!PartialStepRight(innerHandler, sequence[i], sequence[i + 1]))
                     return false;
 
             if (sequence.Length >= 3)
-                if (!StepLeft(matcher.HandleFullMatched, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
+                if (!StepLeft(innerHandler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
                     return false;
 
             return true;
@@ -623,7 +622,7 @@ namespace Platform.Data.Core.Sequences
 
             public bool HandleFullMatched(ulong sequenceToMatch)
             {
-                if (FullMatch(sequenceToMatch))
+                if (FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
                     return _stopableHandler(sequenceToMatch);
                 return true;
             }
@@ -631,7 +630,7 @@ namespace Platform.Data.Core.Sequences
             public bool HandleFullMatchedSequence(ulong sequenceToMatch)
             {
                 var sequence = Sequences.GetSequenceByElements(sequenceToMatch);
-                if (FullMatch(sequenceToMatch) && sequence != Constants.Null)
+                if (sequence != Constants.Null && FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
                     return _stopableHandler(sequence);
                 return true;
             }
