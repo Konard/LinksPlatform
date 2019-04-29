@@ -265,7 +265,7 @@ namespace Platform.Data.Core.Collections
             //_version++;
             return this;
         }
-        
+
         private void RefreshBordersByWord(long wordIndex)
         {
             if (_array[wordIndex] != 0)
@@ -330,6 +330,21 @@ namespace Platform.Data.Core.Collections
             //_version++;
         }
 
+        public bool Add(long index)
+        {
+            var wordIndex = index >> 6;
+            var mask = ((long)1 << (int)(index & 63));
+
+            if ((_array[wordIndex] & mask) == 0)
+            {
+                _array[wordIndex] |= mask;
+                RefreshBordersByWord(wordIndex);
+                return true;
+            }
+            else
+                return false;
+        }
+
         public void Reset(long index)
         {
             if (index < 0 || index >= _length)
@@ -353,7 +368,7 @@ namespace Platform.Data.Core.Collections
         {
             if (index < 0 || index >= _length)
                 throw new ArgumentOutOfRangeException();
-            
+
             if (value)
                 SetCore(index);
             else
@@ -364,7 +379,7 @@ namespace Platform.Data.Core.Collections
         {
             var fillValue = value ? unchecked(((long)0xffffffffffffffff)) : 0;
             var ints = (_length + 63) / 64;
-            for (long i = 0; i < ints; i++)
+            for (long i = 0; i < ints; i++) // TODO: use _minPositiveWord and _maxPositiveWord values
             {
                 _array[i] = fillValue;
             }

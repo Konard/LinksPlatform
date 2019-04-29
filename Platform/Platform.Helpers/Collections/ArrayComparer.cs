@@ -18,7 +18,7 @@ namespace Platform.Helpers.Collections
         {
             var result = 17;
             for (var i = 0; i < obj.Length; i++)
-                unchecked { result = result * 23 + obj[i].GetHashCode(); }
+                result = unchecked(result * 23 + obj[i].GetHashCode());
             return result;
         }
     }

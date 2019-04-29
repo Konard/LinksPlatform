@@ -126,12 +126,22 @@ namespace Platform.Data.Core.Doublets
             var sb = new StringBuilder();
             var visited = new HashSet<ulong>();
 
-            links.AppendStructure(sb, visited, linkIndex, isElement, renderIndex, renderDebug);
+            links.AppendStructure(sb, visited, linkIndex, isElement, (innerSb, link) => innerSb.Append(link.Index), renderIndex, renderDebug);
 
             return sb.ToString();
         }
 
-        public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, HashSet<ulong> visited, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false, bool renderDebug = false)
+        public static string FormatStructure(this ILinks<ulong> links, ulong linkIndex, Func<UInt64Link, bool> isElement, Action<StringBuilder, UInt64Link> appendElement, bool renderIndex = false, bool renderDebug = false)
+        {
+            var sb = new StringBuilder();
+            var visited = new HashSet<ulong>();
+
+            links.AppendStructure(sb, visited, linkIndex, isElement, appendElement, renderIndex, renderDebug);
+
+            return sb.ToString();
+        }
+
+        public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, HashSet<ulong> visited, ulong linkIndex, Func<UInt64Link, bool> isElement, Action<StringBuilder, UInt64Link> appendElement, bool renderIndex = false, bool renderDebug = false)
         {
             if (sb == null)
                 throw new ArgumentNullException(nameof(sb));
@@ -159,9 +169,9 @@ namespace Platform.Data.Core.Doublets
                     {
                         var source = new UInt64Link(links.GetLink(link.Source));
                         if (isElement(source))
-                            sb.Append(source.Index);
+                            appendElement(sb, source);
                         else
-                            links.AppendStructure(sb, visited, source.Index, isElement, renderIndex);
+                            links.AppendStructure(sb, visited, source.Index, isElement, appendElement, renderIndex);
                     }
 
                     sb.Append(' ');
@@ -172,9 +182,9 @@ namespace Platform.Data.Core.Doublets
                     {
                         var target = new UInt64Link(links.GetLink(link.Target));
                         if (isElement(target))
-                            sb.Append(target.Index);
+                            appendElement(sb, target);
                         else
-                            links.AppendStructure(sb, visited, target.Index, isElement, renderIndex);
+                            links.AppendStructure(sb, visited, target.Index, isElement, appendElement, renderIndex);
                     }
 
                     sb.Append(')');

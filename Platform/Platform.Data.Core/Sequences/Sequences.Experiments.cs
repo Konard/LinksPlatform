@@ -737,6 +737,71 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
+        public HashSet<ulong> GetAllPartiallyMatchingSequences4(HashSet<ulong> readAsElements, ulong[] sequence)
+        {
+            return Sync.ExecuteReadOperation(() =>
+            {
+                if (sequence.Length > 0)
+                {
+                    Links.EnsureEachLinkExists(sequence);
+
+                    var results = new HashSet<LinkIndex>();
+                    //var nextResults = new HashSet<ulong>();
+                    //for (var i = 0; i < sequence.Length; i++)
+                    //{
+                    //    AllUsagesCore(sequence[i], nextResults);
+
+                    //    if (results.IsNullOrEmpty())
+                    //    {
+                    //        results = nextResults;
+                    //        nextResults = new HashSet<ulong>();
+                    //    }
+                    //    else
+                    //    {
+                    //        results.IntersectWith(nextResults);
+                    //        nextResults.Clear();
+                    //    }
+                    //}
+
+                    var collector1 = new AllUsagesCollector1(Links.Unsync, results);
+                    collector1.Collect(Links.Unsync.GetLink(sequence[0]));
+
+                    var next = new HashSet<ulong>();
+
+                    for (var i = 1; i < sequence.Length; i++)
+                    {
+                        var collector = new AllUsagesCollector1(Links.Unsync, next);
+                        collector.Collect(Links.Unsync.GetLink(sequence[i]));
+
+                        results.IntersectWith(next);
+                        next.Clear();
+                    }
+
+                    var filteredResults = new HashSet<ulong>();
+                    var matcher = new Matcher(this, sequence, filteredResults, null, readAsElements);
+                    matcher.AddAllPartialMatchedToResultsAndReadAsElements(results.OrderBy(x => x)); // OrderBy is a Hack
+                    return filteredResults;
+                }
+
+                return new HashSet<ulong>();
+            });
+        }
+
+        // Does not work
+        public HashSet<ulong> GetAllPartiallyMatchingSequences5(HashSet<ulong> readAsElements, params ulong[] sequence)
+        {
+            var visited = new HashSet<ulong>();
+            var results = new HashSet<ulong>();
+
+            var matcher = new Matcher(this, sequence, visited, x => { results.Add(x); return true; }, readAsElements);
+
+            var last = sequence.Length - 1;
+            for (var i = 0; i < last; i++)
+                PartialStepRight(matcher.PartialMatch, sequence[i], sequence[i + 1]);
+
+            return results;
+        }
+
         public List<ulong> GetAllPartiallyMatchingSequences(params ulong[] sequence)
         {
             return Sync.ExecuteReadOperation(() =>
@@ -1076,10 +1141,10 @@ namespace Platform.Data.Core.Sequences
 
         private class AllUsagesCollector
         {
-            private readonly SynchronizedLinks<ulong> _links;
+            private readonly ILinks<ulong> _links;
             private readonly HashSet<ulong> _usages;
 
-            public AllUsagesCollector(SynchronizedLinks<ulong> links, HashSet<ulong> usages)
+            public AllUsagesCollector(ILinks<ulong> links, HashSet<ulong> usages)
             {
                 _links = links;
                 _usages = usages;
@@ -1089,19 +1154,41 @@ namespace Platform.Data.Core.Sequences
             {
                 if (_usages.Add(link))
                 {
-                    _links.Unsync.Each(link, Constants.Any, Collect);
-                    _links.Unsync.Each(Constants.Any, link, Collect);
+                    _links.Each(link, Constants.Any, Collect);
+                    _links.Each(Constants.Any, link, Collect);
                 }
                 return true;
             }
         }
 
+        private class AllUsagesCollector1
+        {
+            private readonly ILinks<ulong> _links;
+            private readonly HashSet<ulong> _usages;
+            private readonly ulong _continue;
+
+            public AllUsagesCollector1(ILinks<ulong> links, HashSet<ulong> usages)
+            {
+                _links = links;
+                _usages = usages;
+                _continue = _links.Constants.Continue;
+            }
+
+            public ulong Collect(IList<ulong> link)
+            {
+                var linkIndex = _links.GetIndex(link);
+                if (_usages.Add(linkIndex))
+                    _links.Each(Collect, Constants.Any, linkIndex);
+                return _continue;
+            }
+        }
+
         private class AllUsagesCollector2
         {
-            private readonly SynchronizedLinks<ulong> _links;
+            private readonly ILinks<ulong> _links;
             private readonly BitString _usages;
 
-            public AllUsagesCollector2(SynchronizedLinks<ulong> links, BitString usages)
+            public AllUsagesCollector2(ILinks<ulong> links, BitString usages)
             {
                 _links = links;
                 _usages = usages;
@@ -1109,12 +1196,10 @@ namespace Platform.Data.Core.Sequences
 
             public bool Collect(ulong link)
             {
-                if (!_usages.GetCore((long)link))
+                if (_usages.Add((long)link))
                 {
-                    _usages.SetCore((long)link);
-
-                    _links.Unsync.Each(link, Constants.Any, Collect);
-                    _links.Unsync.Each(Constants.Any, link, Collect);
+                    _links.Each(link, Constants.Any, Collect);
+                    _links.Each(Constants.Any, link, Collect);
                 }
                 return true;
             }
@@ -1290,16 +1375,18 @@ namespace Platform.Data.Core.Sequences
                 {
                     Links.EnsureEachLinkExists(linksToConnect);
 
-                    var collector1 = new AllUsagesCollector(Links, results);
+                    var collector1 = new AllUsagesCollector(Links.Unsync, results);
                     collector1.Collect(linksToConnect[0]);
+
+                    var next = new HashSet<ulong>();
 
                     for (var i = 1; i < linksToConnect.Length; i++)
                     {
-                        var next = new HashSet<ulong>();
-                        var collector = new AllUsagesCollector(Links, next);
+                        var collector = new AllUsagesCollector(Links.Unsync, next);
                         collector.Collect(linksToConnect[i]);
 
                         results.IntersectWith(next);
+                        next.Clear();
                     }
                 }
 
@@ -1350,13 +1437,14 @@ namespace Platform.Data.Core.Sequences
                 {
                     Links.EnsureEachLinkExists(linksToConnect);
 
-                    var collector1 = new AllUsagesCollector2(Links, results);
+                    var collector1 = new AllUsagesCollector2(Links.Unsync, results);
                     collector1.Collect(linksToConnect[0]);
 
                     for (var i = 1; i < linksToConnect.Length; i++)
                     {
                         var next = new BitString((long)Links.Unsync.Count() + 1); //new BitArray((int)_links.Total + 1);
-                        var collector = new AllUsagesCollector2(Links, next);
+
+                        var collector = new AllUsagesCollector2(Links.Unsync, next);
                         collector.Collect(linksToConnect[i]);
 
                         results = results.And(next);

@@ -196,7 +196,7 @@ namespace Platform.Data.Core.Sequences
             return sequenceRoot; // Возвращаем корень последовательности (т.е. сами элементы)
         }
 
-        
+
 
         #endregion
 
@@ -570,20 +570,22 @@ namespace Platform.Data.Core.Sequences
             private readonly HashSet<LinkIndex> _linksInSequence;
             private readonly HashSet<LinkIndex> _results;
             private readonly Func<ulong, bool> _stopableHandler;
+            private readonly HashSet<ulong> _readAsElements;
             private long _filterPosition;
 
-            public Matcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results, Func<LinkIndex, bool> stopableHandler)
+            public Matcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results, Func<LinkIndex, bool> stopableHandler, HashSet<LinkIndex> readAsElements = null)
                 : base(sequences)
             {
                 _patternSequence = patternSequence;
                 _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Constants.Any && x != ZeroOrMany));
                 _results = results;
                 _stopableHandler = stopableHandler;
+                _readAsElements = readAsElements;
             }
 
             protected override bool IsElement(ulong link)
             {
-                return _linksInSequence.Contains(link) || Links.Unsync.GetTarget(link) == link || Links.Unsync.GetSource(link) == link;
+                return Links.Unsync.IsPartialPoint(link) || (_readAsElements != null && _readAsElements.Contains(link)) || _linksInSequence.Contains(link);
             }
 
             public bool FullMatch(LinkIndex sequenceToMatch)
@@ -687,6 +689,16 @@ namespace Platform.Data.Core.Sequences
                 foreach (var sequenceToMatch in sequencesToMatch)
                     if (PartialMatch(sequenceToMatch))
                         _results.Add(sequenceToMatch);
+            }
+
+            public void AddAllPartialMatchedToResultsAndReadAsElements(IEnumerable<ulong> sequencesToMatch)
+            {
+                foreach (var sequenceToMatch in sequencesToMatch)
+                    if (PartialMatch(sequenceToMatch))
+                    {
+                        _readAsElements.Add(sequenceToMatch);
+                        _results.Add(sequenceToMatch);
+                    }
             }
         }
 

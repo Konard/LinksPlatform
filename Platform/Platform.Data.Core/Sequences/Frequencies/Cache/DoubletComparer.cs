@@ -16,12 +16,6 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         public bool Equals(Doublet<T> x, Doublet<T> y) => MathHelpers<T>.IsEquals(x.Source, y.Source) && MathHelpers<T>.IsEquals(x.Target, y.Target);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetHashCode(Doublet<T> obj)
-        {
-            unchecked
-            {
-                return (obj.Source.GetHashCode() << 15) ^ obj.Target.GetHashCode();
-            }
-        }
+        public int GetHashCode(Doublet<T> obj) => unchecked((obj.Source.GetHashCode() << 15) ^ obj.Target.GetHashCode());
     }
 }
