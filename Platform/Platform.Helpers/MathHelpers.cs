@@ -82,6 +82,8 @@ namespace Platform.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Add<T>(T x, T y) => MathHelpers<T>.Add(x, y);
 
+        public static T And<T>(T x, T y) => MathHelpers<T>.And(x, y);
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Increment<T>(T x) => MathHelpers<T>.Increment(x);
 
@@ -130,6 +132,7 @@ namespace Platform.Helpers
         /// TODO: Решить что лучше dynamic operator или Auto&lt;T&gt; c заранее созданными операторами и возможность расширения через статические методы
         /// </remarks>
         public static readonly Func<T, T, T> Add;
+        public static readonly Func<T, T, T> And;
         public static readonly Func<T, T> Increment;
         public static readonly Func<T, T, T> Subtract;
         public static readonly Func<T, T> Decrement;
@@ -151,6 +154,15 @@ namespace Platform.Helpers
 
                 emiter.LoadArguments(0, 1);
                 emiter.Add();
+                emiter.Return();
+            });
+
+            DelegateHelpers.Compile(out And, emiter =>
+            {
+                EnsureNumeric();
+
+                emiter.LoadArguments(0, 1);
+                emiter.And();
                 emiter.Return();
             });
 

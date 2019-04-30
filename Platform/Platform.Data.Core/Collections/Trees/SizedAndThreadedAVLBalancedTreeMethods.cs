@@ -3,7 +3,9 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Exceptions;
 using Platform.Helpers;
+#if USEARRAYPOOL
 using Platform.Helpers.Collections;
+#endif
 
 namespace Platform.Data.Core.Collections.Trees
 {
@@ -55,11 +57,18 @@ namespace Platform.Data.Core.Collections.Trees
         {
             unchecked
             {
+                // TODO: Check what is faster to use simple array or array from array pool
                 // TODO: Try to use stackalloc as an optimization (requires code generation, because of generics)
-                var path = ArrayPool.Allocate<TElement>(MaxPath);
 
+#if USEARRAYPOOL
+                var path = ArrayPool.Allocate<TElement>(MaxPath);
                 var pathPosition = 0;
-                path[pathPosition++] = default(TElement);
+                path[pathPosition++] = default;
+#else
+                var path = new TElement[MaxPath];
+                var pathPosition = 1;
+#endif
+
                 var currentNode = root.GetValue<TElement>();
 
                 while (true)
@@ -153,7 +162,9 @@ namespace Platform.Data.Core.Collections.Trees
                     currentNode = parent;
                 }
 
+#if USEARRAYPOOL
                 ArrayPool.Free(path);
+#endif
             }
         }
 
@@ -309,9 +320,14 @@ namespace Platform.Data.Core.Collections.Trees
         {
             unchecked
             {
+#if USEARRAYPOOL
                 var path = ArrayPool.Allocate<TElement>(MaxPath);
                 var pathPosition = 0;
-                path[pathPosition++] = default(TElement);
+                path[pathPosition++] = default;
+#else
+                var path = new TElement[MaxPath];
+                var pathPosition = 1;
+#endif
 
                 var currentNode = root.GetValue<TElement>();
                 while (true)
@@ -497,7 +513,9 @@ namespace Platform.Data.Core.Collections.Trees
 
                 ClearNode(node);
 
+#if USEARRAYPOOL
                 ArrayPool.Free(path);
+#endif
             }
         }
 

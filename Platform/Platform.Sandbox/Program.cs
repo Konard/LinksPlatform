@@ -11,9 +11,11 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
+            AllRepeatingSubstringsInString.Run();
+
             //SystemTests.EqualsPerfomanceTest();
 
-            SequencesTests.CompressionEfficiencyTest();
+            //SequencesTests.CompressionEfficiencyTest();
 
             //new Zadacha().RunAll();
 

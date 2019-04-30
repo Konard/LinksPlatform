@@ -18,7 +18,7 @@ namespace Platform.Data.Core.Doublets
             var target = Links.Constants.Null;
             for (int i = 0; i < CachedTypeInfo<TLink>.BitsLength; i++)
             {
-                if (MathHelpers<TLink>.IsEquals(number, default)) //if (Equals(MathHelpers.Add(number, Integer<TLink>.One), Integer<TLink>.One))
+                if (Equals(MathHelpers.And(number, Integer<TLink>.One), Integer<TLink>.One))
                 {
                     if (MathHelpers<TLink>.IsEquals(target, Links.Constants.Null))
                         target = _powerOf2ToUnaryNumberConverter.Convert(i);
@@ -26,6 +26,8 @@ namespace Platform.Data.Core.Doublets
                         target = Links.GetOrCreate(_powerOf2ToUnaryNumberConverter.Convert(i), target);
                 }
                 number = (Integer<TLink>)(((ulong)(Integer<TLink>)number) >> 1); // MathHelpers.ShiftRight(number, 1);
+                if (MathHelpers<TLink>.IsEquals(number, default))
+                    break;
             }
             return target;
         }

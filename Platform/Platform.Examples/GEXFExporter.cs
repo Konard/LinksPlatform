@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml;
+using Platform.Helpers;
 using Platform.Communication.Protocol.Gexf;
 using Platform.Data.Core.Doublets;
-using Platform.Helpers;
+using Node = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Examples
 {

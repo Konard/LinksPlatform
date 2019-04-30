@@ -431,11 +431,14 @@ namespace Platform.Data.Core.Doublets
         {
             var constants = links.Constants;
 
-            var list = new IList<TLink>[(Integer<TLink>)links.Count()];
+            int listSize = (Integer<TLink>)links.Count(restrictions);
+            var list = new IList<TLink>[listSize];
 
-            var filler = new ArrayFiller<IList<TLink>, TLink>(list, links.Constants.Continue);
-
-            links.Each(filler.AddAndReturnConstant, restrictions);
+            if (listSize > 0)
+            {
+                var filler = new ArrayFiller<IList<TLink>, TLink>(list, links.Constants.Continue);
+                links.Each(filler.AddAndReturnConstant, restrictions);
+            }
 
             return list;
         }

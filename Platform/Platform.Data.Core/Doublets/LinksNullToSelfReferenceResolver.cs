@@ -20,12 +20,5 @@ namespace Platform.Data.Core.Doublets
 
             return base.Update(restrictions);
         }
-
-        public override void Delete(T link)
-        {
-            // TODO: Looks like this can be moved/copied to separate layer
-            Links.Update(link, Constants.Null, Constants.Null);
-            base.Delete(link);
-        }
     }
 }
