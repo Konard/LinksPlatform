@@ -56,15 +56,19 @@ namespace Platform.Data.Core.Sequences
                 count++;
             }
             
-            ulong[] finalArray = new ulong[count];
-            for (int i = 0, j = 0; i < array.Length; i++)
+            if (count == array.Length)
+                return array;
+            else
             {
-                if (array[i] == 0)
-                    continue;
-                finalArray[j++] = array[i];
+                ulong[] finalArray = new ulong[count];
+                for (int i = 0, j = 0; i < array.Length; i++)
+                {
+                    if (array[i] == 0)
+                        continue;
+                    finalArray[j++] = array[i];
+                }
+                return finalArray;
             }
-            
-            return finalArray;
         }
     }
 }
