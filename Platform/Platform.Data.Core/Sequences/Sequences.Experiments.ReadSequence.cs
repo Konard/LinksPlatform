@@ -42,7 +42,7 @@ namespace Platform.Data.Core.Sequences
                         var linkSource = nextArray[i*2] = links.GetSource(link);
                         var linkTarget = nextArray[i*2 + 1] = links.GetTarget(link);
                         if (!hasElements)
-                            hasElements = !isElement(linkSource) || !isElement(linkTarget);
+                            hasElements = !(isElement(linkSource) && isElement(linkTarget));
                     }
                 }
                 
