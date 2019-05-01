@@ -29,16 +29,17 @@ namespace Platform.Data.Core.Sequences
 
                 for (var i = 0; i < array.Length; i++)
                 {
-                    if (array[i] == 0)
+                    var candidate = array[i];
+                    if (candidate == 0)
                         continue;
                         
-                    if (isElement(array[i]))
+                    if (isElement(candidate))
                     {
-                        nextArray[i*2] = array[i];
+                        nextArray[i*2] = candidate;
                     }
                     else
                     {
-                        var link = links.GetLink(array[i]);
+                        var link = links.GetLink(candidate);
                         var linkSource = nextArray[i*2] = links.GetSource(link);
                         var linkTarget = nextArray[i*2 + 1] = links.GetTarget(link);
                         if (!hasElements)
