@@ -1,13 +1,5 @@
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Platform.Data.Core.Collections;
-using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Doublets;
-using Platform.Helpers;
-using Platform.Helpers.Collections;
-using LinkIndex = System.UInt64;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -17,14 +9,17 @@ namespace Platform.Data.Core.Sequences
         {
             var links = Links.Unsync;
             var length = 1;
-            var hasElements = !isElement(sequence);
             var array = new ulong[length];
             array[0] = sequence;
-            
-            while (hasElements)
+
+            if (isElement(sequence))
+                return array;
+
+            bool hasElements;
+            do
             {
-                var nextArray = new ulong[length = length * 2];
-                
+                var nextArray = new ulong[length *= 2];
+
                 hasElements = false;
 
                 for (var i = 0; i < array.Length; i++)
@@ -32,41 +27,38 @@ namespace Platform.Data.Core.Sequences
                     var candidate = array[i];
                     if (candidate == 0)
                         continue;
-                        
+
                     if (isElement(candidate))
-                        nextArray[i*2] = candidate;
+                        nextArray[i * 2] = candidate;
                     else
                     {
                         var link = links.GetLink(candidate);
-                        var linkSource = nextArray[i*2] = links.GetSource(link);
-                        var linkTarget = nextArray[i*2 + 1] = links.GetTarget(link);
+                        var linkSource = links.GetSource(link);
+                        var linkTarget = links.GetTarget(link);
+                        nextArray[i * 2] = linkSource;
+                        nextArray[i * 2 + 1] = linkTarget;
                         if (!hasElements)
                             hasElements = !(isElement(linkSource) && isElement(linkTarget));
                     }
                 }
-                
+
                 array = nextArray;
             }
-            
+            while (hasElements);
+
             var count = 0;
             for (var i = 0; i < array.Length; i++)
-            {
-                if (array[i] == 0)
-                    continue;
-                count++;
-            }
-            
+                if (array[i] != 0)
+                    count++;
+
             if (count == array.Length)
                 return array;
             else
             {
                 var finalArray = new ulong[count];
-                for (var i = 0, j = 0; i < array.Length; i++)
-                {
-                    if (array[i] == 0)
-                        continue;
-                    finalArray[j++] = array[i];
-                }
+                for (int i = 0, j = 0; i < array.Length; i++)
+                    if (array[i] != 0)
+                        finalArray[j++] = array[i];
                 return finalArray;
             }
         }
