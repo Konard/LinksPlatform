@@ -62,8 +62,8 @@ namespace Platform.Data.Core.Sequences
                 return array;
             else
             {
-                ulong[] finalArray = new ulong[count];
-                for (int i = 0, j = 0; i < array.Length; i++)
+                var finalArray = new ulong[count];
+                for (var i = 0, j = 0; i < array.Length; i++)
                 {
                     if (array[i] == 0)
                         continue;
