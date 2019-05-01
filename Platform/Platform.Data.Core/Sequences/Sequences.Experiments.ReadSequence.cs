@@ -1,4 +1,9 @@
+//#define USEARRAYPOOL
 using System;
+using System.Runtime.CompilerServices;
+#if USEARRAYPOOL
+using Platform.Helpers.Collections;
+#endif
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
@@ -18,7 +23,11 @@ namespace Platform.Data.Core.Sequences
             bool hasElements;
             do
             {
+#if USEARRAYPOOL
+                var nextArray = ArrayPool.Allocate<ulong>(length *= 2);
+#else
                 var nextArray = new ulong[length *= 2];
+#endif
 
                 hasElements = false;
 
@@ -28,39 +37,60 @@ namespace Platform.Data.Core.Sequences
                     if (candidate == 0)
                         continue;
 
+                    var doubletOffset = i * 2;
+
                     if (isElement(candidate))
-                        nextArray[i * 2] = candidate;
+                        nextArray[doubletOffset] = candidate;
                     else
                     {
                         var link = links.GetLink(candidate);
                         var linkSource = links.GetSource(link);
                         var linkTarget = links.GetTarget(link);
-                        nextArray[i * 2] = linkSource;
-                        nextArray[i * 2 + 1] = linkTarget;
+                        nextArray[doubletOffset] = linkSource;
+                        nextArray[doubletOffset + 1] = linkTarget;
                         if (!hasElements)
                             hasElements = !(isElement(linkSource) && isElement(linkTarget));
                     }
                 }
 
+#if USEARRAYPOOL
+                if (array.Length > 1)
+                    ArrayPool.Free(array);
+#endif
                 array = nextArray;
             }
             while (hasElements);
 
-            var count = 0;
-            for (var i = 0; i < array.Length; i++)
-                if (array[i] != 0)
-                    count++;
+            var filledElementsCount = CountFilledElements(array);
 
-            if (count == array.Length)
+            if (filledElementsCount == array.Length)
                 return array;
             else
-            {
-                var finalArray = new ulong[count];
-                for (int i = 0, j = 0; i < array.Length; i++)
-                    if (array[i] != 0)
-                        finalArray[j++] = array[i];
-                return finalArray;
-            }
+                return CopyFilledElements(array, filledElementsCount);
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static ulong[] CopyFilledElements(ulong[] array, int filledElementsCount)
+        {
+            var finalArray = new ulong[filledElementsCount];
+            for (int i = 0, j = 0; i < array.Length; i++)
+                if (array[i] > 0)
+                    finalArray[j++] = array[i];
+
+#if USEARRAYPOOL
+                ArrayPool.Free(array);
+#endif
+            return finalArray;
+        }
+
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        private static int CountFilledElements(ulong[] array)
+        {
+            var count = 0;
+            for (var i = 0; i < array.Length; i++)
+                if (array[i] > 0)
+                    count++;
+            return count;
         }
     }
 }

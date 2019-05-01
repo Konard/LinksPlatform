@@ -11,9 +11,9 @@ namespace Platform.Tests.Data.Core
     public class ReadSequenceTests
     {
         [Fact]
-        public void ReadSequenceTest()
+        public static void ReadSequenceTest()
         {
-            const long sequenceLength = 200;
+            const long sequenceLength = 2000;
 
             using (var scope = new TempLinksTestScope(useSequences: true))
             {
