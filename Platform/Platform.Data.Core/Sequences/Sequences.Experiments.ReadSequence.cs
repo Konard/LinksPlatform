@@ -38,10 +38,11 @@ namespace Platform.Data.Core.Sequences
                     }
                     else
                     {
-                        nextArray[i*2] = links.GetSource(array[i]);
-                        nextArray[i*2 + 1] = links.GetTarget(array[i]);
+                        var link = links.GetLink(array[i]);
+                        var linkSource = nextArray[i*2] = links.GetSource(link);
+                        var linkTarget = nextArray[i*2 + 1] = links.GetTarget(link);
                         if (!hasElements)
-                            hasElements = !isElement(nextArray[i*2]) || !isElement(nextArray[i*2 + 1]);
+                            hasElements = !isElement(linkSource) || !isElement(linkTarget);
                     }
                 }
                 
