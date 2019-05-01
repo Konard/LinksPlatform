@@ -34,9 +34,7 @@ namespace Platform.Data.Core.Sequences
                         continue;
                         
                     if (isElement(candidate))
-                    {
                         nextArray[i*2] = candidate;
-                    }
                     else
                     {
                         var link = links.GetLink(candidate);
