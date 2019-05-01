@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/Konard/LinksPlatform.svg?branch=master)](https://travis-ci.org/Konard/LinksPlatform)
+
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
 [Documentation](http://konard.github.io/LinksPlatform)
