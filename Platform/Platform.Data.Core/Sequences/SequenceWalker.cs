@@ -43,7 +43,6 @@ namespace Platform.Data.Core.Sequences
                         var source = getSource(element);
                         var target = getTarget(element);
 
-                        // Обработка элемента
                         if (isElement(source)) visit(source);
                         if (isElement(target)) visit(target);
 
@@ -79,7 +78,6 @@ namespace Platform.Data.Core.Sequences
                         var source = getSource(element);
                         var target = getTarget(element);
 
-                        // Обработка элемента
                         if (isElement(target)) visit(target);
                         if (isElement(source)) visit(source);
 

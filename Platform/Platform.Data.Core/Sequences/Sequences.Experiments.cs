@@ -1725,8 +1725,9 @@ namespace Platform.Data.Core.Sequences
 
         #region Walkers
 
-        public class PatternMatcher : Walker
+        public class PatternMatcher : RightSequenceWalker<ulong>
         {
+            private readonly Sequences _sequences;
             private readonly ulong[] _patternSequence;
             private readonly HashSet<LinkIndex> _linksInSequence;
             private readonly HashSet<LinkIndex> _results;
@@ -1754,8 +1755,9 @@ namespace Platform.Data.Core.Sequences
             #endregion
 
             public PatternMatcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results)
-                : base(sequences)
+                : base(sequences.Links.Unsync)
             {
+                _sequences = sequences;
                 _patternSequence = patternSequence;
                 _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Constants.Any && x != ZeroOrMany));
                 _results = results;
@@ -1763,9 +1765,9 @@ namespace Platform.Data.Core.Sequences
                 _pattern = CreateDetailedPattern();
             }
 
-            protected override bool IsElement(ulong link)
+            protected override bool IsElement(IList<ulong> link)
             {
-                return _linksInSequence.Contains(link) || Links.Unsync.GetTarget(link) == link || Links.Unsync.GetSource(link) == link;
+                return _linksInSequence.Contains(Links.GetIndex(link)) || base.IsElement(link);
             }
 
             public bool PatternMatch(LinkIndex sequenceToMatch)
@@ -1773,7 +1775,9 @@ namespace Platform.Data.Core.Sequences
                 _patternPosition = 0;
                 _sequencePosition = 0;
 
-                WalkRight(sequenceToMatch, (Func<ulong, bool>)PatternMatchCore);
+                foreach (var part in Walk(sequenceToMatch))
+                    if (!PatternMatchCore(Links.GetIndex(part)))
+                        break;
 
                 return _patternPosition == _pattern.Count || (_patternPosition == _pattern.Count - 1 && _pattern[_patternPosition].Start == 0);
             }

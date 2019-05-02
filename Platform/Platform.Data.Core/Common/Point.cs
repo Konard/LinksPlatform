@@ -1,44 +1,52 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using Platform.Helpers;
+using Platform.Helpers.Collections;
 
 namespace Platform.Data.Core.Common
 {
     public static class Point<TLink>
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsFullPoint(params TLink[] link) => IsFullPoint((IList<TLink>)link);
 
         public static bool IsFullPoint(IList<TLink> link)
         {
+            if (link.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(link));
             if (link.Count <= 1)
                 throw new ArgumentOutOfRangeException(nameof(link), "Cannot determine link's pointness using only its identifier.");
+            return IsFullPointUnchecked(link);
+        }
 
-            var result = false;
-
-            for (var i = 1; i < link.Count; i++)
-            {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsFullPointUnchecked(IList<TLink> link)
+        {
+            var result = true;
+            for (var i = 1; result && i < link.Count; i++)
                 result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
-                if (!result) break;
-            }
-
             return result;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsPartialPoint(params TLink[] link) => IsPartialPoint((IList<TLink>)link);
 
         public static bool IsPartialPoint(IList<TLink> link)
         {
+            if (link.IsNullOrEmpty())
+                throw new ArgumentNullException(nameof(link));
             if (link.Count <= 1)
                 throw new ArgumentOutOfRangeException(nameof(link), "Cannot determine link's pointness using only its identifier.");
+            return IsPartialPointUnchecked(link);
+        }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool IsPartialPointUnchecked(IList<TLink> link)
+        {
             var result = false;
-
-            for (var i = 1; i < link.Count; i++)
-            {
+            for (var i = 1; !result && i < link.Count; i++)
                 result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
-                if (result) break;
-            }
-
             return result;
         }
     }

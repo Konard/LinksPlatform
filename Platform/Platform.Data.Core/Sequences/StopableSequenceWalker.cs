@@ -44,7 +44,6 @@ namespace Platform.Data.Core.Sequences
                     var source = getSource(element);
                     var target = getTarget(element);
 
-                    // Обработка элемента
                     if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
                         return false;
                     if ((isElement(target) || !canEnter(target)) && !visit(target))
@@ -74,7 +73,6 @@ namespace Platform.Data.Core.Sequences
                         var source = getSource(element);
                         var target = getTarget(element);
 
-                        // Обработка элемента
                         if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
                             return false;
                         if ((isElement(target) || !canEnter(target)) && !visit(target))
@@ -107,7 +105,6 @@ namespace Platform.Data.Core.Sequences
                     var source = getSource(element);
                     var target = getTarget(element);
 
-                    // Обработка элемента
                     if (isElement(source) && !visit(source))
                         return false;
                     if (isElement(target) && !visit(target))
@@ -145,7 +142,6 @@ namespace Platform.Data.Core.Sequences
                     var source = getSource(element);
                     var target = getTarget(element);
 
-                    // Обработка элемента
                     if (isElement(target) && !visit(target))
                         return false;
                     if (isElement(source) && !visit(source))

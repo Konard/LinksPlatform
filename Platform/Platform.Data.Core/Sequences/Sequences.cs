@@ -524,48 +524,20 @@ namespace Platform.Data.Core.Sequences
 
         public bool EachPart(Func<ulong, bool> handler, ulong sequence)
         {
-            return (new Walker(this)).WalkRight(sequence, handler);
+            return Sync.ExecuteReadOperation(() =>
+            {
+                var links = Links.Unsync;
+                var walker = new RightSequenceWalker<ulong>(links);
+                foreach (var part in walker.Walk(sequence))
+                    if (!handler(links.GetIndex(part)))
+                        return false;
+                return true;
+            });
         }
 
-        public class Walker
+        public class Matcher : RightSequenceWalker<ulong>
         {
-            protected readonly SynchronizedLinks<ulong> Links;
-            protected readonly Sequences Sequences;
-
-            public Walker(Sequences sequences)
-            {
-                Sequences = sequences;
-                Links = sequences.Links;
-            }
-
-            protected virtual bool IsElement(LinkIndex link)
-            {
-                return Links.Unsync.GetTarget(link) == link || Links.Unsync.GetSource(link) == link;
-            }
-
-            public void WalkRight(LinkIndex sequence, Action<LinkIndex> visit)
-            {
-                SequenceWalker.WalkRight(sequence, Links.Unsync.GetSource, Links.Unsync.GetTarget, IsElement, visit);
-            }
-
-            public void WalkLeft(LinkIndex sequence, Action<LinkIndex> visit)
-            {
-                SequenceWalker.WalkLeft(sequence, Links.Unsync.GetSource, Links.Unsync.GetTarget, IsElement, visit);
-            }
-
-            public bool WalkRight(LinkIndex sequence, Func<LinkIndex, bool> visit)
-            {
-                return StopableSequenceWalker.WalkRight(sequence, Links.Unsync.GetSource, Links.Unsync.GetTarget, IsElement, visit);
-            }
-
-            public bool WalkLeft(LinkIndex sequence, Func<LinkIndex, bool> visit)
-            {
-                return StopableSequenceWalker.WalkLeft(sequence, Links.Unsync.GetSource, Links.Unsync.GetTarget, IsElement, visit);
-            }
-        }
-
-        public class Matcher : Walker
-        {
+            private readonly Sequences _sequences;
             private readonly ulong[] _patternSequence;
             private readonly HashSet<LinkIndex> _linksInSequence;
             private readonly HashSet<LinkIndex> _results;
@@ -574,8 +546,9 @@ namespace Platform.Data.Core.Sequences
             private long _filterPosition;
 
             public Matcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results, Func<LinkIndex, bool> stopableHandler, HashSet<LinkIndex> readAsElements = null)
-                : base(sequences)
+                : base(sequences.Links.Unsync)
             {
+                _sequences = sequences;
                 _patternSequence = patternSequence;
                 _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Constants.Any && x != ZeroOrMany));
                 _results = results;
@@ -583,16 +556,15 @@ namespace Platform.Data.Core.Sequences
                 _readAsElements = readAsElements;
             }
 
-            protected override bool IsElement(ulong link)
-            {
-                return Links.Unsync.IsPartialPoint(link) || (_readAsElements != null && _readAsElements.Contains(link)) || _linksInSequence.Contains(link);
-            }
+            protected override bool IsElement(IList<ulong> link) => base.IsElement(link) || (_readAsElements != null && _readAsElements.Contains(Links.GetIndex(link))) || _linksInSequence.Contains(Links.GetIndex(link));
 
             public bool FullMatch(LinkIndex sequenceToMatch)
             {
                 _filterPosition = 0;
 
-                WalkRight(sequenceToMatch, FullMatchCore);
+                foreach (var part in Walk(sequenceToMatch))
+                    if (!FullMatchCore(Links.GetIndex(part)))
+                        break;
 
                 return _filterPosition == _patternSequence.Length;
             }
@@ -631,7 +603,7 @@ namespace Platform.Data.Core.Sequences
 
             public bool HandleFullMatchedSequence(ulong sequenceToMatch)
             {
-                var sequence = Sequences.GetSequenceByElements(sequenceToMatch);
+                var sequence = _sequences.GetSequenceByElements(sequenceToMatch);
                 if (sequence != Constants.Null && FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
                     return _stopableHandler(sequence);
                 return true;
@@ -644,7 +616,9 @@ namespace Platform.Data.Core.Sequences
             {
                 _filterPosition = -1;
 
-                WalkRight(sequenceToMatch, PartialMatchCore);
+                foreach (var part in Walk(sequenceToMatch))
+                    if (!PartialMatchCore(Links.GetIndex(part)))
+                        break;
 
                 return _filterPosition == _patternSequence.Length - 1;
             }
