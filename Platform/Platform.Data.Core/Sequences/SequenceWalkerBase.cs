@@ -13,7 +13,7 @@ namespace Platform.Data.Core.Sequences
 
         public IEnumerable<IList<TLink>> Walk(TLink sequence)
         {
-            if (_stack.Count > 1)
+            if (_stack.Count > 0)
                 _stack.Clear();
 
             var element = Links.GetLink(sequence);
