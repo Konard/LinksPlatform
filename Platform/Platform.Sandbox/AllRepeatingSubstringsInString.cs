@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Platform.Data.Core.Doublets;
 using Platform.Helpers;
+using Platform.Helpers.Collections;
 using Platform.Helpers.Disposables;
 using Platform.Memory;
 
@@ -71,8 +72,8 @@ namespace Platform.Sandbox
 
         public static void Run()
         {
-            var collector = new Collector1();
-            collector.Collect(ExampleLoremIpsumText);
+            var collector = new Collector4();
+            collector.Collect(ExampleText);
         }
     }
 
@@ -233,6 +234,33 @@ namespace Platform.Sandbox
                 if (actualNumber == 2)
                     OnDuplicateFound(@string, offset, length);
             }
+        }
+    }
+
+    public class Collector4 : CollectorBase
+    {
+        private Dictionary<StringSegment, int> _cache;
+
+        public override void Collect(string @string)
+        {
+            _cache = new Dictionary<StringSegment, int>();
+
+            Loop(@string);
+        }
+
+        protected override void Iteration(char[] @string, int offset, int length)
+        {
+            var key = new StringSegment(@string, offset, length);
+
+            if (_cache.TryGetValue(key, out int count))
+            {
+                var newValue = count + 1;
+                _cache[key] = newValue;
+                if (newValue == 2)
+                    OnDuplicateFound(@string, offset, length);
+            }
+            else
+                _cache.Add(key, 1);
         }
     }
 }

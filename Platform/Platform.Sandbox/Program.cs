@@ -11,9 +11,9 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            //AllRepeatingSubstringsInString.Run();
+            AllRepeatingSubstringsInString.Run();
 
-            ReadSequenceTests.ReadSequenceTest();
+            //ReadSequenceTests.ReadSequenceTest();
 
             //SystemTests.EqualsPerfomanceTest();
 
