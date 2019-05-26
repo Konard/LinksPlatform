@@ -2,17 +2,23 @@
 
 namespace Platform.Helpers.Collections
 {
-    public unsafe class StringSegment : IEquatable<StringSegment>
+    public unsafe struct StringSegment : IEquatable<StringSegment>
     {
-        private readonly char[] _chars;
-        private readonly int _offset;
-        private readonly int _length;
+        public readonly char[] Chars;
+        public readonly int Offset;
+        public readonly int Length;
 
         public StringSegment(char[] chars, int offset, int length)
         {
-            _chars = chars;
-            _offset = offset;
-            _length = length;
+            Chars = chars;
+            Offset = offset;
+            Length = length;
+        }
+
+        public char this[int i]
+        {
+            get => Chars[Offset + i];
+            set => Chars[Offset + i] = value;
         }
 
         /// <remarks>
@@ -30,7 +36,7 @@ namespace Platform.Helpers.Collections
 
             unsafe
             {
-                fixed (char* src = &_chars[_offset])
+                fixed (char* src = &Chars[Offset])
                 {
                     //Contract.Assert(src[this.Length] == '\0', "src[this.Length] == '\\0'");
                     //Contract.Assert(((int)src) % 4 == 0, "Managed string should start at 4 bytes boundary");
@@ -59,7 +65,7 @@ namespace Platform.Helpers.Collections
 //                        hash1 = ((hash1 << 5) + hash1 + (hash1 >> 27)) ^ pint[0];
 //                    }
 //#else
-                    for (char* s = src, last = s + _length; s < last; s++)
+                    for (char* s = src, last = s + Length; s < last; s++)
                         hash1 = ((hash1 << 5) + hash1) ^ *s;
 //#endif
 
@@ -68,22 +74,18 @@ namespace Platform.Helpers.Collections
             }
         }
 
-        public override bool Equals(object obj)
-        {
-            var other = obj as StringSegment;
-            return other == null ? false : Equals(other);
-        }
+        public override bool Equals(object obj) => obj is StringSegment other ? Equals(other) : false;
 
         /// <remarks>
         /// Based on https://github.com/Microsoft/referencesource/blob/3b1eaf5203992df69de44c783a3eda37d3d4cd10/mscorlib/system/string.cs#L364
         /// </remarks>
         public bool Equals(StringSegment other)
         {
-            if (_length != other._length) return false;
+            if (Length != other.Length) return false;
 
-            int length = _length;
+            int length = Length;
 
-            fixed (char* ap = &_chars[_offset]) fixed (char* bp = &other._chars[other._offset])
+            fixed (char* ap = &Chars[Offset]) fixed (char* bp = &other.Chars[other.Offset])
             {
                 char* a = ap;
                 char* b = bp;
@@ -127,5 +129,9 @@ namespace Platform.Helpers.Collections
                 return (length <= 0);
             }
         }
+
+        public static implicit operator string(StringSegment segment) => new string(segment.Chars, segment.Offset, segment.Length);
+
+        public override string ToString() => this;
     }
 }
