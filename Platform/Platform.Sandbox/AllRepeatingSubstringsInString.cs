@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.SegmentsWalkers;
 using Platform.Helpers.Disposables;
 using Platform.Memory;
 
@@ -72,106 +73,88 @@ namespace Platform.Sandbox
 
         public static void Run()
         {
-            var text = ExampleText;
+            var text = ExampleLoremIpsumText;
 
             var iterationsCounter = new IterationsCounter();
-            iterationsCounter.Collect(text);
+            iterationsCounter.WalkAll(text);
             var result = iterationsCounter.IterationsCount;
             Console.WriteLine($"TextLength: {text.Length}. Iterations: {result}.");
 
-            var collector = new Collector4();
-            collector.Collect(text);
+            var walker = new Walker4();
+            walker.WalkAll(text);
         }
     }
 
-    public abstract class CollectorBase
+    public abstract class ConsolePrintedDublicateWalkerBase : DuplicateStringSegmentsWalkerBase
     {
-        public virtual void Collect(string @string) => Loop(@string);
-
-        protected void Loop(string @string)
-        {
-            var chars = @string.ToCharArray();
-
-            var maxOffset = chars.Length - 2;
-            for (int offset = 0; offset <= maxOffset; offset++)
-            {
-                var maxLength = chars.Length - offset;
-                for (int length = 2; length <= maxLength; length++)
-                    Iteration(chars, offset, length);
-            }
-        }
-
-        protected abstract void Iteration(char[] @string, int offset, int length);
-
-        protected void OnDuplicateFound(char[] @string, int offset, int length) => Console.WriteLine(@string, offset, length);
+        protected override void OnDublicateFound(ref StringSegment segment) => Console.WriteLine(segment);
     }
 
     // Slow
-    public class Collector1 : CollectorBase
+    public class Walker1 : ConsolePrintedDublicateWalkerBase
     {
-        private Node _node;
+        private Node _rootNode;
+        private Node _currentNode;
 
-        public override void Collect(string @string)
+        public override void WalkAll(string @string)
         {
-            _node = new Node();
+            _rootNode = new Node();
 
-            Loop(@string);
+            base.WalkAll(@string);
         }
 
-        protected override void Iteration(char[] @string, int offset, int length)
+        protected override int GetSegmentFrequency(ref StringSegment segment)
         {
-            var currentNode = _node;
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < segment.Length; i++)
             {
-                var element = @string[offset + i];
+                var element = segment[i];
 
-                currentNode = currentNode[element];
+                _currentNode = _currentNode[element];
             }
 
-            if (currentNode.Value is int)
-            {
-                var newValue = ((int)currentNode.Value) + 1;
-                currentNode.Value = newValue;
-
-                if (newValue == 2)
-                    OnDuplicateFound(@string, offset, length);
-            }
+            if (_currentNode.Value is int)
+                return (int)_currentNode.Value;
             else
-                currentNode.Value = 1;
+                return 0;
+        }
+
+        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _currentNode.Value = frequency;
+
+        protected override void Iteration(ref StringSegment segment)
+        {
+            _currentNode = _rootNode;
+
+            base.Iteration(ref segment);
         }
     }
 
     // Too much memory, but fast
-    public class Collector2 : CollectorBase
+    public class Walker2 : ConsolePrintedDublicateWalkerBase
     {
         private Dictionary<string, int> _cache;
+        private string _currentKey;
 
-        public override void Collect(string @string)
+        public override void WalkAll(string @string)
         {
             _cache = new Dictionary<string, int>();
 
-            Loop(@string);
+            base.WalkAll(@string);
         }
 
-        protected override void Iteration(char[] @string, int offset, int length)
-        {
-            var key = new string(@string, offset, length);
+        protected override int GetSegmentFrequency(ref StringSegment segment) => _cache.GetOrDefault(_currentKey);
 
-            if (_cache.TryGetValue(key, out int count))
-            {
-                var newValue = count + 1;
-                _cache[key] = newValue;
-                if (newValue == 2)
-                    OnDuplicateFound(@string, offset, length);
-            }
-            else
-                _cache.Add(key, 1);
+        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _cache[_currentKey] = frequency;
+
+        protected override void Iteration(ref StringSegment segment)
+        {
+            _currentKey = segment;
+
+            base.Iteration(ref segment);
         }
     }
 
     // Super slow
-    public class Collector3 : CollectorBase
+    public class Walker3 : ConsolePrintedDublicateWalkerBase
     {
         private HeapResizableDirectMemory _memory;
         private ILinks<TLink> _linksDisposable;
@@ -185,8 +168,9 @@ namespace Platform.Sandbox
         private PowerOf2ToUnaryNumberConverter<TLink> _powerOf2ToUnaryNumberConverter;
         private UnaryNumberToAddressAddOperationConverter<TLink> _fromNumberConverter;
         private DefaultLinkPropertyOperator<TLink> _propertyOperator;
+        private TLink _currentLink;
 
-        public override void Collect(string @string)
+        public override void WalkAll(string @string)
         {
             _memory = new HeapResizableDirectMemory(512 * 1024 * 1024);
 
@@ -208,73 +192,69 @@ namespace Platform.Sandbox
 
             _propertyOperator = new DefaultLinkPropertyOperator<TLink>(_links);
 
-            Loop(@string);
+            base.WalkAll(@string);
 
             Disposable.TryDispose(_linksDisposable);
             Disposable.TryDispose(_memory);
         }
 
-        protected override void Iteration(char[] @string, int offset, int length)
+        protected override int GetSegmentFrequency(ref StringSegment segment)
         {
-            var currentLink = _treeRoot;
-
-            for (int i = 0; i < length; i++)
+            for (int i = 0; i < segment.Length; i++)
             {
-                var element = @string[offset + i];
+                var element = segment[i];
                 var link = _toNumberConverter.Convert(element);
 
-                currentLink = _links.GetOrCreate(currentLink, link);
+                _currentLink = _links.GetOrCreate(_currentLink, link);
             }
 
-            var frequency = _propertyOperator.GetValue(currentLink, _frequencyProperty);
+            var frequency = _propertyOperator.GetValue(_currentLink, _frequencyProperty);
 
             if (frequency == _links.Constants.Null)
-            {
-                _propertyOperator.SetValue(currentLink, _frequencyProperty, _unaryOne);
-            }
+                return 0;
             else
-            {
-                var newValue = _unaryNumberIncrementer.Increment(frequency);
-                _propertyOperator.SetValue(currentLink, _frequencyProperty, newValue);
+                return (int)_fromNumberConverter.Convert(frequency);
+        }
 
-                var actualNumber = _fromNumberConverter.Convert(newValue);
-                if (actualNumber == 2)
-                    OnDuplicateFound(@string, offset, length);
-            }
+        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
+
+        protected override void Iteration(ref StringSegment segment)
+        {
+            _currentLink = _treeRoot;
+
+            base.Iteration(ref segment);
         }
     }
 
-    public class Collector4 : CollectorBase
+    public class Walker4 : DictionaryBasedDuplicateStringSegmentsWalkerBase
     {
-        private Dictionary<StringSegment, int> _cache;
-
-        public override void Collect(string @string)
+        public Walker4()
+            : base(resetDictionaryOnEachWalk: true)
         {
-            _cache = new Dictionary<StringSegment, int>();
-
-            Loop(@string);
         }
 
-        protected override void Iteration(char[] @string, int offset, int length)
-        {
-            var key = new StringSegment(@string, offset, length);
+        private int _totalDuplicates;
 
-            if (_cache.TryGetValue(key, out int count))
-            {
-                var newValue = count + 1;
-                _cache[key] = newValue;
-                if (newValue == 2)
-                    OnDuplicateFound(@string, offset, length);
-            }
-            else
-                _cache.Add(key, 1);
+        public override void WalkAll(string @string)
+        {
+            _totalDuplicates = 0;
+
+            base.WalkAll(@string);
+
+            Console.WriteLine($"Unique string segments: {Dictionary.Count}. Total duplicates: {_totalDuplicates}.");
+        }
+
+        protected override void OnDublicateFound(ref StringSegment segment)
+        {
+            Console.WriteLine(segment);
+            _totalDuplicates++;
         }
     }
 
-    public class IterationsCounter : CollectorBase
+    public class IterationsCounter : AllStringSegmentsWalkerBase
     {
         public long IterationsCount;
 
-        protected override void Iteration(char[] @string, int offset, int length) => IterationsCount++;
+        protected override void Iteration(ref StringSegment segment) => IterationsCount++;
     }
 }
