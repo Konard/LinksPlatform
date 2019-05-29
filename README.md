@@ -14,7 +14,7 @@ Comparison of models:
 
 ![Comparison of models](https://github.com/Konard/LinksPlatform/raw/master/doc/relational_model_vs_associative_model_vs_links.png)
 
-This platform uses a unified data type — link, which is a combination of Item and Link from a work by Simon Williams. So the Item or [Point](https://en.wikipedia.org/wiki/Point) is a specific case of the link, which references itself.
+This platform uses a unified data type — link, which is a combination of Item and Link from a work by Simon Williams. So the Item or [Point](https://en.wikipedia.org/wiki/Point) is a specific case of the [link, which references itself](http://linksplatform.github.io/itself.html).
 
 There are two variants of Link structure:
 
