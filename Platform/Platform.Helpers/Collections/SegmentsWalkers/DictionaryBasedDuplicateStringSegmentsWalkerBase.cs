@@ -9,16 +9,16 @@ namespace Platform.Helpers.Collections.SegmentsWalkers
 
         private readonly bool _resetDictionaryOnEachWalk;
 
-        protected Dictionary<StringSegment, int> Dictionary;
+        protected IDictionary<StringSegment, long> Dictionary;
 
-        public DictionaryBasedDuplicateStringSegmentsWalkerBase(Dictionary<StringSegment, int> dictionary, bool resetDictionaryOnEachWalk = DefaultResetDictionaryOnEachWalk)
+        public DictionaryBasedDuplicateStringSegmentsWalkerBase(IDictionary<StringSegment, long> dictionary, bool resetDictionaryOnEachWalk = DefaultResetDictionaryOnEachWalk)
         {
             Dictionary = dictionary;
             _resetDictionaryOnEachWalk = resetDictionaryOnEachWalk;
         }
 
         public DictionaryBasedDuplicateStringSegmentsWalkerBase(bool resetDictionaryOnEachWalk = DefaultResetDictionaryOnEachWalk)
-            : this(resetDictionaryOnEachWalk ? null : new Dictionary<StringSegment, int>(), resetDictionaryOnEachWalk)
+            : this(resetDictionaryOnEachWalk ? null : new Dictionary<StringSegment, long>(), resetDictionaryOnEachWalk)
         {
         }
 
@@ -27,14 +27,14 @@ namespace Platform.Helpers.Collections.SegmentsWalkers
             if (_resetDictionaryOnEachWalk)
             {
                 var capacity = Math.Ceiling(Math.Pow(@string.Length, 2) / 2);
-                Dictionary = new Dictionary<StringSegment, int>((int)capacity);
+                Dictionary = new Dictionary<StringSegment, long>((int)capacity);
             }
 
             base.WalkAll(@string);
         }
 
-        protected override int GetSegmentFrequency(ref StringSegment segment) => Dictionary.GetOrDefault(segment);
+        protected override long GetSegmentFrequency(ref StringSegment segment) => Dictionary.GetOrDefault(segment);
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => Dictionary[segment] = frequency;
+        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => Dictionary[segment] = frequency;
     }
 }

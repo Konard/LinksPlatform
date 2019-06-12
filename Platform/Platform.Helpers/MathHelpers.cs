@@ -195,7 +195,7 @@ namespace Platform.Helpers
 
             DelegateHelpers.Compile(out IsEquals, emiter =>
             {
-                EnsureNumeric();
+                EnsureCanBeNumeric();
 
                 emiter.LoadArguments(0, 1);
                 emiter.CompareEqual();
@@ -410,6 +410,12 @@ namespace Platform.Helpers
 
                 emiter.Return();
             });
+        }
+
+        private static void EnsureCanBeNumeric()
+        {
+            if (!CachedTypeInfo<T>.CanBeNumeric)
+                throw new NotSupportedException();
         }
 
         private static void EnsureNumeric()

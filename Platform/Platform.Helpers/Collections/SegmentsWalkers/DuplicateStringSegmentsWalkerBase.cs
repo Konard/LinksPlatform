@@ -11,7 +11,7 @@
         }
 
         protected abstract void OnDublicateFound(ref StringSegment segment);
-        protected abstract int GetSegmentFrequency(ref StringSegment segment);
-        protected abstract void SetSegmentFrequency(ref StringSegment segment, int frequency);
+        protected abstract long GetSegmentFrequency(ref StringSegment segment);
+        protected abstract void SetSegmentFrequency(ref StringSegment segment, long frequency);
     }
 }

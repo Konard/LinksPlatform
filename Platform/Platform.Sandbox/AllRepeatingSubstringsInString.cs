@@ -103,7 +103,7 @@ namespace Platform.Sandbox
             base.WalkAll(@string);
         }
 
-        protected override int GetSegmentFrequency(ref StringSegment segment)
+        protected override long GetSegmentFrequency(ref StringSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -118,7 +118,7 @@ namespace Platform.Sandbox
                 return 0;
         }
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _currentNode.Value = frequency;
+        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _currentNode.Value = frequency;
 
         protected override void Iteration(ref StringSegment segment)
         {
@@ -131,19 +131,19 @@ namespace Platform.Sandbox
     // Too much memory, but fast
     public class Walker2 : ConsolePrintedDublicateWalkerBase
     {
-        private Dictionary<string, int> _cache;
+        private Dictionary<string, long> _cache;
         private string _currentKey;
 
         public override void WalkAll(string @string)
         {
-            _cache = new Dictionary<string, int>();
+            _cache = new Dictionary<string, long>();
 
             base.WalkAll(@string);
         }
 
-        protected override int GetSegmentFrequency(ref StringSegment segment) => _cache.GetOrDefault(_currentKey);
+        protected override long GetSegmentFrequency(ref StringSegment segment) => _cache.GetOrDefault(_currentKey);
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _cache[_currentKey] = frequency;
+        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _cache[_currentKey] = frequency;
 
         protected override void Iteration(ref StringSegment segment)
         {
@@ -164,7 +164,6 @@ namespace Platform.Sandbox
         private TLink _unaryOne;
         private TLink _treeRoot;
         private AddressToUnaryNumberConverter<TLink> _toNumberConverter;
-        private UnaryNumberIncrementer<TLink> _unaryNumberIncrementer;
         private PowerOf2ToUnaryNumberConverter<TLink> _powerOf2ToUnaryNumberConverter;
         private UnaryNumberToAddressAddOperationConverter<TLink> _fromNumberConverter;
         private DefaultLinkPropertyOperator<TLink> _propertyOperator;
@@ -185,7 +184,6 @@ namespace Platform.Sandbox
             _treeRoot = _links.CreateAndUpdate(_meaningRoot, _links.Constants.Itself);
 
             _fromNumberConverter = new UnaryNumberToAddressAddOperationConverter<TLink>(_links, _unaryOne);
-            _unaryNumberIncrementer = new UnaryNumberIncrementer<TLink>(_links, _unaryOne);
 
             _powerOf2ToUnaryNumberConverter = new PowerOf2ToUnaryNumberConverter<TLink>(_links, _unaryOne);
             _toNumberConverter = new AddressToUnaryNumberConverter<TLink>(_links, _powerOf2ToUnaryNumberConverter);
@@ -198,7 +196,7 @@ namespace Platform.Sandbox
             Disposable.TryDispose(_memory);
         }
 
-        protected override int GetSegmentFrequency(ref StringSegment segment)
+        protected override long GetSegmentFrequency(ref StringSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -213,10 +211,10 @@ namespace Platform.Sandbox
             if (frequency == _links.Constants.Null)
                 return 0;
             else
-                return (int)_fromNumberConverter.Convert(frequency);
+                return _fromNumberConverter.Convert(frequency);
         }
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, int frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
+        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
 
         protected override void Iteration(ref StringSegment segment)
         {
