@@ -3,7 +3,7 @@ using Xunit;
 
 namespace Platform.Tests.Helpers
 {
-    public class StringSegmentTests
+    public class CharsSegmentTests
     {
         [Fact]
         public static void GetHashCodeEqualsTest()
@@ -12,10 +12,10 @@ namespace Platform.Tests.Helpers
 
             var testArray = testString.ToCharArray();
 
-            var first = new StringSegment(testArray, 0, 4);
+            var first = new CharsSegment(testArray, 0, 4);
             var firstHashCode = first.GetHashCode();
 
-            var second = new StringSegment(testArray, 5, 4);
+            var second = new CharsSegment(testArray, 5, 4);
             var secondHashCode = second.GetHashCode();
 
             Assert.True(firstHashCode == secondHashCode);
@@ -28,8 +28,8 @@ namespace Platform.Tests.Helpers
 
             var testArray = testString.ToCharArray();
 
-            var first = new StringSegment(testArray, 0, 4);
-            var second = new StringSegment(testArray, 5, 4);
+            var first = new CharsSegment(testArray, 0, 4);
+            var second = new CharsSegment(testArray, 5, 4);
 
             Assert.True(first.Equals(second));
         }

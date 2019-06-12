@@ -2,7 +2,7 @@
 {
     public abstract class DuplicateStringSegmentsWalkerBase : AllStringSegmentsWalkerBase
     {
-        protected override void Iteration(ref StringSegment segment)
+        protected override void Iteration(ref CharsSegment segment)
         {
             var frequency = GetSegmentFrequency(ref segment);
             if (frequency == 1)
@@ -10,8 +10,8 @@
             SetSegmentFrequency(ref segment, frequency + 1);
         }
 
-        protected abstract void OnDublicateFound(ref StringSegment segment);
-        protected abstract long GetSegmentFrequency(ref StringSegment segment);
-        protected abstract void SetSegmentFrequency(ref StringSegment segment, long frequency);
+        protected abstract void OnDublicateFound(ref CharsSegment segment);
+        protected abstract long GetSegmentFrequency(ref CharsSegment segment);
+        protected abstract void SetSegmentFrequency(ref CharsSegment segment, long frequency);
     }
 }

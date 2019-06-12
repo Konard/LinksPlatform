@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace Platform.Helpers.Collections
 {
-    public unsafe class StringSegment : Segment<char>
+    public unsafe class CharsSegment : Segment<char>
     {
-        public StringSegment(IList<char> @base, int offset, int length)
+        public CharsSegment(IList<char> @base, int offset, int length)
             : base(@base, offset, length)
         {
         }
@@ -80,7 +80,7 @@ namespace Platform.Helpers.Collections
             }
         }
 
-        public static implicit operator string(StringSegment segment)
+        public static implicit operator string(CharsSegment segment)
         {
             if (!(segment.Base is char[] array))
                 array = segment.Base.ToArray();

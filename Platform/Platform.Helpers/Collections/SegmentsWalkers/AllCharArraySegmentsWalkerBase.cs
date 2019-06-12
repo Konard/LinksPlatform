@@ -16,12 +16,12 @@
                 var maxLength = chars.Length - offset;
                 for (int length = _minimumStringSegmentLength; length <= maxLength; length++)
                 {
-                    var segment = new StringSegment(chars, offset, length);
+                    var segment = new CharsSegment(chars, offset, length);
                     Iteration(ref segment);
                 }
             }
         }
 
-        protected abstract void Iteration(ref StringSegment segment);
+        protected abstract void Iteration(ref CharsSegment segment);
     }
 }

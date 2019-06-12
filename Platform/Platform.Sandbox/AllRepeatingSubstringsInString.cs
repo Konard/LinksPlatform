@@ -87,7 +87,7 @@ namespace Platform.Sandbox
 
     public abstract class ConsolePrintedDublicateWalkerBase : DuplicateStringSegmentsWalkerBase
     {
-        protected override void OnDublicateFound(ref StringSegment segment) => Console.WriteLine(segment);
+        protected override void OnDublicateFound(ref CharsSegment segment) => Console.WriteLine(segment);
     }
 
     // Slow
@@ -103,7 +103,7 @@ namespace Platform.Sandbox
             base.WalkAll(@string);
         }
 
-        protected override long GetSegmentFrequency(ref StringSegment segment)
+        protected override long GetSegmentFrequency(ref CharsSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -118,9 +118,9 @@ namespace Platform.Sandbox
                 return 0;
         }
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _currentNode.Value = frequency;
+        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _currentNode.Value = frequency;
 
-        protected override void Iteration(ref StringSegment segment)
+        protected override void Iteration(ref CharsSegment segment)
         {
             _currentNode = _rootNode;
 
@@ -141,11 +141,11 @@ namespace Platform.Sandbox
             base.WalkAll(@string);
         }
 
-        protected override long GetSegmentFrequency(ref StringSegment segment) => _cache.GetOrDefault(_currentKey);
+        protected override long GetSegmentFrequency(ref CharsSegment segment) => _cache.GetOrDefault(_currentKey);
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _cache[_currentKey] = frequency;
+        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _cache[_currentKey] = frequency;
 
-        protected override void Iteration(ref StringSegment segment)
+        protected override void Iteration(ref CharsSegment segment)
         {
             _currentKey = segment;
 
@@ -196,7 +196,7 @@ namespace Platform.Sandbox
             Disposable.TryDispose(_memory);
         }
 
-        protected override long GetSegmentFrequency(ref StringSegment segment)
+        protected override long GetSegmentFrequency(ref CharsSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -214,9 +214,9 @@ namespace Platform.Sandbox
                 return _fromNumberConverter.Convert(frequency);
         }
 
-        protected override void SetSegmentFrequency(ref StringSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
+        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
 
-        protected override void Iteration(ref StringSegment segment)
+        protected override void Iteration(ref CharsSegment segment)
         {
             _currentLink = _treeRoot;
 
@@ -242,7 +242,7 @@ namespace Platform.Sandbox
             Console.WriteLine($"Unique string segments: {Dictionary.Count}. Total duplicates: {_totalDuplicates}.");
         }
 
-        protected override void OnDublicateFound(ref StringSegment segment)
+        protected override void OnDublicateFound(ref CharsSegment segment)
         {
             Console.WriteLine(segment);
             _totalDuplicates++;
@@ -253,6 +253,6 @@ namespace Platform.Sandbox
     {
         public long IterationsCount;
 
-        protected override void Iteration(ref StringSegment segment) => IterationsCount++;
+        protected override void Iteration(ref CharsSegment segment) => IterationsCount++;
     }
 }
