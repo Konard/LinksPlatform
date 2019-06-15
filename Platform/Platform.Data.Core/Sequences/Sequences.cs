@@ -209,7 +209,7 @@ namespace Platform.Data.Core.Sequences
             return results;
         }
 
-        public bool Each(Func<ulong, bool> handler, params ulong[] sequence)
+        public bool Each(Func<ulong, bool> handler, IList<ulong> sequence)
         {
             return Sync.ExecuteReadOperation(() =>
             {
@@ -218,7 +218,7 @@ namespace Platform.Data.Core.Sequences
 
                 Links.EnsureEachLinkIsAnyOrExists(sequence);
 
-                if (sequence.Length == 1)
+                if (sequence.Count == 1)
                 {
                     var link = sequence[0];
 
@@ -227,7 +227,7 @@ namespace Platform.Data.Core.Sequences
 
                     return handler(link);
                 }
-                if (sequence.Length == 2)
+                if (sequence.Count == 2)
                     return Links.Unsync.Each(sequence[0], sequence[1], handler);
 
                 if (Options.UseIndex && !Options.Indexer.CheckIndex(sequence))
@@ -237,7 +237,7 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
-        private bool EachCore(Func<ulong, bool> handler, params ulong[] sequence)
+        private bool EachCore(Func<ulong, bool> handler, IList<ulong> sequence)
         {
             var matcher = new Matcher(this, sequence, new HashSet<LinkIndex>(), handler);
 
@@ -249,13 +249,13 @@ namespace Platform.Data.Core.Sequences
             if (!StepRight(innerHandler, sequence[0], sequence[1]))
                 return false;
 
-            var last = sequence.Length - 2;
+            var last = sequence.Count - 2;
             for (var i = 1; i < last; i++)
                 if (!PartialStepRight(innerHandler, sequence[i], sequence[i + 1]))
                     return false;
 
-            if (sequence.Length >= 3)
-                if (!StepLeft(innerHandler, sequence[sequence.Length - 2], sequence[sequence.Length - 1]))
+            if (sequence.Count >= 3)
+                if (!StepLeft(innerHandler, sequence[sequence.Count - 2], sequence[sequence.Count - 1]))
                     return false;
 
             return true;
@@ -538,14 +538,14 @@ namespace Platform.Data.Core.Sequences
         public class Matcher : RightSequenceWalker<ulong>
         {
             private readonly Sequences _sequences;
-            private readonly ulong[] _patternSequence;
+            private readonly IList<LinkIndex> _patternSequence;
             private readonly HashSet<LinkIndex> _linksInSequence;
             private readonly HashSet<LinkIndex> _results;
             private readonly Func<ulong, bool> _stopableHandler;
             private readonly HashSet<ulong> _readAsElements;
-            private long _filterPosition;
+            private int _filterPosition;
 
-            public Matcher(Sequences sequences, LinkIndex[] patternSequence, HashSet<LinkIndex> results, Func<LinkIndex, bool> stopableHandler, HashSet<LinkIndex> readAsElements = null)
+            public Matcher(Sequences sequences, IList<LinkIndex> patternSequence, HashSet<LinkIndex> results, Func<LinkIndex, bool> stopableHandler, HashSet<LinkIndex> readAsElements = null)
                 : base(sequences.Links.Unsync)
             {
                 _sequences = sequences;
@@ -566,12 +566,12 @@ namespace Platform.Data.Core.Sequences
                     if (!FullMatchCore(Links.GetIndex(part)))
                         break;
 
-                return _filterPosition == _patternSequence.Length;
+                return _filterPosition == _patternSequence.Count;
             }
 
             private bool FullMatchCore(LinkIndex element)
             {
-                if (_filterPosition == _patternSequence.Length)
+                if (_filterPosition == _patternSequence.Count)
                 {
                     _filterPosition = -2; // Длиннее чем нужно
                     return false;
@@ -620,12 +620,12 @@ namespace Platform.Data.Core.Sequences
                     if (!PartialMatchCore(Links.GetIndex(part)))
                         break;
 
-                return _filterPosition == _patternSequence.Length - 1;
+                return _filterPosition == _patternSequence.Count - 1;
             }
 
             private bool PartialMatchCore(LinkIndex element)
             {
-                if (_filterPosition == (_patternSequence.Length - 1))
+                if (_filterPosition == (_patternSequence.Count - 1))
                     return false; // Нашлось
 
                 if (_filterPosition >= 0)

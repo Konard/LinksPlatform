@@ -1,5 +1,6 @@
 ﻿using Platform.Helpers;
 using Platform.Data.Core.Doublets;
+using System.Collections.Generic;
 
 namespace Platform.Data.Core.Sequences
 {
@@ -77,11 +78,11 @@ namespace Platform.Data.Core.Sequences
             return indexed;
         }
 
-        public bool CheckIndex(TLink[] sequence)
+        public bool CheckIndex(IList<TLink> sequence)
         {
             var indexed = true;
 
-            var i = sequence.Length;
+            var i = sequence.Count;
             while (--i >= 1 && (indexed = !MathHelpers<TLink>.IsEquals(_links.SearchOrDefault(sequence[i - 1], sequence[i]), _null))) { }
 
             return indexed;

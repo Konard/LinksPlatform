@@ -79,11 +79,11 @@ namespace Platform.Sandbox
 
                     var sequencesCount = 0;
 
-                    sequences.Each(x =>
-                    {
-                        sequencesCount++;
-                        return true;
-                    }, temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
+                    //sequences.Each(x =>
+                    //{
+                    //    sequencesCount++;
+                    //    return true;
+                    //}, temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
 
                     sequences.Compact(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
 

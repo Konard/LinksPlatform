@@ -2,16 +2,20 @@
 using System.Collections.Generic;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.SegmentsWalkers;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Common;
 
 namespace Platform.Data.Core.Sequences
 {
-    public class DuplicateFragmentsProvider<TLink> : IProvider<IList<IList<TLink>>>
+    public class DuplicateFragmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<IList<TLink>>>
     {
         private readonly ILinks<TLink> _links;
         private readonly ISequences<TLink> _sequences;
+        private List<IList<TLink>> _groups;
+        private HashSet<Segment<TLink>> _checkedSequences;
+        private BitString _visited;
 
         public DuplicateFragmentsProvider(ILinks<TLink> links, ISequences<TLink> sequences)
         {
@@ -21,19 +25,19 @@ namespace Platform.Data.Core.Sequences
 
         public IList<IList<TLink>> Get()
         {
-            var groups = new List<IList<TLink>>();
-            var checkedSequences = new HashSet<TLink[]>();
+            _groups = new List<IList<TLink>>();
+            _checkedSequences = new HashSet<Segment<TLink>>();
 
             var count = _links.Count();
 
-            var visited = new BitString((long)(Integer<TLink>)count + 1);
+            _visited = new BitString((long)(Integer<TLink>)count + 1);
 
             _links.Each(link =>
             {
                 var linkIndex = _links.GetIndex(link);
                 var linkBitIndex = (long)(Integer<TLink>)linkIndex;
 
-                if (!visited.Get(linkBitIndex))
+                if (!_visited.Get(linkBitIndex))
                 {
                     var sequenceElements = new List<TLink>();
                     _sequences.EachPart(sequenceElements.AddAndReturnTrue, linkIndex);
@@ -42,48 +46,38 @@ namespace Platform.Data.Core.Sequences
 
                     if (sequenceElements.Count > 2)
                     {
-                        var maxOffset = sequenceElements.Count - 3;
-                        for (int offset = 0; offset <= maxOffset; offset++)
-                        {
-                            var maxLength = sequenceElementsArray.Length - offset;
-                            for (int length = 3; length <= maxLength; length++)
-                            {
-                                TLink[] sequenceElementsCopy;
-                                if (offset == 0 && length == sequenceElementsArray.Length)
-                                    sequenceElementsCopy = sequenceElementsArray;
-                                else
-                                {
-                                    sequenceElementsCopy = new TLink[length];
-                                    Array.Copy(sequenceElementsArray, offset, sequenceElementsCopy, 0, length);
-                                }
-
-                                if (checkedSequences.Add(sequenceElementsCopy))
-                                    CollectDuplicatesForSequence(groups, visited, sequenceElementsCopy);
-                            }
-                        }
+                        WalkAll(sequenceElements);
                     }
                 }
 
                 return _links.Constants.Continue;
             });
 
-            return groups;
+            return _groups;
         }
 
-        private void CollectDuplicatesForSequence(List<IList<TLink>> groups, BitString visited, TLink[] sequenceElements)
+        protected override Segment<TLink> CreateSegment(IList<TLink> elements, int offset, int length) => new Segment<TLink>(elements, offset, length);
+
+        protected override void OnDublicateFound(Segment<TLink> segment)
         {
-            List<TLink> duplicates = CollectDuplicatesForSequence(visited, sequenceElements);
+            if (_checkedSequences.Add(segment))
+                CollectDuplicatesForSequence(segment);
+        }
+
+        private void CollectDuplicatesForSequence(Segment<TLink> segment)
+        {
+            List<TLink> duplicates = CollectDuplicatesForSegment(segment);
 
             if (duplicates.Count > 1)
             {
-                groups.Add(duplicates);
+                _groups.Add(duplicates);
 #if DEBUG
                 PrintDuplicates(duplicates);
 #endif
             }
         }
 
-        private List<TLink> CollectDuplicatesForSequence(BitString visited, TLink[] sequenceElements)
+        private List<TLink> CollectDuplicatesForSegment(Segment<TLink> segment)
         {
             var duplicates = new List<TLink>();
             var readAsElement = new HashSet<TLink>();
@@ -91,27 +85,27 @@ namespace Platform.Data.Core.Sequences
             _sequences.Each(sequence =>
             {
                 var sequenceBitIndex = (long)(Integer<TLink>)sequence;
-                if (!visited.Get(sequenceBitIndex))
+                if (!_visited.Get(sequenceBitIndex))
                 {
-                    visited.Set(sequenceBitIndex);
+                    _visited.Set(sequenceBitIndex);
                     duplicates.Add(sequence);
                     readAsElement.Add(sequence);
                 }
 
                 return true; // Continue
-            }, sequenceElements);
+            }, segment);
 
             var sequencesExperiments = _sequences as Sequences;
             if (sequencesExperiments != null)
             {
-                var partiallyMatched = sequencesExperiments.GetAllPartiallyMatchingSequences4((HashSet<ulong>)(object)readAsElement, (ulong[])(object)sequenceElements);
+                var partiallyMatched = sequencesExperiments.GetAllPartiallyMatchingSequences4((HashSet<ulong>)(object)readAsElement, (IList<ulong>)(object)segment);
                 foreach (var partiallyMatchedSequence in partiallyMatched)
                 {
                     var sequenceBitIndex = (long)(Integer<TLink>)partiallyMatchedSequence;
-                    if (!visited.Get(sequenceBitIndex))
+                    if (!_visited.Get(sequenceBitIndex))
                     {
                         TLink sequenceIndex = (Integer<TLink>)partiallyMatchedSequence;
-                        visited.Set(sequenceBitIndex);
+                        _visited.Set(sequenceBitIndex);
                         duplicates.Add(sequenceIndex);
                     }
                 }

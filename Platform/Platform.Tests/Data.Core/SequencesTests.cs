@@ -10,6 +10,7 @@ using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
+using Platform.Helpers.Collections;
 
 namespace Platform.Tests.Data.Core
 {

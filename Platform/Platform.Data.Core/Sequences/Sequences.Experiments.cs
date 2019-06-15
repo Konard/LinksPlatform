@@ -737,11 +737,11 @@ namespace Platform.Data.Core.Sequences
             });
         }
 
-        public HashSet<ulong> GetAllPartiallyMatchingSequences4(HashSet<ulong> readAsElements, ulong[] sequence)
+        public HashSet<ulong> GetAllPartiallyMatchingSequences4(HashSet<ulong> readAsElements, IList<ulong> sequence)
         {
             return Sync.ExecuteReadOperation(() =>
             {
-                if (sequence.Length > 0)
+                if (sequence.Count > 0)
                 {
                     Links.EnsureEachLinkExists(sequence);
 
@@ -768,7 +768,7 @@ namespace Platform.Data.Core.Sequences
 
                     var next = new HashSet<ulong>();
 
-                    for (var i = 1; i < sequence.Length; i++)
+                    for (var i = 1; i < sequence.Count; i++)
                     {
                         var collector = new AllUsagesCollector1(Links.Unsync, next);
                         collector.Collect(Links.Unsync.GetLink(sequence[i]));

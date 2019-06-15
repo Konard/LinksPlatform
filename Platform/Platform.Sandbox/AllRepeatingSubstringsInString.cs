@@ -85,9 +85,11 @@ namespace Platform.Sandbox
         }
     }
 
-    public abstract class ConsolePrintedDublicateWalkerBase : DuplicateStringSegmentsWalkerBase
+    public abstract class ConsolePrintedDublicateWalkerBase : DuplicateSegmentsWalkerBase<char, CharsSegment>
     {
-        protected override void OnDublicateFound(ref CharsSegment segment) => Console.WriteLine(segment);
+        protected override void OnDublicateFound(CharsSegment segment) => Console.WriteLine(segment);
+
+        protected override CharsSegment CreateSegment(IList<char> elements, int offset, int length) => new CharsSegment(elements, offset, length);
     }
 
     // Slow
@@ -96,14 +98,14 @@ namespace Platform.Sandbox
         private Node _rootNode;
         private Node _currentNode;
 
-        public override void WalkAll(string @string)
+        public override void WalkAll(IList<char> elements)
         {
             _rootNode = new Node();
 
-            base.WalkAll(@string);
+            base.WalkAll(elements);
         }
 
-        protected override long GetSegmentFrequency(ref CharsSegment segment)
+        protected override long GetSegmentFrequency(CharsSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -118,13 +120,13 @@ namespace Platform.Sandbox
                 return 0;
         }
 
-        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _currentNode.Value = frequency;
+        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _currentNode.Value = frequency;
 
-        protected override void Iteration(ref CharsSegment segment)
+        protected override void Iteration(CharsSegment segment)
         {
             _currentNode = _rootNode;
 
-            base.Iteration(ref segment);
+            base.Iteration(segment);
         }
     }
 
@@ -134,22 +136,22 @@ namespace Platform.Sandbox
         private Dictionary<string, long> _cache;
         private string _currentKey;
 
-        public override void WalkAll(string @string)
+        public override void WalkAll(IList<char> elements)
         {
             _cache = new Dictionary<string, long>();
 
-            base.WalkAll(@string);
+            base.WalkAll(elements);
         }
 
-        protected override long GetSegmentFrequency(ref CharsSegment segment) => _cache.GetOrDefault(_currentKey);
+        protected override long GetSegmentFrequency(CharsSegment segment) => _cache.GetOrDefault(_currentKey);
 
-        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _cache[_currentKey] = frequency;
+        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _cache[_currentKey] = frequency;
 
-        protected override void Iteration(ref CharsSegment segment)
+        protected override void Iteration(CharsSegment segment)
         {
             _currentKey = segment;
 
-            base.Iteration(ref segment);
+            base.Iteration(segment);
         }
     }
 
@@ -169,7 +171,7 @@ namespace Platform.Sandbox
         private DefaultLinkPropertyOperator<TLink> _propertyOperator;
         private TLink _currentLink;
 
-        public override void WalkAll(string @string)
+        public override void WalkAll(IList<char> elements)
         {
             _memory = new HeapResizableDirectMemory(512 * 1024 * 1024);
 
@@ -190,13 +192,13 @@ namespace Platform.Sandbox
 
             _propertyOperator = new DefaultLinkPropertyOperator<TLink>(_links);
 
-            base.WalkAll(@string);
+            base.WalkAll(elements);
 
             Disposable.TryDispose(_linksDisposable);
             Disposable.TryDispose(_memory);
         }
 
-        protected override long GetSegmentFrequency(ref CharsSegment segment)
+        protected override long GetSegmentFrequency(CharsSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -214,17 +216,17 @@ namespace Platform.Sandbox
                 return _fromNumberConverter.Convert(frequency);
         }
 
-        protected override void SetSegmentFrequency(ref CharsSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
+        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
 
-        protected override void Iteration(ref CharsSegment segment)
+        protected override void Iteration(CharsSegment segment)
         {
             _currentLink = _treeRoot;
 
-            base.Iteration(ref segment);
+            base.Iteration(segment);
         }
     }
 
-    public class Walker4 : DictionaryBasedDuplicateStringSegmentsWalkerBase
+    public class Walker4 : DictionaryBasedDuplicateSegmentsWalkerBase<char, CharsSegment>
     {
         public Walker4()
             : base(resetDictionaryOnEachWalk: true)
@@ -233,26 +235,28 @@ namespace Platform.Sandbox
 
         private int _totalDuplicates;
 
-        public override void WalkAll(string @string)
+        public override void WalkAll(IList<char> elements)
         {
             _totalDuplicates = 0;
 
-            base.WalkAll(@string);
+            base.WalkAll(elements);
 
             Console.WriteLine($"Unique string segments: {Dictionary.Count}. Total duplicates: {_totalDuplicates}.");
         }
 
-        protected override void OnDublicateFound(ref CharsSegment segment)
+        protected override CharsSegment CreateSegment(IList<char> elements, int offset, int length) => new CharsSegment(elements, offset, length);
+
+        protected override void OnDublicateFound(CharsSegment segment)
         {
             Console.WriteLine(segment);
             _totalDuplicates++;
         }
     }
 
-    public class IterationsCounter : AllStringSegmentsWalkerBase
+    public class IterationsCounter : AllSegmentsWalkerBase<char>
     {
         public long IterationsCount;
 
-        protected override void Iteration(ref CharsSegment segment) => IterationsCount++;
+        protected override void Iteration(Segment<char> segment) => IterationsCount++;
     }
 }
