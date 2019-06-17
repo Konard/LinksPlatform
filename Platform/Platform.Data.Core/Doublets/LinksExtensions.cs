@@ -489,14 +489,14 @@ namespace Platform.Data.Core.Doublets
         public static void EnsureInnerReferenceExists<T>(this ILinks<T> links, IList<T> restrictions, string argumentName)
         {
             for (int i = 0; i < restrictions.Count; i++)
-                links.EnsureInnerReferenceExists(restrictions[0], argumentName);
+                links.EnsureInnerReferenceExists(restrictions[i], argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureLinkIsAnyOrExists<T>(this ILinks<T> links, IList<T> restrictions)
         {
             for (int i = 0; i < restrictions.Count; i++)
-                links.EnsureLinkIsAnyOrExists(restrictions[0], nameof(restrictions));
+                links.EnsureLinkIsAnyOrExists(restrictions[i], nameof(restrictions));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
