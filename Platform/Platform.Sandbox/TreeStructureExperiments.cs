@@ -43,11 +43,11 @@ namespace Platform.Sandbox
                 {
                     return false;
                 }
-                if (!IsLeftThreaded(this) && Left.Value > Value)
+                if (!IsLeftThreaded(this) && Left.Value > Value) //-V3125
                 {
                     return false;
                 }
-                if (!IsRightThreaded(this) && Right.Value < Value)
+                if (!IsRightThreaded(this) && Right.Value < Value) //-V3125
                 {
                     return false;
                 }

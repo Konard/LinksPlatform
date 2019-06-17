@@ -876,7 +876,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var searchResults4 = sequences.GetAllConnections3(sequence); sw4.Stop();
 
                     Global.Trash = searchResults3;
-                    Global.Trash = searchResults4;
+                    Global.Trash = searchResults4; //-V3008
 
                     var intersection1 = createResults.Intersect(searchResults1).ToList();
                     Assert.True(intersection1.Count == createResults.Length);

@@ -90,18 +90,18 @@ namespace Platform.Sandbox
 
             Console.ReadLine();
 
-            Console.WriteLine("Xml export started.");
+            //Console.WriteLine("Xml export started.");
 
-            readableFilename = @"C:\Texts\result.txt";
+            //readableFilename = @"C:\Texts\result.txt";
 
-            var xmlFilename = Path.Combine(Path.GetDirectoryName(readableFilename), Path.GetFileNameWithoutExtension(readableFilename) + ".gexf");
+            //var xmlFilename = Path.Combine(Path.GetDirectoryName(readableFilename), Path.GetFileNameWithoutExtension(readableFilename) + ".gexf");
 
-            GexfExporter.ToFile(xmlFilename, link =>
-            {
-                return (link.ReferersByLinkerCount < (link.ReferersBySourceCount + link.ReferersByTargetCount)) && ((link.ReferersBySourceCount + link.ReferersByTargetCount + link.ReferersByLinkerCount) >= 5);
-            });
+            //GexfExporter.ToFile(xmlFilename, link =>
+            //{
+            //    return (link.ReferersByLinkerCount < (link.ReferersBySourceCount + link.ReferersByTargetCount)) && ((link.ReferersBySourceCount + link.ReferersByTargetCount + link.ReferersByLinkerCount) >= 5);
+            //});
 
-            Console.WriteLine("Xml export finished");
+            //Console.WriteLine("Xml export finished");
 
             Console.ReadLine();
         }

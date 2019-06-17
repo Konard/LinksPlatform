@@ -300,7 +300,7 @@ namespace Platform.Data.Core.Doublets
             }
             else // Replace / Update
             {
-                if (patternOrCondition.Count == 1)
+                if (patternOrCondition.Count == 1) //-V3125
                 {
                     var linkToUpdate = patternOrCondition[0];
                     var before = Links.GetLink(linkToUpdate);
@@ -308,7 +308,7 @@ namespace Platform.Data.Core.Doublets
                     if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
-                    var after = (IList<T>)substitution.ToArray();
+                    var after = (IList<T>)substitution.ToArray(); //-V3125
 
                     if (MathHelpers<T>.IsEquals(after[0], default))
                         after[0] = linkToUpdate;

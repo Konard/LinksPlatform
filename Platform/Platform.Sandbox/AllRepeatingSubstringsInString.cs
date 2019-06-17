@@ -156,7 +156,7 @@ namespace Platform.Sandbox
     }
 
     // Super slow
-    public class Walker3 : ConsolePrintedDublicateWalkerBase
+    public class Walker3 : ConsolePrintedDublicateWalkerBase //-V3072
     {
         private HeapResizableDirectMemory _memory;
         private ILinks<TLink> _linksDisposable;

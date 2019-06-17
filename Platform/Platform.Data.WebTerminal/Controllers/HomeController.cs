@@ -10,7 +10,7 @@ namespace Platform.Data.WebTerminal.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        public IActionResult Index() //-V3013
         {
             return View();
         }

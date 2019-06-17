@@ -31,7 +31,7 @@ namespace Platform.Helpers.Reflection
         {
             Type = typeof(T);
 
-            if (IsNullable = Type.IsNullable())
+            if (IsNullable = Type.IsNullable()) //-V3055
                 UnderlyingType = Nullable.GetUnderlyingType(Type);
             else
                 UnderlyingType = Type;
