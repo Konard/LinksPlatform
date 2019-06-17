@@ -11,7 +11,7 @@ using System.Linq;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class UInt64LinksTransactionsLayer : LinksDisposableDecoratorBase<ulong>
+    public class UInt64LinksTransactionsLayer : LinksDisposableDecoratorBase<ulong> //-V3073
     {
         /// <remarks>
         /// Альтернативные варианты хранения трансформации (элемента транзакции):
@@ -192,17 +192,14 @@ namespace Platform.Data.Core.Doublets
                 if (transaction.IsCommitted) throw new InvalidOperationException("Transation is commited.");
             }
 
-            protected override void DisposeCore(bool manual)
+            protected override void DisposeCore(bool manual, bool wasDisposed)
             {
-                if (manual)
+                if (!wasDisposed && _layer != null && !_layer.IsDisposed)
                 {
-                    if (_layer != null && !_layer.IsDisposed)
-                    {
-                        if (!IsCommitted && !IsReverted)
-                            Revert();
+                    if (!IsCommitted && !IsReverted)
+                        Revert();
 
-                        _layer.ResetCurrentTransation();
-                    }
+                    _layer.ResetCurrentTransation();
                 }
             }
         }
@@ -365,12 +362,12 @@ namespace Platform.Data.Core.Doublets
 
         #region DisposalBase
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            if (manual)
+            if (!wasDisposed)
                 DisposeTransitions();
 
-            base.DisposeCore(manual);
+            base.DisposeCore(manual, wasDisposed);
         }
 
         #endregion

@@ -529,11 +529,11 @@ namespace Platform.Data.Core.Doublets
 
         protected override bool AllowMultipleDisposeCalls => true;
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            SetPointers(null);
-            if (manual)
-                Disposable.TryDispose(_memory);
+            if (!wasDisposed)
+                SetPointers(null);
+            Disposable.TryDispose(_memory);
         }
 
         #endregion

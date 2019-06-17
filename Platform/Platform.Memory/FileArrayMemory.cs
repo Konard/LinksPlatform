@@ -5,7 +5,7 @@ using Platform.Helpers.IO;
 
 namespace Platform.Memory
 {
-    public class FileArrayMemory<TElement> : DisposableBase, IArrayMemory<TElement>
+    public class FileArrayMemory<TElement> : DisposableBase, IArrayMemory<TElement> //-V3073
         where TElement : struct
     {
         private static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
@@ -37,11 +37,7 @@ namespace Platform.Memory
 
         #region Disposable
 
-        protected override void DisposeCore(bool manual)
-        {
-            if (manual)
-                Disposable.TryDispose(_file);
-        }
+        protected override void DisposeCore(bool manual, bool wasDisposed) => Disposable.TryDispose(_file);
 
         protected override string ObjectName => $"File stored memory block '{_address}'.";
 

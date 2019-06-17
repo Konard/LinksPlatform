@@ -46,7 +46,7 @@ namespace Platform.Tests.Data.Core
                         if (linksCount > 2 && createPoint)
                         {
                             var source = random.NextUInt64(1, linksCount);
-                            var target = random.NextUInt64(1, linksCount);
+                            var target = random.NextUInt64(1, linksCount); //-V3086
 
                             var resultLink = links.CreateAndUpdate(source, target);
                             if (resultLink > linksCount)

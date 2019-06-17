@@ -28,10 +28,6 @@ namespace Platform.Data.Core.Doublets
 
         protected override bool AllowMultipleDisposeCalls => true;
 
-        protected override void DisposeCore(bool manual)
-        {
-            if (manual)
-                Disposable.TryDispose(Links);
-        }
+        protected override void DisposeCore(bool manual, bool wasDisposed) => Disposable.TryDispose(Links);
     }
 }

@@ -58,13 +58,13 @@ namespace Platform.Helpers.Disposables
         private void Dispose(bool manual)
         {
             var originalDisposedValue = Interlocked.CompareExchange(ref _disposed, 1, 0);
-            var wasNotDisposed = originalDisposedValue == 0;
+            var wasDisposed = originalDisposedValue > 0;
 
-            if (AllowMultipleDisposeAttempts || wasNotDisposed)
+            if (AllowMultipleDisposeAttempts || !wasDisposed)
             {
                 try
                 {
-                    if (wasNotDisposed)
+                    if (!wasDisposed)
                     {
                         if (CurrentProcess != null)
                             CurrentProcess.Exited -= OnProcessExit;
@@ -72,7 +72,7 @@ namespace Platform.Helpers.Disposables
                         //    Process.GetCurrentProcess().Exited -= OnProcessExit;
                     }
 
-                    DisposeCore(manual);
+                    DisposeCore(manual, wasDisposed);
                 }
                 catch(Exception exception)
                 {
@@ -86,7 +86,7 @@ namespace Platform.Helpers.Disposables
             }
         }
 
-        protected abstract void DisposeCore(bool manual);
+        protected abstract void DisposeCore(bool manual, bool wasDisposed);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual void EnsureNotDisposed()

@@ -16,7 +16,7 @@ namespace Platform.Communication.Protocol.Udp
     /// <remarks>
     /// TODO: Попробовать ThreadPool / Tasks
     /// </remarks>
-    public class UdpReceiver : DisposableBase
+    public class UdpReceiver : DisposableBase //-V3073
     {
         private const int DefaultPort = 15000;
 
@@ -98,13 +98,11 @@ namespace Platform.Communication.Protocol.Udp
             }
         }
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            if (manual)
-            {
+            if (!wasDisposed)
                 Stop();
-                Disposable.TryDispose(_udp);
-            }
+            Disposable.TryDispose(_udp);
         }
     }
 }

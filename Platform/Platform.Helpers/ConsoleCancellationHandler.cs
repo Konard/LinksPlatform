@@ -43,14 +43,12 @@ namespace Platform.Helpers
             while (NoCancellationRequested) ThreadHelpers.Sleep();
         }
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            if (manual)
-            {
-                if (!IsDisposed)
-                    Console.CancelKeyPress -= OnCancelKeyPress;
-                Disposable.TryDispose(Source);
-            }
+            if (!wasDisposed)
+                Console.CancelKeyPress -= OnCancelKeyPress;
+
+            Disposable.TryDispose(Source);
         }
     }
 }

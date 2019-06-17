@@ -100,11 +100,14 @@ namespace Platform.Memory
 
         protected override bool AllowMultipleDisposeCalls => true;
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            var pointer = Interlocked.Exchange(ref _pointer, IntPtr.Zero);
-            if (pointer != IntPtr.Zero)
-                DisposePointer(pointer, _usedCapacity);
+            if (!wasDisposed)
+            {
+                var pointer = Interlocked.Exchange(ref _pointer, IntPtr.Zero);
+                if (pointer != IntPtr.Zero)
+                    DisposePointer(pointer, _usedCapacity);
+            }
         }
 
         protected abstract void DisposePointer(IntPtr pointer, long size);

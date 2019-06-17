@@ -270,7 +270,7 @@ namespace Platform.Helpers
 
         #endregion
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             while (_dependencies.Count > 0)
                 Disposable.TryDispose(_dependencies.Pop());

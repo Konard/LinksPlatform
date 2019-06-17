@@ -25,7 +25,7 @@ namespace Platform.Helpers.Disposables
             OnDispose = disposed;
         }
 
-        protected override void DisposeCore(bool manual) => OnDispose(manual);
+        protected override void DisposeCore(bool manual, bool wasDisposed) => OnDispose(manual);
 
         #region Helpers
 
@@ -107,9 +107,9 @@ namespace Platform.Helpers.Disposables
 
         public static implicit operator T(Disposable<T> disposable) => disposable.Object;
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            base.DisposeCore(manual);
+            base.DisposeCore(manual, wasDisposed);
 
             TryDispose(Object);
         }
@@ -143,9 +143,9 @@ namespace Platform.Helpers.Disposables
 
         public static implicit operator TAuxiliary(Disposable<TPrimary, TAuxiliary> autoDisposable) => autoDisposable.AuxiliaryObject;
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            base.DisposeCore(manual);
+            base.DisposeCore(manual, wasDisposed);
 
             TryDispose(AuxiliaryObject);
         }

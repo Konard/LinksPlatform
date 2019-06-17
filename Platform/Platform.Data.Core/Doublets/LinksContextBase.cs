@@ -57,7 +57,7 @@ namespace Platform.Data.Core.Doublets
             Links = links;
         }
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             Disposable.TryDispose(Links);
             Disposable.TryDispose(Memory);

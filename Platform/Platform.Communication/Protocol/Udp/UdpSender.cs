@@ -8,7 +8,7 @@ namespace Platform.Communication.Protocol.Udp
     /// <summary>
     /// Представляет отправителя сообщений по протоколу UDP.
     /// </summary>
-    public class UdpSender : DisposableBase
+    public class UdpSender : DisposableBase //-V3073
     {
         private readonly UdpClient _udp;
         private readonly IPEndPoint _ipendpoint;
@@ -37,10 +37,6 @@ namespace Platform.Communication.Protocol.Udp
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public int Send(string message) => _udp.SendString(_ipendpoint, message);
 
-        protected override void DisposeCore(bool manual)
-        {
-            if (manual)
-                Disposable.TryDispose(_udp);
-        }
+        protected override void DisposeCore(bool manual, bool wasDisposed) => Disposable.TryDispose(_udp);
     }
 }

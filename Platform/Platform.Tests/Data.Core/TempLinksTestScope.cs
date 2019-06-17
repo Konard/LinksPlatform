@@ -29,12 +29,11 @@ namespace Platform.Tests.Data.Core
                 Sequences = new Sequences(Links, sequencesOptions);
         }
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            if (manual)
-                Disposable.TryDispose(Links.Unsync);
+            Disposable.TryDispose(Links.Unsync);
 
-            if (_deleteFiles)
+            if (!wasDisposed && _deleteFiles)
                 DeleteFiles();
         }
 

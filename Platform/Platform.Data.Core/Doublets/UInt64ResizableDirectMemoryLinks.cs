@@ -455,17 +455,18 @@ namespace Platform.Data.Core.Doublets
                    || (_links[link].SizeAsSource == Constants.Null && _links[link].Source != Constants.Null);
         }
 
-#region Disposable
+        #region Disposable
 
         protected override bool AllowMultipleDisposeCalls => true;
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            SetPointers(null);
-            if (manual)
-                Disposable.TryDispose(_memory);
+            if (!wasDisposed)
+                SetPointers(null);
+
+            Disposable.TryDispose(_memory);
         }
 
-#endregion
+        #endregion
     }
 }

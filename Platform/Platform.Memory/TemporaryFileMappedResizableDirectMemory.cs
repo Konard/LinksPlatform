@@ -14,11 +14,12 @@ namespace Platform.Memory
         {
         }
 
-        protected override void DisposeCore(bool manual)
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            base.DisposeCore(manual);
+            base.DisposeCore(manual, wasDisposed);
 
-            File.Delete(Address);
+            if (!wasDisposed)
+                File.Delete(Address);
         }
     }
 }
