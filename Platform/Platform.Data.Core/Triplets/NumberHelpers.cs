@@ -76,7 +76,7 @@ namespace Platform.Data.Core.Triplets
 
             if (number >= 0)
             {
-                for (long key = 1, powerOf2 = 0, i = 0; key <= number; key += key, powerOf2++)
+                for (long key = 1, powerOf2 = 0, i = 0; key <= number; key *= 2, powerOf2++)
                     if ((number & key) == key)
                         links[i++] = FromPowerOf2(powerOf2);
             }
