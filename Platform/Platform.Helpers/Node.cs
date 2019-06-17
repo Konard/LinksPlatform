@@ -66,12 +66,12 @@ namespace Platform.Helpers
         {
             var node = this;
             for (var i = 0; i < keys.Length; i++)
-                node = SetChildValue(keys[i], value);
+                node = SetChildValue(value, keys[i]);
             node.Value = value;
             return node;
         }
 
-        public Node SetChildValue(object key, object value)
+        public Node SetChildValue(object value, object key)
         {
             if (!ChildNodes.TryGetValue(key, out Node child))
                 child = AddChild(key, value);
