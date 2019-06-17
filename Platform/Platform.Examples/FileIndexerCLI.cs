@@ -17,8 +17,7 @@ namespace Platform.Examples
                 Console.WriteLine("Entered file to index does not exists.");
             else
             {
-                var cancellationSource = ConsoleHelpers.HandleCancellation();
-
+                using (var cancellation = new ConsoleCancellationHandler())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep * 16))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
@@ -31,7 +30,7 @@ namespace Platform.Examples
 
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
                     //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
-                    fileIndexer.IndexParallel(fileToIndex, cancellationSource.Token);
+                    fileIndexer.IndexParallel(fileToIndex, cancellation.Token);
                 }
             }
 

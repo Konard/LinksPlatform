@@ -1,8 +1,7 @@
 ﻿using System;
-using System.IO;
 using System.Net.Sockets;
-using System.Threading;
 using Platform.Helpers;
+using Platform.Helpers.Threading;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
@@ -13,18 +12,14 @@ namespace Platform.Examples
     {
         private const string DefaultDatabaseFilename = "db.links";
 
-        private bool _linksServerRunning = true;
-
         public void Run(params string[] args)
         {
-            Console.CancelKeyPress += OnCancelKeyPressed;
-
             try
             {
 #if DEBUG
                 File.Delete(DefaultDatabaseFilename);
 #endif
-
+                using (var cancellation = new ConsoleCancellationHandler(showDefaultIntroMessage: false))
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(DefaultDatabaseFilename, 8 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
@@ -61,7 +56,7 @@ namespace Platform.Examples
                         //using (var receiver = new UdpReceiver(7777, handleMessage))
                         using (var receiver = new UdpClient(7777))
                         {
-                            while (_linksServerRunning)
+                            while (cancellation.NoCancellationRequested)
                             {
                                 while (receiver.Available > 0)
                                     handleMessage(receiver.ReceiveString());
@@ -70,10 +65,10 @@ namespace Platform.Examples
                                 {
                                     var info = Console.ReadKey(true);
                                     if (info.Key == ConsoleKey.Escape)
-                                        _linksServerRunning = false;
+                                        cancellation.ForceCancellation();
                                 }
 
-                                Thread.Sleep(1);
+                                ThreadHelpers.Sleep();
                             }
 
                             Console.WriteLine("Links server stopped.");
@@ -85,14 +80,6 @@ namespace Platform.Examples
             {
                 Console.Write(ex.ToRecursiveString());
             }
-
-            Console.CancelKeyPress -= OnCancelKeyPressed;
-        }
-
-        private void OnCancelKeyPressed(object sender, ConsoleCancelEventArgs e)
-        {
-            e.Cancel = true;
-            _linksServerRunning = false;
         }
     }
 }

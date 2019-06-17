@@ -88,5 +88,7 @@ namespace Platform.Helpers.Threading
             thread.Start();
             return thread;
         }
+
+        public static void Sleep() => Thread.Sleep(1);
     }
 }

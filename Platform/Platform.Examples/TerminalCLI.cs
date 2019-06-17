@@ -1,65 +1,52 @@
 ﻿using System;
 using System.Net.Sockets;
-using System.Threading;
-using Platform.Communication.Protocol.Udp;
 using Platform.Helpers;
+using Platform.Helpers.Threading;
+using Platform.Communication.Protocol.Udp;
 
 namespace Platform.Examples
 {
     public class TerminalCLI : ICommandLineInterface
     {
-        private bool _terminalRunning = true;
-
         public void Run(params string[] args)
         {
-            Console.CancelKeyPress += OnCancelKeyPressed;
-
             try
             {
+                using (var cancellation = new ConsoleCancellationHandler(showDefaultIntroMessage: false))
                 using (var receiver = new UdpClient(8888))
+                using (var sender = new UdpSender(7777))
                 {
-                    using (var sender = new UdpSender(7777))
+                    Console.WriteLine("Welcome to terminal.");
+                    Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
+
+                    while (cancellation.NoCancellationRequested)
                     {
-                        Console.WriteLine("Welcome to terminal.");
-                        Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
-
-                        while (_terminalRunning)
+                        while (Console.KeyAvailable)
                         {
-                            while (Console.KeyAvailable)
-                            {
-                                var line = Console.ReadLine();
-                                if (!string.IsNullOrWhiteSpace(line))
-                                    sender.Send(line);
-                                else
-                                    _terminalRunning = false;
-                            }
-
-                            while (receiver.Available > 0)
-                            {
-                                var message = receiver.ReceiveString();
-                                if (!string.IsNullOrWhiteSpace(message))
-                                    Console.WriteLine($"<- {message}");
-                            }
-
-                            Thread.Sleep(1);
+                            var line = Console.ReadLine();
+                            if (!string.IsNullOrWhiteSpace(line))
+                                sender.Send(line);
+                            else
+                                cancellation.ForceCancellation();
                         }
 
-                        Console.WriteLine("Terminal stopped.");
+                        while (receiver.Available > 0)
+                        {
+                            var message = receiver.ReceiveString();
+                            if (!string.IsNullOrWhiteSpace(message))
+                                Console.WriteLine($"<- {message}");
+                        }
+
+                        ThreadHelpers.Sleep();
                     }
+
+                    Console.WriteLine("Terminal stopped.");
                 }
             }
             catch (Exception ex)
             {
                 Console.Write(ex.ToRecursiveString());
             }
-
-            Console.CancelKeyPress -= OnCancelKeyPressed;
-        }
-
-        private void OnCancelKeyPressed(object sender, ConsoleCancelEventArgs e)
-        {
-            e.Cancel = true;
-            _terminalRunning = false;
         }
     }
 }

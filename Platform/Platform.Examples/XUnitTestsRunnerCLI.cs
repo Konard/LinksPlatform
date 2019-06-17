@@ -1,5 +1,5 @@
-﻿using System;
-using System.IO;
+﻿using Platform.Helpers.Threading;
+using System;
 using System.Threading;
 using Xunit.Runners;
 
@@ -54,8 +54,8 @@ namespace Platform.Examples
                 if (runner.Status != AssemblyRunnerStatus.Idle)
                 {
                     Console.WriteLine("Waiting to get Idle..");
-                    while (runner.Status != AssemblyRunnerStatus.Idle)
-                        Thread.Sleep(1);
+                    while (runner.Status != AssemblyRunnerStatus.Idle) //-V3022
+                        ThreadHelpers.Sleep();
                     Console.WriteLine("Idle status reached.");
                 }
             }

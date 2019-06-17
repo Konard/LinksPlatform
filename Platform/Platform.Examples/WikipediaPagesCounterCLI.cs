@@ -14,10 +14,11 @@ namespace Platform.Examples
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
             else
             {
-                var cancellationSource = ConsoleHelpers.HandleCancellation();
-
-                var wikipediaPagesCounter = new WikipediaPagesCounter();
-                wikipediaPagesCounter.Count(wikipediaFile, cancellationSource.Token).Wait();
+                using (var cancellation = new ConsoleCancellationHandler())
+                {
+                    var wikipediaPagesCounter = new WikipediaPagesCounter();
+                    wikipediaPagesCounter.Count(wikipediaFile, cancellation.Token).Wait();
+                }
             }
 
             ConsoleHelpers.PressAnyKeyToContinue();

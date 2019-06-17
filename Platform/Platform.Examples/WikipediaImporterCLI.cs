@@ -19,10 +19,9 @@ namespace Platform.Examples
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
             else
             {
-                var cancellationSource = ConsoleHelpers.HandleCancellation();
-
                 const long gb32 = 34359738368;
 
+                using (var cancellation = new ConsoleCancellationHandler())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, gb32))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
@@ -33,7 +32,7 @@ namespace Platform.Examples
                     var wikipediaStorage = new WikipediaLinksStorage(sequences);
                     var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
 
-                    wikipediaImporter.Import(wikipediaFile, cancellationSource.Token).Wait();
+                    wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
                 }
             }
 

@@ -13,26 +13,6 @@ namespace Platform.Helpers
             Console.ReadKey();
         }
 
-        public static CancellationTokenSource HandleCancellation()
-        {
-            Console.WriteLine("Press CTRL+C to stop.");
-
-            var importCancellationSource = new CancellationTokenSource();
-
-            Console.CancelKeyPress += (sender, args) =>
-            {
-                args.Cancel = true;
-
-                if (!importCancellationSource.IsCancellationRequested)
-                {
-                    importCancellationSource.Cancel();
-                    Console.WriteLine("Stopping...");
-                }
-            };
-
-            return importCancellationSource;
-        }
-
         public static string GetOrReadArgument(int index, params string[] args) => GetOrReadArgument(index, $"{index + 1} argument");
 
         public static string GetOrReadArgument(int index, string readMessage, params string[] args)

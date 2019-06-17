@@ -16,7 +16,7 @@ namespace Platform.Helpers.Disposables
     {
         private static readonly Process CurrentProcess = Process.GetCurrentProcess();
 
-        private int _disposed;
+        private volatile int _disposed;
 
         public bool IsDisposed => _disposed > 0;
 
@@ -57,13 +57,14 @@ namespace Platform.Helpers.Disposables
 
         private void Dispose(bool manual)
         {
-            var originalValue = Interlocked.CompareExchange(ref _disposed, 1, 0);
+            var originalDisposedValue = Interlocked.CompareExchange(ref _disposed, 1, 0);
+            var wasNotDisposed = originalDisposedValue == 0;
 
-            if (AllowMultipleDisposeAttempts || originalValue == 0)
+            if (AllowMultipleDisposeAttempts || wasNotDisposed)
             {
                 try
                 {
-                    if (originalValue == 0)
+                    if (wasNotDisposed)
                     {
                         if (CurrentProcess != null)
                             CurrentProcess.Exited -= OnProcessExit;

@@ -21,8 +21,7 @@ namespace Platform.Examples
                 Console.WriteLine("Entered exported file cannot be created.");
             else
             {
-                var cancellationSource = ConsoleHelpers.HandleCancellation();
-
+                using (var cancellation = new ConsoleCancellationHandler())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
@@ -32,7 +31,7 @@ namespace Platform.Examples
 
                     var exporter = new CSVExporter(syncLinks, isUnicodeMapped);
 
-                    exporter.Export(exportTo, cancellationSource.Token);
+                    exporter.Export(exportTo, cancellation.Token);
                 }
             }
 
