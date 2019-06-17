@@ -54,13 +54,11 @@ namespace Platform.Examples
             var parentContexts = new Stack<ElementContext>();
             var elements = new Stack<string>(); // Path
 
-            var selfCancel = false;
-
             // TODO: If path was loaded previously, skip it.
 
             while (reader.Read())
             {
-                if (token.IsCancellationRequested || selfCancel)
+                if (token.IsCancellationRequested)
                     return;
 
                 switch (reader.NodeType)
