@@ -209,9 +209,9 @@ namespace Platform.Data.Core.Sequences
             var frequency = data.Frequency;
             var maxFrequency = _maxDoubletData.Frequency;
 
-            //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target)) 
+            //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
             if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) &&
-               (MathHelpers.LessThan(maxFrequency, frequency) || MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+               (MathHelpers.LessThan(maxFrequency, frequency) || (MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target))))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;
