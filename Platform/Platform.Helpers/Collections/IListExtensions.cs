@@ -57,5 +57,27 @@ namespace Platform.Helpers.Collections
             for (var i = 0; i < list.Count; i++)
                 action(list[i]);
         }
+
+        /// <remarks>
+        /// Based on http://stackoverflow.com/questions/263400/what-is-the-best-algorithm-for-an-overridden-system-object-gethashcode
+        /// </remarks>
+        public static int GenerateHashCode<T>(this IList<T> list)
+        {
+            var result = 17;
+            for (var i = 0; i < list.Count; i++)
+                result = unchecked(result * 23 + list[i].GetHashCode());
+            return result;
+        }
+
+        public static int CompareTo<T>(this IList<T> left, IList<T> right)
+        {
+            var comparer = Comparer<T>.Default;
+            var leftLength = left?.Count ?? 0;
+            var rightLength = right?.Count ?? 0;
+            var intermediateResult = leftLength.CompareTo(rightLength);
+            for (var i = 0; intermediateResult == 0 && i < leftLength; i++)
+                intermediateResult = comparer.Compare(left[i], right[i]);
+            return intermediateResult;
+        }
     }
 }

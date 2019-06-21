@@ -20,7 +20,7 @@ namespace Platform.Helpers
     public struct Singleton<T>
     {
         private static readonly ConcurrentDictionary<Func<T>, byte[]> Functions = new ConcurrentDictionary<Func<T>, byte[]>();
-        private static readonly ConcurrentDictionary<byte[], T> Singletons = new ConcurrentDictionary<byte[], T>(Default<ArrayComparer<byte>>.Instance);
+        private static readonly ConcurrentDictionary<byte[], T> Singletons = new ConcurrentDictionary<byte[], T>(Default<IListEqualityComparer<byte>>.Instance);
 
         private readonly Func<T> _creator;
 
