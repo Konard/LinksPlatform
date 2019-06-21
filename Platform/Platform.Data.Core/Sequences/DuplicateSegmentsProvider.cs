@@ -10,7 +10,7 @@ using Platform.Data.Core.Common;
 
 namespace Platform.Data.Core.Sequences
 {
-    public class DuplicateFragmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<KeyValuePair<IList<TLink>, IList<TLink>>>>
+    public class DuplicateSegmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<KeyValuePair<IList<TLink>, IList<TLink>>>>
     {
         private readonly ILinks<TLink> _links;
         private readonly ISequences<TLink> _sequences;
@@ -49,7 +49,7 @@ namespace Platform.Data.Core.Sequences
             }
         }
 
-        public DuplicateFragmentsProvider(ILinks<TLink> links, ISequences<TLink> sequences)
+        public DuplicateSegmentsProvider(ILinks<TLink> links, ISequences<TLink> sequences)
             : base(minimumStringSegmentLength: 2)
         {
             _links = links;

@@ -594,13 +594,13 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 Assert.True(scope1.Links.Unsync.Count() - initialCount1 < scope2.Links.Unsync.Count() - initialCount2);
                 Assert.True(scope3.Links.Unsync.Count() - initialCount3 < scope2.Links.Unsync.Count() - initialCount2);
 
-                var duplicateProvider1 = new DuplicateFragmentsProvider<ulong>(scope1.Links.Unsync, scope1.Sequences);
-                var duplicateProvider2 = new DuplicateFragmentsProvider<ulong>(scope2.Links.Unsync, scope2.Sequences);
-                var duplicateProvider3 = new DuplicateFragmentsProvider<ulong>(scope3.Links.Unsync, scope3.Sequences);
+                var duplicateProvider1 = new DuplicateSegmentsProvider<ulong>(scope1.Links.Unsync, scope1.Sequences);
+                var duplicateProvider2 = new DuplicateSegmentsProvider<ulong>(scope2.Links.Unsync, scope2.Sequences);
+                var duplicateProvider3 = new DuplicateSegmentsProvider<ulong>(scope3.Links.Unsync, scope3.Sequences);
 
-                var duplicateCounter1 = new DuplicateFragmentsCounter<ulong>(duplicateProvider1);
-                var duplicateCounter2 = new DuplicateFragmentsCounter<ulong>(duplicateProvider2);
-                var duplicateCounter3 = new DuplicateFragmentsCounter<ulong>(duplicateProvider3);
+                var duplicateCounter1 = new DuplicateSegmentsCounter<ulong>(duplicateProvider1);
+                var duplicateCounter2 = new DuplicateSegmentsCounter<ulong>(duplicateProvider2);
+                var duplicateCounter3 = new DuplicateSegmentsCounter<ulong>(duplicateProvider3);
 
                 var duplicates1 = duplicateCounter1.Count();
 
