@@ -1,8 +1,15 @@
-﻿namespace Platform.Helpers.Collections.SegmentsWalkers
+﻿using System;
+
+namespace Platform.Helpers.Collections.SegmentsWalkers
 {
     public abstract class DuplicateSegmentsWalkerBase<T, TSegment> : AllSegmentsWalkerBase<T, TSegment>
         where TSegment : Segment<T>
     {
+        protected DuplicateSegmentsWalkerBase(int minimumStringSegmentLength = DefaultMinimumStringSegmentLength)
+            : base(minimumStringSegmentLength)
+        {
+        }
+
         protected override void Iteration(TSegment segment)
         {
             var frequency = GetSegmentFrequency(segment);

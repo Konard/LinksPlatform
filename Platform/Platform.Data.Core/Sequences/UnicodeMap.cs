@@ -69,6 +69,16 @@ namespace Platform.Data.Core.Sequences
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsCharLink(ulong link) => link <= MapSize;
 
+        public static string FromLinksToString(IList<ulong> linksList)
+        {
+            var sb = new StringBuilder();
+
+            for (int i = 0; i < linksList.Count; i++)
+                sb.Append(FromLinkToChar(linksList[i]));
+
+            return sb.ToString();
+        }
+
         public static string FromSequenceLinkToString(ulong link, ILinks<ulong> links)
         {
             var sb = new StringBuilder();

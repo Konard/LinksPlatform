@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Collections.Generic;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
@@ -9,24 +10,55 @@ using Platform.Data.Core.Common;
 
 namespace Platform.Data.Core.Sequences
 {
-    public class DuplicateFragmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<IList<TLink>>>
+    public class DuplicateFragmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<KeyValuePair<IList<TLink>, IList<TLink>>>>
     {
         private readonly ILinks<TLink> _links;
         private readonly ISequences<TLink> _sequences;
-        private List<IList<TLink>> _groups;
-        private HashSet<Segment<TLink>> _checkedSequences;
+        private HashSet<KeyValuePair<IList<TLink>, IList<TLink>>> _groups;
         private BitString _visited;
 
+        private class ItemEquilityComparer : IEqualityComparer<KeyValuePair<IList<TLink>, IList<TLink>>>
+        {
+            private readonly IListEqualityComparer<TLink> _listComparer;
+
+            public ItemEquilityComparer()
+            {
+                _listComparer = Default<IListEqualityComparer<TLink>>.Instance;
+            }
+
+            public bool Equals(KeyValuePair<IList<TLink>, IList<TLink>> left, KeyValuePair<IList<TLink>, IList<TLink>> right) => _listComparer.Equals(left.Key, right.Key) && _listComparer.Equals(left.Value, right.Value);
+
+            public int GetHashCode(KeyValuePair<IList<TLink>, IList<TLink>> pair) => HashHelpers.Generate(_listComparer.GetHashCode(pair.Key), _listComparer.GetHashCode(pair.Value));
+        }
+
+        private class ItemComparer : IComparer<KeyValuePair<IList<TLink>, IList<TLink>>>
+        {
+            private readonly IListComparer<TLink> _listComparer;
+
+            public ItemComparer()
+            {
+                _listComparer = Default<IListComparer<TLink>>.Instance;
+            }
+
+            public int Compare(KeyValuePair<IList<TLink>, IList<TLink>> left, KeyValuePair<IList<TLink>, IList<TLink>> right)
+            {
+                var intermediateResult = _listComparer.Compare(left.Key, right.Key);
+                if (intermediateResult == 0)
+                    intermediateResult = _listComparer.Compare(left.Value, right.Value);
+                return intermediateResult;
+            }
+        }
+
         public DuplicateFragmentsProvider(ILinks<TLink> links, ISequences<TLink> sequences)
+            : base(minimumStringSegmentLength: 2)
         {
             _links = links;
             _sequences = sequences;
         }
 
-        public IList<IList<TLink>> Get()
+        public IList<KeyValuePair<IList<TLink>, IList<TLink>>> Get()
         {
-            _groups = new List<IList<TLink>>();
-            _checkedSequences = new HashSet<Segment<TLink>>();
+            _groups = new HashSet<KeyValuePair<IList<TLink>, IList<TLink>>>(Default<ItemEquilityComparer>.Instance);
 
             var count = _links.Count();
 
@@ -42,8 +74,6 @@ namespace Platform.Data.Core.Sequences
                     var sequenceElements = new List<TLink>();
                     _sequences.EachPart(sequenceElements.AddAndReturnTrue, linkIndex);
 
-                    var sequenceElementsArray = sequenceElements.ToArray();
-
                     if (sequenceElements.Count > 2)
                     {
                         WalkAll(sequenceElements);
@@ -53,28 +83,30 @@ namespace Platform.Data.Core.Sequences
                 return _links.Constants.Continue;
             });
 
-            return _groups;
+            var resultList = _groups.ToList();
+
+            var comparer = Default<ItemComparer>.Instance;
+
+            resultList.Sort(comparer);
+
+#if DEBUG
+
+            foreach (var item in resultList)
+                PrintDuplicates(item);
+
+#endif
+
+            return resultList;
         }
 
         protected override Segment<TLink> CreateSegment(IList<TLink> elements, int offset, int length) => new Segment<TLink>(elements, offset, length);
 
         protected override void OnDublicateFound(Segment<TLink> segment)
         {
-            if (_checkedSequences.Add(segment))
-                CollectDuplicatesForSequence(segment);
-        }
-
-        private void CollectDuplicatesForSequence(Segment<TLink> segment)
-        {
-            List<TLink> duplicates = CollectDuplicatesForSegment(segment);
+            var duplicates = CollectDuplicatesForSegment(segment);
 
             if (duplicates.Count > 1)
-            {
-                _groups.Add(duplicates);
-#if DEBUG
-                PrintDuplicates(duplicates);
-#endif
-            }
+                _groups.Add(new KeyValuePair<IList<TLink>, IList<TLink>>(segment.ToArray(), duplicates));
         }
 
         private List<TLink> CollectDuplicatesForSegment(Segment<TLink> segment)
@@ -84,16 +116,20 @@ namespace Platform.Data.Core.Sequences
 
             _sequences.Each(sequence =>
             {
-                var sequenceBitIndex = (long)(Integer<TLink>)sequence;
-                if (!_visited.Get(sequenceBitIndex))
-                {
-                    _visited.Set(sequenceBitIndex);
-                    duplicates.Add(sequence);
-                    readAsElement.Add(sequence);
-                }
+                duplicates.Add(sequence);
+                readAsElement.Add(sequence);
 
                 return true; // Continue
             }, segment);
+
+            if (duplicates.Any(x => _visited.Get((long)(Integer<TLink>)x)))
+                return new List<TLink>();
+
+            foreach (var duplicate in duplicates)
+            {
+                var duplicateBitIndex = (long)(Integer<TLink>)duplicate;
+                _visited.Set(duplicateBitIndex);
+            }
 
             var sequencesExperiments = _sequences as Sequences;
             if (sequencesExperiments != null)
@@ -101,23 +137,27 @@ namespace Platform.Data.Core.Sequences
                 var partiallyMatched = sequencesExperiments.GetAllPartiallyMatchingSequences4((HashSet<ulong>)(object)readAsElement, (IList<ulong>)(object)segment);
                 foreach (var partiallyMatchedSequence in partiallyMatched)
                 {
-                    var sequenceBitIndex = (long)(Integer<TLink>)partiallyMatchedSequence;
-                    if (!_visited.Get(sequenceBitIndex))
-                    {
-                        TLink sequenceIndex = (Integer<TLink>)partiallyMatchedSequence;
-                        _visited.Set(sequenceBitIndex);
-                        duplicates.Add(sequenceIndex);
-                    }
+                    TLink sequenceIndex = (Integer<TLink>)partiallyMatchedSequence;
+                    duplicates.Add(sequenceIndex);
                 }
             }
+
+            duplicates.Sort();
 
             return duplicates;
         }
 
-        private void PrintDuplicates(List<TLink> duplicatesList)
+        private void PrintDuplicates(KeyValuePair<IList<TLink>, IList<TLink>> duplicatesItem)
         {
             if (!(_links is ILinks<ulong> ulongLinks))
                 return;
+
+            var duplicatesKey = duplicatesItem.Key;
+
+            var keyString = UnicodeMap.FromLinksToString((IList<ulong>)duplicatesKey);
+            Console.WriteLine($"> {keyString} ({string.Join(", ", duplicatesKey)})");
+
+            var duplicatesList = duplicatesItem.Value;
 
             for (int i = 0; i < duplicatesList.Count; i++)
             {

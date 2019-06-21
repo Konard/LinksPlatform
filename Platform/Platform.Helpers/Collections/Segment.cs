@@ -42,7 +42,7 @@ namespace Platform.Helpers.Collections
             if (Length != other.Length) return false;
 
             for (int i = 0; i < Length; i++)
-                if (!MathHelpers<T>.IsEquals(Base[i], other.Base[i]))
+                if (!MathHelpers<T>.IsEquals(this[i], other[i]))
                     return false;
             return true;
         }

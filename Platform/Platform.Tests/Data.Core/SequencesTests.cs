@@ -603,7 +603,13 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var duplicateCounter3 = new DuplicateFragmentsCounter<ulong>(duplicateProvider3);
 
                 var duplicates1 = duplicateCounter1.Count();
+
+                ConsoleHelpers.Debug("------");
+                
                 var duplicates2 = duplicateCounter2.Count();
+
+                ConsoleHelpers.Debug("------");
+
                 var duplicates3 = duplicateCounter3.Count();
 
                 Console.WriteLine($"{duplicates1} | {duplicates2} | {duplicates3}");
