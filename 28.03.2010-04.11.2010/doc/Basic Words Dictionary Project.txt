@@ -1,9 +1,0 @@
-Basic word - is a word, which cannot be explained by other basic words, without referencing to itself.
-
-"First word referencing to second word" is means that, any of first word definitions contain either second word or word referencing to second word.
-
-Basic word is a word referencing to itself.
-
-Is "be" a basic word? - Yes, it is.
-
-Обычно в определении слова не используется само слово, но это не значит что можно упрощать приведённое выше определение, так как из-за этого оно перестанет быть рекурсивным.

@@ -1,8 +1,0 @@
-Drawing on examples from a large number of the world's languages, after a brief introductory unit we will devote about two weeks to each of the major areas of linguistic analysis, in order:
-
-Morphology
-Phonetics
-Phonology
-Syntax
-Semantics
-Pragmatics
