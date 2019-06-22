@@ -11,7 +11,7 @@ if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]
 fi
 
 # Save some useful information
-REPO=`git config remote.origin.url`
+REPO=`https://github.com/LinksPlatform/Documentation`
 SHA=`git rev-parse --verify HEAD`
 COMMIT_AUTHOR_EMAIL="konard@me.com"
 TOKEN="013ce67101622e7c396d49d21b36b80aa087912b"
