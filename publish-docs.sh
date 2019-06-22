@@ -52,4 +52,4 @@ git add -A .
 git commit -m "Deploy to GitHub Pages: ${SHA}"
 
 # Now that we're all set up, we can push.
-git push https://linksplatform-docs:$TOKEN@github.com/Konard/LinksPlatform/Documentation.git $TARGET_BRANCH
+git push https://linksplatform-docs:$TOKEN@github.com/LinksPlatform/Documentation.git $TARGET_BRANCH
