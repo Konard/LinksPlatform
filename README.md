@@ -2,7 +2,7 @@
 
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
-[Documentation](http://konard.github.io/LinksPlatform)
+[Documentation](http://linksplatform.github.io/Documentation)
 
 [![introduction](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
 
