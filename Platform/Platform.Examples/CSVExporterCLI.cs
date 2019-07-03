@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
-using Platform.Data.Core.Doublets;
 using Platform.Helpers;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Examples
 {

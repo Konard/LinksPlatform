@@ -1,7 +1,7 @@
-﻿using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Text;
 using System.Threading;
+using System.Collections.Generic;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 
@@ -83,15 +83,9 @@ namespace Platform.Examples
             }
 
             if (_referenceByLines)
-            {
-                //link -= UnicodeMap.LastCharLink;
-
                 link = _addressToLineNumber[link];
-            }
-
 
             return link.ToString();
         }
     }
 }
-
