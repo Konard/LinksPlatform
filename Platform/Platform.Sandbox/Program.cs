@@ -11,7 +11,15 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            AllRepeatingSubstringsInString.Run();
+            args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
+
+            new CSVExporterCLI<CSVExporter>().Run(args);
+
+            args = new string[] { "C:\\compressed.links", "C:\\compressed2.csv", "True", "True", "True" };
+
+            new CSVExporterCLI<CSVSequencesExporter>().Run(args);
+
+            //AllRepeatingSubstringsInString.Run();
 
             //ReadSequenceTests.ReadSequenceTest();
 

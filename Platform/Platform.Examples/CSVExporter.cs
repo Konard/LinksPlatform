@@ -1,9 +1,9 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
 using System.Text;
 using System.Threading;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
 
 namespace Platform.Examples
 {
@@ -12,51 +12,66 @@ namespace Platform.Examples
     /// </remarks>
     public class CSVExporter
     {
-        private readonly bool _unicodeMapped;
-        private readonly SynchronizedLinks<ulong> _links;
+        protected SynchronizedLinks<ulong> _links;
+        protected bool _unicodeMapped;
+        protected bool _convertUnicodeLinksToCharacters;
+        protected bool _referenceByLines;
+        protected HashSet<ulong> _visited;
+        protected Dictionary<ulong, ulong> _addressToLineNumber = new Dictionary<ulong, ulong>();
+        protected ulong _linksCounter;
+        protected ulong _linesCounter;
 
-        public CSVExporter(SynchronizedLinks<ulong> links, bool unicodeMapped = false)
+        public void Export(SynchronizedLinks<ulong> links, string path, bool unicodeMapped, bool convertUnicodeLinksToCharacters, bool referenceByLines, CancellationToken cancellationToken)
         {
             _links = links;
             _unicodeMapped = unicodeMapped;
-        }
+            _convertUnicodeLinksToCharacters = convertUnicodeLinksToCharacters;
+            _referenceByLines = referenceByLines;
+            _visited = new HashSet<ulong>();
 
-        public void Export(string path, CancellationToken cancellationToken)
-        {
             using (var file = File.OpenWrite(path))
             using (var writer = new StreamWriter(file, Encoding.UTF8))
             {
-                var links = 1;
-                var lines = 0;
-
-                var constants = _links.Constants;
+                _linksCounter = 1;
+                _linesCounter = 0;
 
                 _links.Each(link =>
                 {
                     if (cancellationToken.IsCancellationRequested)
-                        return constants.Break;
+                        return _links.Constants.Break;
 
-                    if (!_unicodeMapped || links > UnicodeMap.MapSize)
-                    {
-                        if (lines > 0)
-                            writer.WriteLine();
+                    var linkIndex = link[_links.Constants.IndexPart];
 
-                        writer.Write("{0},{1}", FormatLink(link[constants.SourcePart]), FormatLink(link[constants.TargetPart]));
-                        lines++;
-                    }
+                    if (!_unicodeMapped || _linksCounter > UnicodeMap.MapSize)
+                        if (Visit(linkIndex))
+                            WriteLink(writer, link);
 
-                    links++;
-                    return constants.Continue;
+                    _linksCounter++;
+                    return _links.Constants.Continue;
                 });
             }
         }
 
-        private string FormatLink(ulong link)
+        protected bool Visit(ulong linkIndex)
+        {
+            var result = _visited.Add(linkIndex);
+            if (result)
+                _addressToLineNumber.Add(linkIndex, (ulong)(_linesCounter + 1));
+            return result;
+        }
+
+        protected virtual void WriteLink(StreamWriter writer, IList<ulong> link)
+        {
+            writer.WriteLine($"{FormatLink(link[_links.Constants.SourcePart])},{FormatLink(link[_links.Constants.TargetPart])}");
+            _linesCounter++;
+        }
+
+        protected string FormatLink(ulong link)
         {
             const char comma = ',';
             const char doubleQuote = '"';
 
-            if (_unicodeMapped && link <= UnicodeMap.MapSize)
+            if (_unicodeMapped && _convertUnicodeLinksToCharacters && link <= UnicodeMap.MapSize)
             {
                 var character = UnicodeMap.FromLinkToChar(link);
 
@@ -64,8 +79,16 @@ namespace Platform.Examples
                     return "\",\"";
                 if (character == doubleQuote)
                     return "\"\"\"\"";
-                return character.ToString();
+                return $"\"{character}\"";
             }
+
+            if (_referenceByLines)
+            {
+                //link -= UnicodeMap.LastCharLink;
+
+                link = _addressToLineNumber[link];
+            }
+
 
             return link.ToString();
         }

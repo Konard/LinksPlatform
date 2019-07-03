@@ -5,13 +5,21 @@ using Platform.Helpers;
 
 namespace Platform.Examples
 {
-    public class CSVExporterCLI : ICommandLineInterface
+    public class CSVExporterCLI<TExporter> : ICommandLineInterface
+        where TExporter : CSVExporter, new()
     {
         public void Run(params string[] args)
         {
-            var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
-            var exportTo = ConsoleHelpers.GetOrReadArgument(1, "Export to", args);
-            var unicodeMapped = ConsoleHelpers.GetOrReadArgument(1, "Unicode is mapped", args);
+            var i = 0;
+            var linksFile = ConsoleHelpers.GetOrReadArgument(i++, "Links file", args);
+            var exportTo = ConsoleHelpers.GetOrReadArgument(i++, "Export to", args);
+            var unicodeMapped = ConsoleHelpers.GetOrReadArgument(i++, "Unicode is mapped", args);
+            var convertUnicodeLinksToCharacters = ConsoleHelpers.GetOrReadArgument(i++, "Convert each unicode-link to a corresponding character", args);
+            var referenceByLines = ConsoleHelpers.GetOrReadArgument(i++, "Reference by row (line) number", args);
+
+            bool.TryParse(unicodeMapped, out bool isUnicodeMapped);
+            bool.TryParse(convertUnicodeLinksToCharacters, out bool doConvertUnicodeLinksToCharacters);
+            bool.TryParse(referenceByLines, out bool doReferenceByLines);
 
             File.Create(exportTo).Dispose();
 
@@ -26,12 +34,10 @@ namespace Platform.Examples
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
-                    bool isUnicodeMapped;
-                    bool.TryParse(unicodeMapped, out isUnicodeMapped);
 
-                    var exporter = new CSVExporter(syncLinks, isUnicodeMapped);
+                    var exporter = new TExporter();
 
-                    exporter.Export(exportTo, cancellation.Token);
+                    exporter.Export(syncLinks, exportTo, isUnicodeMapped, doConvertUnicodeLinksToCharacters, doReferenceByLines, cancellation.Token);
                 }
             }
 
