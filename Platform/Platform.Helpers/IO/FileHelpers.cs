@@ -1,16 +1,12 @@
 ﻿using Platform.Helpers.Unsafe;
 using System;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Platform.Helpers.IO
 {
     public static class FileHelpers
     {
-        public static char[] ReadAllChars(string path)
-        {
-            return File.ReadAllText(path).ToCharArray();
-        }
+        public static char[] ReadAllChars(string path) => File.ReadAllText(path).ToCharArray();
 
         public static T[] ReadAll<T>(string path)
             where T : struct
@@ -23,7 +19,7 @@ namespace Platform.Helpers.IO
             where T : struct
         {
             using (var fileStream = GetValidFileStreamOrDefault<T>(path))
-                return fileStream?.ReadOrDefault<T>() ?? default(T);
+                return fileStream?.ReadOrDefault<T>() ?? default;
         }
 
         private static FileStream GetValidFileStreamOrDefault<TStruct>(string path)

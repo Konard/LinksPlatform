@@ -1,6 +1,5 @@
 ﻿using Platform.Helpers.Unsafe;
 using System.IO;
-using System.Runtime.InteropServices;
 
 namespace Platform.Helpers.IO
 {
@@ -19,7 +18,7 @@ namespace Platform.Helpers.IO
             var size = UnsafeHelpers.SizeOf<T>();
             var buffer = new byte[size];
             var read = stream.Read(buffer, 0, size);
-            return read < size ? default(T) : To.Structure<T>(buffer);
+            return read < size ? default : To.Structure<T>(buffer);
         }
 
         public static T[] ReadAll<T>(this Stream stream)
