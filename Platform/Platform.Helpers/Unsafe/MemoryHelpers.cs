@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Unsafe
 {
     public unsafe class MemoryHelpers
     {

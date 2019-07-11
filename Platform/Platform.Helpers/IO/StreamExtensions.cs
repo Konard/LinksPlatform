@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using Platform.Helpers.Unsafe;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace Platform.Helpers.IO

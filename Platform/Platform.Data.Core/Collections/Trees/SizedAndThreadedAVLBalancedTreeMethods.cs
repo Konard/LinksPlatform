@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Data.Core.Exceptions;
-using Platform.Helpers;
+using Platform.Helpers.Unsafe;
 #if USEARRAYPOOL
 using Platform.Helpers.Collections;
 #endif

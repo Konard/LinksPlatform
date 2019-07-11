@@ -1,14 +1,14 @@
 ﻿using System.IO;
-using Platform.Helpers;
 using Platform.Helpers.Disposables;
 using Platform.Helpers.IO;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory
 {
     public class FileArrayMemory<TElement> : DisposableBase, IArrayMemory<TElement> //-V3073
         where TElement : struct
     {
-        private static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
+        public static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
 
         private readonly string _address;
         private readonly FileStream _file;

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 using Xunit;
-using Platform.Helpers;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Tests.Helpers
 {

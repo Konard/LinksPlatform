@@ -8,6 +8,7 @@ using Platform.Helpers;
 using Platform.Helpers.Disposables;
 using Platform.Helpers.IO;
 using System.Linq;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Data.Core.Doublets
 {

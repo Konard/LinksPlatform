@@ -1,13 +1,15 @@
 ﻿using System;
-using Platform.Helpers;
+using Platform.Helpers.Disposables;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory
 {
-    public class DirectMemoryAsArrayMemoryAdapter<TElement> : IArrayMemory<TElement>, IDirectMemory
+    public class DirectMemoryAsArrayMemoryAdapter<TElement> : DisposableBase, IArrayMemory<TElement>, IDirectMemory
         where TElement : struct
     {
+        public static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
+
         private readonly IDirectMemory _memory;
-        private readonly int _elementSize;
 
         public long Size => _memory.Size;
 
@@ -15,29 +17,22 @@ namespace Platform.Memory
 
         public TElement this[long index]
         {
-            get
-            {
-                return Pointer.GetElement((long)_elementSize, index).GetValue<TElement>();
-            }
-            set
-            {
-                Pointer.GetElement((long)_elementSize, index).SetValue(value);
-            }
+            get => Pointer.GetElement(ElementSize, index).GetValue<TElement>();
+            set => Pointer.GetElement(ElementSize, index).SetValue(value);
         }
 
         public DirectMemoryAsArrayMemoryAdapter(IDirectMemory memory)
         {
-            _elementSize = UnsafeHelpers.SizeOf<TElement>();
-
             _memory = memory;
 
-            if (_memory.Size % _elementSize > 0)
+            if (_memory.Size % ElementSize > 0)
                 throw new ArgumentException("Memory is not aligned to element size.", nameof(memory));
         }
 
-        public void Dispose()
+        protected override void DisposeCore(bool manual, bool wasDisposed)
         {
-            _memory.Dispose();
+            if (!wasDisposed)
+                _memory.Dispose();
         }
     }
 }

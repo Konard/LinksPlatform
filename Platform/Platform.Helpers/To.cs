@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Platform.Helpers.Reflection;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Helpers
 {

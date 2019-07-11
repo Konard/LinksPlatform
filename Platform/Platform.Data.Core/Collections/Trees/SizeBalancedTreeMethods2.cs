@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Helpers;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Data.Core.Collections.Trees
 {

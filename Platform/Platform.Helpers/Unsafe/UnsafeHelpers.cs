@@ -1,6 +1,6 @@
 ﻿using System.Runtime.InteropServices;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Unsafe
 {
     public static class UnsafeHelpers
     {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Platform.Helpers.Unsafe;
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 

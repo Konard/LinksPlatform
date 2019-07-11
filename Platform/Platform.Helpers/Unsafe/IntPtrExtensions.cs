@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 using Platform.Helpers.Reflection;
 using System.Reflection;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Unsafe
 {
     public static class IntPtrExtensions
     {
@@ -57,7 +57,7 @@ namespace Platform.Helpers
                 else
                 {
                     emiter.LoadArguments(0);
-                    emiter.Call(typeof(Marshal).GetGenericMethod("PtrToStructure", new [] { typeof(T) }, new[] { typeof(IntPtr), typeof(Type), typeof(bool) }));
+                    emiter.Call(typeof(Marshal).GetGenericMethod("PtrToStructure", new[] { typeof(T) }, new[] { typeof(IntPtr), typeof(Type), typeof(bool) }));
                     emiter.Return();
                 }
             });
