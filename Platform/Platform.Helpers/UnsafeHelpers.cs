@@ -1,5 +1,4 @@
-﻿using System.Reflection;
-using System.Runtime.InteropServices;
+﻿using System.Runtime.InteropServices;
 
 namespace Platform.Helpers
 {
@@ -7,7 +6,7 @@ namespace Platform.Helpers
     {
         /// <summary>
         /// Returns the size of an unmanaged type in bytes.
-        /// This method do this without throwing additional exceptions as Marshal.SizeOf[T]() and Marshal.SizeOf(Type type) do.
+        /// This method do this without throwing exceptions for generic types as Marshal.SizeOf[T]() and Marshal.SizeOf(Type type) do.
         /// </summary>
         /// <remarks>
         /// Based on proposed solution at https://stackoverflow.com/a/18167584/710069
