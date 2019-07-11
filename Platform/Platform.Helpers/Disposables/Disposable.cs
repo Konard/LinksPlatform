@@ -4,7 +4,6 @@ namespace Platform.Helpers.Disposables
 {
     public delegate void DisposedDelegate(bool manual);
 
-    /// <example><code source="DisposableUsageExample.cs" /></example>
     public class Disposable : DisposableBase
     {
         private static readonly DisposedDelegate EmptyDelegate = manual => { };
@@ -15,15 +14,9 @@ namespace Platform.Helpers.Disposables
         {
         }
 
-        public Disposable(Action disposed)
-        {
-            OnDispose = m => disposed();
-        }
+        public Disposable(Action disposed) => OnDispose = m => disposed();
 
-        public Disposable(DisposedDelegate disposed)
-        {
-            OnDispose = disposed;
-        }
+        public Disposable(DisposedDelegate disposed) => OnDispose = disposed;
 
         protected override void DisposeCore(bool manual, bool wasDisposed) => OnDispose(manual);
 
@@ -39,7 +32,7 @@ namespace Platform.Helpers.Disposables
                     if (!disposal.IsDisposed)
                     {
                         disposal.Dispose();
-                        @object = default(T);
+                        @object = default;
                         return true;
                     }
                 }
@@ -49,7 +42,7 @@ namespace Platform.Helpers.Disposables
                     if (disposable != null)
                     {
                         disposable.Dispose();
-                        @object = default(T);
+                        @object = default;
                         return true;
                     }
                 }
@@ -63,15 +56,9 @@ namespace Platform.Helpers.Disposables
             return false;
         }
 
-        public static bool TryDispose<T>(T @object)
-        {
-            return TryDispose(ref @object);
-        }
+        public static bool TryDispose<T>(T @object) => TryDispose(ref @object);
 
-        public static void DisposeIfDisposable<T>(T @object)
-        {
-            TryDispose(ref @object);
-        }
+        public static void DisposeIfDisposable<T>(T @object) => TryDispose(ref @object);
 
         #endregion
     }
@@ -80,16 +67,9 @@ namespace Platform.Helpers.Disposables
     {
         public readonly T Object;
 
-        public Disposable(T @object)
-        {
-            Object = @object;
-        }
+        public Disposable(T @object) => Object = @object;
 
-        public Disposable(T @object, Action disposed)
-            : base(disposed)
-        {
-            Object = @object;
-        }
+        public Disposable(T @object, Action disposed) : base(disposed) => Object = @object;
 
         public Disposable(T @object, Action<T> disposed)
         {
@@ -98,10 +78,7 @@ namespace Platform.Helpers.Disposables
         }
 
         public Disposable(T @object, DisposedDelegate disposed)
-            : base(disposed)
-        {
-            Object = @object;
-        }
+            : base(disposed) => Object = @object;
 
         public static implicit operator Disposable<T>(T @object) => new Disposable<T>(@object);
 
@@ -116,10 +93,7 @@ namespace Platform.Helpers.Disposables
 
         #region Helpers
 
-        public static Disposable<T> Create(T value, Action<T> dispose)
-        {
-            return new Disposable<T>(value, dispose);
-        }
+        public static Disposable<T> Create(T value, Action<T> dispose) => new Disposable<T>(value, dispose);
 
         #endregion
     }
@@ -133,11 +107,7 @@ namespace Platform.Helpers.Disposables
         {
         }
 
-        public Disposable(TPrimary @object, TAuxiliary auxiliaryObject)
-            : this(@object)
-        {
-            AuxiliaryObject = auxiliaryObject;
-        }
+        public Disposable(TPrimary @object, TAuxiliary auxiliaryObject) : this(@object) => AuxiliaryObject = auxiliaryObject;
 
         public static implicit operator TPrimary(Disposable<TPrimary, TAuxiliary> autoDisposable) => autoDisposable.Object;
 

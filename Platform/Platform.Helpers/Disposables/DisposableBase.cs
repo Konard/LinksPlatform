@@ -6,9 +6,9 @@ using System.Threading;
 namespace Platform.Helpers.Disposables
 {
     /// <summary>
-    /// Представляет базовый класс реализующий основную логику необходимую для повышения вероятности корректного высвобождения памяти.
+    /// Provides a base implementation for IDisposable interface with the basic logic necessary to increase the likelihood of correct memory release.
+    /// Предоставляет базовую реализацию для интерфейса IDisposable с основной логикой необходимой для повышения вероятности корректного высвобождения памяти.
     /// </summary>
-    /// <example><code source="DisposalBaseUsageExample.cs" /></example>
     /// <remarks>
     /// TODO: Попробовать реализовать компилируемый автоматический вариант DisposeCore (находить все типы IDisposable, IDisposal и автоматически вычищать их).
     /// </remarks>
@@ -50,10 +50,7 @@ namespace Platform.Helpers.Disposables
             Destruct();
         }
 
-        ~DisposableBase()
-        {
-            Destruct();
-        }
+        ~DisposableBase() => Destruct();
 
         private void Dispose(bool manual)
         {
