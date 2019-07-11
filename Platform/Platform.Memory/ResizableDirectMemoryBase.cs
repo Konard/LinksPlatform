@@ -5,6 +5,10 @@ using Platform.Helpers.Disposables;
 
 namespace Platform.Memory
 {
+    /// <summary>
+    /// Provides a base implementation for the resizable memory block with direct access (via unmanaged pointers).
+    /// Предоставляет базовую реализацию для блока памяти c изменяемым размером и прямым доступом (через неуправляемые указатели).
+    /// </summary>
     public abstract class ResizableDirectMemoryBase : DisposableBase, IResizableDirectMemory
     {
         #region Constants
@@ -23,10 +27,7 @@ namespace Platform.Memory
 
         #region Properties
 
-        /// <summary>
-        /// Gets the size (bytes) of this memory block.
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
+        /// <exception cref="ObjectDisposedException">The memory block is disposed. Блок памяти уже высвобожден.</exception>
         public long Size
         {
             get
@@ -36,10 +37,6 @@ namespace Platform.Memory
             }
         }
 
-        /// <summary>
-        /// Gets the pointer to the beginning of this memory block.
-        /// </summary>
-        /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
         public IntPtr Pointer
         {
             get
@@ -54,15 +51,6 @@ namespace Platform.Memory
             }
         }
 
-        /// <summary>
-        /// Gets or sets the reserved capacity (bytes) of this memory block.
-        /// </summary>
-        /// <remarks>
-        /// If less then zero the value is replaced with zero.
-        /// Cannot be less than the used capacity of thie memory block.
-        /// </remarks>
-        /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Attempted to set the reserved capacity to a value that is less than the used capacity.</exception>
         public long ReservedCapacity
         {
             get
@@ -82,15 +70,7 @@ namespace Platform.Memory
             }
         }
 
-        /// <summary>
-        /// Gets or sets the used capacity (bytes) of this memory block.
-        /// </summary>
-        /// <remarks>
-        /// If less then zero the value is replaced with zero.
-        /// Cannot be greater than the reserved capacity of this memory block.
-        /// </remarks>
-        /// <exception cref="ObjectDisposedException">The memory block is disposed.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Attempted to set the used capacity to a value that is greater than the reserved capacity.</exception>
+
         public long UsedCapacity
         {
             get

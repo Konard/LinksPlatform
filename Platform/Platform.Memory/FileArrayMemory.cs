@@ -5,6 +5,11 @@ using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory
 {
+    /// <summary>
+    /// Represents a memory block with access via indexer and stored as file on disk.
+    /// Представляет блок памяти с доступом через индексатор и хранящийся в виде файла на диске.
+    /// </summary>
+    /// <typeparam name="TElement">Element type. Тип элемента.</typeparam>
     public class FileArrayMemory<TElement> : DisposableBase, IArrayMemory<TElement> //-V3073
         where TElement : struct
     {

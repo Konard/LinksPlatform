@@ -1,5 +1,10 @@
 ﻿namespace Platform.Memory
 {
+    /// <summary>
+    /// Represents a memory block with access via indexer.
+    /// Представляет блок памяти с доступом через индексатор.
+    /// </summary>
+    /// <typeparam name="TElement">Element type. Тип элемента.</typeparam>
     public class ArrayMemory<TElement> : IArrayMemory<TElement>
     {
         #region Fields

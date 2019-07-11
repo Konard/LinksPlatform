@@ -4,6 +4,11 @@ using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory
 {
+    /// <summary>
+    /// Represents adapter to a memory block with access via indexer.
+    /// Представляет адаптер к блоку памяти с доступом через индексатор.
+    /// </summary>
+    /// <typeparam name="TElement">Element type. Тип элемента.</typeparam>
     public class DirectMemoryAsArrayMemoryAdapter<TElement> : DisposableBase, IArrayMemory<TElement>, IDirectMemory
         where TElement : struct
     {
