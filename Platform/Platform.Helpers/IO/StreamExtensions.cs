@@ -1,5 +1,5 @@
-﻿using Platform.Helpers.Unsafe;
-using System.IO;
+﻿using System.IO;
+using Platform.Helpers.Unsafe;
 
 namespace Platform.Helpers.IO
 {
