@@ -1,8 +1,7 @@
-﻿namespace Platform.Helpers.Disposables
+﻿using Platform.Helpers.Disposables;
+
+namespace Platform.Examples
 {
-    /// <summary>
-    /// TODO: Move to Platform.Helpers.Examples or Platform.Examples
-    /// </summary>
     internal class DisposableUsageExample : System.IDisposable
     {
         private readonly Disposable _disposable;
