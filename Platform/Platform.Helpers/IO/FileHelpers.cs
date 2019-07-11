@@ -49,7 +49,7 @@ namespace Platform.Helpers.IO
             using (var reader = GetValidFileStreamOrDefault(path, elementSize))
             {
                 if (reader == null)
-                    return default(T);
+                    return default;
 
                 var totalElements = reader.Length / elementSize;
                 reader.Position = (totalElements - 1) * elementSize; // Set to last element
