@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Threading;
-using Platform.Helpers.Disposables;
+using Platform.Disposables;
 using Platform.Helpers.Threading;
 
 namespace Platform.Helpers

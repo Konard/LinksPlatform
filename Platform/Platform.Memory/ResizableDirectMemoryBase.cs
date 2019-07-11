@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
+using Platform.Disposables;
 using Platform.Helpers;
-using Platform.Helpers.Disposables;
 
 namespace Platform.Memory
 {

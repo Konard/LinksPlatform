@@ -1,4 +1,4 @@
-﻿using Platform.Helpers.Disposables;
+﻿using Platform.Disposables;
 
 namespace Platform.Examples
 {

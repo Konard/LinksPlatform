@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using Platform.Helpers.Disposables;
+using Platform.Disposables;
 using Platform.Helpers.IO;
 using Platform.Helpers.Unsafe;
 

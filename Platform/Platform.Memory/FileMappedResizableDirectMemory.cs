@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.IO.MemoryMappedFiles;
-using Platform.Helpers.Disposables;
+using Platform.Disposables;
 using Platform.Helpers.IO;
 
 namespace Platform.Memory

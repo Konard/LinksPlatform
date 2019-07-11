@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Helpers.Disposables;
+using Platform.Disposables;
 using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory

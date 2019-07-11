@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Disposables;
+using Platform.Disposables;
 
 namespace Platform.Helpers.Collections
 {
