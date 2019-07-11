@@ -8,18 +8,22 @@ namespace Platform.Memory
     public class FileArrayMemory<TElement> : DisposableBase, IArrayMemory<TElement> //-V3073
         where TElement : struct
     {
+        #region Constants
+
         public static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
+
+        #endregion
+
+        #region Fields
 
         private readonly string _address;
         private readonly FileStream _file;
 
-        public long Size => _file.Length;
+        #endregion
 
-        public FileArrayMemory(string address)
-        {
-            _address = address;
-            _file = File.Open(address, FileMode.OpenOrCreate, FileAccess.ReadWrite);
-        }
+        #region Properties
+
+        public long Size => _file.Length;
 
         public TElement this[long index]
         {
@@ -35,11 +39,27 @@ namespace Platform.Memory
             }
         }
 
-        #region Disposable
+        #endregion
+
+        #region DisposableBase Properties
+
+        protected override string ObjectName => $"File stored memory block at '{_address}' path.";
+
+        #endregion
+
+        #region Contructors
+
+        public FileArrayMemory(string address)
+        {
+            _address = address;
+            _file = File.Open(address, FileMode.OpenOrCreate, FileAccess.ReadWrite);
+        }
+
+        #endregion
+
+        #region DisposableBase Methods
 
         protected override void DisposeCore(bool manual, bool wasDisposed) => Disposable.TryDispose(_file);
-
-        protected override string ObjectName => $"File stored memory block '{_address}'.";
 
         #endregion
     }

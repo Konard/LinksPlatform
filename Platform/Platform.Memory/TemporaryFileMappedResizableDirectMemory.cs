@@ -4,6 +4,14 @@ namespace Platform.Memory
 {
     public class TemporaryFileMappedResizableDirectMemory : FileMappedResizableDirectMemory
     {
+        #region DisposableBase Properties
+
+        protected override string ObjectName => $"Temporary file stored memory block at '{Address}' path.";
+
+        #endregion
+
+        #region Constructors
+
         public TemporaryFileMappedResizableDirectMemory(long minimumReservedCapacity)
             : base(Path.GetTempFileName(), minimumReservedCapacity)
         {
@@ -14,6 +22,10 @@ namespace Platform.Memory
         {
         }
 
+        #endregion
+
+        #region DisposableBase Methods
+
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             base.DisposeCore(manual, wasDisposed);
@@ -21,5 +33,7 @@ namespace Platform.Memory
             if (!wasDisposed)
                 File.Delete(Address);
         }
+
+        #endregion
     }
 }

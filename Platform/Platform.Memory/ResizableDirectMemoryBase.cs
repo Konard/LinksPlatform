@@ -7,11 +7,21 @@ namespace Platform.Memory
 {
     public abstract class ResizableDirectMemoryBase : DisposableBase, IResizableDirectMemory
     {
+        #region Constants
+
         public const long MinimumCapacity = 4096;
+
+        #endregion
+
+        #region Fields
 
         private IntPtr _pointer;
         private long _reservedCapacity;
         private long _usedCapacity;
+
+        #endregion
+
+        #region Properties
 
         /// <summary>
         /// Gets the size (bytes) of this memory block.
@@ -96,9 +106,23 @@ namespace Platform.Memory
             }
         }
 
-        protected abstract void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity);
+        #endregion
+
+        #region DisposableBase Properties
 
         protected override bool AllowMultipleDisposeCalls => true;
+
+        #endregion
+
+        #region Methods
+
+        protected abstract void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity);
+
+        protected abstract void DisposePointer(IntPtr pointer, long size);
+
+        #endregion
+
+        #region DisposableBase Methods
 
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {
@@ -110,6 +134,6 @@ namespace Platform.Memory
             }
         }
 
-        protected abstract void DisposePointer(IntPtr pointer, long size);
+        #endregion
     }
 }

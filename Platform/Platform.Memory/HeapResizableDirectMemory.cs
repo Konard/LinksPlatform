@@ -13,7 +13,13 @@ namespace Platform.Memory
     /// </remarks>
     public unsafe class HeapResizableDirectMemory : ResizableDirectMemoryBase
     {
-        #region Logic
+        #region DisposableBase Properties
+
+        protected override string ObjectName => $"Heap stored memory block at {Pointer} address.";
+
+        #endregion
+
+        #region Constructors
 
         public HeapResizableDirectMemory(long minimumReservedCapacity)
         {
@@ -29,24 +35,21 @@ namespace Platform.Memory
         {
         }
 
+        #endregion
+
+        #region ResizableDirectMemoryBase Methods
+
+        protected override void DisposePointer(IntPtr pointer, long size) => Marshal.FreeHGlobal(pointer);
+
         protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
         {
             if (Pointer == IntPtr.Zero)
             {
                 Pointer = Marshal.AllocHGlobal(new IntPtr(newReservedCapacity));
-
                 MemoryHelpers.ZeroMemory(Pointer.ToPointer(), newReservedCapacity);
             }
             else Pointer = Marshal.ReAllocHGlobal(Pointer, new IntPtr(newReservedCapacity));
         }
-
-        #endregion
-
-        #region DisposalBase
-
-        protected override void DisposePointer(IntPtr pointer, long size) => Marshal.FreeHGlobal(pointer);
-
-        protected override string ObjectName => "Heap stored memory block";
 
         #endregion
     }

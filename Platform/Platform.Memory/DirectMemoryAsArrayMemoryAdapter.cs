@@ -7,9 +7,19 @@ namespace Platform.Memory
     public class DirectMemoryAsArrayMemoryAdapter<TElement> : DisposableBase, IArrayMemory<TElement>, IDirectMemory
         where TElement : struct
     {
+        #region Constants
+
         public static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
 
+        #endregion
+
+        #region Fields
+
         private readonly IDirectMemory _memory;
+
+        #endregion
+
+        #region Properties
 
         public long Size => _memory.Size;
 
@@ -21,6 +31,16 @@ namespace Platform.Memory
             set => Pointer.GetElement(ElementSize, index).SetValue(value);
         }
 
+        #endregion
+
+        #region DisposableBase Properties
+
+        protected override string ObjectName => $"Array as memory block at '{Pointer}' address.";
+
+        #endregion
+
+        #region Constructors
+
         public DirectMemoryAsArrayMemoryAdapter(IDirectMemory memory)
         {
             _memory = memory;
@@ -29,10 +49,12 @@ namespace Platform.Memory
                 throw new ArgumentException("Memory is not aligned to element size.", nameof(memory));
         }
 
-        protected override void DisposeCore(bool manual, bool wasDisposed)
-        {
-            if (!wasDisposed)
-                _memory.Dispose();
-        }
+        #endregion
+
+        #region DisposableBase Methods
+
+        protected override void DisposeCore(bool manual, bool wasDisposed) => Disposable.TryDispose(_memory);
+
+        #endregion
     }
 }

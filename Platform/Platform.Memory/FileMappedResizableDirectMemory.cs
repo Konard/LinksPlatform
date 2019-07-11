@@ -11,7 +11,7 @@ namespace Platform.Memory
     /// </summary>
     public unsafe class FileMappedResizableDirectMemory : ResizableDirectMemoryBase
     {
-        #region Structure
+        #region Fields
 
         private MemoryMappedFile _file;
         private MemoryMappedViewAccessor _accessor;
@@ -20,7 +20,13 @@ namespace Platform.Memory
 
         #endregion
 
-        #region Logic
+        #region DisposableBase Properties
+
+        protected override string ObjectName => $"File stored memory block at '{Address}' path.";
+
+        #endregion
+
+        #region Constructors
 
         public FileMappedResizableDirectMemory(string address, long minimumReservedCapacity)
         {
@@ -42,14 +48,9 @@ namespace Platform.Memory
         {
         }
 
-        protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
-        {
-            UnmapFile();
+        #endregion
 
-            FileHelpers.SetSize(Address, newReservedCapacity);
-
-            MapFile(newReservedCapacity);
-        }
+        #region Methods
 
         private void MapFile(long capacity)
         {
@@ -87,15 +88,22 @@ namespace Platform.Memory
 
         #endregion
 
-        #region DisposalBase
+        #region ResizableDirectMemoryBase Methods
+
+        protected override void OnReservedCapacityChanged(long oldReservedCapacity, long newReservedCapacity)
+        {
+            UnmapFile();
+
+            FileHelpers.SetSize(Address, newReservedCapacity);
+
+            MapFile(newReservedCapacity);
+        }
 
         protected override void DisposePointer(IntPtr pointer, long size)
         {
             if (UnmapFile(pointer))
                 FileHelpers.SetSize(Address, size);
         }
-
-        protected override string ObjectName => $"File stored memory block '{Address}'.";
 
         #endregion
     }
