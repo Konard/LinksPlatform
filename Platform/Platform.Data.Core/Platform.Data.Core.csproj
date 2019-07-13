@@ -23,6 +23,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Platform.Timestamps" Version="0.0.1" />
     <ProjectReference Include="../Platform.Communication/Platform.Communication.csproj" />
     <ProjectReference Include="../Platform.Memory/Platform.Memory.csproj" />
   </ItemGroup>
