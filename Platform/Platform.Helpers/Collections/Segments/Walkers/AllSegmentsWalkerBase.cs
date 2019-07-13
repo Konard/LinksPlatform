@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections.SegmentsWalkers
+namespace Platform.Helpers.Collections.Segments.Walkers
 {
     public abstract class AllSegmentsWalkerBase<T, TSegment>
         where TSegment : Segment<T>

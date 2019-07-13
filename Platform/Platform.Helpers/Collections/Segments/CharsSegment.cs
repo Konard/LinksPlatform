@@ -1,7 +1,7 @@
 ﻿using System.Linq;
 using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Segments
 {
     public unsafe class CharsSegment : Segment<char>
     {
@@ -23,13 +23,13 @@ namespace Platform.Helpers.Collections
                 {
                     fixed (char* src = &baseArray[Offset])
                         for (char* s = src, last = s + Length; s < last; s++)
-                            hashAccumulator = ((hashAccumulator << 5) + hashAccumulator) ^ *s;
+                            hashAccumulator = (hashAccumulator << 5) + hashAccumulator ^ *s;
                 }
             else
                 for (var i = 0; i < Length; i++)
-                    hashAccumulator = ((hashAccumulator << 5) + hashAccumulator) ^ this[i];
+                    hashAccumulator = (hashAccumulator << 5) + hashAccumulator ^ this[i];
 
-            return hashAccumulator + (hashSeed * 1566083941);
+            return hashAccumulator + hashSeed * 1566083941;
         }
 
         /// <remarks>

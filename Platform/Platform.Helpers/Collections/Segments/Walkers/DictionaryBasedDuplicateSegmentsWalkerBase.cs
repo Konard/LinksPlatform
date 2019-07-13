@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections.SegmentsWalkers
+namespace Platform.Helpers.Collections.Segments.Walkers
 {
     public abstract class DictionaryBasedDuplicateSegmentsWalkerBase<T, TSegment> : DuplicateSegmentsWalkerBase<T, TSegment>
         where TSegment : Segment<T>

@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Segments
 {
     public class Segment<T> : IEquatable<Segment<T>>, IList<T>
     {
@@ -32,9 +32,9 @@ namespace Platform.Helpers.Collections
             var hashAccumulator = hashSeed;
 
             for (var i = 0; i < Length; i++)
-                hashAccumulator = ((hashAccumulator << 5) + hashAccumulator) ^ this[i].GetHashCode();
+                hashAccumulator = (hashAccumulator << 5) + hashAccumulator ^ this[i].GetHashCode();
 
-            return hashAccumulator + (hashSeed * 1566083941);
+            return hashAccumulator + hashSeed * 1566083941;
         }
 
         public virtual bool Equals(Segment<T> other)

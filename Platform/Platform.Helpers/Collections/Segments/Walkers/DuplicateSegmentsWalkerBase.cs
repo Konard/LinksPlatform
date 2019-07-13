@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Platform.Helpers.Collections.SegmentsWalkers
+﻿namespace Platform.Helpers.Collections.Segments.Walkers
 {
     public abstract class DuplicateSegmentsWalkerBase<T, TSegment> : AllSegmentsWalkerBase<T, TSegment>
         where TSegment : Segment<T>

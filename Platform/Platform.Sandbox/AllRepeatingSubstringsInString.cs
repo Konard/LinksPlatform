@@ -4,7 +4,8 @@ using Platform.Data.Core.Doublets;
 using Platform.Disposables;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.SegmentsWalkers;
+using Platform.Helpers.Collections.Segments;
+using Platform.Helpers.Collections.Segments.Walkers;
 using Platform.Memory;
 
 using TLink = System.UInt32;
