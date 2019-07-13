@@ -1,6 +1,6 @@
-﻿using Platform.Helpers;
+﻿using System.Collections.Generic;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
-using System.Collections.Generic;
 
 namespace Platform.Data.Core.Sequences
 {

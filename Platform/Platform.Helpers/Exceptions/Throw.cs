@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Exceptions
 {
     public static class Throw
     {

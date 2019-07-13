@@ -4,13 +4,13 @@ using System.Diagnostics;
 using System.Linq;
 using Xunit;
 using Platform.Helpers;
-using Platform.Data.Core.Common;
+using Platform.Helpers.Console;
+using Platform.Helpers.Random;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
-using Platform.Helpers.Collections;
 
 namespace Platform.Tests.Data.Core
 {

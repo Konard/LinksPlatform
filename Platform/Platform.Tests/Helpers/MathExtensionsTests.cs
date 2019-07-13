@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 
 namespace Platform.Tests.Helpers
 {

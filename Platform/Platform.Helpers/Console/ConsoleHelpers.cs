@@ -1,15 +1,16 @@
-﻿using System;
+﻿using Platform.Helpers.Exceptions;
+using System;
 using System.Diagnostics;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Console
 {
     public static class ConsoleHelpers
     {
         public static void PressAnyKeyToContinue()
         {
             // TODO: Internationalization
-            Console.WriteLine("Press any key to continue.");
-            Console.ReadKey();
+            System.Console.WriteLine("Press any key to continue.");
+            System.Console.ReadKey();
         }
 
         public static string GetOrReadArgument(int index, params string[] args) => GetOrReadArgument(index, $"{index + 1} argument");
@@ -22,15 +23,15 @@ namespace Platform.Helpers
                 result = args[index];
             else
             {
-                Console.Write($"{readMessage}: ");
-                result = Console.ReadLine();
+                System.Console.Write($"{readMessage}: ");
+                result = System.Console.ReadLine();
             }
 
             return (result ?? "").Trim().Trim('"').Trim();
         }
 
         [Conditional("DEBUG")]
-        public static void Debug(string format, params object[] args) => Console.WriteLine(format, args);
+        public static void Debug(string format, params object[] args) => System.Console.WriteLine(format, args);
 
         [Conditional("DEBUG")]
         public static void EnableIgnoredExceptionsAutoPrint() => Global.IgnoredException += OnIgnoredException;
@@ -38,6 +39,6 @@ namespace Platform.Helpers
         [Conditional("DEBUG")]
         public static void DisableIgnoredExceptionsAutoPrint() => Global.IgnoredException -= OnIgnoredException;
 
-        private static void OnIgnoredException(object sender, Exception e) => Console.WriteLine(e.ToRecursiveString());
+        private static void OnIgnoredException(object sender, Exception e) => System.Console.WriteLine(e.ToRecursiveString());
     }
 }

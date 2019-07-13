@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Platform.Helpers;
+using Platform.Helpers.Console;
 
 namespace Platform.Examples
 {

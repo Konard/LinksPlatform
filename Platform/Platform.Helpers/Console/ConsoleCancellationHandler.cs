@@ -3,7 +3,7 @@ using System.Threading;
 using Platform.Disposables;
 using Platform.Helpers.Threading;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Console
 {
     public class ConsoleCancellationHandler : DisposableBase
     {
@@ -17,12 +17,12 @@ namespace Platform.Helpers
         public ConsoleCancellationHandler(bool showDefaultIntroMessage = true)
         {
             if (showDefaultIntroMessage)
-                Console.WriteLine("Press CTRL+C to stop.");
+                System.Console.WriteLine("Press CTRL+C to stop.");
 
             Source = new CancellationTokenSource();
             Token = Source.Token;
 
-            Console.CancelKeyPress += OnCancelKeyPress;
+            System.Console.CancelKeyPress += OnCancelKeyPress;
         }
 
         public void ForceCancellation() => Source.Cancel();
@@ -34,7 +34,7 @@ namespace Platform.Helpers
             if (!Source.IsCancellationRequested)
             {
                 Source.Cancel();
-                Console.WriteLine("Stopping...");
+                System.Console.WriteLine("Stopping...");
             }
         }
 
@@ -46,7 +46,7 @@ namespace Platform.Helpers
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             if (!wasDisposed)
-                Console.CancelKeyPress -= OnCancelKeyPress;
+                System.Console.CancelKeyPress -= OnCancelKeyPress;
 
             Disposable.TryDispose(Source);
         }

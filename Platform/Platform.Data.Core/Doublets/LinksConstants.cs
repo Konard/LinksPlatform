@@ -1,4 +1,4 @@
-﻿using Platform.Helpers;
+﻿using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {

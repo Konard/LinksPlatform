@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 

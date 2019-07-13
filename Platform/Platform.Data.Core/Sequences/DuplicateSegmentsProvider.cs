@@ -6,10 +6,10 @@ using Platform.Helpers;
 using Platform.Helpers.Collections.List;
 using Platform.Helpers.Collections.Segments;
 using Platform.Helpers.Collections.Segments.Walkers;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Common;
-
 
 namespace Platform.Data.Core.Sequences
 {

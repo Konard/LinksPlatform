@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Platform.Helpers;
+using Platform.Helpers.Collections;
+using Platform.Helpers.Console;
+using Platform.Helpers.Exceptions;
 
 namespace Platform.Examples
 {

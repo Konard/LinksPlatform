@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Helpers;
+using Platform.Helpers.Console;
 using Platform.Communication.Protocol.Udp;
 
 namespace Platform.Data.SlaveServer

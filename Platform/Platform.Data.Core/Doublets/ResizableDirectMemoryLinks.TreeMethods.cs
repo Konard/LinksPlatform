@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Collections.Trees;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 using Platform.Helpers.Unsafe;
+using Platform.Data.Core.Collections.Trees;
 
 namespace Platform.Data.Core.Doublets
 {

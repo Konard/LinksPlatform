@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
+using Platform.Helpers.Numbers;
 
 namespace Platform.Helpers.Unsafe
 {

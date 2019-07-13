@@ -2,6 +2,8 @@
 using System.Runtime.CompilerServices;
 using Platform.Disposables;
 using Platform.Helpers.Collections.Stack;
+using Platform.Helpers.Exceptions;
+using Platform.Helpers.Numbers;
 
 namespace Platform.Helpers.Collections.Array
 {
@@ -47,7 +49,7 @@ namespace Platform.Helpers.Collections.Array
         {
             var destination = AllocateDisposable(size);
             var sourceArray = source.Object;
-            Array.Copy(sourceArray, destination.Object, size < sourceArray.Length ? (int)size : sourceArray.Length);
+            System.Array.Copy(sourceArray, destination.Object, size < sourceArray.Length ? (int)size : sourceArray.Length);
             source.Dispose();
             return destination;
         }

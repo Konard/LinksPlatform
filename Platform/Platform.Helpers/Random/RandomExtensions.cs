@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Random
 {
     public static class RandomExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong NextUInt64(this Random rnd, ulong minValue = ulong.MinValue, ulong maxValue = ulong.MaxValue)
+        public static ulong NextUInt64(this System.Random rnd, ulong minValue = ulong.MinValue, ulong maxValue = ulong.MaxValue)
         {
             if (minValue >= maxValue)
                 return minValue;
@@ -14,7 +14,7 @@ namespace Platform.Helpers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool NextBoolean(this Random rnd)
+        public static bool NextBoolean(this System.Random rnd)
         {
             return rnd.Next(2) == 1;
         }

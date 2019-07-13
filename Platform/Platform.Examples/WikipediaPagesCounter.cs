@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using Platform.Helpers;
 using System.Linq;
+using Platform.Helpers.Exceptions;
 
 namespace Platform.Examples
 {

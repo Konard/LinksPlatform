@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using Platform.Helpers;
+using Platform.Helpers.Console;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 

@@ -1,14 +1,14 @@
 ﻿using System;
+using LinkIndex = System.UInt64;
 using System.Collections.Generic;
+using Stack = System.Collections.Generic.Stack<ulong>;
 using System.Linq;
 using System.Text;
-using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Doublets;
-using LinkIndex = System.UInt64;
-using Stack = System.Collections.Generic.Stack<ulong>;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
 
 namespace Platform.Data.Core.Sequences

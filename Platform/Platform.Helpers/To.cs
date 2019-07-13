@@ -2,6 +2,7 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using Platform.Helpers.Exceptions;
 using Platform.Helpers.Reflection;
 using Platform.Helpers.Unsafe;
 

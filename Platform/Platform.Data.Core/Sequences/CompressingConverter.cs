@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Interfaces;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
-using System;
 
 namespace Platform.Data.Core.Sequences
 {

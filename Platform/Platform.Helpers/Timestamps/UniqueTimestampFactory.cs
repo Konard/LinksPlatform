@@ -1,7 +1,7 @@
 ﻿using System;
 using Platform.Interfaces;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Timestamps
 {
     /// <summary>
     /// Представляет фабрику по созданию уникальных отметок времени.

@@ -2,6 +2,7 @@
 using System.Threading;
 using Platform.Disposables;
 using Platform.Helpers;
+using Platform.Helpers.Exceptions;
 
 namespace Platform.Memory
 {

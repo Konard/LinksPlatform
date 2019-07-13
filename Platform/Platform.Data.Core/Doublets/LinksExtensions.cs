@@ -9,6 +9,8 @@ using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
 using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Numbers;
+using Platform.Helpers.Random;
 
 namespace Platform.Data.Core.Doublets
 {

@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Collections;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Exceptions
 {
     /// <remarks>
     /// Shorter version of ExceptionHelpers.

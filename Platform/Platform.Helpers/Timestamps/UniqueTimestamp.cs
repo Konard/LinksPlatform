@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Timestamps
 {
     /// <summary>
     /// Представляет уникальную отметку времени.

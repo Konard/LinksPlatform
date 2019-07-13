@@ -1,12 +1,11 @@
 ﻿using System;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Reflection;
 using System.Reflection;
 
 // ReSharper disable StaticFieldInGenericType
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Numbers
 {
     /// <remarks>
     /// Resizable array (FileMappedMemory) for values cache may be used. or cached oeis.org
@@ -66,7 +65,7 @@ namespace Platform.Helpers
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsPowerOfTwo(ulong x) => (x & (x - 1)) == 0;
+        public static bool IsPowerOfTwo(ulong x) => (x & x - 1) == 0;
 
         public static long CountBits(long x)
         {
@@ -74,7 +73,7 @@ namespace Platform.Helpers
             while (x != 0)
             {
                 n++;
-                x = x & (x - 1);
+                x = x & x - 1;
             }
             return n;
         }
@@ -290,25 +289,25 @@ namespace Platform.Helpers
                 var checkLimit = emiter.DefineLabel();
                 var calculateSourceMask = emiter.DefineLabel();
 
-                    // Check shift
-                    emiter.LoadArgument(shiftArgument);
+                // Check shift
+                emiter.LoadArgument(shiftArgument);
                 emiter.LoadConstant(0);
                 emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
 
-                    // Fix shift
-                    emiter.LoadConstant(bitsNumber);
+                // Fix shift
+                emiter.LoadConstant(bitsNumber);
                 emiter.LoadArgument(shiftArgument);
                 emiter.Add();
                 emiter.StoreArgument(shiftArgument);
 
                 emiter.MarkLabel(checkLimit);
-                    // Check limit
-                    emiter.LoadArgument(limitArgument);
+                // Check limit
+                emiter.LoadArgument(limitArgument);
                 emiter.LoadConstant(0);
                 emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
 
-                    // Fix limit
-                    emiter.LoadConstant(bitsNumber);
+                // Fix limit
+                emiter.LoadConstant(bitsNumber);
                 emiter.LoadArgument(limitArgument);
                 emiter.Add();
                 emiter.StoreArgument(limitArgument);
@@ -333,10 +332,10 @@ namespace Platform.Helpers
                     emiter.StoreLocal(targetMask);
 
                     emiter.LoadArgument(0); // target
-                        emiter.LoadLocal(targetMask);
+                    emiter.LoadLocal(targetMask);
                     emiter.And();
                     emiter.LoadArgument(1); // source
-                        emiter.LoadLocal(sourceMask);
+                    emiter.LoadLocal(sourceMask);
                     emiter.And();
                     emiter.LoadArgument(shiftArgument);
                     emiter.ShiftLeft();
@@ -360,25 +359,25 @@ namespace Platform.Helpers
                 var checkLimit = emiter.DefineLabel();
                 var calculateSourceMask = emiter.DefineLabel();
 
-                    // Check shift
-                    emiter.LoadArgument(shiftArgument);
+                // Check shift
+                emiter.LoadArgument(shiftArgument);
                 emiter.LoadConstant(0);
                 emiter.BranchIfGreaterOrEqual(checkLimit); // Skip fix
 
-                    // Fix shift
-                    emiter.LoadConstant(bitsNumber);
+                // Fix shift
+                emiter.LoadConstant(bitsNumber);
                 emiter.LoadArgument(shiftArgument);
                 emiter.Add();
                 emiter.StoreArgument(shiftArgument);
 
                 emiter.MarkLabel(checkLimit);
-                    // Check limit
-                    emiter.LoadArgument(limitArgument);
+                // Check limit
+                emiter.LoadArgument(limitArgument);
                 emiter.LoadConstant(0);
                 emiter.BranchIfGreaterOrEqual(calculateSourceMask); // Skip fix
 
-                    // Fix limit
-                    emiter.LoadConstant(bitsNumber);
+                // Fix limit
+                emiter.LoadConstant(bitsNumber);
                 emiter.LoadArgument(limitArgument);
                 emiter.Add();
                 emiter.StoreArgument(limitArgument);
@@ -390,7 +389,7 @@ namespace Platform.Helpers
                 {
                     emiter.LoadConstant(typeof(T), numberFilledWithOnes);
                     emiter.LoadArgument(limitArgument); // limit
-                        emiter.ShiftLeft();
+                    emiter.ShiftLeft();
                     emiter.Not();
                     emiter.LoadConstant(typeof(T), numberFilledWithOnes);
                     emiter.And();
@@ -402,7 +401,7 @@ namespace Platform.Helpers
                     emiter.StoreLocal(targetMask);
 
                     emiter.LoadArgument(0); // target
-                        emiter.LoadLocal(targetMask);
+                    emiter.LoadLocal(targetMask);
                     emiter.And();
                     emiter.LoadArgument(shiftArgument);
                     emiter.ShiftRight();

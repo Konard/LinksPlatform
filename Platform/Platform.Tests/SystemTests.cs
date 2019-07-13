@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using Xunit;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 
 namespace Platform.Tests
 {

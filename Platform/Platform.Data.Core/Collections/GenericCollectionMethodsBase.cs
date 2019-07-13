@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 using Platform.Helpers.Unsafe;
 
 namespace Platform.Data.Core.Collections

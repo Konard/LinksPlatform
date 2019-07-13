@@ -3,7 +3,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Platform.Helpers;
+using Platform.Helpers.Numbers;
 using Platform.Helpers.Unsafe;
 
 namespace Platform.Data.Core.Collections.Trees

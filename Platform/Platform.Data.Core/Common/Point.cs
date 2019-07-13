@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Common
 {

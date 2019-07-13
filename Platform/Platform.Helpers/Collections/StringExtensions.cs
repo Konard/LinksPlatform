@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text;
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Collections
 {
     public static class StringExtensions
     {

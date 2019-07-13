@@ -4,7 +4,7 @@ using Platform.Helpers.Reflection;
 
 // ReSharper disable StaticFieldInGenericType
 
-namespace Platform.Helpers
+namespace Platform.Helpers.Numbers
 {
     public struct Integer
     {

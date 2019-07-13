@@ -1,8 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Interfaces;
-using Platform.Helpers;
-using Platform.Helpers.Collections;
+using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences

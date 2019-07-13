@@ -5,11 +5,12 @@ using System.Runtime.InteropServices;
 
 using Platform.Disposables;
 using Platform.Helpers;
+using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Numbers;
+using static Platform.Helpers.Numbers.MathHelpers;
 using Platform.Helpers.Unsafe;
 using Platform.Memory;
 using Platform.Data.Core.Exceptions;
-using static Platform.Helpers.MathHelpers;
-using Platform.Helpers.Collections.Array;
 
 #pragma warning disable 0649
 #pragma warning disable 169
