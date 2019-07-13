@@ -22,6 +22,8 @@ namespace Platform.Helpers
     /// </remarks>
     public static class To
     {
+        public const char UnknownCharacter = '�';
+
         private static class SignProcessor<T>
         {
             public static readonly Func<T, object> ToSignedFunc;
@@ -121,11 +123,7 @@ namespace Platform.Helpers
         public static bool Boolean(ulong value) => value > 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static char Char(ulong value)
-        {
-            const char unknownCharacter = '�';
-            return value > char.MaxValue ? unknownCharacter : (char)value;
-        }
+        public static char Char(ulong value) => value > char.MaxValue ? UnknownCharacter : (char)value;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static DateTime DateTime(ulong value) => value > long.MaxValue ? System.DateTime.MaxValue : new DateTime((long)value);

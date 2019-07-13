@@ -10,10 +10,7 @@ namespace Platform.Helpers.Numbers
     {
         public readonly ulong Value;
 
-        public Integer(ulong value)
-        {
-            Value = value;
-        }
+        public Integer(ulong value) => Value = value;
 
         public static implicit operator Integer(ulong integer) => new Integer(integer);
 
@@ -51,10 +48,7 @@ namespace Platform.Helpers.Numbers
 
         public static implicit operator bool(Integer integer) => To.Boolean(integer.Value);
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString();
     }
 
     public struct Integer<T>
@@ -108,10 +102,7 @@ namespace Platform.Helpers.Numbers
 
         public readonly T Value;
 
-        public Integer(T value)
-        {
-            Value = value;
-        }
+        public Integer(T value) => Value = value;
 
         public static implicit operator Integer(Integer<T> integer)
         {
@@ -162,9 +153,6 @@ namespace Platform.Helpers.Numbers
 
         public static implicit operator bool(Integer<T> integer) => To.Boolean(integer);
 
-        public override string ToString()
-        {
-            return Value.ToString();
-        }
+        public override string ToString() => Value.ToString();
     }
 }

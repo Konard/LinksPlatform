@@ -34,10 +34,7 @@ namespace Platform.Helpers
     {
         private readonly TDecision _trueValue;
 
-        public Counter(TDecision trueValue = default(TDecision))
-        {
-            _trueValue = trueValue;
-        }
+        public Counter(TDecision trueValue = default) => _trueValue = trueValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TDecision IncrementAndReturnTrue()

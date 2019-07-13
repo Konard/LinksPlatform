@@ -10,9 +10,9 @@ namespace Platform.Helpers.Console
         public CancellationTokenSource Source { get; private set; }
         public CancellationToken Token { get; private set; }
 
-        public bool IsCancellationRequested { get => Source.IsCancellationRequested; }
+        public bool IsCancellationRequested => Source.IsCancellationRequested;
 
-        public bool NoCancellationRequested { get => !Source.IsCancellationRequested; }
+        public bool NoCancellationRequested => !Source.IsCancellationRequested;
 
         public ConsoleCancellationHandler(bool showDefaultIntroMessage = true)
         {
@@ -40,7 +40,8 @@ namespace Platform.Helpers.Console
 
         public void Wait()
         {
-            while (NoCancellationRequested) ThreadHelpers.Sleep();
+            while (NoCancellationRequested)
+                ThreadHelpers.Sleep();
         }
 
         protected override void DisposeCore(bool manual, bool wasDisposed)

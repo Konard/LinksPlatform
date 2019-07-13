@@ -10,10 +10,7 @@ namespace Platform.Helpers
     {
         private static readonly ConcurrentDictionary<Type, XmlSerializer> XmlSerializerCache = new ConcurrentDictionary<Type, XmlSerializer>();
 
-        public static XmlSerializer GetCachedXmlSerializer<T>()
-        {
-            return XmlSerializerCache.GetOrAdd(typeof(T), type => new XmlSerializer(type));
-        }
+        public static XmlSerializer GetCachedXmlSerializer<T>() => XmlSerializerCache.GetOrAdd(typeof(T), type => new XmlSerializer(type));
 
         public static T DeserializeFromXmlFile<T>(string path)
         {

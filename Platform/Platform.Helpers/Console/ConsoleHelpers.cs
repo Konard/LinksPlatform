@@ -13,7 +13,7 @@ namespace Platform.Helpers.Console
             System.Console.ReadKey();
         }
 
-        public static string GetOrReadArgument(int index, params string[] args) => GetOrReadArgument(index, $"{index + 1} argument");
+        public static string GetOrReadArgument(int index, params string[] args) => GetOrReadArgument(index, $"{index + 1} argument", args);
 
         public static string GetOrReadArgument(int index, string readMessage, params string[] args)
         {

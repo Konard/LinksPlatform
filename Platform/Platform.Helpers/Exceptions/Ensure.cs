@@ -39,10 +39,7 @@ namespace Platform.Helpers.Exceptions
         [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentInRange<T>(T argument, Range<T> range)
-            where T : IComparable<T>
-        {
-            ArgumentInRange(argument, null, range);
-        }
+            where T : IComparable<T> => ArgumentInRange(argument, null, range);
 
         [Conditional("DEBUG")]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

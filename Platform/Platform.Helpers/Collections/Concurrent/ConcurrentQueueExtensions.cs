@@ -11,8 +11,7 @@ namespace Platform.Helpers.Collections.Concurrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IEnumerable<T> DequeueAll<T>(this ConcurrentQueue<T> queue)
         {
-            T item;
-            while (queue.TryDequeue(out item))
+            while (queue.TryDequeue(out T item))
                 yield return item;
         }
 
@@ -27,8 +26,7 @@ namespace Platform.Helpers.Collections.Concurrent
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task AwaitOne(this ConcurrentQueue<Task> queue)
         {
-            Task item;
-            if (queue.TryDequeue(out item))
+            if (queue.TryDequeue(out Task item))
                 await item;
         }
 

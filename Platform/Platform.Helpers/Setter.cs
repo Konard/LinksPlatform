@@ -10,10 +10,7 @@ namespace Platform.Helpers
     {
         public TResult Result;
 
-        protected SetterBase(TResult defaultValue = default)
-        {
-            Result = defaultValue;
-        }
+        protected SetterBase(TResult defaultValue = default) => Result = defaultValue;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Set(TResult value) => Result = value;

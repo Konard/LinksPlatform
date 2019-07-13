@@ -68,25 +68,13 @@ namespace Platform.Helpers.Collections.Segments
             return -1;
         }
 
-        public void Insert(int index, T item)
-        {
-            throw new NotSupportedException();
-        }
+        public void Insert(int index, T item) => throw new NotSupportedException();
 
-        public void RemoveAt(int index)
-        {
-            throw new NotSupportedException();
-        }
+        public void RemoveAt(int index) => throw new NotSupportedException();
 
-        public void Add(T item)
-        {
-            throw new NotSupportedException();
-        }
+        public void Add(T item) => throw new NotSupportedException();
 
-        public void Clear()
-        {
-            throw new NotSupportedException();
-        }
+        public void Clear() => throw new NotSupportedException();
 
         public bool Contains(T item) => IndexOf(item) >= 0;
 
@@ -96,10 +84,7 @@ namespace Platform.Helpers.Collections.Segments
                 array[arrayIndex + i] = this[i];
         }
 
-        public bool Remove(T item)
-        {
-            throw new NotSupportedException();
-        }
+        public bool Remove(T item) => throw new NotSupportedException();
 
         public IEnumerator<T> GetEnumerator()
         {

@@ -6,27 +6,15 @@ namespace Platform.Helpers.Exceptions
     public static class Throw
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotSupportedException()
-        {
-            throw new NotSupportedException();
-        }
+        public static void NotSupportedException() => throw new NotSupportedException();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T NotSupportedExceptionAndReturn<T>()
-        {
-            throw new NotSupportedException();
-        }
+        public static T NotSupportedExceptionAndReturn<T>() => throw new NotSupportedException();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void NotImplementedException()
-        {
-            throw new NotImplementedException();
-        }
+        public static void NotImplementedException() => throw new NotImplementedException();
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T NotImplementedExceptionAndReturn<T>()
-        {
-            throw new NotImplementedException();
-        }
+        public static T NotImplementedExceptionAndReturn<T>() => throw new NotImplementedException();
     }
 }

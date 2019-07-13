@@ -202,10 +202,7 @@ namespace Platform.Helpers
             }
         }
 
-        protected virtual void SortConstructors(List<ConstructorInfo> resultConstructors)
-        {
-            resultConstructors.Sort((x, y) => -x.GetParameters().Length.CompareTo(y.GetParameters().Length));
-        }
+        protected virtual void SortConstructors(List<ConstructorInfo> resultConstructors) => resultConstructors.Sort((x, y) => -x.GetParameters().Length.CompareTo(y.GetParameters().Length));
 
         protected virtual bool TryResolveInstance(List<ConstructorInfo> constructors, out object resolved)
         {
@@ -286,9 +283,6 @@ namespace Platform.Helpers
         }
 
         public Scope(bool autoInclude = false, bool autoExplore = false)
-            : base(autoInclude, autoExplore)
-        {
-            Include<TInclude>();
-        }
+            : base(autoInclude, autoExplore) => Include<TInclude>();
     }
 }

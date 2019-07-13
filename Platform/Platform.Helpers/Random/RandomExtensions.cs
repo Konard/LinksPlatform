@@ -14,9 +14,6 @@ namespace Platform.Helpers.Random
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool NextBoolean(this System.Random rnd)
-        {
-            return rnd.Next(2) == 1;
-        }
+        public static bool NextBoolean(this System.Random rnd) => rnd.Next(2) == 1;
     }
 }

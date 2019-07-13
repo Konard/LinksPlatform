@@ -25,9 +25,6 @@ namespace Platform.Helpers.Reflection
             }
         }
 
-        public static Type[] GetCachedLoadableTypes(this Assembly assembly)
-        {
-            return LoadableAssemblyTypesCache.GetOrAdd(assembly, GetLoadableTypes);
-        }
+        public static Type[] GetCachedLoadableTypes(this Assembly assembly) => LoadableAssemblyTypesCache.GetOrAdd(assembly, GetLoadableTypes);
     }
 }

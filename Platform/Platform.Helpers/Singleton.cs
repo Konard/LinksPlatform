@@ -25,10 +25,7 @@ namespace Platform.Helpers
 
         private readonly Func<T> _creator;
 
-        public Singleton(Func<T> creator)
-        {
-            _creator = creator;
-        }
+        public Singleton(Func<T> creator) => _creator = creator;
 
         public T Instance
         {

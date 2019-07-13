@@ -12,10 +12,7 @@ namespace Platform.Helpers
         {
         }
 
-        public Comparer(Func<object, object, int> compare)
-        {
-            _compare = compare;
-        }
+        public Comparer(Func<object, object, int> compare) => _compare = compare;
 
         public int Compare(object x, object y) => _compare(x, y);
 

@@ -1,7 +1,7 @@
 ﻿using System;
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Reflection;
-using System.Reflection;
 
 // ReSharper disable StaticFieldInGenericType
 

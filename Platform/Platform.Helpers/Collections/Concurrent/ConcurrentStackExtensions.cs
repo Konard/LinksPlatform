@@ -6,10 +6,6 @@ namespace Platform.Helpers.Collections.Concurrent
     public static class ConcurrentStackExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T PopOrDefault<T>(this ConcurrentStack<T> stack)
-        {
-            T value;
-            return stack.TryPop(out value) ? value : default;
-        }
+        public static T PopOrDefault<T>(this ConcurrentStack<T> stack) => stack.TryPop(out T value) ? value : default;
     }
 }
