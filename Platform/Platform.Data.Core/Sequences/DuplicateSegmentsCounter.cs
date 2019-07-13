@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using Platform.Helpers;
+using Platform.Interfaces;
 
 namespace Platform.Data.Core.Sequences
 {

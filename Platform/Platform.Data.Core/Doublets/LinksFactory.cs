@@ -1,5 +1,5 @@
 ﻿using System;
-using Platform.Helpers;
+using Platform.Interfaces;
 using Platform.Memory;
 
 namespace Platform.Data.Core.Doublets

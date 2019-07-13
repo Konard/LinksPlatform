@@ -1,4 +1,5 @@
 ﻿using System;
+using Platform.Interfaces;
 using Platform.Helpers;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 

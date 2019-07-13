@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reflection;
+using Platform.Interfaces;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Reflection;
 

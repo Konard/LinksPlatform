@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Platform.Interfaces;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Data.Core.Doublets;

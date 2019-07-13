@@ -1,4 +1,5 @@
-﻿using Platform.Helpers;
+﻿using Platform.Interfaces;
+using Platform.Helpers;
 using System.Collections.Generic;
 
 namespace Platform.Data.Core.Doublets

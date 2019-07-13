@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using Xunit;
-using Platform.Helpers;
+using Platform.Interfaces;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.Frequencies.Cache;

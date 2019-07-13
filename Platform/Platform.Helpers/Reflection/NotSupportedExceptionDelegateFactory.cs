@@ -1,5 +1,6 @@
 ﻿using System;
 using Sigil;
+using Platform.Interfaces;
 
 namespace Platform.Helpers.Reflection
 {

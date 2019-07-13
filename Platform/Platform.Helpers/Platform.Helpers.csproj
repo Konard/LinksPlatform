@@ -29,6 +29,7 @@
     <PackageReference Include="System.Threading.Tasks.Parallel" Version="4.3.0" />
     <PackageReference Include="System.Xml.XmlSerializer" Version="4.3.0" />
     <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    <PackageReference Include="Platform.Interfaces" Version="0.0.1" />
     <PackageReference Include="Platform.Disposables" Version="0.0.1" />
   </ItemGroup>
 

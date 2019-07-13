@@ -1,4 +1,5 @@
-﻿using Platform.Helpers;
+﻿using Platform.Interfaces;
+using Platform.Helpers;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences

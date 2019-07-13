@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using System.Collections.Generic;
+using Platform.Interfaces;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Collections.SegmentsWalkers;
