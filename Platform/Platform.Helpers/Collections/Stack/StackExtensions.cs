@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Stack
 {
     public static class StackExtensions
     {

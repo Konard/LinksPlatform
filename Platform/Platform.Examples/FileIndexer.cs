@@ -3,8 +3,8 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using Platform.Helpers.Collections.Concurrent;
 using Platform.Helpers.IO;
-using Platform.Helpers.Collections;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 
@@ -42,7 +42,7 @@ namespace Platform.Examples
                             UnicodeMap.FromCharToLink(buffer[0]));
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
-                   
+
                     var linkArray = UnicodeMap.FromCharsToLinkArray(buffer, readChars);
                     _indexer.BulkIndexUnsync(linkArray);
 
@@ -89,7 +89,7 @@ namespace Platform.Examples
 
                     if (tasks.Count > 3) await tasks.AwaitOne();
 
-                    Console.WriteLine($"chars: {(ulong) steps*stepSize + (ulong) readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
+                    Console.WriteLine($"chars: {(ulong)steps * stepSize + (ulong)readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
 
                     steps++;
                 }

@@ -1,9 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Disposables;
+using Platform.Helpers.Collections.Stack;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Array
 {
     /// <remarks>
     /// TODO: Check actual performance

@@ -4,6 +4,8 @@ using System.Linq;
 using Platform.Data.Core.Common;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Collections.List;
 
 namespace Platform.Data.Core.Doublets
 {

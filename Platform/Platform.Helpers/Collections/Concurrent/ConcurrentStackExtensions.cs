@@ -1,7 +1,7 @@
 ﻿using System.Collections.Concurrent;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers.Collections
+namespace Platform.Helpers.Collections.Concurrent
 {
     public static class ConcurrentStackExtensions
     {

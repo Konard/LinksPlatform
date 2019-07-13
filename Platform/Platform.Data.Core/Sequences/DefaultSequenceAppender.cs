@@ -1,6 +1,6 @@
 ﻿using Platform.Data.Core.Doublets;
 using Platform.Helpers;
-using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.Stack;
 
 namespace Platform.Data.Core.Sequences
 {

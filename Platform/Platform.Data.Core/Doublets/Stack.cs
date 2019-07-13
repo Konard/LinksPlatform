@@ -1,5 +1,5 @@
 ﻿using Platform.Helpers;
-using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.Stack;
 
 namespace Platform.Data.Core.Doublets
 {

@@ -1,4 +1,4 @@
-﻿namespace Platform.Helpers.Collections
+﻿namespace Platform.Helpers.Collections.Array
 {
     public class ArrayString<T>
     {

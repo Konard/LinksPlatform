@@ -2,6 +2,7 @@
 using System.Reflection;
 using Xunit;
 using Platform.Helpers.Collections;
+using Platform.Helpers.Collections.List;
 using Platform.Helpers.Reflection;
 
 namespace Platform.Tests.Helpers
