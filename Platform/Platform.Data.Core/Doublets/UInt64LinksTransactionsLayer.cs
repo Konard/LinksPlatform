@@ -85,7 +85,7 @@ namespace Platform.Data.Core.Doublets
             public ulong TransactionId;
             public UInt64Link Before;
             public UInt64Link After;
-            public UniqueTimestamp Timestamp;
+            public Timestamp Timestamp;
 
             public Transition(UniqueTimestampFactory uniqueTimestampFactory, ulong transactionId, UInt64Link before = default, UInt64Link after = default)
             {

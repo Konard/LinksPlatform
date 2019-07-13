@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Platform.Helpers.Random
+﻿namespace Platform.Helpers.Random
 {
     /// <remarks>
     /// TODO: Возможно нужна отдельная точка доступа к фабрикам по их типу.
@@ -8,6 +6,6 @@ namespace Platform.Helpers.Random
     /// </remarks>
     public static class RandomHelpers
     {
-        public static readonly System.Random DefaultFactory = Singleton.Get(() => new System.Random((int)DateTime.UtcNow.Ticks));
+        public static readonly System.Random DefaultFactory = Singleton.Get(() => new System.Random((int)System.DateTime.UtcNow.Ticks));
     }
 }
