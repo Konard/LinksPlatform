@@ -1,4 +1,4 @@
-﻿using Platform.Helpers.Collections.List;
+﻿using Platform.Helpers.Collections.Lists;
 
 namespace Platform.Helpers
 {

@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Platform.Data.Core.Doublets;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.List;
+using Platform.Helpers.Collections.Lists;
 using Platform.Helpers.Threading;
 using LinkIndex = System.UInt64;
 

@@ -1,4 +1,4 @@
-﻿using Platform.Helpers.Collections.Stack;
+﻿using Platform.Helpers.Collections.Stacks;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets

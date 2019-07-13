@@ -1,4 +1,4 @@
-﻿namespace Platform.Helpers.Collections.Stack
+﻿namespace Platform.Helpers.Collections.Stacks
 {
     public interface IStack<TElement>
     {

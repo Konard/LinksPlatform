@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using Platform.Data.Core.Exceptions;
 using Platform.Disposables;
 using Platform.Helpers;
-using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Collections.Arrays;
 using Platform.Memory;
 
 #pragma warning disable 0649

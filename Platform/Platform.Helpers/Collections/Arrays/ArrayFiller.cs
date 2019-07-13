@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Helpers.Collections.Array
+namespace Platform.Helpers.Collections.Arrays
 {
     public class ArrayFiller<TElement, TReturnConstant>
     {
@@ -22,10 +22,7 @@ namespace Platform.Helpers.Collections.Array
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void Add(TElement element)
-        {
-            _array[_position++] = element;
-        }
+        public void Add(TElement element) => _array[_position++] = element;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public bool AddAndReturnTrue(TElement element)

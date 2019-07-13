@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections.Stack
+namespace Platform.Helpers.Collections.Stacks
 {
     public class DefaultStack<TElement> : IStack<TElement>
     {

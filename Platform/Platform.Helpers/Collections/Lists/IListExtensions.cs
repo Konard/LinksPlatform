@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections.List
+namespace Platform.Helpers.Collections.Lists
 {
     public static class ListExtensions
     {

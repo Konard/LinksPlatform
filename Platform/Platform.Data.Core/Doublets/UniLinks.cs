@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using Platform.Helpers;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Array;
-using Platform.Helpers.Collections.List;
+using Platform.Helpers.Collections.Arrays;
+using Platform.Helpers.Collections.Lists;
 using Platform.Helpers.Numbers;
 using Platform.Data.Core.Common;
 

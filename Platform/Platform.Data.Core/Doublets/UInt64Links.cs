@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Collections.Arrays;
 
 namespace Platform.Data.Core.Doublets
 {

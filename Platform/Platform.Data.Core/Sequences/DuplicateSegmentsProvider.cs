@@ -3,7 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Platform.Interfaces;
 using Platform.Helpers;
-using Platform.Helpers.Collections.List;
+using Platform.Helpers.Collections.Lists;
 using Platform.Helpers.Collections.Segments;
 using Platform.Helpers.Collections.Segments.Walkers;
 using Platform.Helpers.Numbers;

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Helpers.Collections.List
+namespace Platform.Helpers.Collections.Lists
 {
     public class IListEqualityComparer<T> : IEqualityComparer<IList<T>>
     {

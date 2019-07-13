@@ -8,7 +8,7 @@ using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
 using Platform.Helpers;
-using Platform.Helpers.Collections.Array;
+using Platform.Helpers.Collections.Arrays;
 using Platform.Helpers.Numbers;
 using Platform.Helpers.Random;
 
