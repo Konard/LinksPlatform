@@ -2,7 +2,7 @@
 using System.Threading;
 using Platform.Disposables;
 using Platform.Ranges;
-using Platform.Helpers.Exceptions;
+using Platform.Exceptions;
 
 namespace Platform.Memory
 {

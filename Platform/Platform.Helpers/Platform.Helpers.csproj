@@ -32,6 +32,7 @@
     <PackageReference Include="Platform.Interfaces" Version="0.0.1" />
     <PackageReference Include="Platform.Disposables" Version="0.0.1" />
     <PackageReference Include="Platform.Ranges" Version="0.0.1" />
+    <PackageReference Include="Platform.Exceptions" Version="0.0.1" />
   </ItemGroup>
 
 </Project>

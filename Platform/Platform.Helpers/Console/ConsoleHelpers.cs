@@ -1,6 +1,6 @@
-﻿using Platform.Helpers.Exceptions;
-using System;
+﻿using System;
 using System.Diagnostics;
+using Platform.Exceptions;
 
 namespace Platform.Helpers.Console
 {

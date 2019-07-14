@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Disposables;
 using Platform.Ranges;
+using Platform.Exceptions;
 using Platform.Helpers.Collections.Stacks;
-using Platform.Helpers.Exceptions;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Helpers.Collections.Arrays

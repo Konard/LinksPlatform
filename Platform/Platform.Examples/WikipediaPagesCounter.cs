@@ -4,7 +4,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Linq;
-using Platform.Helpers.Exceptions;
+using Platform.Exceptions;
 
 namespace Platform.Examples
 {
