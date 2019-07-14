@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using Platform.Ranges;
 using Platform.Helpers.Collections;
 
 namespace Platform.Helpers.Exceptions

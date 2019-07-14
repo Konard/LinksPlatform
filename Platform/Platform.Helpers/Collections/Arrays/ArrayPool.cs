@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Disposables;
+using Platform.Ranges;
 using Platform.Helpers.Collections.Stacks;
 using Platform.Helpers.Exceptions;
 using Platform.Helpers.Numbers;
