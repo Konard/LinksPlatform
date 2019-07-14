@@ -2,7 +2,6 @@
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Platform.Ranges;
-using Platform.Helpers.Collections;
 
 namespace Platform.Helpers.Exceptions
 {
@@ -25,7 +24,7 @@ namespace Platform.Helpers.Exceptions
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void ArgumentNotEmpty<TArgument>(TArgument[] argument, string argumentName)
         {
-            if (argument.IsNullOrEmpty())
+            if (argument == null || argument.Length == 0)
                 throw new ArgumentNullException(argumentName);
         }
 
