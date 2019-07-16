@@ -1,7 +1,10 @@
 ﻿using System;
 using System.Diagnostics;
 using Xunit;
+using Platform.Helpers;
 using Platform.Helpers.Numbers;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 
 namespace Platform.Tests
 {
@@ -17,6 +20,13 @@ namespace Platform.Tests
                 Assert.True(disposable == null);
         }
 
+        protected class UInt64EqualityComparer : IEqualityComparer<ulong>
+        {
+            public bool Equals(ulong x, ulong y) => x == y;
+
+            public int GetHashCode(ulong obj) => obj.GetHashCode();
+        }
+
         [Fact]
         public static void EqualsPerfomanceTest()
         {
@@ -27,42 +37,65 @@ namespace Platform.Tests
 
             bool result = false;
 
-            var sw1 = Stopwatch.StartNew();
+            var ts1 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = Equals1(x, y);
+            });
 
-            for (int i = 0; i < N; i++)
-                result = Equals1(x, y);
+            var ts2 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = Equals2(x, y);
+            });
 
-            sw1.Stop();
-
-            var sw2 = Stopwatch.StartNew();
-
-            for (int i = 0; i < N; i++)
-                result = Equals2(x, y);
-
-            sw2.Stop();
-
-            var sw3 = Stopwatch.StartNew();
-
-            for (int i = 0; i < N; i++)
-                result = Equals3(x, y);
-
-            sw3.Stop();
+            var ts3 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = Equals3(x, y);
+            });
 
             if (!result)
                 result = MathHelpers<ulong>.IsEquals(x, y); // Ensure precompiled
 
-            var sw4 = Stopwatch.StartNew();
+            var ts4 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = MathHelpers<ulong>.IsEquals(x, y);
+            });
 
-            for (int i = 0; i < N; i++)
-                result = MathHelpers<ulong>.IsEquals(x, y);
+            var equalityComparer1 = EqualityComparer<ulong>.Default;
 
-            sw4.Stop();
+            var ts5 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = equalityComparer1.Equals(x, y);
+            });
 
-            Assert.True(sw2.Elapsed < sw1.Elapsed);
-            Assert.True(sw3.Elapsed < sw2.Elapsed);
-            Assert.True(sw4.Elapsed < sw2.Elapsed);
+            var equalityComparer2 = new UInt64EqualityComparer();
 
-            Console.WriteLine($"{sw1.Elapsed} {sw2.Elapsed} {sw3.Elapsed} {sw4.Elapsed} {result}");
+            var ts6 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = equalityComparer2.Equals(x, y);
+            });
+
+            Func<ulong, ulong, bool> equalsMethodReference = equalityComparer2.Equals;
+
+            var ts7 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = equalsMethodReference(x, y);
+            });
+
+            Assert.True(ts2 < ts1);
+            Assert.True(ts3 < ts2);
+            Assert.True(ts4 < ts2);
+            Assert.True(ts6 < ts4);
+            Assert.True(ts6 < ts5);
+            Assert.True(ts6 < ts7);
+
+            Console.WriteLine($"{ts1} {ts2} {ts3} {ts4} {ts5} {ts6} {ts7} {result}");
         }
 
         private static bool Equals1<T>(T x, T y) => Equals(x, y);

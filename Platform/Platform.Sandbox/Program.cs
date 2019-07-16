@@ -11,19 +11,19 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
+            SystemTests.EqualsPerfomanceTest();
 
-            new CSVExporterCLI<CSVExporter>().Run(args);
+            //args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
 
-            args = new string[] { "C:\\compressed.links", "C:\\compressed2.csv", "True", "True", "True" };
+            //new CSVExporterCLI<CSVExporter>().Run(args);
 
-            new CSVExporterCLI<CSVSequencesExporter>().Run(args);
+            //args = new string[] { "C:\\compressed.links", "C:\\compressed2.csv", "True", "True", "True" };
+
+            //new CSVExporterCLI<CSVSequencesExporter>().Run(args);
 
             //AllRepeatingSubstringsInString.Run();
 
             //ReadSequenceTests.ReadSequenceTest();
-
-            //SystemTests.EqualsPerfomanceTest();
 
             //SequencesTests.CompressionEfficiencyTest();
 
