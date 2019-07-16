@@ -80,12 +80,20 @@ namespace Platform.Tests
                     result = equalityComparer2.Equals(x, y);
             });
 
-            Func<ulong, ulong, bool> equalsMethodReference = equalityComparer2.Equals;
+            Func<ulong, ulong, bool> equalityComparer3 = equalityComparer2.Equals;
 
             var ts7 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
-                    result = equalsMethodReference(x, y);
+                    result = equalityComparer3(x, y);
+            });
+
+            var comparer = Comparer<ulong>.Default;
+
+            var ts8 = PerformanceHelpers.Measure(() =>
+            {
+                for (int i = 0; i < N; i++)
+                    result = comparer.Compare(x, y) == 0;
             });
 
             Assert.True(ts2 < ts1);
@@ -95,7 +103,7 @@ namespace Platform.Tests
             Assert.True(ts6 < ts5);
             Assert.True(ts6 < ts7);
 
-            Console.WriteLine($"{ts1} {ts2} {ts3} {ts4} {ts5} {ts6} {ts7} {result}");
+            Console.WriteLine($"{ts1} {ts2} {ts3} {ts4} {ts5} {ts6} {ts7} {ts8} {result}");
         }
 
         private static bool Equals1<T>(T x, T y) => Equals(x, y);
