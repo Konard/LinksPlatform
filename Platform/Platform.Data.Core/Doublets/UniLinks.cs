@@ -5,7 +5,6 @@ using Platform.Helpers;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Collections.Arrays;
 using Platform.Helpers.Collections.Lists;
-using Platform.Helpers.Numbers;
 using Platform.Data.Core.Common;
 
 namespace Platform.Data.Core.Doublets
@@ -16,33 +15,35 @@ namespace Platform.Data.Core.Doublets
     /// 
     /// TODO: Decide to change to IDoubletLinks or not to change. (Better to create DefaultUniLinksBase, that contains logic itself and can be implemented using both IDoubletLinks and ILinks.)
     /// </remarks>
-    internal class UniLinks<T> : LinksDecoratorBase<T>, IUniLinks<T>
+    internal class UniLinks<TLink> : LinksDecoratorBase<TLink>, IUniLinks<TLink>
     {
-        public UniLinks(ILinks<T> links)
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
+        public UniLinks(ILinks<TLink> links)
             : base(links)
         {
         }
 
         private struct Transition
         {
-            public IList<T> Before;
-            public IList<T> After;
+            public IList<TLink> Before;
+            public IList<TLink> After;
 
-            public Transition(IList<T> before, IList<T> after)
+            public Transition(IList<TLink> before, IList<TLink> after)
             {
                 Before = before;
                 After = after;
             }
         }
 
-        private static readonly T NullConstant = Use<ILinksCombinedConstants<T, T, int>>.Single.Null;
-        private static readonly IList<T> NullLink = new List<T> { NullConstant, NullConstant, NullConstant };
+        private static readonly TLink NullConstant = Use<ILinksCombinedConstants<TLink, TLink, int>>.Single.Null;
+        private static readonly IList<TLink> NullLink = new List<TLink> { NullConstant, NullConstant, NullConstant };
 
 
 
         // TODO: Подумать о том, как реализовать древовидный Restriction и Substitution (Links-Expression)
 
-        public T Trigger(IList<T> restriction, Func<IList<T>, IList<T>, T> matchedHandler, IList<T> substitution, Func<IList<T>, IList<T>, T> substitutedHandler)
+        public TLink Trigger(IList<TLink> restriction, Func<IList<TLink>, IList<TLink>, TLink> matchedHandler, IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutedHandler)
         {
             ////List<Transition> transitions = null;
 
@@ -243,7 +244,7 @@ namespace Platform.Data.Core.Doublets
             return Constants.Continue;
         }
 
-        public T Trigger(IList<T> patternOrCondition, Func<IList<T>, T> matchHandler, IList<T> substitution, Func<IList<T>, IList<T>, T> substitutionHandler)
+        public TLink Trigger(IList<TLink> patternOrCondition, Func<IList<TLink>, TLink> matchHandler, IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutionHandler)
         {
             if (patternOrCondition.IsNullOrEmpty() && substitution.IsNullOrEmpty())
                 return Constants.Continue;
@@ -254,15 +255,15 @@ namespace Platform.Data.Core.Doublets
             }
             else if (!substitution.IsNullOrEmpty()) // Creation
             {
-                var before = ArrayPool<T>.Empty;
+                var before = ArrayPool<TLink>.Empty;
 
                 // Что должно означать False здесь? Остановиться (перестать идти) или пропустить (пройти мимо) или пустить (взять)?
-                if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
+                if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
                     return Constants.Break;
 
-                var after = (IList<T>)substitution.ToArray();
+                var after = (IList<TLink>)substitution.ToArray();
 
-                if (MathHelpers<T>.IsEquals(after[0], default))
+                if (EqualityComparer.Equals(after[0], default))
                 {
                     var newLink = Links.Create();
                     after[0] = newLink;
@@ -286,10 +287,10 @@ namespace Platform.Data.Core.Doublets
                     var linkToDelete = patternOrCondition[0];
                     var before = Links.GetLink(linkToDelete);
 
-                    if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
-                    var after = ArrayPool<T>.Empty;
+                    var after = ArrayPool<TLink>.Empty;
 
                     Links.Update(linkToDelete, Constants.Null, Constants.Null);
                     Links.Delete(linkToDelete);
@@ -308,17 +309,17 @@ namespace Platform.Data.Core.Doublets
                     var linkToUpdate = patternOrCondition[0];
                     var before = Links.GetLink(linkToUpdate);
 
-                    if (matchHandler != null && MathHelpers<T>.IsEquals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
                         return Constants.Break;
 
-                    var after = (IList<T>)substitution.ToArray(); //-V3125
+                    var after = (IList<TLink>)substitution.ToArray(); //-V3125
 
-                    if (MathHelpers<T>.IsEquals(after[0], default))
+                    if (EqualityComparer.Equals(after[0], default))
                         after[0] = linkToUpdate;
 
                     if (substitution.Count == 1)
                     {
-                        if (!MathHelpers<T>.IsEquals(substitution[0], linkToUpdate))
+                        if (!EqualityComparer.Equals(substitution[0], linkToUpdate))
                         {
                             after = Links.GetLink(substitution[0]);
 
@@ -352,9 +353,9 @@ namespace Platform.Data.Core.Doublets
         ///  --------------------
         ///        changes
         /// </remarks>
-        public IList<IList<IList<T>>> Trigger(IList<T> condition, IList<T> substitution)
+        public IList<IList<IList<TLink>>> Trigger(IList<TLink> condition, IList<TLink> substitution)
         {
-            var changes = new List<IList<IList<T>>>();
+            var changes = new List<IList<IList<TLink>>>();
 
             Trigger(condition, AlwaysContinue, substitution, (before, after) =>
             {
@@ -367,7 +368,7 @@ namespace Platform.Data.Core.Doublets
             return changes;
         }
 
-        private T AlwaysContinue(IList<T> linkToMatch) => Constants.Continue;
+        private TLink AlwaysContinue(IList<TLink> linkToMatch) => Constants.Continue;
     }
 }
 

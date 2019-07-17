@@ -1,10 +1,12 @@
-﻿using Platform.Interfaces;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 
 namespace Platform.Data.Core.Doublets
 {
     public class UnaryNumberIncrementer<TLink> : LinksOperatorBase<TLink>, IIncrementer<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly TLink _unaryOne;
 
         public UnaryNumberIncrementer(ILinks<TLink> links, TLink unaryOne)
@@ -13,13 +15,13 @@ namespace Platform.Data.Core.Doublets
 
         public TLink Increment(TLink unaryNumber)
         {
-            if (MathHelpers<TLink>.IsEquals(unaryNumber, _unaryOne))
+            if (EqualityComparer.Equals(unaryNumber, _unaryOne))
                 return Links.GetOrCreate(_unaryOne, _unaryOne);
 
             var source = Links.GetSource(unaryNumber);
             var target = Links.GetTarget(unaryNumber);
 
-            if (MathHelpers<TLink>.IsEquals(source, target))
+            if (EqualityComparer.Equals(source, target))
                 return Links.GetOrCreate(unaryNumber, _unaryOne);
             else
                 return Links.GetOrCreate(source, Increment(target));

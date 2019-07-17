@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers
@@ -35,6 +36,6 @@ namespace Platform.Helpers
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T GetOrCreateThreadInstance<T>(T nullValue)
-            where T : struct => Equals(Default<T>.ThreadInstance, nullValue) ? (Default<T>.ThreadInstance = new T()) : Default<T>.ThreadInstance;
+            where T : struct => EqualityComparer<T>.Default.Equals(Default<T>.ThreadInstance, nullValue) ? (Default<T>.ThreadInstance = new T()) : Default<T>.ThreadInstance;
     }
 }

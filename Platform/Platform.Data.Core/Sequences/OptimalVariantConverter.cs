@@ -8,6 +8,8 @@ namespace Platform.Data.Core.Sequences
 {
     public class OptimalVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly IConverter<IList<TLink>> _sequenceToItsLocalElementLevelsConverter;
 
         public OptimalVariantConverter(
@@ -41,7 +43,7 @@ namespace Platform.Data.Core.Sequences
                 var w = 0;
                 for (var i = 1; i < length; i++)
                 {
-                    if (MathHelpers<TLink>.IsEquals(currentLevel, levels[i]))
+                    if (EqualityComparer.Equals(currentLevel, levels[i]))
                     {
                         levelRepeat++;
 

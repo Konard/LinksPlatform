@@ -18,6 +18,7 @@ namespace Platform.Data.Core.Sequences
     public class CompressingConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
         private static readonly LinksConstants<bool, TLink, long> Constants = Default<LinksConstants<bool, TLink, long>>.Instance;
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
         private readonly IConverter<IList<TLink>, TLink> _baseConverter;
         private readonly LinkFrequenciesCache<TLink> _doubletFrequenciesCache;
@@ -136,7 +137,7 @@ namespace Platform.Data.Core.Sequences
                 var maxDoubletSource = _maxDoublet.Source;
                 var maxDoubletTarget = _maxDoublet.Target;
 
-                if (MathHelpers<TLink>.IsEquals(_maxDoubletData.Link, Constants.Null))
+                if (EqualityComparer.Equals(_maxDoubletData.Link, Constants.Null))
                     _maxDoubletData.Link = Links.GetOrCreate(maxDoubletSource, maxDoubletTarget);
 
                 var maxDoubletReplacementLink = _maxDoubletData.Link;
@@ -148,7 +149,7 @@ namespace Platform.Data.Core.Sequences
                 int w = 0, r = 0; // (r == read, w == write)
                 for (; r < oldLength; r++)
                 {
-                    if (MathHelpers<TLink>.IsEquals(copy[r].Element, maxDoubletSource) && MathHelpers<TLink>.IsEquals(copy[r + 1].Element, maxDoubletTarget))
+                    if (EqualityComparer.Equals(copy[r].Element, maxDoubletSource) && EqualityComparer.Equals(copy[r + 1].Element, maxDoubletTarget))
                     {
                         if (r > 0)
                         {
@@ -213,7 +214,7 @@ namespace Platform.Data.Core.Sequences
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
             if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) &&
-               (MathHelpers.LessThan(maxFrequency, frequency) || (MathHelpers<TLink>.IsEquals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target))))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+               (MathHelpers.LessThan(maxFrequency, frequency) || (EqualityComparer.Equals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target))))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

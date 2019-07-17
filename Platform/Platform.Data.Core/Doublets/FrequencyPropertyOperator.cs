@@ -1,10 +1,12 @@
-﻿using Platform.Interfaces;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 
 namespace Platform.Data.Core.Doublets
 {
     public class FrequencyPropertyOperator<TLink> : LinksOperatorBase<TLink>, ISpecificPropertyOperator<TLink, TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly TLink _frequencyPropertyMarker;
         private readonly TLink _frequencyMarker;
 
@@ -26,7 +28,7 @@ namespace Platform.Data.Core.Doublets
         {
             var frequencyContainer = default(TLink);
 
-            if (MathHelpers<TLink>.IsEquals(property, default))
+            if (EqualityComparer.Equals(property, default))
                 return frequencyContainer;
 
             Links.Each(candidate =>
@@ -34,7 +36,7 @@ namespace Platform.Data.Core.Doublets
                 var candidateTarget = Links.GetTarget(candidate);
                 var frequencyTarget = Links.GetTarget(candidateTarget);
 
-                if (MathHelpers<TLink>.IsEquals(frequencyTarget, _frequencyMarker))
+                if (EqualityComparer.Equals(frequencyTarget, _frequencyMarker))
                 {
                     frequencyContainer = Links.GetIndex(candidate);
                     return Links.Constants.Break;
@@ -46,13 +48,13 @@ namespace Platform.Data.Core.Doublets
             return frequencyContainer;
         }
 
-        private TLink GetFrequency(TLink container) => MathHelpers<TLink>.IsEquals(container, default) ? default : Links.GetTarget(container);
+        private TLink GetFrequency(TLink container) => EqualityComparer.Equals(container, default) ? default : Links.GetTarget(container);
 
         public void Set(TLink link, TLink frequency)
         {
             var property = Links.GetOrCreate(link, _frequencyPropertyMarker);
             var container = GetContainer(property);
-            if (MathHelpers<TLink>.IsEquals(container, default))
+            if (EqualityComparer.Equals(container, default))
                 Links.GetOrCreate(property, frequency);
             else
                 Links.Update(container, property, frequency);

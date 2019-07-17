@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Numbers;
 using Platform.Helpers.Unsafe;
@@ -7,6 +8,8 @@ namespace Platform.Data.Core.Collections
 {
     public abstract class GenericCollectionMethodsBase<TElement>
     {
+        private static readonly EqualityComparer<TElement> EqualityComparer = EqualityComparer<TElement>.Default;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual TElement GetZero() => Integer<TElement>.Zero;
 
@@ -17,13 +20,13 @@ namespace Platform.Data.Core.Collections
         protected virtual TElement GetTwo() => Integer<TElement>.Two;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool ValueEqualToZero(IntPtr pointer) => MathHelpers<TElement>.IsEquals(pointer.GetValue<TElement>(), GetZero());
+        protected virtual bool ValueEqualToZero(IntPtr pointer) => EqualityComparer.Equals(pointer.GetValue<TElement>(), GetZero());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool EqualToZero(TElement value) => MathHelpers<TElement>.IsEquals(value, GetZero());
+        protected virtual bool EqualToZero(TElement value) => EqualityComparer.Equals(value, GetZero());
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool IsEquals(TElement first, TElement second) => MathHelpers<TElement>.IsEquals(first, second);
+        protected virtual bool IsEquals(TElement first, TElement second) => EqualityComparer.Equals(first, second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual bool GreaterThanZero(TElement value) => MathHelpers<TElement>.GreaterThan(value, GetZero());

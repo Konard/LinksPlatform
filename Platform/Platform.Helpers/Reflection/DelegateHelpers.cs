@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Sigil;
 
 namespace Platform.Helpers.Reflection
@@ -21,7 +22,7 @@ namespace Platform.Helpers.Reflection
             }
             finally
             {
-                if (Equals(@delegate, default(TDelegate)))
+                if (EqualityComparer<TDelegate>.Default.Equals(@delegate, default))
                     @delegate = Singleton.Get(Default<NotSupportedExceptionDelegateFactory<TDelegate>>.Instance);
             }
         }

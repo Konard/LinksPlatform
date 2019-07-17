@@ -1,12 +1,14 @@
 ﻿using System;
+using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers.Numbers;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 
 namespace Platform.Data.Core.Doublets
 {
     public class LinkToItsFrequencyNumberConveter<TLink> : LinksOperatorBase<TLink>, IConverter<Doublet<TLink>, TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly ISpecificPropertyOperator<TLink, TLink> _frequencyPropertyOperator;
         private readonly IConverter<TLink> _unaryNumberToAddressConverter;
 
@@ -23,11 +25,11 @@ namespace Platform.Data.Core.Doublets
         public TLink Convert(Doublet<TLink> doublet)
         {
             var link = Links.SearchOrDefault(doublet.Source, doublet.Target);
-            if (MathHelpers<TLink>.IsEquals(link, Links.Constants.Null))
+            if (EqualityComparer.Equals(link, Links.Constants.Null))
                 throw new ArgumentException($"Link with {doublet.Source} source and {doublet.Target} target not found.", nameof(doublet));
 
             var frequency = _frequencyPropertyOperator.Get(link);
-            if (MathHelpers<TLink>.IsEquals(frequency, default))
+            if (EqualityComparer.Equals(frequency, default))
                 return default;
             var frequencyNumber = Links.GetSource(frequency);
             var number = _unaryNumberToAddressConverter.Convert(frequencyNumber);

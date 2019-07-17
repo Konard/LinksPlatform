@@ -7,16 +7,16 @@ using Platform.Data.Core.Collections.Trees;
 
 namespace Platform.Data.Core.Doublets
 {
-    partial class ResizableDirectMemoryLinks<T>
+    partial class ResizableDirectMemoryLinks<TLink>
     {
-        private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<T>
+        private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<TLink>
         {
-            private readonly ResizableDirectMemoryLinks<T> _memory;
-            private readonly ILinksCombinedConstants<T, T, int> _constants;
+            private readonly ResizableDirectMemoryLinks<TLink> _memory;
+            private readonly ILinksCombinedConstants<TLink, TLink, int> _constants;
             protected readonly IntPtr Links;
             protected readonly IntPtr Header;
 
-            protected LinksTreeMethodsBase(ResizableDirectMemoryLinks<T> memory)
+            protected LinksTreeMethodsBase(ResizableDirectMemoryLinks<TLink> memory)
             {
                 Links = memory._links;
                 Header = memory._header;
@@ -25,12 +25,12 @@ namespace Platform.Data.Core.Doublets
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected abstract T GetTreeRoot();
+            protected abstract TLink GetTreeRoot();
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            protected abstract T GetBasePartValue(T link);
+            protected abstract TLink GetBasePartValue(TLink link);
 
-            public T this[T index]
+            public TLink this[TLink index]
             {
                 get
                 {
@@ -59,7 +59,7 @@ namespace Platform.Data.Core.Doublets
             }
 
             // TODO: Return indices range instead of references count
-            public T CalculateReferences(T link)
+            public TLink CalculateReferences(TLink link)
             {
                 var root = GetTreeRoot();
                 var total = GetSize(root);
@@ -101,14 +101,14 @@ namespace Platform.Data.Core.Doublets
                 return Subtract(Subtract(total, totalRightIgnore), totalLeftIgnore);
             }
 
-            public T EachReference(T link, Func<IList<T>, T> handler)
+            public TLink EachReference(TLink link, Func<IList<TLink>, TLink> handler)
             {
                 var root = GetTreeRoot();
 
                 if (EqualToZero(root))
                     return _constants.Continue;
 
-                T first = GetZero(), current = root;
+                TLink first = GetZero(), current = root;
                 while (!EqualToZero(current))
                 {
                     var @base = GetBasePartValue(current);
@@ -181,7 +181,7 @@ namespace Platform.Data.Core.Doublets
 
         private class LinksSourcesTreeMethods : LinksTreeMethodsBase
         {
-            public LinksSourcesTreeMethods(ResizableDirectMemoryLinks<T> memory)
+            public LinksSourcesTreeMethods(ResizableDirectMemoryLinks<TLink> memory)
                 : base(memory)
             {
             }
@@ -198,98 +198,98 @@ namespace Platform.Data.Core.Doublets
 
             //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(size);
 
-            protected override IntPtr GetLeftPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
+            protected override IntPtr GetLeftPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
 
-            protected override IntPtr GetRightPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
+            protected override IntPtr GetRightPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
 
-            protected override T GetLeftValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).GetValue<T>();
+            protected override TLink GetLeftValue(TLink node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).GetValue<TLink>();
 
-            protected override T GetRightValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).GetValue<T>();
+            protected override TLink GetRightValue(TLink node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).GetValue<TLink>();
 
-            protected override T GetSize(T node)
+            protected override TLink GetSize(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
                 return MathHelpers.PartialRead(previousValue, 5, -5);
             }
 
-            protected override void SetLeft(T node, T left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).SetValue(left);
+            protected override void SetLeft(TLink node, TLink left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).SetValue(left);
 
-            protected override void SetRight(T node, T right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).SetValue(right);
+            protected override void SetRight(TLink node, TLink right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).SetValue(right);
 
-            protected override void SetSize(T node, T size)
+            protected override void SetSize(TLink node, TLink size)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(MathHelpers.PartialWrite(previousValue, size, 5, -5));
             }
 
-            protected override bool GetLeftIsChild(T node)
+            protected override bool GetLeftIsChild(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                return (Integer<T>)MathHelpers.PartialRead(previousValue, 4, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                return (Integer<TLink>)MathHelpers.PartialRead(previousValue, 4, 1);
             }
 
-            protected override void SetLeftIsChild(T node, bool value)
+            protected override void SetLeftIsChild(TLink node, bool value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                var modified = MathHelpers.PartialWrite(previousValue, (T)(Integer<T>)value, 4, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                var modified = MathHelpers.PartialWrite(previousValue, (TLink)(Integer<TLink>)value, 4, 1);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(modified);
             }
 
-            protected override bool GetRightIsChild(T node)
+            protected override bool GetRightIsChild(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                return (Integer<T>)MathHelpers.PartialRead(previousValue, 3, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                return (Integer<TLink>)MathHelpers.PartialRead(previousValue, 3, 1);
             }
 
-            protected override void SetRightIsChild(T node, bool value)
+            protected override void SetRightIsChild(TLink node, bool value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                var modified = MathHelpers.PartialWrite(previousValue, (T)(Integer<T>)value, 3, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                var modified = MathHelpers.PartialWrite(previousValue, (TLink)(Integer<TLink>)value, 3, 1);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(modified);
             }
 
-            protected override sbyte GetBalance(T node)
+            protected override sbyte GetBalance(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                var value = (ulong)(Integer<T>)MathHelpers.PartialRead(previousValue, 0, 3);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                var value = (ulong)(Integer<TLink>)MathHelpers.PartialRead(previousValue, 0, 3);
                 var unpackedValue = (sbyte)((value & 4) > 0 ? ((value & 4) << 5) | value & 3 | 124 : value & 3);
                 return unpackedValue;
             }
 
-            protected override void SetBalance(T node, sbyte value)
+            protected override void SetBalance(TLink node, sbyte value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-                var packagedValue = (T)(Integer<T>)((((byte)value >> 5) & 4) | value & 3);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<TLink>();
+                var packagedValue = (TLink)(Integer<TLink>)((((byte)value >> 5) & 4) | value & 3);
                 var modified = MathHelpers.PartialWrite(previousValue, packagedValue, 0, 3);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(modified);
             }
 
-            protected override bool FirstIsToTheLeftOfSecond(T first, T second)
+            protected override bool FirstIsToTheLeftOfSecond(TLink first, TLink second)
             {
-                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>();
-                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
+                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>();
+                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>();
 
                 return LessThan(firstSource, secondSource) ||
-                       (IsEquals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
+                       (IsEquals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>()));
             }
 
-            protected override bool FirstIsToTheRightOfSecond(T first, T second)
+            protected override bool FirstIsToTheRightOfSecond(TLink first, TLink second)
             {
-                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>();
-                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>();
+                var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>();
+                var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>();
 
                 return GreaterThan(firstSource, secondSource) ||
-                       (IsEquals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>()));
+                       (IsEquals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>()));
             }
 
-            protected override T GetTreeRoot()
+            protected override TLink GetTreeRoot()
             {
-                return (Header + LinksHeader.FirstAsSourceOffset).GetValue<T>();
+                return (Header + LinksHeader.FirstAsSourceOffset).GetValue<TLink>();
             }
 
-            protected override T GetBasePartValue(T link)
+            protected override TLink GetBasePartValue(TLink link)
             {
-                return (Links.GetElement(LinkSizeInBytes, link) + Link.SourceOffset).GetValue<T>();
+                return (Links.GetElement(LinkSizeInBytes, link) + Link.SourceOffset).GetValue<TLink>();
             }
 
             /// <summary>
@@ -299,14 +299,14 @@ namespace Platform.Data.Core.Doublets
             /// <param name="source">Индекс связи, которая является началом на искомой связи.</param>
             /// <param name="target">Индекс связи, которая является концом на искомой связи.</param>
             /// <returns>Индекс искомой связи.</returns>
-            public T Search(T source, T target)
+            public TLink Search(TLink source, TLink target)
             {
                 var root = GetTreeRoot();
 
                 while (!EqualToZero(root))
                 {
-                    var rootSource = (Links.GetElement(LinkSizeInBytes, root) + Link.SourceOffset).GetValue<T>();
-                    var rootTarget = (Links.GetElement(LinkSizeInBytes, root) + Link.TargetOffset).GetValue<T>();
+                    var rootSource = (Links.GetElement(LinkSizeInBytes, root) + Link.SourceOffset).GetValue<TLink>();
+                    var rootTarget = (Links.GetElement(LinkSizeInBytes, root) + Link.TargetOffset).GetValue<TLink>();
 
                     if (FirstIsToTheLeftOfSecond(source, target, rootSource, rootTarget)) // node.Key < root.Key
                         root = GetLeftOrDefault(root);
@@ -320,13 +320,13 @@ namespace Platform.Data.Core.Doublets
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool FirstIsToTheLeftOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
+            private bool FirstIsToTheLeftOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget)
             {
                 return LessThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool FirstIsToTheRightOfSecond(T firstSource, T firstTarget, T secondSource, T secondTarget)
+            private bool FirstIsToTheRightOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget)
             {
                 return GreaterThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
             }
@@ -334,7 +334,7 @@ namespace Platform.Data.Core.Doublets
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
         {
-            public LinksTargetsTreeMethods(ResizableDirectMemoryLinks<T> memory)
+            public LinksTargetsTreeMethods(ResizableDirectMemoryLinks<TLink> memory)
                 : base(memory)
             {
             }
@@ -351,98 +351,98 @@ namespace Platform.Data.Core.Doublets
 
             //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(size);
 
-            protected override IntPtr GetLeftPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
+            protected override IntPtr GetLeftPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
 
-            protected override IntPtr GetRightPointer(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
+            protected override IntPtr GetRightPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
 
-            protected override T GetLeftValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).GetValue<T>();
+            protected override TLink GetLeftValue(TLink node) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).GetValue<TLink>();
 
-            protected override T GetRightValue(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).GetValue<T>();
+            protected override TLink GetRightValue(TLink node) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).GetValue<TLink>();
 
-            protected override T GetSize(T node)
+            protected override TLink GetSize(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
                 return MathHelpers.PartialRead(previousValue, 5, -5);
             }
 
-            protected override void SetLeft(T node, T left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).SetValue(left);
+            protected override void SetLeft(TLink node, TLink left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).SetValue(left);
 
-            protected override void SetRight(T node, T right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).SetValue(right);
+            protected override void SetRight(TLink node, TLink right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).SetValue(right);
 
-            protected override void SetSize(T node, T size)
+            protected override void SetSize(TLink node, TLink size)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(MathHelpers.PartialWrite(previousValue, size, 5, -5));
             }
 
-            protected override bool GetLeftIsChild(T node)
+            protected override bool GetLeftIsChild(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                return (Integer<T>)MathHelpers.PartialRead(previousValue, 4, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                return (Integer<TLink>)MathHelpers.PartialRead(previousValue, 4, 1);
             }
 
-            protected override void SetLeftIsChild(T node, bool value)
+            protected override void SetLeftIsChild(TLink node, bool value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                var modified = MathHelpers.PartialWrite(previousValue, (T)(Integer<T>)value, 4, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                var modified = MathHelpers.PartialWrite(previousValue, (TLink)(Integer<TLink>)value, 4, 1);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(modified);
             }
 
-            protected override bool GetRightIsChild(T node)
+            protected override bool GetRightIsChild(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                return (Integer<T>)MathHelpers.PartialRead(previousValue, 3, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                return (Integer<TLink>)MathHelpers.PartialRead(previousValue, 3, 1);
             }
 
-            protected override void SetRightIsChild(T node, bool value)
+            protected override void SetRightIsChild(TLink node, bool value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                var modified = MathHelpers.PartialWrite(previousValue, (T)(Integer<T>)value, 3, 1);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                var modified = MathHelpers.PartialWrite(previousValue, (TLink)(Integer<TLink>)value, 3, 1);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(modified);
             }
 
-            protected override sbyte GetBalance(T node)
+            protected override sbyte GetBalance(TLink node)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                var value = (ulong)(Integer<T>)MathHelpers.PartialRead(previousValue, 0, 3);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                var value = (ulong)(Integer<TLink>)MathHelpers.PartialRead(previousValue, 0, 3);
                 var unpackedValue = (sbyte)((value & 4) > 0 ? ((value & 4) << 5) | value & 3 | 124 : value & 3);
                 return unpackedValue;
             }
 
-            protected override void SetBalance(T node, sbyte value)
+            protected override void SetBalance(TLink node, sbyte value)
             {
-                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-                var packagedValue = (T)(Integer<T>)((((byte)value >> 5) & 4) | value & 3);
+                var previousValue = (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<TLink>();
+                var packagedValue = (TLink)(Integer<TLink>)((((byte)value >> 5) & 4) | value & 3);
                 var modified = MathHelpers.PartialWrite(previousValue, packagedValue, 0, 3);
                 (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(modified);
             }
 
-            protected override bool FirstIsToTheLeftOfSecond(T first, T second)
+            protected override bool FirstIsToTheLeftOfSecond(TLink first, TLink second)
             {
-                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>();
-                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
+                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>();
+                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>();
 
                 return LessThan(firstTarget, secondTarget) ||
-                       (IsEquals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
+                       (IsEquals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>()));
             }
 
-            protected override bool FirstIsToTheRightOfSecond(T first, T second)
+            protected override bool FirstIsToTheRightOfSecond(TLink first, TLink second)
             {
-                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<T>();
-                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<T>();
+                var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>();
+                var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>();
 
                 return GreaterThan(firstTarget, secondTarget) ||
-                       (IsEquals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<T>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<T>()));
+                       (IsEquals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>()));
             }
 
-            protected override T GetTreeRoot()
+            protected override TLink GetTreeRoot()
             {
-                return (Header + LinksHeader.FirstAsTargetOffset).GetValue<T>();
+                return (Header + LinksHeader.FirstAsTargetOffset).GetValue<TLink>();
             }
 
-            protected override T GetBasePartValue(T link)
+            protected override TLink GetBasePartValue(TLink link)
             {
-                return (Links.GetElement(LinkSizeInBytes, link) + Link.TargetOffset).GetValue<T>();
+                return (Links.GetElement(LinkSizeInBytes, link) + Link.TargetOffset).GetValue<TLink>();
             }
         }
     }

@@ -11,6 +11,8 @@ namespace Platform.Data.Core.Doublets
     /// </summary>
     public struct UInt64Link : IEquatable<UInt64Link>, IList<ulong>
     {
+        private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+
         private const int Length = 3;
 
         public readonly ulong Index;
@@ -18,8 +20,7 @@ namespace Platform.Data.Core.Doublets
         public readonly ulong Target;
 
         public static readonly UInt64Link Null = new UInt64Link();
-
-        private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        
 
         public UInt64Link(params ulong[] values)
         {

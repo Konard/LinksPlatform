@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Platform.Interfaces;
 using Platform.Helpers;
-using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
@@ -11,6 +10,7 @@ namespace Platform.Data.Core.Sequences
 {
     public struct SequencesOptions<TLink> // TODO: To use type parameter <TLink> the ILinks<TLink> must contain GetConstants function.
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
         private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
 
         public TLink SequenceMarkerLink;
@@ -36,14 +36,14 @@ namespace Platform.Data.Core.Sequences
         {
             if (UseSequenceMarker)
             {
-                if (MathHelpers<TLink>.IsEquals(SequenceMarkerLink, links.Constants.Null))
+                if (EqualityComparer.Equals(SequenceMarkerLink, links.Constants.Null))
                     SequenceMarkerLink = links.CreatePoint();
                 else
                 {
                     if (!links.Exists(SequenceMarkerLink))
                     {
                         var link = links.CreatePoint();
-                        if (!MathHelpers<TLink>.IsEquals(link, SequenceMarkerLink))
+                        if (!EqualityComparer.Equals(link, SequenceMarkerLink))
                             throw new Exception("Cannot recreate sequence marker link.");
                     }
                 }

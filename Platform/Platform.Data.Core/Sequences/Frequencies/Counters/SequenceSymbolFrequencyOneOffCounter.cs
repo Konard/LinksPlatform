@@ -1,4 +1,5 @@
-﻿using Platform.Interfaces;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 
@@ -6,6 +7,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
 {
     public class SequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         protected readonly ILinks<TLink> _links;
         protected readonly TLink _sequenceLink;
         protected readonly TLink _symbol;
@@ -27,11 +30,11 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
             return _total;
         }
 
-        private bool IsElement(TLink x) => MathHelpers<TLink>.IsEquals(x, _symbol) || _links.IsPartialPoint(x); // TODO: Use SequenceElementCreteriaMatcher instead of IsPartialPoint
+        private bool IsElement(TLink x) => EqualityComparer.Equals(x, _symbol) || _links.IsPartialPoint(x); // TODO: Use SequenceElementCreteriaMatcher instead of IsPartialPoint
 
         private bool VisitElement(TLink element)
         {
-            if (MathHelpers<TLink>.IsEquals(element, _symbol))
+            if (EqualityComparer.Equals(element, _symbol))
                 _total = MathHelpers.Increment(_total);
             return true;
         }

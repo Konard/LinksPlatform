@@ -1,25 +1,28 @@
-﻿using Platform.Helpers.Collections.Arrays;
+﻿using System.Collections.Generic;
+using Platform.Helpers.Collections.Arrays;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinksCascadeDependenciesResolver<T> : LinksDecoratorBase<T>
+    public class LinksCascadeDependenciesResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        public LinksCascadeDependenciesResolver(ILinks<T> links) : base(links) {}
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
-        public override void Delete(T link)
+        public LinksCascadeDependenciesResolver(ILinks<TLink> links) : base(links) {}
+
+        public override void Delete(TLink link)
         {
             EnsureNoDependenciesOnDelete(link);
             base.Delete(link);
         }
 
-        public void EnsureNoDependenciesOnDelete(T link)
+        public void EnsureNoDependenciesOnDelete(TLink link)
         {
-            ulong referencesCount = (Integer<T>)Links.Count(Constants.Any, link);
+            ulong referencesCount = (Integer<TLink>)Links.Count(Constants.Any, link);
 
-            var references = ArrayPool.Allocate<T>(referencesCount);
+            var references = ArrayPool.Allocate<TLink>(referencesCount);
 
-            var referencesFiller = new ArrayFiller<T, T>(references, Constants.Continue);
+            var referencesFiller = new ArrayFiller<TLink, TLink>(references, Constants.Continue);
 
             Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, link);
 
@@ -27,7 +30,7 @@ namespace Platform.Data.Core.Doublets
 
             for (var i = (long)referencesCount - 1; i >= 0; i--)
             {
-                if (MathHelpers<T>.IsEquals(references[i], link)) continue;
+                if (EqualityComparer.Equals(references[i], link)) continue;
                 Links.Delete(references[i]);
             }
 

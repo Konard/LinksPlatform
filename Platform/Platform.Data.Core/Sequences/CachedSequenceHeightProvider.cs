@@ -1,11 +1,13 @@
-﻿using Platform.Interfaces;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
 {
     public class CachedSequenceHeightProvider<TLink> : LinksOperatorBase<TLink>, ISequenceHeightProvider<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly TLink _heightPropertyMarker;
         private readonly ISequenceHeightProvider<TLink> _baseHeightProvider;
         private readonly IConverter<TLink> _addressToUnaryNumberConverter;
@@ -32,7 +34,7 @@ namespace Platform.Data.Core.Sequences
         {
             TLink height;
             var heightValue = _propertyOperator.GetValue(sequence, _heightPropertyMarker);
-            if (MathHelpers<TLink>.IsEquals(heightValue, default))
+            if (EqualityComparer.Equals(heightValue, default))
             {
                 height = _baseHeightProvider.Get(sequence);
                 heightValue = _addressToUnaryNumberConverter.Convert(height);

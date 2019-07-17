@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Helpers.Collections;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Common
 {
     public static class Point<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsFullPoint(params TLink[] link) => IsFullPoint((IList<TLink>)link);
 
@@ -25,7 +26,7 @@ namespace Platform.Data.Core.Common
         {
             var result = true;
             for (var i = 1; result && i < link.Count; i++)
-                result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
+                result = EqualityComparer.Equals(link[0], link[i]);
             return result;
         }
 
@@ -46,7 +47,7 @@ namespace Platform.Data.Core.Common
         {
             var result = false;
             for (var i = 1; !result && i < link.Count; i++)
-                result = MathHelpers<TLink>.IsEquals(link[0], link[i]);
+                result = EqualityComparer.Equals(link[0], link[i]);
             return result;
         }
     }

@@ -1,28 +1,29 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinksSelfReferenceResolver<T> : LinksDecoratorBase<T>
+    public class LinksSelfReferenceResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        public LinksSelfReferenceResolver(ILinks<T> links) : base(links) { }
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
-        public override T Each(Func<IList<T>, T> handler, IList<T> restrictions)
+        public LinksSelfReferenceResolver(ILinks<TLink> links) : base(links) { }
+
+        public override TLink Each(Func<IList<TLink>, TLink> handler, IList<TLink> restrictions)
         {
-            if (!MathHelpers<T>.IsEquals(Constants.Any, Constants.Itself)
-                && ((restrictions.Count > Constants.IndexPart && MathHelpers<T>.IsEquals(restrictions[Constants.IndexPart], Constants.Itself))
-                 || (restrictions.Count > Constants.SourcePart && MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Itself))
-                 || (restrictions.Count > Constants.TargetPart && MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Itself))))
+            if (!EqualityComparer.Equals(Constants.Any, Constants.Itself)
+                && ((restrictions.Count > Constants.IndexPart && EqualityComparer.Equals(restrictions[Constants.IndexPart], Constants.Itself))
+                 || (restrictions.Count > Constants.SourcePart && EqualityComparer.Equals(restrictions[Constants.SourcePart], Constants.Itself))
+                 || (restrictions.Count > Constants.TargetPart && EqualityComparer.Equals(restrictions[Constants.TargetPart], Constants.Itself))))
                 return Constants.Continue;
 
             return base.Each(handler, restrictions);
         }
 
-        public override T Update(IList<T> restrictions)
+        public override TLink Update(IList<TLink> restrictions)
         {
-            restrictions[Constants.SourcePart] = MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
-            restrictions[Constants.TargetPart] = MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
+            restrictions[Constants.SourcePart] = EqualityComparer.Equals(restrictions[Constants.SourcePart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
+            restrictions[Constants.TargetPart] = EqualityComparer.Equals(restrictions[Constants.TargetPart], Constants.Itself) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
 
             return base.Update(restrictions);
         }

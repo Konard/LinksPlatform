@@ -1,11 +1,13 @@
-﻿using Platform.Interfaces;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
 {
     public class MarkedSequenceMatcher<TLink> : ICreteriaMatcher<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly ILinks<TLink> _links;
         private readonly TLink _sequenceMarkerLink;
 
@@ -16,7 +18,7 @@ namespace Platform.Data.Core.Sequences
         }
 
         public bool IsMatched(TLink sequenceCandidate) =>
-            MathHelpers<TLink>.IsEquals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
-        || !MathHelpers<TLink>.IsEquals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
+            EqualityComparer.Equals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
+        || !EqualityComparer.Equals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
     }
 }

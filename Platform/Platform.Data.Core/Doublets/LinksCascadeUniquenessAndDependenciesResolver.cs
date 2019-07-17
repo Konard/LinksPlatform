@@ -1,21 +1,24 @@
-﻿using Platform.Helpers.Collections.Arrays;
+﻿using System.Collections.Generic;
+using Platform.Helpers.Collections.Arrays;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinksCascadeUniquenessAndDependenciesResolver<T> : LinksUniquenessResolver<T>
+    public class LinksCascadeUniquenessAndDependenciesResolver<TLink> : LinksUniquenessResolver<TLink>
     {
-        public LinksCascadeUniquenessAndDependenciesResolver(ILinks<T> links) : base(links) { }
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
-        protected override T ResolveAddressChangeConflict(T oldLinkAddress, T newLinkAddress)
+        public LinksCascadeUniquenessAndDependenciesResolver(ILinks<TLink> links) : base(links) { }
+
+        protected override TLink ResolveAddressChangeConflict(TLink oldLinkAddress, TLink newLinkAddress)
         {
             // TODO: Very similar to Merge (logic should be reused)
-            ulong referencesAsSourceCount = (Integer<T>)Links.Count(Constants.Any, oldLinkAddress, Constants.Any);
-            ulong referencesAsTargetCount = (Integer<T>)Links.Count(Constants.Any, Constants.Any, oldLinkAddress);
+            ulong referencesAsSourceCount = (Integer<TLink>)Links.Count(Constants.Any, oldLinkAddress, Constants.Any);
+            ulong referencesAsTargetCount = (Integer<TLink>)Links.Count(Constants.Any, Constants.Any, oldLinkAddress);
 
-            var references = ArrayPool.Allocate<T>(referencesAsSourceCount + referencesAsTargetCount);
+            var references = ArrayPool.Allocate<TLink>(referencesAsSourceCount + referencesAsTargetCount);
 
-            var referencesFiller = new ArrayFiller<T, T>(references, Constants.Continue);
+            var referencesFiller = new ArrayFiller<TLink, TLink>(references, Constants.Continue);
 
             Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, oldLinkAddress, Constants.Any);
             Links.Each(referencesFiller.AddFirstAndReturnConstant, Constants.Any, Constants.Any, oldLinkAddress);
@@ -23,13 +26,13 @@ namespace Platform.Data.Core.Doublets
             for (ulong i = 0; i < referencesAsSourceCount; i++)
             {
                 var reference = references[i];
-                if (MathHelpers<T>.IsEquals(reference, oldLinkAddress)) continue;
+                if (EqualityComparer.Equals(reference, oldLinkAddress)) continue;
                 Links.Update(reference, newLinkAddress, Links.GetTarget(reference));
             }
             for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
             {
                 var reference = references[i];
-                if (MathHelpers<T>.IsEquals(reference, oldLinkAddress)) continue;
+                if (EqualityComparer.Equals(reference, oldLinkAddress)) continue;
                 Links.Update(reference, Links.GetSource(reference), newLinkAddress);
             }
 

@@ -1,10 +1,12 @@
-﻿using Platform.Helpers.Collections.Stacks;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Helpers.Collections.Stacks;
 
 namespace Platform.Data.Core.Doublets
 {
     public class Stack<TLink> : IStack<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly ILinks<TLink> _links;
         private readonly TLink _stack;
 
@@ -23,7 +25,7 @@ namespace Platform.Data.Core.Doublets
         public TLink Pop()
         {
             var element = Peek();
-            if (!MathHelpers<TLink>.IsEquals(element, _stack))
+            if (!EqualityComparer.Equals(element, _stack))
             {
                 var top = GetTopDoublet();
                 var previousTop = _links.GetSource(top);

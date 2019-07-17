@@ -1,10 +1,12 @@
-﻿using Platform.Interfaces;
-using Platform.Helpers.Numbers;
+﻿using System.Collections.Generic;
+using Platform.Interfaces;
 
 namespace Platform.Data.Core.Doublets
 {
     public class FrequencyIncrementer<TLink> : LinksOperatorBase<TLink>, IIncrementer<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly TLink _frequencyMarker;
         private readonly TLink _unaryOne;
         private readonly IIncrementer<TLink> _unaryNumberIncrementer;
@@ -19,7 +21,7 @@ namespace Platform.Data.Core.Doublets
 
         public TLink Increment(TLink frequency)
         {
-            if (MathHelpers<TLink>.IsEquals(frequency, default))
+            if (EqualityComparer.Equals(frequency, default))
                 return Links.GetOrCreate(_unaryOne, _frequencyMarker);
             var source = Links.GetSource(frequency);
             var incrementedSource = _unaryNumberIncrementer.Increment(source);

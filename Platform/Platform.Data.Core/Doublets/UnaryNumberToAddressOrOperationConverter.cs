@@ -7,6 +7,8 @@ namespace Platform.Data.Core.Doublets
 {
     public class UnaryNumberToAddressOrOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly IDictionary<TLink, int> _unaryNumberPowerOf2Indicies;
 
         public UnaryNumberToAddressOrOperationConverter(ILinks<TLink> links, IConverter<int, TLink> powerOf2ToUnaryNumberConverter)
@@ -21,7 +23,7 @@ namespace Platform.Data.Core.Doublets
         {
             var source = sourceNumber;
             var target = Links.Constants.Null;
-            while (!MathHelpers<TLink>.IsEquals(source, Links.Constants.Null))
+            while (!EqualityComparer.Equals(source, Links.Constants.Null))
             {
                 if (_unaryNumberPowerOf2Indicies.TryGetValue(source, out int powerOf2Index))
                     source = Links.Constants.Null;

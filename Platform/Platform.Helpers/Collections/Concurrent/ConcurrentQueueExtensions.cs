@@ -22,7 +22,6 @@ namespace Platform.Helpers.Collections.Concurrent
                 await item;
         }
 
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static async Task AwaitOne(this ConcurrentQueue<Task> queue)
         {

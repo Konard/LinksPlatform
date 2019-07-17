@@ -1,23 +1,24 @@
 ﻿using System.Collections.Generic;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinksUniquenessResolver<T> : LinksDecoratorBase<T>
+    public class LinksUniquenessResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        public LinksUniquenessResolver(ILinks<T> links) : base(links) {}
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
-        public override T Update(IList<T> restrictions)
+        public LinksUniquenessResolver(ILinks<TLink> links) : base(links) {}
+
+        public override TLink Update(IList<TLink> restrictions)
         {
             var newLinkAddress = Links.SearchOrDefault(restrictions[Constants.SourcePart], restrictions[Constants.TargetPart]);
 
-            if (MathHelpers<T>.IsEquals(newLinkAddress, default))
+            if (EqualityComparer.Equals(newLinkAddress, default))
                 return base.Update(restrictions);
 
             return ResolveAddressChangeConflict(restrictions[Constants.IndexPart], newLinkAddress);
         }
 
-        protected virtual T ResolveAddressChangeConflict(T oldLinkAddress, T newLinkAddress)
+        protected virtual TLink ResolveAddressChangeConflict(TLink oldLinkAddress, TLink newLinkAddress)
         {
             if (Links.Exists(oldLinkAddress))
                 Delete(oldLinkAddress);

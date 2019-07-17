@@ -13,6 +13,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
     /// </remarks>
     public class LinkFrequenciesCache<TLink> : LinksOperatorBase<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly Dictionary<Doublet<TLink>, LinkFrequency<TLink>> _doubletsCache;
         private readonly ICounter<TLink, TLink> _frequencyCounter;
 
@@ -75,7 +77,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
 
                 data = new LinkFrequency<TLink>(Integer<TLink>.One, link);
 
-                if (!MathHelpers<TLink>.IsEquals(link, default))
+                if (!EqualityComparer.Equals(link, default))
                     data.Frequency = MathHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
 
                 _doubletsCache.Add(doublet, data);
@@ -91,7 +93,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
 
                 var linkIndex = value.Link;
 
-                if (!MathHelpers<TLink>.IsEquals(linkIndex, default))
+                if (!EqualityComparer.Equals(linkIndex, default))
                 {
                     var frequency = value.Frequency;
                     var count = _frequencyCounter.Count(linkIndex);

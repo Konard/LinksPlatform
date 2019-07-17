@@ -1,11 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
     public class PowerOf2ToUnaryNumberConverter<TLink> : LinksOperatorBase<TLink>, IConverter<int, TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private readonly TLink[] _unaryNumberPowersOf2;
 
         public PowerOf2ToUnaryNumberConverter(ILinks<TLink> links, TLink one) : base(links)
@@ -18,7 +20,7 @@ namespace Platform.Data.Core.Doublets
         {
             if (power < 0 || power >= _unaryNumberPowersOf2.Length)
                 throw new ArgumentOutOfRangeException(nameof(power));
-            if (!MathHelpers<TLink>.IsEquals(_unaryNumberPowersOf2[power], default))
+            if (!EqualityComparer.Equals(_unaryNumberPowersOf2[power], default))
                 return _unaryNumberPowersOf2[power];
 
             var previousPowerOf2 = Convert(power - 1);

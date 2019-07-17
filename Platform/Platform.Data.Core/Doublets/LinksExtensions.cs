@@ -20,37 +20,37 @@ namespace Platform.Data.Core.Doublets
 
         public static void UseUnicode(this ILinks<ulong> links) => UnicodeMap.InitNew(links);
 
-        public static void RunRandomCreations<T>(this ILinks<T> links, long amountOfCreations)
+        public static void RunRandomCreations<TLink>(this ILinks<TLink> links, long amountOfCreations)
         {
             for (long i = 0; i < amountOfCreations; i++)
             {
-                Integer<T> source = RandomHelpers.DefaultFactory.NextUInt64((Integer<T>)links.Count());
-                Integer<T> target = RandomHelpers.DefaultFactory.NextUInt64((Integer<T>)links.Count());
+                Integer<TLink> source = RandomHelpers.DefaultFactory.NextUInt64((Integer<TLink>)links.Count());
+                Integer<TLink> target = RandomHelpers.DefaultFactory.NextUInt64((Integer<TLink>)links.Count());
 
                 links.CreateAndUpdate(source, target);
             }
         }
 
-        public static void RunRandomSearches<T>(this ILinks<T> links, long amountOfSearches)
+        public static void RunRandomSearches<TLink>(this ILinks<TLink> links, long amountOfSearches)
         {
             for (long i = 0; i < amountOfSearches; i++)
             {
-                Integer<T> source = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<T>)links.Count());
-                Integer<T> target = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<T>)links.Count());
+                Integer<TLink> source = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<TLink>)links.Count());
+                Integer<TLink> target = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<TLink>)links.Count());
 
                 links.SearchOrDefault(source, target);
             }
         }
 
-        public static void RunRandomDeletions<T>(this ILinks<T> links, long amountOfDeletions)
+        public static void RunRandomDeletions<TLink>(this ILinks<TLink> links, long amountOfDeletions)
         {
-            var min = (ulong)amountOfDeletions > (Integer<T>)links.Count() ? 1 : (Integer<T>)links.Count() - (ulong)amountOfDeletions;
+            var min = (ulong)amountOfDeletions > (Integer<TLink>)links.Count() ? 1 : (Integer<TLink>)links.Count() - (ulong)amountOfDeletions;
 
             for (long i = 0; i < amountOfDeletions; i++)
             {
-                Integer<T> link = RandomHelpers.DefaultFactory.NextUInt64(min, (Integer<T>)links.Count());
+                Integer<TLink> link = RandomHelpers.DefaultFactory.NextUInt64(min, (Integer<TLink>)links.Count());
                 links.Delete(link);
-                if ((Integer<T>)links.Count() < min)
+                if ((Integer<TLink>)links.Count() < min)
                     break;
             }
         }
@@ -63,10 +63,12 @@ namespace Platform.Data.Core.Doublets
         /// </remarks>
         public static void DeleteAll<TLink>(this ILinks<TLink> links)
         {
+            var equalityComparer = EqualityComparer<TLink>.Default;
+
             for (var i = links.Count(); MathHelpers.GreaterThan(i, default); i = MathHelpers.Decrement(i))
             {
                 links.Delete(i);
-                if (!MathHelpers<TLink>.IsEquals(links.Count(), MathHelpers.Decrement(i)))
+                if (!equalityComparer.Equals(links.Count(), MathHelpers.Decrement(i)))
                     i = links.Count();
             }
         }
@@ -75,7 +77,9 @@ namespace Platform.Data.Core.Doublets
         {
             TLink firstLink = default;
 
-            if (MathHelpers<TLink>.IsEquals(links.Count(), default))
+            var equalityComparer = EqualityComparer<TLink>.Default;
+
+            if (equalityComparer.Equals(links.Count(), default))
                 throw new Exception("В хранилище нет связей.");
 
             links.Each(links.Constants.Any, links.Constants.Any, link =>
@@ -84,7 +88,7 @@ namespace Platform.Data.Core.Doublets
                 return links.Constants.Break;
             });
 
-            if (MathHelpers<TLink>.IsEquals(firstLink, default))
+            if (equalityComparer.Equals(firstLink, default))
                 throw new Exception("В процессе поиска по хранилищу не было найдено связей.");
 
             return firstLink;
@@ -206,7 +210,7 @@ namespace Platform.Data.Core.Doublets
             }
         }
 
-        public static bool IsInnerReference<T>(this ILinks<T> links, T reference)
+        public static bool IsInnerReference<TLink>(this ILinks<TLink> links, TLink reference)
         {
             var constants = links.Constants;
             return MathHelpers.GreaterOrEqualThan(constants.MinPossibleIndex, reference) && MathHelpers.LessOrEqualThan(reference, constants.MaxPossibleIndex);
@@ -268,13 +272,15 @@ namespace Platform.Data.Core.Doublets
         /// Stack в конкретный путь из Source, Target до связи, но это не всегда так.
         /// TODO: Возможно нужен метод, который именно выбрасывает исключения (EnsurePathExists)
         /// </remarks>
-        public static bool CheckPathExistance<T>(this ILinks<T> links, params T[] path)
+        public static bool CheckPathExistance<TLink>(this ILinks<TLink> links, params TLink[] path)
         {
             var current = path[0];
 
             //EnsureLinkExists(current, "path");
             if (!links.Exists(current))
                 return false;
+
+            var equalityComparer = EqualityComparer<TLink>.Default;
 
             for (var i = 1; i < path.Length; i++)
             {
@@ -284,10 +290,10 @@ namespace Platform.Data.Core.Doublets
                 var source = values[Constants.SourcePart];
                 var target = values[Constants.TargetPart];
 
-                if (MathHelpers<T>.IsEquals(source, target) && MathHelpers<T>.IsEquals(source, next))
+                if (equalityComparer.Equals(source, target) && equalityComparer.Equals(source, next))
                     //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
                     return false;
-                if (!MathHelpers<T>.IsEquals(next, source) && !MathHelpers<T>.IsEquals(next, target))
+                if (!equalityComparer.Equals(next, source) && !equalityComparer.Equals(next, target))
                     //throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
                     return false;
 
@@ -300,7 +306,7 @@ namespace Platform.Data.Core.Doublets
         /// <remarks>
         /// Может потребовать дополнительного стека для PathElement's при использовании SequenceWalker.
         /// </remarks>
-        public static T GetByKeys<T>(this ILinks<T> links, T root, params int[] path)
+        public static TLink GetByKeys<TLink>(this ILinks<TLink> links, TLink root, params int[] path)
         {
             links.EnsureLinkExists(root, "root");
 
@@ -310,7 +316,7 @@ namespace Platform.Data.Core.Doublets
             return currentLink;
         }
 
-        public static T GetSquareMatrixSequenceElementByIndex<T>(this ILinks<T> links, T root, ulong size, ulong index)
+        public static TLink GetSquareMatrixSequenceElementByIndex<TLink>(this ILinks<TLink> links, TLink root, ulong size, ulong index)
         {
             var source = Constants.SourcePart;
             var target = Constants.TargetPart;
@@ -338,7 +344,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
         /// <returns>Индекс начальной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetIndex<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.IndexPart];
+        public static TLink GetIndex<TLink>(this ILinks<TLink> links, IList<TLink> link) => link[links.Constants.IndexPart];
 
         /// <summary>
         /// Возвращает индекс начальной (Source) связи для указанной связи.
@@ -347,7 +353,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс начальной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetSource<T>(this ILinks<T> links, T link) => links.GetLink(link)[links.Constants.SourcePart];
+        public static TLink GetSource<TLink>(this ILinks<TLink> links, TLink link) => links.GetLink(link)[links.Constants.SourcePart];
 
         /// <summary>
         /// Возвращает индекс начальной (Source) связи для указанной связи.
@@ -356,7 +362,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
         /// <returns>Индекс начальной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetSource<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.SourcePart];
+        public static TLink GetSource<TLink>(this ILinks<TLink> links, IList<TLink> link) => link[links.Constants.SourcePart];
 
         /// <summary>
         /// Возвращает индекс конечной (Target) связи для указанной связи.
@@ -365,7 +371,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Индекс связи.</param>
         /// <returns>Индекс конечной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetTarget<T>(this ILinks<T> links, T link) => links.GetLink(link)[links.Constants.TargetPart];
+        public static TLink GetTarget<TLink>(this ILinks<TLink> links, TLink link) => links.GetLink(link)[links.Constants.TargetPart];
 
         /// <summary>
         /// Возвращает индекс конечной (Target) связи для указанной связи.
@@ -374,7 +380,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Связь представленная списком, состоящим из её адреса и содержимого.</param>
         /// <returns>Индекс конечной связи для указанной связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetTarget<T>(this ILinks<T> links, IList<T> link) => link[links.Constants.TargetPart];
+        public static TLink GetTarget<TLink>(this ILinks<TLink> links, IList<TLink> link) => link[links.Constants.TargetPart];
 
         /// <summary>
         /// Возвращает части-значения для связи с указанным индексом.
@@ -426,7 +432,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions) => !MathHelpers<TLink>.IsEquals(links.Each(handler, restrictions), links.Constants.Break);
+        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions) => !EqualityComparer<TLink>.Default.Equals(links.Each(handler, restrictions), links.Constants.Break);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
@@ -452,7 +458,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Индекс проверяемой на существование связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<T>(this ILinks<T> links, T link) => MathHelpers.GreaterThan(links.Count(link), default);
+        public static bool Exists<TLink>(this ILinks<TLink> links, TLink link) => MathHelpers.GreaterThan(links.Count(link), default);
 
         /// <summary>
         /// Возвращает значение, определяющее существует ли связь с указанными началом и концом в хранилище связей.
@@ -462,82 +468,86 @@ namespace Platform.Data.Core.Doublets
         /// <param name="target">Конец связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<T>(this ILinks<T> links, T source, T target) => MathHelpers.GreaterThan(links.Count(links.Constants.Any, source, target), default);
+        public static bool Exists<TLink>(this ILinks<TLink> links, TLink source, TLink target) => MathHelpers.GreaterThan(links.Count(links.Constants.Any, source, target), default);
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkExists<T>(this ILinks<T> links, T link)
+        public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link)
         {
             if (!links.Exists(link))
-                throw new ArgumentLinkDoesNotExistsException<T>(link);
+                throw new ArgumentLinkDoesNotExistsException<TLink>(link);
         }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkExists<T>(this ILinks<T> links, T link, string argumentName)
+        public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link, string argumentName)
         {
             if (!links.Exists(link))
-                throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
+                throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureInnerReferenceExists<T>(this ILinks<T> links, T reference, string argumentName)
+        public static void EnsureInnerReferenceExists<TLink>(this ILinks<TLink> links, TLink reference, string argumentName)
         {
             if (links.IsInnerReference(reference) && !links.Exists(reference))
-                throw new ArgumentLinkDoesNotExistsException<T>(reference, argumentName);
+                throw new ArgumentLinkDoesNotExistsException<TLink>(reference, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureInnerReferenceExists<T>(this ILinks<T> links, IList<T> restrictions, string argumentName)
+        public static void EnsureInnerReferenceExists<TLink>(this ILinks<TLink> links, IList<TLink> restrictions, string argumentName)
         {
             for (int i = 0; i < restrictions.Count; i++)
                 links.EnsureInnerReferenceExists(restrictions[i], argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkIsAnyOrExists<T>(this ILinks<T> links, IList<T> restrictions)
+        public static void EnsureLinkIsAnyOrExists<TLink>(this ILinks<TLink> links, IList<TLink> restrictions)
         {
             for (int i = 0; i < restrictions.Count; i++)
                 links.EnsureLinkIsAnyOrExists(restrictions[i], nameof(restrictions));
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkIsAnyOrExists<T>(this ILinks<T> links, T link, string argumentName)
+        public static void EnsureLinkIsAnyOrExists<TLink>(this ILinks<TLink> links, TLink link, string argumentName)
         {
-            if (!MathHelpers<T>.IsEquals(link, links.Constants.Any) && !links.Exists(link))
-                throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
+            var equalityComparer = EqualityComparer<TLink>.Default;
+            if (!equalityComparer.Equals(link, links.Constants.Any) && !links.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkIsItselfOrExists<T>(this ILinks<T> links, T link, string argumentName)
+        public static void EnsureLinkIsItselfOrExists<TLink>(this ILinks<TLink> links, TLink link, string argumentName)
         {
-            if (!MathHelpers<T>.IsEquals(link, links.Constants.Itself) && !links.Exists(link))
-                throw new ArgumentLinkDoesNotExistsException<T>(link, argumentName);
+            var equalityComparer = EqualityComparer<TLink>.Default;
+            if (!equalityComparer.Equals(link, links.Constants.Itself) && !links.Exists(link))
+                throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
         }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureDoesNotExists<T>(this ILinks<T> links, T source, T target)
+        public static void EnsureDoesNotExists<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
             if (links.Exists(source, target))
                 throw new LinkWithSameValueAlreadyExistsException();
         }
 
         /// <param name="links">Хранилище связей.</param>
-        public static ulong DependenciesCount<T>(this ILinks<T> links, T link)
+        public static ulong DependenciesCount<TLink>(this ILinks<TLink> links, TLink link)
         {
             var constants = links.Constants;
 
             var values = links.GetLink(link);
 
-            ulong referencesAsSource = (Integer<T>)links.Count(constants.Any, link, constants.Any);
+            ulong referencesAsSource = (Integer<TLink>)links.Count(constants.Any, link, constants.Any);
 
-            if (MathHelpers<T>.IsEquals(values[Constants.SourcePart], link))
+            var equalityComparer = EqualityComparer<TLink>.Default;
+
+            if (equalityComparer.Equals(values[Constants.SourcePart], link))
                 referencesAsSource--;
 
-            ulong referencesAsTarget = (Integer<T>)links.Count(constants.Any, constants.Any, link);
+            ulong referencesAsTarget = (Integer<TLink>)links.Count(constants.Any, constants.Any, link);
 
-            if (MathHelpers<T>.IsEquals(values[Constants.TargetPart], link))
+            if (equalityComparer.Equals(values[Constants.TargetPart], link))
                 referencesAsTarget--;
 
             return referencesAsSource + referencesAsTarget;
@@ -545,21 +555,22 @@ namespace Platform.Data.Core.Doublets
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool DependenciesExist<T>(this ILinks<T> links, T link) => links.DependenciesCount(link) > 0;
+        public static bool DependenciesExist<TLink>(this ILinks<TLink> links, TLink link) => links.DependenciesCount(link) > 0;
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsureNoDependencies<T>(this ILinks<T> links, T link)
+        public static void EnsureNoDependencies<TLink>(this ILinks<TLink> links, TLink link)
         {
             if (links.DependenciesExist(link))
-                throw new ArgumentLinkHasDependenciesException<T>(link);
+                throw new ArgumentLinkHasDependenciesException<TLink>(link);
         }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Equals<T>(this ILinks<T> links, T link, T source, T target)
+        public static bool Equals<TLink>(this ILinks<TLink> links, TLink link, TLink source, TLink target)
         {
             var values = links.GetLink(link);
-            return MathHelpers<T>.IsEquals(values[Constants.SourcePart], source) && MathHelpers<T>.IsEquals(values[Constants.TargetPart], target);
+            var equalityComparer = EqualityComparer<TLink>.Default;
+            return equalityComparer.Equals(values[Constants.SourcePart], source) && equalityComparer.Equals(values[Constants.TargetPart], target);
         }
 
         /// <summary>
@@ -570,16 +581,16 @@ namespace Platform.Data.Core.Doublets
         /// <param name="target">Индекс связи, которая является концом для искомой связи.</param>
         /// <returns>Индекс искомой связи с указанными Source (началом) и Target (концом).</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T SearchOrDefault<T>(this ILinks<T> links, T source, T target)
+        public static TLink SearchOrDefault<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
-            var setter = new Setter<T, T>(falseValue: links.Constants.Break);
+            var setter = new Setter<TLink, TLink>(falseValue: links.Constants.Break);
             links.Each(setter.SetFirstAndReturnFalse, links.Constants.Any, source, target);
             return setter.Result;
         }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T CreatePoint<T>(this ILinks<T> links)
+        public static TLink CreatePoint<TLink>(this ILinks<TLink> links)
         {
             var link = links.Create();
             return links.Update(link, link, link);
@@ -587,7 +598,7 @@ namespace Platform.Data.Core.Doublets
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T CreateAndUpdate<T>(this ILinks<T> links, T source, T target) => links.Update(links.Create(), source, target);
+        public static TLink CreateAndUpdate<TLink>(this ILinks<TLink> links, TLink source, TLink target) => links.Update(links.Create(), source, target);
 
         /// <summary>
         /// Обновляет связь с указанными началом (Source) и концом (Target)
@@ -620,33 +631,35 @@ namespace Platform.Data.Core.Doublets
         }
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsureCreated<T>(this ILinks<T> links, params T[] addresses) => links.EnsureCreated(links.Create, addresses);
+        public static void EnsureCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.Create, addresses);
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsurePointsCreated<T>(this ILinks<T> links, params T[] addresses) => links.EnsureCreated(links.CreatePoint, addresses);
+        public static void EnsurePointsCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.CreatePoint, addresses);
 
         /// <param name="links">Хранилище связей.</param>
-        public static void EnsureCreated<T>(this ILinks<T> links, Func<T> creator, params T[] addresses)
+        public static void EnsureCreated<TLink>(this ILinks<TLink> links, Func<TLink> creator, params TLink[] addresses)
         {
             var constants = links.Constants;
 
-            var nonExistentAddresses = new HashSet<ulong>(addresses.Where(x => !links.Exists(x)).Select(x => (ulong)(Integer<T>)x));
+            var nonExistentAddresses = new HashSet<ulong>(addresses.Where(x => !links.Exists(x)).Select(x => (ulong)(Integer<TLink>)x));
             if (nonExistentAddresses.Count > 0)
             {
                 var max = nonExistentAddresses.Max();
 
                 // TODO: Эту верхнюю границу нужно разрешить переопределять (проверить применяется ли эта логика)
-                max = Math.Min(max, (Integer<T>)constants.MaxPossibleIndex);
+                max = Math.Min(max, (Integer<TLink>)constants.MaxPossibleIndex);
 
-                var createdLinks = new List<T>();
+                var createdLinks = new List<TLink>();
 
-                T createdLink;
-                while (!MathHelpers<T>.IsEquals(createdLink = creator(), (T)(Integer<T>)max))
+                var equalityComparer = EqualityComparer<TLink>.Default;
+
+                TLink createdLink;
+                while (!equalityComparer.Equals(createdLink = creator(), (TLink)(Integer<TLink>)max))
                     createdLinks.Add(createdLink);
 
                 for (var i = 0; i < createdLinks.Count; i++)
                 {
-                    if (!nonExistentAddresses.Contains((Integer<T>)createdLinks[i]))
+                    if (!nonExistentAddresses.Contains((Integer<TLink>)createdLinks[i]))
                         links.Delete(createdLinks[i]);
                 }
             }
@@ -660,10 +673,10 @@ namespace Platform.Data.Core.Doublets
         /// <param name="target">Индекс связи, которая является концом для создаваемой связи.</param>
         /// <returns>Индекс связи, с указанным Source (началом) и Target (концом)</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T GetOrCreate<T>(this ILinks<T> links, T source, T target)
+        public static TLink GetOrCreate<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
             var link = links.SearchOrDefault(source, target);
-            if (MathHelpers<T>.IsEquals(link, default))
+            if (EqualityComparer<TLink>.Default.Equals(link, default))
                 link = links.CreateAndUpdate(source, target);
             return link;
         }
@@ -679,12 +692,13 @@ namespace Platform.Data.Core.Doublets
         /// <param name="newTarget">Индекс связи, которая является концом связи, на которую выполняется обновление.</param>
         /// <returns>Индекс обновлённой связи.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T UpdateOrCreateOrGet<T>(this ILinks<T> links, T source, T target, T newSource, T newTarget)
+        public static TLink UpdateOrCreateOrGet<TLink>(this ILinks<TLink> links, TLink source, TLink target, TLink newSource, TLink newTarget)
         {
+            var equalityComparer = EqualityComparer<TLink>.Default;
             var link = links.SearchOrDefault(source, target);
-            if (MathHelpers<T>.IsEquals(link, default))
+            if (equalityComparer.Equals(link, default))
                 return links.CreateAndUpdate(newSource, newTarget);
-            if (MathHelpers<T>.IsEquals(newSource, source) && MathHelpers<T>.IsEquals(newTarget, target))
+            if (equalityComparer.Equals(newSource, source) && equalityComparer.Equals(newTarget, target))
                 return link;
             return links.Update(link, newSource, newTarget);
         }
@@ -694,10 +708,10 @@ namespace Platform.Data.Core.Doublets
         /// <param name="source">Индекс связи, которая является началом удаляемой связи.</param>
         /// <param name="target">Индекс связи, которая является концом удаляемой связи.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T DeleteIfExists<T>(this ILinks<T> links, T source, T target)
+        public static TLink DeleteIfExists<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
             var link = links.SearchOrDefault(source, target);
-            if (!MathHelpers<T>.IsEquals(link, default))
+            if (!EqualityComparer<TLink>.Default.Equals(link, default))
             {
                 links.Delete(link);
                 return link;
@@ -709,30 +723,31 @@ namespace Platform.Data.Core.Doublets
         /// <param name="links">Хранилище связей.</param>
         /// <param name="deletedLinks">Список адресов связей к удалению.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void DeleteMany<T>(this ILinks<T> links, IList<T> deletedLinks)
+        public static void DeleteMany<TLink>(this ILinks<TLink> links, IList<TLink> deletedLinks)
         {
             for (int i = 0; i < deletedLinks.Count; i++)
                 links.Delete(deletedLinks[i]);
         }
 
         // Replace one link with another (replaced link is deleted, children are updated or deleted)
-        public static T Merge<T>(this ILinks<T> links, T linkIndex, T newLink)
+        public static TLink Merge<TLink>(this ILinks<TLink> links, TLink linkIndex, TLink newLink)
         {
-            if (MathHelpers<T>.IsEquals(linkIndex, newLink))
+            var equalityComparer = EqualityComparer<TLink>.Default;
+            if (equalityComparer.Equals(linkIndex, newLink))
                 return newLink;
 
             var constants = links.Constants;
-            ulong referencesAsSourceCount = (Integer<T>)links.Count(constants.Any, linkIndex, constants.Any);
-            ulong referencesAsTargetCount = (Integer<T>)links.Count(constants.Any, constants.Any, linkIndex);
+            ulong referencesAsSourceCount = (Integer<TLink>)links.Count(constants.Any, linkIndex, constants.Any);
+            ulong referencesAsTargetCount = (Integer<TLink>)links.Count(constants.Any, constants.Any, linkIndex);
 
-            var isStandalonePoint = Point<T>.IsFullPoint(links.GetLink(linkIndex)) && referencesAsSourceCount == 1 && referencesAsTargetCount == 1;
+            var isStandalonePoint = Point<TLink>.IsFullPoint(links.GetLink(linkIndex)) && referencesAsSourceCount == 1 && referencesAsTargetCount == 1;
             if (!isStandalonePoint)
             {
                 var totalReferences = referencesAsSourceCount + referencesAsTargetCount;
                 if (totalReferences > 0)
                 {
-                    var references = ArrayPool.Allocate<T>(totalReferences);
-                    var referencesFiller = new ArrayFiller<T, T>(references, links.Constants.Continue);
+                    var references = ArrayPool.Allocate<TLink>(totalReferences);
+                    var referencesFiller = new ArrayFiller<TLink, TLink>(references, links.Constants.Continue);
 
                     links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, linkIndex, constants.Any);
                     links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, constants.Any, linkIndex);
@@ -740,13 +755,13 @@ namespace Platform.Data.Core.Doublets
                     for (ulong i = 0; i < referencesAsSourceCount; i++)
                     {
                         var reference = references[i];
-                        if (MathHelpers<T>.IsEquals(reference, linkIndex)) continue;
+                        if (equalityComparer.Equals(reference, linkIndex)) continue;
                         links.Update(reference, newLink, links.GetTarget(reference));
                     }
                     for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
                     {
                         var reference = references[i];
-                        if (MathHelpers<T>.IsEquals(reference, linkIndex)) continue;
+                        if (equalityComparer.Equals(reference, linkIndex)) continue;
                         links.Update(reference, links.GetSource(reference), newLink);
                     }
                     ArrayPool.Free(references);

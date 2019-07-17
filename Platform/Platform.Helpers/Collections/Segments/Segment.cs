@@ -1,12 +1,13 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Helpers.Collections.Segments
 {
     public class Segment<T> : IEquatable<Segment<T>>, IList<T>
     {
+        private static readonly EqualityComparer<T> EqualityComparer = EqualityComparer<T>.Default;
+
         public readonly IList<T> Base;
         public readonly int Offset;
         public readonly int Length;
@@ -43,7 +44,7 @@ namespace Platform.Helpers.Collections.Segments
             if (Length != other.Length) return false;
 
             for (int i = 0; i < Length; i++)
-                if (!MathHelpers<T>.IsEquals(this[i], other[i]))
+                if (!EqualityComparer.Equals(this[i], other[i]))
                     return false;
             return true;
         }

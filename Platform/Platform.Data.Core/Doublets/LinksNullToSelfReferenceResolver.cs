@@ -1,22 +1,23 @@
 ﻿using System.Collections.Generic;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {
-    public class LinksNullToSelfReferenceResolver<T> : LinksDecoratorBase<T>
+    public class LinksNullToSelfReferenceResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        public LinksNullToSelfReferenceResolver(ILinks<T> links) : base(links) {}
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
-        public override T Create()
+        public LinksNullToSelfReferenceResolver(ILinks<TLink> links) : base(links) {}
+
+        public override TLink Create()
         {
             var link = base.Create();
             return Links.Update(link, link, link);
         }
 
-        public override T Update(IList<T> restrictions)
+        public override TLink Update(IList<TLink> restrictions)
         {
-            restrictions[Constants.SourcePart] = MathHelpers<T>.IsEquals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
-            restrictions[Constants.TargetPart] = MathHelpers<T>.IsEquals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
+            restrictions[Constants.SourcePart] = EqualityComparer.Equals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
+            restrictions[Constants.TargetPart] = EqualityComparer.Equals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
 
             return base.Update(restrictions);
         }

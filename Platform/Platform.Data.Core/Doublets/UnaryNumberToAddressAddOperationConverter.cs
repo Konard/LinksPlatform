@@ -6,6 +6,8 @@ namespace Platform.Data.Core.Doublets
 {
     public class UnaryNumberToAddressAddOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
+        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+
         private Dictionary<TLink, TLink> _unaryToUInt64;
         private readonly TLink _unaryOne;
 
@@ -30,15 +32,15 @@ namespace Platform.Data.Core.Doublets
 
         public TLink Convert(TLink unaryNumber)
         {
-            if (MathHelpers<TLink>.IsEquals(unaryNumber, default))
+            if (EqualityComparer.Equals(unaryNumber, default))
                 return default;
-            if (MathHelpers<TLink>.IsEquals(unaryNumber, _unaryOne))
+            if (EqualityComparer.Equals(unaryNumber, _unaryOne))
                 return Integer<TLink>.One;
 
             var source = Links.GetSource(unaryNumber);
             var target = Links.GetTarget(unaryNumber);
 
-            if (MathHelpers<TLink>.IsEquals(source, target))
+            if (EqualityComparer.Equals(source, target))
                 return _unaryToUInt64[unaryNumber];
             else
             {
