@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Platform.Helpers.Collections.Lists
 {
@@ -33,24 +34,13 @@ namespace Platform.Helpers.Collections.Lists
             if (list == null)
                 return null;
 
-            var count = 0;
+            var result = new List<T>(list.Count);
 
             for (var i = 0; i < list.Count; i++)
                 if (predicate(list[i]))
-                    count++;
+                    result.Add(list[i]);
 
-            var array = new T[count];
-
-            if (count > 0)
-            {
-                count = 0;
-
-                for (var i = 0; i < list.Count; i++)
-                    if (predicate(list[i]))
-                        array[count++] = list[i];
-            }
-
-            return array;
+            return result.ToArray();
         }
 
         public static void ForEach<T>(this IList<T> list, Action<T> action)
