@@ -43,7 +43,7 @@ namespace Platform.Helpers.Collections.Segments
         {
             if (Length != other.Length) return false;
 
-            for (int i = 0; i < Length; i++)
+            for (var i = 0; i < Length; i++)
                 if (!EqualityComparer.Equals(this[i], other[i]))
                     return false;
             return true;
@@ -81,15 +81,15 @@ namespace Platform.Helpers.Collections.Segments
 
         public void CopyTo(T[] array, int arrayIndex)
         {
-            for (int i = 0; i < Length; i++)
-                array[arrayIndex + i] = this[i];
+            for (var i = 0; i < Length;)
+                array[arrayIndex++] = this[i++];
         }
 
         public bool Remove(T item) => throw new NotSupportedException();
 
         public IEnumerator<T> GetEnumerator()
         {
-            for (int i = 0; i < Length; i++)
+            for (var i = 0; i < Length; i++)
                 yield return this[i];
         }
 
