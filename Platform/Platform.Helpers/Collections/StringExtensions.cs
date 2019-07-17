@@ -1,5 +1,5 @@
 ﻿using System;
-using System.Text;
+using System.Globalization;
 
 namespace Platform.Helpers.Collections
 {
@@ -9,9 +9,27 @@ namespace Platform.Helpers.Collections
         {
             if (string.IsNullOrWhiteSpace(str))
                 return str;
-            return new StringBuilder().Append(char.ToUpper(str[0])).Append(str.Substring(1, str.Length - 1)).ToString();
+
+            var chars = str.ToCharArray();
+            for (int i = 0; i < chars.Length; i++)
+            {
+                var category = char.GetUnicodeCategory(chars[i]);
+                if (category == UnicodeCategory.UppercaseLetter)
+                    return str;
+                if (category == UnicodeCategory.LowercaseLetter)
+                {
+                    chars[i] = char.ToUpper(chars[i]);
+                    return new string(chars);
+                }
+            }
+            return str;
         }
 
-        public static string Truncate(this string str, int maxLength) => str.Substring(0, Math.Min(str.Length, maxLength));
+        public static string Truncate(this string str, int maxLength)
+        {
+            if (string.IsNullOrEmpty(str))
+                return str;
+            return str.Substring(0, Math.Min(str.Length, maxLength));
+        }
     }
 }

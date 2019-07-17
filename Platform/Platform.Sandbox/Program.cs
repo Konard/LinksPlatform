@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Platform.Examples;
 using Platform.Tests;
+using Platform.Tests.Collections;
 using Platform.Tests.Data.Core;
 
 namespace Platform.Sandbox
@@ -11,7 +12,9 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            SystemTests.EqualsPerfomanceTest();
+            StringTests.CapitalizeFirstLetterTest();
+
+            //SystemTests.EqualsPerfomanceTest();
 
             //args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
 
