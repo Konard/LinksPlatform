@@ -20,7 +20,7 @@ namespace Platform.Data.Core.Doublets
         {
             ulong referencesCount = (Integer<TLink>)Links.Count(Constants.Any, link);
 
-            var references = ArrayPool.Allocate<TLink>(referencesCount);
+            var references = ArrayPool.Allocate<TLink>((long)referencesCount);
 
             var referencesFiller = new ArrayFiller<TLink, TLink>(references, Constants.Continue);
 

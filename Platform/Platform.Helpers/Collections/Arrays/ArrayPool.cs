@@ -5,7 +5,6 @@ using Platform.Disposables;
 using Platform.Ranges;
 using Platform.Exceptions;
 using Platform.Helpers.Collections.Stacks;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Helpers.Collections.Arrays
 {
@@ -16,10 +15,10 @@ namespace Platform.Helpers.Collections.Arrays
     public static class ArrayPool
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T[] Allocate<T>(Integer size) => Default.GetOrCreateThreadInstance<ArrayPool<T>>().Allocate(size);
+        public static T[] Allocate<T>(long size) => ArrayPool<T>.GetOrCreateThreadInstance().Allocate(size);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void Free<T>(T[] array) => Default.GetOrCreateThreadInstance<ArrayPool<T>>().Free(array);
+        public static void Free<T>(T[] array) => ArrayPool<T>.GetOrCreateThreadInstance().Free(array);
     }
 
     /// <remarks>
@@ -32,6 +31,11 @@ namespace Platform.Helpers.Collections.Arrays
 
         private readonly int _maxArraysPerSize;
         public static readonly T[] Empty = new T[0];
+
+        // May be use Default class for that later.
+        [ThreadStatic]
+        internal static ArrayPool<T> ThreadInstance;
+        internal static ArrayPool<T> GetOrCreateThreadInstance() => ThreadInstance ?? (ThreadInstance = new ArrayPool<T>());
 
         private readonly Dictionary<int, Stack<T[]>> _pool = new Dictionary<int, Stack<T[]>>(DefaultSizesAmount);
 

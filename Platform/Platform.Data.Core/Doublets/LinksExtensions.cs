@@ -746,7 +746,7 @@ namespace Platform.Data.Core.Doublets
                 var totalReferences = referencesAsSourceCount + referencesAsTargetCount;
                 if (totalReferences > 0)
                 {
-                    var references = ArrayPool.Allocate<TLink>(totalReferences);
+                    var references = ArrayPool.Allocate<TLink>((long)totalReferences);
                     var referencesFiller = new ArrayFiller<TLink, TLink>(references, links.Constants.Continue);
 
                     links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, linkIndex, constants.Any);
