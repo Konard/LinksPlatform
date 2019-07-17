@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Platform.Helpers.Collections.Arrays;
+using Platform.Collections.Arrays;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets

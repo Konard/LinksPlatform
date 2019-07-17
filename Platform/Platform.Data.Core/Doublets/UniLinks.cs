@@ -1,10 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using Platform.Collections;
+using Platform.Collections.Arrays;
+using Platform.Collections.Lists;
 using Platform.Helpers;
-using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Arrays;
-using Platform.Helpers.Collections.Lists;
 using Platform.Data.Core.Common;
 
 namespace Platform.Data.Core.Doublets

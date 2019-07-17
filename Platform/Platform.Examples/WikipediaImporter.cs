@@ -5,7 +5,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using Platform.Exceptions;
-using Platform.Helpers.Collections;
+using Platform.Collections;
 using Platform.Helpers.Console;
 
 namespace Platform.Examples

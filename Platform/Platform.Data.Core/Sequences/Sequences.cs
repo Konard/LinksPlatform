@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Doublets;
+using Platform.Collections;
+using Platform.Collections.Lists;
 using Platform.Helpers;
-using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Lists;
 using Platform.Helpers.Threading;
+using Platform.Data.Core.Doublets;
 using LinkIndex = System.UInt64;
 
 namespace Platform.Data.Core.Sequences

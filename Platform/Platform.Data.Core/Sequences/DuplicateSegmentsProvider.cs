@@ -2,11 +2,11 @@
 using System.Linq;
 using System.Collections.Generic;
 using Platform.Interfaces;
+using Platform.Collections;
+using Platform.Collections.Lists;
+using Platform.Collections.Segments;
+using Platform.Collections.Segments.Walkers;
 using Platform.Helpers;
-using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Lists;
-using Platform.Helpers.Collections.Segments;
-using Platform.Helpers.Collections.Segments.Walkers;
 using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Common;

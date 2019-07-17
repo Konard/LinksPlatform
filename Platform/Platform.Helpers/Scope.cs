@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Linq;
 using Platform.Interfaces;
 using Platform.Disposables;
+using Platform.Collections.Lists;
 using Platform.Helpers.Reflection;
-using Platform.Helpers.Collections.Lists;
 
 namespace Platform.Helpers
 {

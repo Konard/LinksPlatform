@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using Platform.Helpers.Collections.Stacks;
+using Platform.Collections.Stacks;
 
 namespace Platform.Data.Core.Doublets
 {

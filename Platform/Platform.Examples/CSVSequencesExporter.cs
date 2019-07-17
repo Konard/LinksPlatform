@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using System.Linq;
 using System.Collections.Generic;
-using Platform.Helpers.Collections.Lists;
+using Platform.Collections.Lists;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 

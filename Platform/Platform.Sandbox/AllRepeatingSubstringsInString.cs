@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Data.Core.Doublets;
 using Platform.Disposables;
+using Platform.Collections;
+using Platform.Collections.Segments;
+using Platform.Collections.Segments.Walkers;
 using Platform.Helpers;
-using Platform.Helpers.Collections;
-using Platform.Helpers.Collections.Segments;
-using Platform.Helpers.Collections.Segments.Walkers;
 using Platform.Memory;
+using Platform.Data.Core.Doublets;
 
 using TLink = System.UInt32;
 

@@ -4,13 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Collections.Arrays;
+using Platform.Helpers;
+using Platform.Helpers.Numbers;
+using Platform.Helpers.Random;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
-using Platform.Helpers.Collections.Arrays;
-using Platform.Helpers.Numbers;
-using Platform.Helpers.Random;
 
 namespace Platform.Data.Core.Doublets
 {

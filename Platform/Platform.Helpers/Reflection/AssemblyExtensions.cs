@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Reflection;
-using Platform.Helpers.Collections.Lists;
+using Platform.Collections.Lists;
 
 namespace Platform.Helpers.Reflection
 {

@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 
 using Platform.Disposables;
 using Platform.Helpers;
-using Platform.Helpers.Collections.Arrays;
+using Platform.Collections.Arrays;
 using Platform.Helpers.Numbers;
 using static Platform.Helpers.Numbers.MathHelpers;
 using Platform.Helpers.Unsafe;

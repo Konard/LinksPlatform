@@ -3,11 +3,11 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Data.Core.Exceptions;
 using Platform.Disposables;
+using Platform.Collections.Arrays;
 using Platform.Helpers;
-using Platform.Helpers.Collections.Arrays;
 using Platform.Memory;
+using Platform.Data.Core.Exceptions;
 
 #pragma warning disable 0649
 #pragma warning disable 169

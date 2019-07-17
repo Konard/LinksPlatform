@@ -1,5 +1,5 @@
 ﻿using Xunit;
-using Platform.Helpers.Collections;
+using Platform.Collections;
 
 namespace Platform.Tests.Collections
 {

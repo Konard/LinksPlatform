@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Collections;
+using Platform.Collections;
 
 namespace Platform.Data.Core.Common
 {

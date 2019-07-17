@@ -1,4 +1,4 @@
-﻿using Platform.Helpers.Collections.Segments;
+﻿using Platform.Collections.Segments;
 using Xunit;
 
 namespace Platform.Tests.Helpers
