@@ -6,7 +6,6 @@ using System.Linq;
 using System.Text;
 using Platform.Helpers.Collections;
 using Platform.Helpers.Numbers;
-using Platform.Data.Core.Collections;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
