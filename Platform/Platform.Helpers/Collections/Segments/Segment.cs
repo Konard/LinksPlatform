@@ -64,7 +64,7 @@ namespace Platform.Helpers.Collections.Segments
             {
                 var actualIndex = index - Offset;
                 if (actualIndex < Length)
-                    return index - Offset;
+                    return actualIndex;
             }
             return -1;
         }
