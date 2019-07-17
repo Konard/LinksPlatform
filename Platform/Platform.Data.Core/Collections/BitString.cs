@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
-using Platform.Helpers;
+using Platform.Helpers.Console;
 
 // ReSharper disable ForCanBeConvertedToForeach
 
