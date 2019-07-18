@@ -2,7 +2,7 @@
 using Sigil;
 using Platform.Interfaces;
 
-namespace Platform.Helpers.Reflection
+namespace Platform.Helpers.Reflection.Sigil
 {
     public class NotSupportedExceptionDelegateFactory<TDelegate> : IFactory<TDelegate>
     {

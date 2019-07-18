@@ -40,26 +40,23 @@ namespace Platform.Helpers.Reflection
                 UnderlyingType == typeof(Double) ||
                 UnderlyingType == typeof(Single))
                 CanBeNumeric = IsNumeric = IsSigned = IsFloatPoint = true;
-
-            if (UnderlyingType == typeof(SByte) ||
+            else if (UnderlyingType == typeof(SByte) ||
                 UnderlyingType == typeof(Int16) ||
                 UnderlyingType == typeof(Int32) ||
                 UnderlyingType == typeof(Int64))
                 CanBeNumeric = IsNumeric = IsSigned = true;
-
-            if (UnderlyingType == typeof(Byte) ||
+            else if (UnderlyingType == typeof(Byte) ||
                 UnderlyingType == typeof(UInt16) ||
                 UnderlyingType == typeof(UInt32) ||
                 UnderlyingType == typeof(UInt64))
                 CanBeNumeric = IsNumeric = true;
-
-            if (UnderlyingType == typeof(Boolean) ||
+            else if (UnderlyingType == typeof(Boolean) ||
                 UnderlyingType == typeof(Char) ||
                 UnderlyingType == typeof(DateTime) ||
                 UnderlyingType == typeof(TimeSpan))
                 CanBeNumeric = true;
 
-            BitsLength = Marshal.SizeOf(UnderlyingType) * 8;
+            BitsLength = Marshal.SizeOf((object)UnderlyingType) * 8;
 
             if (UnderlyingType == typeof(Boolean))
             {
@@ -75,39 +72,13 @@ namespace Platform.Helpers.Reflection
             if (IsSigned)
             {
                 SignedVersion = UnderlyingType;
-                UnsignedVersion = GetUnsignedFor(UnderlyingType);
+                UnsignedVersion = UnderlyingType.GetUnsignedVersionOrNull();
             }
             else
             {
-                SignedVersion = GetSignedFor(UnderlyingType);
+                SignedVersion = UnderlyingType.GetSignedVersionOrNull();
                 UnsignedVersion = UnderlyingType;
             }
-        }
-
-        private static Type GetUnsignedFor(Type signedType)
-        {
-            if (signedType == typeof(SByte))
-                return typeof(Byte);
-            if (signedType == typeof(Int16))
-                return typeof(UInt16);
-            if (signedType == typeof(Int32))
-                return typeof(UInt32);
-            if (signedType == typeof(Int64))
-                return typeof(UInt64);
-            return null;
-        }
-
-        private static Type GetSignedFor(Type unsignedType)
-        {
-            if (unsignedType == typeof(Byte))
-                return typeof(SByte);
-            if (unsignedType == typeof(UInt16))
-                return typeof(Int16);
-            if (unsignedType == typeof(UInt32))
-                return typeof(Int32);
-            if (unsignedType == typeof(UInt64))
-                return typeof(Int64);
-            return null;
         }
     }
 }

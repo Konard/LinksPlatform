@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Sigil;
 
-namespace Platform.Helpers.Reflection
+namespace Platform.Helpers.Reflection.Sigil
 {
     public static class DelegateHelpers
     {

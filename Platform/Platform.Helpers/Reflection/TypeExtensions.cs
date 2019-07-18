@@ -51,5 +51,31 @@ namespace Platform.Helpers.Reflection
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsNullable(this Type type) => type.IsGeneric(typeof(Nullable<>));
+
+        public static Type GetUnsignedVersionOrNull(this Type signedType)
+        {
+            if (signedType == typeof(SByte))
+                return typeof(Byte);
+            if (signedType == typeof(Int16))
+                return typeof(UInt16);
+            if (signedType == typeof(Int32))
+                return typeof(UInt32);
+            if (signedType == typeof(Int64))
+                return typeof(UInt64);
+            return null;
+        }
+
+        public static Type GetSignedVersionOrNull(this Type unsignedType)
+        {
+            if (unsignedType == typeof(Byte))
+                return typeof(SByte);
+            if (unsignedType == typeof(UInt16))
+                return typeof(Int16);
+            if (unsignedType == typeof(UInt32))
+                return typeof(Int32);
+            if (unsignedType == typeof(UInt64))
+                return typeof(Int64);
+            return null;
+        }
     }
 }

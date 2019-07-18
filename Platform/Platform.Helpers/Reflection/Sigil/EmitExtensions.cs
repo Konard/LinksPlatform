@@ -1,9 +1,9 @@
 ﻿using System;
 using Sigil;
 
-namespace Platform.Helpers.Reflection
+namespace Platform.Helpers.Reflection.Sigil
 {
-    public static class SigilExtensions
+    public static class EmitExtensions
     {
         public static Emit<TDelegate> LoadConstantOne<TDelegate>(this Emit<TDelegate> emiter, Type constantType)
         {
