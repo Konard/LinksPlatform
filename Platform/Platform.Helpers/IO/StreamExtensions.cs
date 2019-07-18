@@ -8,7 +8,7 @@ namespace Platform.Helpers.IO
         public static void Write<T>(this Stream stream, T value)
             where T : struct
         {
-            var bytes = To.Bytes(value);
+            var bytes = value.ToBytes();
             stream.Write(bytes, 0, bytes.Length);
         }
 
@@ -18,7 +18,7 @@ namespace Platform.Helpers.IO
             var size = StructureHelpers.SizeOf<T>();
             var buffer = new byte[size];
             var read = stream.Read(buffer, 0, size);
-            return read < size ? default : To.Structure<T>(buffer);
+            return read < size ? default : buffer.ToStructure<T>();
         }
 
         public static T[] ReadAll<T>(this Stream stream)
@@ -32,7 +32,7 @@ namespace Platform.Helpers.IO
             for (var i = 0; i < elementsLength; i++)
             {
                 stream.Read(buffer, 0, size);
-                elements[i] = To.Structure<T>(buffer);
+                elements[i] = buffer.ToStructure<T>();
             }
 
             return elements;

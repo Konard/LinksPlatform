@@ -172,43 +172,6 @@ namespace Platform.Helpers
 
         public static T ToUnsignedAs<T>(object value) => SignProcessor<T>.ToUnsignedAsFunc(value);
 
-        public static byte[] Bytes<T>(T obj)
-            where T : struct
-        {
-            var structureSize = StructureHelpers.SizeOf<T>();
-
-            var bytes = new byte[structureSize];
-
-            var pointer = Marshal.AllocHGlobal(structureSize);
-
-            Marshal.StructureToPtr(obj, pointer, true);
-
-            Marshal.Copy(pointer, bytes, 0, structureSize);
-
-            Marshal.FreeHGlobal(pointer);
-
-            return bytes;
-        }
-
-        public static T Structure<T>(byte[] bytes)
-            where T : struct
-        {
-            Ensure.ArgumentNotEmpty(bytes, nameof(bytes));
-
-            var structureSize = StructureHelpers.SizeOf<T>();
-
-            if (bytes.Length != structureSize)
-                throw new ArgumentOutOfRangeException(nameof(bytes), "Bytes array should be the same length as struct size.");
-
-            var pointer = Marshal.AllocHGlobal(structureSize);
-
-            Marshal.Copy(bytes, 0, pointer, structureSize);
-
-            var structure = Marshal.PtrToStructure<T>(pointer);
-
-            Marshal.FreeHGlobal(pointer);
-
-            return structure;
-        }
+        
     }
 }
