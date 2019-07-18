@@ -80,7 +80,7 @@ namespace Platform.Data.Core.Doublets
         /// </remarks>
         public struct Transition
         {
-            public static readonly long Size = UnsafeHelpers.SizeOf<Transition>();
+            public static readonly long Size = StructureHelpers.SizeOf<Transition>();
 
             public ulong TransactionId;
             public UInt64Link Before;

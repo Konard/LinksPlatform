@@ -31,9 +31,9 @@ namespace Platform.Data.Core.Doublets
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
 
         /// <summary>Возвращает размер одной связи в байтах.</summary>
-        public static readonly int LinkSizeInBytes = UnsafeHelpers.SizeOf<Link>();
+        public static readonly int LinkSizeInBytes = StructureHelpers.SizeOf<Link>();
 
-        public static readonly int LinkHeaderSizeInBytes = UnsafeHelpers.SizeOf<LinksHeader>();
+        public static readonly int LinkHeaderSizeInBytes = StructureHelpers.SizeOf<LinksHeader>();
 
         public static readonly long DefaultLinksSizeStep = LinkSizeInBytes * 1024 * 1024;
 

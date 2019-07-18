@@ -14,7 +14,7 @@ namespace Platform.Memory
     {
         #region Constants
 
-        public static readonly long ElementSize = UnsafeHelpers.SizeOf<TElement>();
+        public static readonly long ElementSize = StructureHelpers.SizeOf<TElement>();
 
         #endregion
 

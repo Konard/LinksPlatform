@@ -175,7 +175,7 @@ namespace Platform.Helpers
         public static byte[] Bytes<T>(T obj)
             where T : struct
         {
-            var structureSize = UnsafeHelpers.SizeOf<T>();
+            var structureSize = StructureHelpers.SizeOf<T>();
 
             var bytes = new byte[structureSize];
 
@@ -195,7 +195,7 @@ namespace Platform.Helpers
         {
             Ensure.ArgumentNotEmpty(bytes, nameof(bytes));
 
-            var structureSize = UnsafeHelpers.SizeOf<T>();
+            var structureSize = StructureHelpers.SizeOf<T>();
 
             if (bytes.Length != structureSize)
                 throw new ArgumentOutOfRangeException(nameof(bytes), "Bytes array should be the same length as struct size.");

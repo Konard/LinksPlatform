@@ -2,7 +2,7 @@
 
 namespace Platform.Helpers.Unsafe
 {
-    public static class UnsafeHelpers
+    public static class StructureHelpers
     {
         /// <summary>
         /// Returns the size of an unmanaged type in bytes.

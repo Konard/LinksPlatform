@@ -25,7 +25,7 @@ namespace Platform.Helpers.IO
         private static FileStream GetValidFileStreamOrDefault<TStruct>(string path)
             where TStruct : struct
         {
-            var elementSize = UnsafeHelpers.SizeOf<TStruct>();
+            var elementSize = StructureHelpers.SizeOf<TStruct>();
             return GetValidFileStreamOrDefault(path, elementSize);
         }
 
@@ -45,7 +45,7 @@ namespace Platform.Helpers.IO
         public static T ReadLastOrDefault<T>(string path)
             where T : struct
         {
-            var elementSize = UnsafeHelpers.SizeOf<T>();
+            var elementSize = StructureHelpers.SizeOf<T>();
             using (var reader = GetValidFileStreamOrDefault(path, elementSize))
             {
                 if (reader == null)
