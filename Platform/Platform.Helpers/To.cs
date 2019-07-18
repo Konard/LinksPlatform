@@ -1,11 +1,8 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using Platform.Exceptions;
 using Platform.Reflection;
 using Platform.Reflection.Sigil;
-using Platform.Helpers.Unsafe;
 
 namespace Platform.Helpers
 {
@@ -39,7 +36,7 @@ namespace Platform.Helpers
 
                     emiter.LoadArgument(0);
 
-                    var method = typeof(To).GetTypeInfo().GetMethod("ToSigned", Types<T>.Array);
+                    var method = typeof(To).GetTypeInfo().GetMethod("Signed", Types<T>.Array);
 
                     emiter.Call(method);
 
@@ -54,7 +51,7 @@ namespace Platform.Helpers
 
                     emiter.LoadArgument(0);
 
-                    var method = typeof(To).GetTypeInfo().GetMethod("ToUnsigned", Types<T>.Array);
+                    var method = typeof(To).GetTypeInfo().GetMethod("Unsigned", Types<T>.Array);
 
                     emiter.Call(method);
 
@@ -73,7 +70,7 @@ namespace Platform.Helpers
 
                     emiter.UnboxAny(signedVersion);
 
-                    var method = typeof(To).GetTypeInfo().GetMethod("ToUnsigned", new [] { signedVersion });
+                    var method = typeof(To).GetTypeInfo().GetMethod("Unsigned", new [] { signedVersion });
 
                     emiter.Call(method);
 
@@ -150,28 +147,26 @@ namespace Platform.Helpers
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static ulong UInt64(char value) => value;
 
-        public static long ToSigned(ulong value) => (long)value;
+        public static long Signed(ulong value) => (long)value;
 
-        public static int ToSigned(uint value) => (int)value;
+        public static int Signed(uint value) => (int)value;
 
-        public static short ToSigned(ushort value) => (short)value;
+        public static short Signed(ushort value) => (short)value;
 
-        public static sbyte ToSigned(byte value) => (sbyte)value;
+        public static sbyte Signed(byte value) => (sbyte)value;
 
-        public static object ToSigned<T>(T value) => SignProcessor<T>.ToSignedFunc(value);
+        public static object Signed<T>(T value) => SignProcessor<T>.ToSignedFunc(value);
 
-        public static ulong ToUnsigned(long value) => (ulong)value;
+        public static ulong Unsigned(long value) => (ulong)value;
 
-        public static uint ToUnsigned(int value) => (uint)value;
+        public static uint Unsigned(int value) => (uint)value;
 
-        public static ushort ToUnsigned(short value) => (ushort)value;
+        public static ushort Unsigned(short value) => (ushort)value;
 
-        public static byte ToUnsigned(sbyte value) => (byte)value;
+        public static byte Unsigned(sbyte value) => (byte)value;
 
-        public static object ToUnsigned<T>(T value) => SignProcessor<T>.ToUnsignedFunc(value);
+        public static object Unsigned<T>(T value) => SignProcessor<T>.ToUnsignedFunc(value);
 
-        public static T ToUnsignedAs<T>(object value) => SignProcessor<T>.ToUnsignedAsFunc(value);
-
-        
+        public static T UnsignedAs<T>(object value) => SignProcessor<T>.ToUnsignedAsFunc(value);
     }
 }

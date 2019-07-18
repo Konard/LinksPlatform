@@ -9,10 +9,10 @@ namespace Platform.Data.Core.Doublets
     public class Hybrid<T>
     {
         public readonly T Value;
-        public bool IsNothing => Convert.ToInt64(To.ToSigned(Value)) == 0;
-        public bool IsInternal => Convert.ToInt64(To.ToSigned(Value)) > 0;
-        public bool IsExternal => Convert.ToInt64(To.ToSigned(Value)) < 0;
-        public long AbsoluteValue => Math.Abs(Convert.ToInt64(To.ToSigned(Value)));
+        public bool IsNothing => Convert.ToInt64(To.Signed(Value)) == 0;
+        public bool IsInternal => Convert.ToInt64(To.Signed(Value)) > 0;
+        public bool IsExternal => Convert.ToInt64(To.Signed(Value)) < 0;
+        public long AbsoluteValue => Math.Abs(Convert.ToInt64(To.Signed(Value)));
 
         public Hybrid(T value)
         {
@@ -24,7 +24,7 @@ namespace Platform.Data.Core.Doublets
 
         public Hybrid(object value)
         {
-            Value = To.ToUnsignedAs<T>(Convert.ChangeType(value, CachedTypeInfo<T>.SignedVersion));
+            Value = To.UnsignedAs<T>(Convert.ChangeType(value, CachedTypeInfo<T>.SignedVersion));
         }
 
         public Hybrid(object value, bool isExternal)
@@ -36,7 +36,7 @@ namespace Platform.Data.Core.Doublets
             var absoluteValue = abs.Invoke(null, new[] { signedValue });
             var resultValue = isExternal ? negate.Invoke(null, new[] { absoluteValue }) : absoluteValue;
 
-            Value = To.ToUnsignedAs<T>(resultValue);
+            Value = To.UnsignedAs<T>(resultValue);
         }
 
         public static implicit operator Hybrid<T>(T integer) => new Hybrid<T>(integer);
