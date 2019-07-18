@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Platform.Helpers.Threading
 {
-    public class UnsafeSynchronization : ISynchronization
+    public class Unsynchronization : ISynchronization
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void ExecuteReadOperation(Action action) => action();
