@@ -32,7 +32,7 @@ namespace Platform.Helpers
             {
                 DelegateHelpers.Compile(out ToSignedFunc, emiter =>
                 {
-                    EnsureSupportedUnsignedTypes();
+                    EnsureSupportedUnsignedType();
 
                     emiter.LoadArgument(0);
 
@@ -47,7 +47,7 @@ namespace Platform.Helpers
 
                 DelegateHelpers.Compile(out ToUnsignedFunc, emiter =>
                 {
-                    EnsureSupportedSignedTypes();
+                    EnsureSupportedSignedType();
 
                     emiter.LoadArgument(0);
 
@@ -62,7 +62,7 @@ namespace Platform.Helpers
 
                 DelegateHelpers.Compile(out ToUnsignedAsFunc, emiter =>
                 {
-                    EnsureSupportedUnsignedTypes();
+                    EnsureSupportedUnsignedType();
 
                     emiter.LoadArgument(0);
 
@@ -78,14 +78,14 @@ namespace Platform.Helpers
                 });
             }
 
-            private static void EnsureSupportedUnsignedTypes()
+            private static void EnsureSupportedUnsignedType()
             {
                 var type = typeof(T);
                 if (type != typeof(ulong) && type != typeof(uint) && type != typeof(ushort) && type != typeof(byte))
                     throw new NotSupportedException();
             }
 
-            private static void EnsureSupportedSignedTypes()
+            private static void EnsureSupportedSignedType()
             {
                 var type = typeof(T);
                 if (type != typeof(long) && type != typeof(int) && type != typeof(short) && type != typeof(sbyte))
