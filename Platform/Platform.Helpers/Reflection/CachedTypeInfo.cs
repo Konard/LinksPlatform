@@ -10,6 +10,7 @@ namespace Platform.Helpers.Reflection
 {
     public class CachedTypeInfo<T>
     {
+        public static readonly bool IsSupported;
         public static readonly Type Type;
         public static readonly Type UnderlyingType;
 
@@ -36,48 +37,71 @@ namespace Platform.Helpers.Reflection
             else
                 UnderlyingType = Type;
 
-            if (UnderlyingType == typeof(Decimal) ||
-                UnderlyingType == typeof(Double) ||
-                UnderlyingType == typeof(Single))
-                CanBeNumeric = IsNumeric = IsSigned = IsFloatPoint = true;
-            else if (UnderlyingType == typeof(SByte) ||
-                UnderlyingType == typeof(Int16) ||
-                UnderlyingType == typeof(Int32) ||
-                UnderlyingType == typeof(Int64))
-                CanBeNumeric = IsNumeric = IsSigned = true;
-            else if (UnderlyingType == typeof(Byte) ||
-                UnderlyingType == typeof(UInt16) ||
-                UnderlyingType == typeof(UInt32) ||
-                UnderlyingType == typeof(UInt64))
-                CanBeNumeric = IsNumeric = true;
-            else if (UnderlyingType == typeof(Boolean) ||
-                UnderlyingType == typeof(Char) ||
-                UnderlyingType == typeof(DateTime) ||
-                UnderlyingType == typeof(TimeSpan))
-                CanBeNumeric = true;
+            try
+            {
+                bool canBeNumeric = false, isNumeric = false, isSigned = false, isFloatPoint = false;
 
-            BitsLength = Marshal.SizeOf((object)UnderlyingType) * 8;
+                if (UnderlyingType == typeof(Decimal) ||
+                    UnderlyingType == typeof(Double) ||
+                    UnderlyingType == typeof(Single))
+                    canBeNumeric = isNumeric = isSigned = isFloatPoint = true;
+                else if (UnderlyingType == typeof(SByte) ||
+                    UnderlyingType == typeof(Int16) ||
+                    UnderlyingType == typeof(Int32) ||
+                    UnderlyingType == typeof(Int64))
+                    canBeNumeric = isNumeric = isSigned = true;
+                else if (UnderlyingType == typeof(Byte) ||
+                    UnderlyingType == typeof(UInt16) ||
+                    UnderlyingType == typeof(UInt32) ||
+                    UnderlyingType == typeof(UInt64))
+                    canBeNumeric = isNumeric = true;
+                else if (UnderlyingType == typeof(Boolean) ||
+                    UnderlyingType == typeof(Char) ||
+                    UnderlyingType == typeof(DateTime) ||
+                    UnderlyingType == typeof(TimeSpan))
+                    canBeNumeric = true;
 
-            if (UnderlyingType == typeof(Boolean))
-            {
-                MinValue = (T)(object)false;
-                MaxValue = (T)(object)true;
-            }
-            else
-            {
-                MinValue = UnderlyingType.GetStaticFieldValue<T>("MinValue");
-                MaxValue = UnderlyingType.GetStaticFieldValue<T>("MaxValue");
-            }
+                int bitsLength = Marshal.SizeOf(UnderlyingType) * 8;
 
-            if (IsSigned)
-            {
-                SignedVersion = UnderlyingType;
-                UnsignedVersion = UnderlyingType.GetUnsignedVersionOrNull();
+                T minValue, maxValue;
+
+                if (UnderlyingType == typeof(Boolean))
+                {
+                    minValue = (T)(object)false;
+                    maxValue = (T)(object)true;
+                }
+                else
+                {
+                    minValue = UnderlyingType.GetStaticFieldValue<T>("MinValue");
+                    maxValue = UnderlyingType.GetStaticFieldValue<T>("MaxValue");
+                }
+
+                Type signedVersion, unsignedVersion;
+
+                if (isSigned)
+                {
+                    signedVersion = UnderlyingType;
+                    unsignedVersion = UnderlyingType.GetUnsignedVersionOrNull();
+                }
+                else
+                {
+                    signedVersion = UnderlyingType.GetSignedVersionOrNull();
+                    unsignedVersion = UnderlyingType;
+                }
+
+                IsSupported = true;
+                CanBeNumeric = canBeNumeric;
+                IsNumeric = isNumeric;
+                IsSigned = isSigned;
+                IsFloatPoint = isFloatPoint;
+                BitsLength = bitsLength;
+                MinValue = minValue;
+                MaxValue = maxValue;
+                SignedVersion = signedVersion;
+                UnsignedVersion = unsignedVersion;
             }
-            else
+            catch (Exception)
             {
-                SignedVersion = UnderlyingType.GetSignedVersionOrNull();
-                UnsignedVersion = UnderlyingType;
             }
         }
     }

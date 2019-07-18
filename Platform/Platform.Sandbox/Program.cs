@@ -12,9 +12,9 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            StringTests.CapitalizeFirstLetterTest();
+            //StringTests.CapitalizeFirstLetterTest();
 
-            //SystemTests.EqualsPerfomanceTest();
+            SystemTests.EqualsPerfomanceTest();
 
             //args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
 
