@@ -17,12 +17,6 @@ namespace Platform.Helpers.Threading
             {
                 action();
             }
-#if DEBUG
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#endif
             finally
             {
                 _rwLock.ExitReadLock();
@@ -36,12 +30,6 @@ namespace Platform.Helpers.Threading
             {
                 return func();
             }
-#if DEBUG
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#endif
             finally
             {
                 _rwLock.ExitReadLock();
@@ -55,12 +43,6 @@ namespace Platform.Helpers.Threading
             {
                 action();
             }
-#if DEBUG
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#endif
             finally
             {
                 _rwLock.ExitWriteLock();
@@ -74,12 +56,6 @@ namespace Platform.Helpers.Threading
             {
                 return func();
             }
-#if DEBUG
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-#endif
             finally
             {
                 _rwLock.ExitWriteLock();
