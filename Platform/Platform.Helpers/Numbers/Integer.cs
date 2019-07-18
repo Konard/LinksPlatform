@@ -2,6 +2,7 @@
 using System.Reflection;
 using Platform.Reflection;
 using Platform.Reflection.Sigil;
+using Platform.Converters;
 
 // ReSharper disable StaticFieldInGenericType
 
