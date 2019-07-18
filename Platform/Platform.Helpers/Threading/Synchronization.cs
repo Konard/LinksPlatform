@@ -6,7 +6,7 @@ namespace Platform.Helpers.Threading
     /// <summary>
     /// TODO: Сравнить что производительнее использовать анонимную функцию или using (создание объекта + dispose)
     /// </summary>
-    public class SafeSynchronization : ISynchronization
+    public class Synchronization : ISynchronization
     {
         private readonly ReaderWriterLockSlim _rwLock = new ReaderWriterLockSlim(LockRecursionPolicy.SupportsRecursion);
 

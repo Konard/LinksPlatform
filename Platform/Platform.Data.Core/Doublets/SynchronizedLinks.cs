@@ -17,7 +17,7 @@ namespace Platform.Data.Core.Doublets
         public ILinks<T> Unsync { get; }
 
         public SynchronizedLinks(ILinks<T> links)
-            : this(new SafeSynchronization(), links)
+            : this(new Synchronization(), links)
         {
         }
 
