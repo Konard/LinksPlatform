@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Platform.Exceptions;
 using Platform.Reflection;
-using Platform.Helpers.Reflection.Sigil;
+using Platform.Reflection.Sigil;
 using Platform.Helpers.Unsafe;
 
 namespace Platform.Helpers

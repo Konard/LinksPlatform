@@ -2,7 +2,7 @@
 using System.Reflection;
 using System.Runtime.InteropServices;
 using Platform.Reflection;
-using Platform.Helpers.Reflection.Sigil;
+using Platform.Reflection.Sigil;
 
 namespace Platform.Helpers.Unsafe
 {
