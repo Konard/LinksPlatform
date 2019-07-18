@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers.Reflection;
+using Platform.Reflection;
 using Platform.Helpers.Numbers;
 
 namespace Platform.Data.Core.Doublets

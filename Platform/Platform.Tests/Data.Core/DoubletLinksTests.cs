@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Xunit;
+using Platform.Reflection;
 using Platform.Helpers;
-using Platform.Helpers.Reflection;
 using Platform.Helpers.Numbers;
 using Platform.Memory;
 using Platform.Data.Core.Doublets;

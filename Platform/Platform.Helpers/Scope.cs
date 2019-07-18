@@ -5,7 +5,7 @@ using System.Linq;
 using Platform.Interfaces;
 using Platform.Disposables;
 using Platform.Collections.Lists;
-using Platform.Helpers.Reflection;
+using Platform.Reflection;
 
 namespace Platform.Helpers
 {

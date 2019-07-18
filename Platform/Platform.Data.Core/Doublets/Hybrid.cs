@@ -1,6 +1,6 @@
 ﻿using System;
+using Platform.Reflection;
 using Platform.Helpers;
-using Platform.Helpers.Reflection;
 using Platform.Helpers.Numbers;
 using System.Reflection;
 

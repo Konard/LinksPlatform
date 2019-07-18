@@ -3,7 +3,7 @@ using System.Reflection;
 using Xunit;
 using Platform.Collections;
 using Platform.Collections.Lists;
-using Platform.Helpers.Reflection;
+using Platform.Reflection;
 
 namespace Platform.Tests.Helpers
 {

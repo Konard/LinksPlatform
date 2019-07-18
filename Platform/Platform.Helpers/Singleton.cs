@@ -3,7 +3,7 @@ using System.Collections.Concurrent;
 using System.Reflection;
 using Platform.Interfaces;
 using Platform.Collections.Lists;
-using Platform.Helpers.Reflection;
+using Platform.Reflection;
 
 namespace Platform.Helpers
 {

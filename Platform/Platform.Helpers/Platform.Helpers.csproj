@@ -34,6 +34,7 @@
     <PackageReference Include="Platform.Ranges" Version="0.0.1" />
     <PackageReference Include="Platform.Exceptions" Version="0.0.1" />
     <PackageReference Include="Platform.Collections" Version="0.0.1" />
+    <PackageReference Include="Platform.Reflection" Version="0.0.1" />
   </ItemGroup>
 
 </Project>

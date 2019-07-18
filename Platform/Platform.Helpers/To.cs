@@ -3,7 +3,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Platform.Exceptions;
-using Platform.Helpers.Reflection;
+using Platform.Reflection;
 using Platform.Helpers.Reflection.Sigil;
 using Platform.Helpers.Unsafe;
 
