@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using Platform.Disposables;
-using Platform.Helpers.Threading;
+using Platform.Threading;
 
 namespace Platform.Helpers.Console
 {

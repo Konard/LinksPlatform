@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Net.Sockets;
 using Platform.Exceptions;
+using Platform.Threading;
 using Platform.Helpers.Console;
-using Platform.Helpers.Threading;
 using Platform.Communication.Protocol.Udp;
 
 namespace Platform.Examples

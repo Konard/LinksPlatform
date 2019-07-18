@@ -1,4 +1,4 @@
-﻿using Platform.Helpers.Threading;
+﻿using Platform.Threading;
 
 namespace Platform.Data.Core.Triplets
 {

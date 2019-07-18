@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Helpers.Threading;
+using Platform.Threading.Synchronization;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -17,7 +17,7 @@ namespace Platform.Data.Core.Doublets
         public ILinks<T> Unsync { get; }
 
         public SynchronizedLinks(ILinks<T> links)
-            : this(new Synchronization(), links)
+            : this(new ReaderWriterLockSynchronization(), links)
         {
         }
 

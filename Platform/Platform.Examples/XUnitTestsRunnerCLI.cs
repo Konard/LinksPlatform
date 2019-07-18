@@ -1,7 +1,7 @@
-﻿using Platform.Helpers.Threading;
-using System;
+﻿using System;
 using System.Threading;
 using Xunit.Runners;
+using Platform.Threading;
 
 namespace Platform.Examples
 {
