@@ -52,7 +52,7 @@ namespace Platform.Helpers
 
         public void IncludeAssemblyOfType(Type type) => IncludeAssembly(type.GetAssembly());
 
-        public void IncludeAssembly(Assembly assembly) => assembly.GetCachedLoadableTypes().ForEach(Include);
+        public void IncludeAssembly(Assembly assembly) => assembly.GetExportedTypes().ForEach(Include);
 
         public void Include<T>()
         {
