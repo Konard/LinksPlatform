@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Platform.Disposables;
+using Platform.Unsafe;
 using Platform.Helpers.IO;
-using Platform.Helpers.Unsafe;
 
 namespace Platform.Memory
 {

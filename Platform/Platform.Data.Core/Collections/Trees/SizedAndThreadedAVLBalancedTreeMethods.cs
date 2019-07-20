@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Unsafe;
 using Platform.Data.Core.Exceptions;
-using Platform.Helpers.Unsafe;
 #if USEARRAYPOOL
 using Platform.Helpers.Collections;
 #endif

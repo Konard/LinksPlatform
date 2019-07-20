@@ -1,6 +1,6 @@
 ﻿using System;
+using Platform.Unsafe;
 using Platform.Data.Core.Collections.Lists;
-using Platform.Helpers.Unsafe;
 
 namespace Platform.Data.Core.Doublets
 {

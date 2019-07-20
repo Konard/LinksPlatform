@@ -7,7 +7,7 @@ using Platform.Helpers;
 using Platform.Collections.Arrays;
 using Platform.Numbers;
 using static Platform.Numbers.ArithmeticHelpers;
-using Platform.Helpers.Unsafe;
+using Platform.Unsafe;
 using Platform.Memory;
 using Platform.Data.Core.Exceptions;
 

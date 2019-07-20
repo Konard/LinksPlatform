@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Runtime.InteropServices;
-using Platform.Helpers.Unsafe;
+using Platform.Unsafe;
 
 namespace Platform.Memory
 {

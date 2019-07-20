@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Numbers;
-using Platform.Helpers.Unsafe;
+using Platform.Unsafe;
 using Platform.Data.Core.Collections.Trees;
 
 namespace Platform.Data.Core.Doublets

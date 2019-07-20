@@ -4,7 +4,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Numbers;
-using Platform.Helpers.Unsafe;
+using Platform.Unsafe;
 
 namespace Platform.Data.Core.Collections.Trees
 {

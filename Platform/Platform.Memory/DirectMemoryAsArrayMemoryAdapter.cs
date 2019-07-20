@@ -1,6 +1,6 @@
 ﻿using System;
 using Platform.Disposables;
-using Platform.Helpers.Unsafe;
+using Platform.Unsafe;
 
 namespace Platform.Memory
 {
