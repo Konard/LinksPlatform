@@ -86,10 +86,10 @@ namespace Platform.Data.Core.Doublets
         {
             Null = Integer<TAddress>.Zero;
             MinPossibleIndex = Integer<TAddress>.One;
-            MaxPossibleIndex = MathHelpers.Subtract<TAddress>(ulong.MaxValue, 3);
+            MaxPossibleIndex = ArithmeticHelpers.Subtract<TAddress>(ulong.MaxValue, 3);
 
-            Itself = MathHelpers.Subtract<TAddress>(ulong.MaxValue, 2);
-            Any = MathHelpers.Subtract<TAddress>(ulong.MaxValue, 1);
+            Itself = ArithmeticHelpers.Subtract<TAddress>(ulong.MaxValue, 2);
+            Any = ArithmeticHelpers.Subtract<TAddress>(ulong.MaxValue, 1);
             // ulong.MaxValue is reserved for "Continue"
         }
     }

@@ -6,7 +6,7 @@ using Platform.Disposables;
 using Platform.Helpers;
 using Platform.Collections.Arrays;
 using Platform.Helpers.Numbers;
-using static Platform.Helpers.Numbers.MathHelpers;
+using static Platform.Helpers.Numbers.ArithmeticHelpers;
 using Platform.Helpers.Unsafe;
 using Platform.Memory;
 using Platform.Data.Core.Exceptions;

@@ -54,15 +54,15 @@ namespace Platform.Data.Core.Collections
         protected virtual bool LessThan(TElement first, TElement second) => Comparer.Compare(first, second) < 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement Increment(TElement value) => MathHelpers<TElement>.Increment(value);
+        protected virtual TElement Increment(TElement value) => ArithmeticHelpers<TElement>.Increment(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement Decrement(TElement value) => MathHelpers<TElement>.Decrement(value);
+        protected virtual TElement Decrement(TElement value) => ArithmeticHelpers<TElement>.Decrement(value);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement Add(TElement first, TElement second) => MathHelpers<TElement>.Add(first, second);
+        protected virtual TElement Add(TElement first, TElement second) => ArithmeticHelpers<TElement>.Add(first, second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement Subtract(TElement first, TElement second) => MathHelpers<TElement>.Subtract(first, second);
+        protected virtual TElement Subtract(TElement first, TElement second) => ArithmeticHelpers<TElement>.Subtract(first, second);
     }
 }

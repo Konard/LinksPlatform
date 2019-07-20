@@ -215,7 +215,7 @@ namespace Platform.Data.Core.Sequences
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
             if ((Comparer.Compare(frequency, _minFrequencyToCompress) > 0) &&
-               ((Comparer.Compare(maxFrequency, frequency) < 0) || (EqualityComparer.Equals(maxFrequency, frequency) && (Comparer.Compare(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+               ((Comparer.Compare(maxFrequency, frequency) < 0) || (EqualityComparer.Equals(maxFrequency, frequency) && (Comparer.Compare(ArithmeticHelpers.Add(doublet.Source, doublet.Target), ArithmeticHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

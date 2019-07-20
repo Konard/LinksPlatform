@@ -66,10 +66,10 @@ namespace Platform.Data.Core.Doublets
             var equalityComparer = EqualityComparer<TLink>.Default;
             var comparer = Comparer<TLink>.Default;
 
-            for (var i = links.Count(); comparer.Compare(i, default) > 0; i = MathHelpers.Decrement(i))
+            for (var i = links.Count(); comparer.Compare(i, default) > 0; i = ArithmeticHelpers.Decrement(i))
             {
                 links.Delete(i);
-                if (!equalityComparer.Equals(links.Count(), MathHelpers.Decrement(i)))
+                if (!equalityComparer.Equals(links.Count(), ArithmeticHelpers.Decrement(i)))
                     i = links.Count();
             }
         }
@@ -327,7 +327,7 @@ namespace Platform.Data.Core.Doublets
                 throw new ArgumentOutOfRangeException(nameof(size), "Sequences with sizes other than powers of two are not supported.");
 
             var path = new BitArray(BitConverter.GetBytes(index));
-            var length = MathHelpers.GetLowestBitPosition(size);
+            var length = BitwiseHelpers.GetLowestBitPosition(size);
 
             links.EnsureLinkExists(root, "root");
 

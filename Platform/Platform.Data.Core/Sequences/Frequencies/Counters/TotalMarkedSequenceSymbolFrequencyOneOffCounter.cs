@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
         protected override void CountSequenceSymbolFrequency(TLink link)
         {
             var symbolFrequencyCounter = new MarkedSequenceSymbolFrequencyOneOffCounter<TLink>(_links, _markedSequenceMatcher, link, _symbol);
-            _total = MathHelpers.Add(_total, symbolFrequencyCounter.Count());
+            _total = ArithmeticHelpers.Add(_total, symbolFrequencyCounter.Count());
         }
     }
 }

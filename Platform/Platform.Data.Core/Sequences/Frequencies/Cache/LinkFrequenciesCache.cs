@@ -79,7 +79,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
                 data = new LinkFrequency<TLink>(Integer<TLink>.One, link);
 
                 if (!EqualityComparer.Equals(link, default))
-                    data.Frequency = MathHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
+                    data.Frequency = ArithmeticHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
 
                 _doubletsCache.Add(doublet, data);
             }
@@ -100,8 +100,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
                     var count = _frequencyCounter.Count(linkIndex);
 
                     // TODO: Why `frequency` always greater than `count` by 1?
-                    if (((Comparer.Compare(frequency, count) > 0) && (Comparer.Compare(MathHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0))
-                     || ((Comparer.Compare(count, frequency) > 0) && (Comparer.Compare(MathHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)))
+                    if (((Comparer.Compare(frequency, count) > 0) && (Comparer.Compare(ArithmeticHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0))
+                     || ((Comparer.Compare(count, frequency) > 0) && (Comparer.Compare(ArithmeticHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)))
                         throw new Exception("Frequencies validation failed.");
                 }
                 //else

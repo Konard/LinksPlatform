@@ -72,7 +72,7 @@ namespace Platform.Data.Core.Triplets
             if (number == 1)
                 return Net.One;
 
-            var links = new Link[MathHelpers.CountBits(number)];
+            var links = new Link[BitwiseHelpers.CountBits(number)];
 
             if (number >= 0)
             {

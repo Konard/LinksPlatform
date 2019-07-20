@@ -20,7 +20,7 @@ namespace Platform.Data.Core.Sequences
             while(!_elementMatcher.IsMatched(pairOrElement))
             {
                 pairOrElement = Links.GetTarget(pairOrElement);
-                height = MathHelpers.Increment(height);
+                height = ArithmeticHelpers.Increment(height);
             }
             return height;
         }

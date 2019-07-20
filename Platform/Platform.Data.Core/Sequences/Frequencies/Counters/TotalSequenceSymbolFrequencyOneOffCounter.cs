@@ -45,7 +45,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
         protected virtual void CountSequenceSymbolFrequency(TLink link)
         {
             var symbolFrequencyCounter = new SequenceSymbolFrequencyOneOffCounter<TLink>(_links, link, _symbol);
-            _total = MathHelpers.Add(_total, symbolFrequencyCounter.Count());
+            _total = ArithmeticHelpers.Add(_total, symbolFrequencyCounter.Count());
         }
 
         private TLink EachElementHandler(IList<TLink> doublet)

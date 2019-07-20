@@ -19,10 +19,10 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void IncrementFrequency() => Frequency = MathHelpers<TLink>.Increment(Frequency);
+        public void IncrementFrequency() => Frequency = ArithmeticHelpers<TLink>.Increment(Frequency);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public void DecrementFrequency() => Frequency = MathHelpers<TLink>.Decrement(Frequency);
+        public void DecrementFrequency() => Frequency = ArithmeticHelpers<TLink>.Decrement(Frequency);
 
         public override string ToString() => $"F: {Frequency}, L: {Link}";
     }

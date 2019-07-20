@@ -36,7 +36,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
         private bool VisitElement(TLink element)
         {
             if (EqualityComparer.Equals(element, _symbol))
-                _total = MathHelpers.Increment(_total);
+                _total = ArithmeticHelpers.Increment(_total);
             return true;
         }
     }

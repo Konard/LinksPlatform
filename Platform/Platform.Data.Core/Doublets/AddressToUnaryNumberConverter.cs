@@ -22,7 +22,7 @@ namespace Platform.Data.Core.Doublets
             var target = Links.Constants.Null;
             for (int i = 0; i < CachedTypeInfo<TLink>.BitsLength; i++)
             {
-                if (EqualityComparer.Equals(MathHelpers.And(number, Integer<TLink>.One), Integer<TLink>.One))
+                if (EqualityComparer.Equals(ArithmeticHelpers.And(number, Integer<TLink>.One), Integer<TLink>.One))
                 {
                     if (EqualityComparer.Equals(target, Links.Constants.Null))
                         target = _powerOf2ToUnaryNumberConverter.Convert(i);

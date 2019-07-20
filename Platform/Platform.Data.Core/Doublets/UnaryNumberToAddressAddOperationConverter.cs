@@ -49,10 +49,10 @@ namespace Platform.Data.Core.Doublets
                 while (!_unaryToUInt64.TryGetValue(target, out lastValue))
                 {
                     source = Links.GetSource(target);
-                    result = MathHelpers.Add(result, _unaryToUInt64[source]);
+                    result = ArithmeticHelpers.Add(result, _unaryToUInt64[source]);
                     target = Links.GetTarget(target);
                 }
-                result = MathHelpers.Add(result, lastValue);
+                result = ArithmeticHelpers.Add(result, lastValue);
                 return result;
             }
         }
