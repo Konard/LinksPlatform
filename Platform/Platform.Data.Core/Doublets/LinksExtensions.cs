@@ -64,8 +64,9 @@ namespace Platform.Data.Core.Doublets
         public static void DeleteAll<TLink>(this ILinks<TLink> links)
         {
             var equalityComparer = EqualityComparer<TLink>.Default;
+            var comparer = Comparer<TLink>.Default;
 
-            for (var i = links.Count(); MathHelpers.GreaterThan(i, default); i = MathHelpers.Decrement(i))
+            for (var i = links.Count(); comparer.Compare(i, default) > 0; i = MathHelpers.Decrement(i))
             {
                 links.Delete(i);
                 if (!equalityComparer.Equals(links.Count(), MathHelpers.Decrement(i)))
@@ -213,7 +214,8 @@ namespace Platform.Data.Core.Doublets
         public static bool IsInnerReference<TLink>(this ILinks<TLink> links, TLink reference)
         {
             var constants = links.Constants;
-            return MathHelpers.GreaterOrEqualThan(constants.MinPossibleIndex, reference) && MathHelpers.LessOrEqualThan(reference, constants.MaxPossibleIndex);
+            var comparer = Comparer<TLink>.Default;
+            return (comparer.Compare(constants.MinPossibleIndex, reference) >= 0) && (comparer.Compare(reference, constants.MaxPossibleIndex) <= 0);
         }
 
         #region Points
@@ -458,7 +460,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="link">Индекс проверяемой на существование связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<TLink>(this ILinks<TLink> links, TLink link) => MathHelpers.GreaterThan(links.Count(link), default);
+        public static bool Exists<TLink>(this ILinks<TLink> links, TLink link) => Comparer<TLink>.Default.Compare(links.Count(link), default) > 0;
 
         /// <summary>
         /// Возвращает значение, определяющее существует ли связь с указанными началом и концом в хранилище связей.
@@ -468,7 +470,7 @@ namespace Platform.Data.Core.Doublets
         /// <param name="target">Конец связи.</param>
         /// <returns>Значение, определяющее существует ли связь.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<TLink>(this ILinks<TLink> links, TLink source, TLink target) => MathHelpers.GreaterThan(links.Count(links.Constants.Any, source, target), default);
+        public static bool Exists<TLink>(this ILinks<TLink> links, TLink source, TLink target) => Comparer<TLink>.Default.Compare(links.Count(links.Constants.Any, source, target), default) > 0;
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

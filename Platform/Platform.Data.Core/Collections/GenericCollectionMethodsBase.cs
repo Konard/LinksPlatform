@@ -9,6 +9,7 @@ namespace Platform.Data.Core.Collections
     public abstract class GenericCollectionMethodsBase<TElement>
     {
         private static readonly EqualityComparer<TElement> EqualityComparer = EqualityComparer<TElement>.Default;
+        private static readonly Comparer<TElement> Comparer = Comparer<TElement>.Default;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual TElement GetZero() => Integer<TElement>.Zero;
@@ -29,28 +30,28 @@ namespace Platform.Data.Core.Collections
         protected virtual bool IsEquals(TElement first, TElement second) => EqualityComparer.Equals(first, second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool GreaterThanZero(TElement value) => MathHelpers<TElement>.GreaterThan(value, GetZero());
+        protected virtual bool GreaterThanZero(TElement value) => Comparer.Compare(value, GetZero()) > 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool GreaterThan(TElement first, TElement second) => MathHelpers<TElement>.GreaterThan(first, second);
+        protected virtual bool GreaterThan(TElement first, TElement second) => Comparer.Compare(first, second) > 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool GreaterOrEqualThanZero(TElement value) => MathHelpers<TElement>.GreaterOrEqualThan(value, GetZero());
+        protected virtual bool GreaterOrEqualThanZero(TElement value) => Comparer.Compare(value, GetZero()) >= 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool GreaterOrEqualThan(TElement first, TElement second) => MathHelpers<TElement>.GreaterOrEqualThan(first, second);
+        protected virtual bool GreaterOrEqualThan(TElement first, TElement second) => Comparer.Compare(first, second) >= 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool LessOrEqualThanZero(TElement value) => MathHelpers<TElement>.LessOrEqualThan(value, GetZero());
+        protected virtual bool LessOrEqualThanZero(TElement value) => Comparer.Compare(value, GetZero()) <= 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool LessOrEqualThan(TElement first, TElement second) => MathHelpers<TElement>.LessOrEqualThan(first, second);
+        protected virtual bool LessOrEqualThan(TElement first, TElement second) => Comparer.Compare(first, second) <= 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool LessThanZero(TElement value) => MathHelpers<TElement>.LessThan(value, GetZero());
+        protected virtual bool LessThanZero(TElement value) => Comparer.Compare(value, GetZero()) < 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual bool LessThan(TElement first, TElement second) => MathHelpers<TElement>.LessThan(first, second);
+        protected virtual bool LessThan(TElement first, TElement second) => Comparer.Compare(first, second) < 0;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected virtual TElement Increment(TElement value) => MathHelpers<TElement>.Increment(value);

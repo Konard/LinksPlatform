@@ -97,21 +97,6 @@ namespace Platform.Helpers.Numbers
         public static T Decrement<T>(T x) => MathHelpers<T>.Decrement(x);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEquals<T>(T x, T y) => MathHelpers<T>.IsEquals(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GreaterThan<T>(T x, T y) => MathHelpers<T>.GreaterThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool GreaterOrEqualThan<T>(T x, T y) => MathHelpers<T>.GreaterOrEqualThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool LessThan<T>(T x, T y) => MathHelpers<T>.LessThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool LessOrEqualThan<T>(T x, T y) => MathHelpers<T>.LessOrEqualThan(x, y);
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static T Abs<T>(T x) => MathHelpers<T>.Abs(x);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -136,11 +121,6 @@ namespace Platform.Helpers.Numbers
         public static readonly Func<T, T> Increment;
         public static readonly Func<T, T, T> Subtract;
         public static readonly Func<T, T> Decrement;
-        public static readonly Func<T, T, bool> IsEquals;
-        public static readonly Func<T, T, bool> GreaterThan;
-        public static readonly Func<T, T, bool> GreaterOrEqualThan;
-        public static readonly Func<T, T, bool> LessThan;
-        public static readonly Func<T, T, bool> LessOrEqualThan;
         public static readonly Func<T, T> Abs;
         public static readonly Func<T, T> Negate;
         public static readonly Func<T, T, int, int, T> PartialWrite;
@@ -190,67 +170,6 @@ namespace Platform.Helpers.Numbers
 
                 emiter.LoadArgument(0);
                 emiter.Decrement(typeof(T));
-                emiter.Return();
-            });
-
-            DelegateHelpers.Compile(out IsEquals, emiter =>
-            {
-                EnsureCanBeNumeric();
-
-                emiter.LoadArguments(0, 1);
-                emiter.CompareEqual();
-                emiter.Return();
-            });
-
-            DelegateHelpers.Compile(out GreaterThan, emiter =>
-            {
-                EnsureNumeric();
-
-                emiter.LoadArguments(0, 1);
-                emiter.CompareGreaterThan(CachedTypeInfo<T>.IsSigned);
-                emiter.Return();
-            });
-
-            DelegateHelpers.Compile(out GreaterOrEqualThan, emiter =>
-            {
-                EnsureNumeric();
-
-                var secondIsGreaterOrEqual = emiter.DefineLabel();
-                var theEnd = emiter.DefineLabel();
-
-                emiter.LoadArguments(0, 1);
-                emiter.BranchIfGreaterOrEqual(CachedTypeInfo<T>.IsSigned, secondIsGreaterOrEqual);
-                emiter.LoadConstant(false);
-                emiter.Branch(theEnd);
-                emiter.MarkLabel(secondIsGreaterOrEqual);
-                emiter.LoadConstant(true);
-                emiter.MarkLabel(theEnd);
-                emiter.Return();
-            });
-
-            DelegateHelpers.Compile(out LessThan, emiter =>
-            {
-                EnsureNumeric();
-
-                emiter.LoadArguments(0, 1);
-                emiter.CompareLessThan(CachedTypeInfo<T>.IsSigned);
-                emiter.Return();
-            });
-
-            DelegateHelpers.Compile(out LessOrEqualThan, emiter =>
-            {
-                EnsureNumeric();
-
-                var secondIsLessOrEqual = emiter.DefineLabel();
-                var theEnd = emiter.DefineLabel();
-
-                emiter.LoadArguments(0, 1);
-                emiter.BranchIfLessOrEqual(CachedTypeInfo<T>.IsSigned, secondIsLessOrEqual);
-                emiter.LoadConstant(false);
-                emiter.Branch(theEnd);
-                emiter.MarkLabel(secondIsLessOrEqual);
-                emiter.LoadConstant(true);
-                emiter.MarkLabel(theEnd);
                 emiter.Return();
             });
 
@@ -410,12 +329,6 @@ namespace Platform.Helpers.Numbers
 
                 emiter.Return();
             });
-        }
-
-        private static void EnsureCanBeNumeric()
-        {
-            if (!CachedTypeInfo<T>.CanBeNumeric)
-                throw new NotSupportedException();
         }
 
         private static void EnsureNumeric()

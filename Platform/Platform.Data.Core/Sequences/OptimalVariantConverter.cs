@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Interfaces;
-using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Data.Core.Sequences
@@ -9,6 +8,7 @@ namespace Platform.Data.Core.Sequences
     public class OptimalVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
 
         private readonly IConverter<IList<TLink>> _sequenceToItsLocalElementLevelsConverter;
 
@@ -101,14 +101,14 @@ namespace Platform.Data.Core.Sequences
 
         private TLink GetGreatestNeigbourLowerThanCurrentOrCurrent(TLink previous, TLink current, TLink next)
         {
-            if (MathHelpers.GreaterThan(previous, next))
-                return MathHelpers.LessThan(previous, current) ? previous : current;
+            if (Comparer.Compare(previous, next) > 0)
+                return Comparer.Compare(previous, current) < 0 ? previous : current;
             else
-                return MathHelpers.LessThan(next, current) ? next : current;
+                return Comparer.Compare(next, current) < 0 ? next : current;
         }
 
-        private TLink GetNextLowerThanCurrentOrCurrent(TLink current, TLink next) => MathHelpers.LessThan(next, current) ? next : current;
+        private TLink GetNextLowerThanCurrentOrCurrent(TLink current, TLink next) => Comparer.Compare(next, current) < 0 ? next : current;
 
-        private TLink GetPreviousLowerThanCurrentOrCurrent(TLink previous, TLink current) => MathHelpers.LessThan(previous, current) ? previous : current;
+        private TLink GetPreviousLowerThanCurrentOrCurrent(TLink previous, TLink current) => Comparer.Compare(previous, current) < 0 ? previous : current;
     }
 }

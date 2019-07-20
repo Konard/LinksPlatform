@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 
@@ -8,6 +7,8 @@ namespace Platform.Data.Core.Sequences
 {
     public class SequenceToItsLocalElementLevelsConverter<TLink> : LinksOperatorBase<TLink>, IConverter<IList<TLink>>
     {
+        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+
         private readonly IConverter<Doublet<TLink>, TLink> _linkToItsFrequencyToNumberConveter;
 
         public SequenceToItsLocalElementLevelsConverter(ILinks<TLink> links, IConverter<Doublet<TLink>, TLink> linkToItsFrequencyToNumberConveter) : base(links) => _linkToItsFrequencyToNumberConveter = linkToItsFrequencyToNumberConveter;
@@ -21,7 +22,7 @@ namespace Platform.Data.Core.Sequences
             {
                 var previous = GetFrequencyNumber(sequence[i - 1], sequence[i]);
                 var next = GetFrequencyNumber(sequence[i], sequence[i + 1]);
-                levels[i] = MathHelpers.GreaterThan(previous, next) ? previous : next;
+                levels[i] = Comparer.Compare(previous, next) > 0 ? previous : next;
             }
 
             levels[levels.Length - 1] = GetFrequencyNumber(sequence[sequence.Count - 2], sequence[sequence.Count - 1]);

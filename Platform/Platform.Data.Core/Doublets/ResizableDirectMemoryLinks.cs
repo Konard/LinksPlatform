@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-
 using Platform.Disposables;
 using Platform.Helpers;
 using Platform.Collections.Arrays;
@@ -29,6 +28,7 @@ namespace Platform.Data.Core.Doublets
     public partial class ResizableDirectMemoryLinks<TLink> : DisposableBase, ILinks<TLink>
     {
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
 
         /// <summary>Возвращает размер одной связи в байтах.</summary>
         public static readonly int LinkSizeInBytes = StructureHelpers.SizeOf<Link>();
@@ -304,7 +304,7 @@ namespace Platform.Data.Core.Doublets
         {
             if (restrictions.Count == 0)
             {
-                for (TLink link = Integer<TLink>.One; LessOrEqualThan(link, (TLink)(Integer<TLink>)LinksHeader.GetAllocatedLinks(_header)); link = Increment(link))
+                for (TLink link = Integer<TLink>.One; Comparer.Compare(link, (TLink)(Integer<TLink>)LinksHeader.GetAllocatedLinks(_header)) <= 0; link = Increment(link))
                     if (Exists(link))
                         if (EqualityComparer.Equals(handler(GetLinkStruct(link)), Constants.Break))
                             return Constants.Break;
@@ -451,10 +451,10 @@ namespace Platform.Data.Core.Doublets
                 _unusedLinksListMethods.Detach(freeLink);
             else
             {
-                if (GreaterThan(LinksHeader.GetAllocatedLinks(_header), Constants.MaxPossibleIndex))
+                if (Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Constants.MaxPossibleIndex) > 0)
                     throw new LinksLimitReachedException((Integer<TLink>)Constants.MaxPossibleIndex);
 
-                if (GreaterOrEqualThan(LinksHeader.GetAllocatedLinks(_header), Decrement(LinksHeader.GetReservedLinks(_header))))
+                if (Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Decrement(LinksHeader.GetReservedLinks(_header))) >= 0)
                 {
                     _memory.ReservedCapacity += _memoryReservationStep;
                     SetPointers(_memory);
@@ -471,7 +471,7 @@ namespace Platform.Data.Core.Doublets
 
         public void Delete(TLink link)
         {
-            if (LessThan(link, LinksHeader.GetAllocatedLinks(_header)))
+            if (Comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) < 0)
                 _unusedLinksListMethods.AttachAsFirst(link);
             else if (EqualityComparer.Equals(link, LinksHeader.GetAllocatedLinks(_header)))
             {
@@ -480,7 +480,7 @@ namespace Platform.Data.Core.Doublets
 
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
-                while (GreaterThan(LinksHeader.GetAllocatedLinks(_header), Integer<TLink>.Zero) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
+                while ((Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Integer<TLink>.Zero) > 0) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
                 {
                     _unusedLinksListMethods.Detach(LinksHeader.GetAllocatedLinks(_header));
 
@@ -520,7 +520,7 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool Exists(TLink link)
         {
-            return GreaterOrEqualThan(link, Constants.MinPossibleIndex) && LessOrEqualThan(link, LinksHeader.GetAllocatedLinks(_header)) && !IsUnusedLink(link);
+            return (Comparer.Compare(link, Constants.MinPossibleIndex) >= 0) && (Comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) <= 0) && !IsUnusedLink(link);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

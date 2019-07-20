@@ -112,7 +112,7 @@ namespace Platform.Data.Core.Doublets
                 while (!EqualToZero(current))
                 {
                     var @base = GetBasePartValue(current);
-                    if (MathHelpers.GreaterOrEqualThan(@base, link))
+                    if (GreaterOrEqualThan(@base, link))
                     {
                         if (IsEquals(@base, link))
                             first = current;

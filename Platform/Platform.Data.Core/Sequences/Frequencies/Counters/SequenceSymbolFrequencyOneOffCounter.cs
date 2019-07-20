@@ -8,6 +8,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
     public class SequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
 
         protected readonly ILinks<TLink> _links;
         protected readonly TLink _sequenceLink;
@@ -24,7 +25,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
 
         public virtual TLink Count()
         {
-            if (MathHelpers.GreaterThan(_total, default))
+            if (Comparer.Compare(_total, default) > 0)
                 return _total;
             StopableSequenceWalker.WalkRight(_sequenceLink, _links.GetSource, _links.GetTarget, IsElement, VisitElement);
             return _total;

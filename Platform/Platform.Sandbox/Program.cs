@@ -14,7 +14,7 @@ namespace Platform.Sandbox
         {
             //StringTests.CapitalizeFirstLetterTest();
 
-            SystemTests.EqualsPerfomanceTest();
+            ComparisonTests.GreaterOrEqualPerfomanceTest();
 
             //args = new string[] { "C:\\compressed.links", "C:\\compressed1.csv", "True", "True", "True" };
 

@@ -19,6 +19,7 @@ namespace Platform.Data.Core.Sequences
     {
         private static readonly LinksConstants<bool, TLink, long> Constants = Default<LinksConstants<bool, TLink, long>>.Instance;
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
 
         private readonly IConverter<IList<TLink>, TLink> _baseConverter;
         private readonly LinkFrequenciesCache<TLink> _doubletFrequenciesCache;
@@ -57,7 +58,7 @@ namespace Platform.Data.Core.Sequences
             _baseConverter = baseConverter;
             _doubletFrequenciesCache = doubletFrequenciesCache;
 
-            if (MathHelpers.LessThan(minFrequencyToCompress, Integer<TLink>.One)) minFrequencyToCompress = Integer<TLink>.One;
+            if (Comparer.Compare(minFrequencyToCompress, Integer<TLink>.One) < 0) minFrequencyToCompress = Integer<TLink>.One;
             _minFrequencyToCompress = minFrequencyToCompress;
 
             _doInitialFrequenciesIncrement = doInitialFrequenciesIncrement;
@@ -111,7 +112,7 @@ namespace Platform.Data.Core.Sequences
             copy[sequence.Count - 1].Element = sequence[sequence.Count - 1];
             copy[sequence.Count - 1].DoubletData = new LinkFrequency<TLink>();
 
-            if (MathHelpers.GreaterThan(_maxDoubletData.Frequency, default))
+            if (Comparer.Compare(_maxDoubletData.Frequency, default) > 0)
             {
                 var newLength = ReplaceDoublets(copy);
 
@@ -132,7 +133,7 @@ namespace Platform.Data.Core.Sequences
             var oldLength = copy.Length;
             var newLength = copy.Length;
 
-            while (MathHelpers.GreaterThan(_maxDoubletData.Frequency, default))
+            while (Comparer.Compare(_maxDoubletData.Frequency, default) > 0)
             {
                 var maxDoubletSource = _maxDoublet.Source;
                 var maxDoubletTarget = _maxDoublet.Target;
@@ -213,8 +214,8 @@ namespace Platform.Data.Core.Sequences
             var maxFrequency = _maxDoubletData.Frequency;
 
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
-            if (MathHelpers.GreaterThan(frequency, _minFrequencyToCompress) &&
-               (MathHelpers.LessThan(maxFrequency, frequency) || (EqualityComparer.Equals(maxFrequency, frequency) && MathHelpers.GreaterThan(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target))))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+            if ((Comparer.Compare(frequency, _minFrequencyToCompress) > 0) &&
+               ((Comparer.Compare(maxFrequency, frequency) < 0) || (EqualityComparer.Equals(maxFrequency, frequency) && (Comparer.Compare(MathHelpers.Add(doublet.Source, doublet.Target), MathHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;
