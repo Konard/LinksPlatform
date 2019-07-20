@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 
 namespace Platform.Data.Core.Triplets
 {

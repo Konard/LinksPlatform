@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using Platform.Collections.Arrays;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {

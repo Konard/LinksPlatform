@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 using Platform.Communication.Protocol.Gexf;
 using Node = Platform.Communication.Protocol.Gexf.Node;
 using Platform.Data.Core.Doublets;

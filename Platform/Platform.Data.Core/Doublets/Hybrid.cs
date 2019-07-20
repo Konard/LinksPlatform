@@ -2,7 +2,7 @@
 using System.Reflection;
 using Platform.Reflection;
 using Platform.Converters;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 
 namespace Platform.Data.Core.Doublets
 {

@@ -2,7 +2,7 @@
 using Xunit;
 using Platform.Reflection;
 using Platform.Helpers;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 using Platform.Memory;
 using Platform.Data.Core.Doublets;
 

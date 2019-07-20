@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 
 namespace Platform.Data.Core.Sequences.Frequencies.Cache
 {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 using Platform.Helpers.Unsafe;
 using Platform.Data.Core.Collections.Trees;
 

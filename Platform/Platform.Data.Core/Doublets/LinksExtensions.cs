@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Collections.Arrays;
 using Platform.Helpers;
-using Platform.Helpers.Numbers;
+using Platform.Numbers;
 using Platform.Helpers.Random;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
