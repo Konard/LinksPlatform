@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Xunit;
 using Platform.Helpers;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Tests
 {
@@ -20,8 +19,6 @@ namespace Platform.Tests
         private static bool Equals2<T>(T x, T y) => x.Equals(y);
 
         private static bool Equals3(ulong x, ulong y) => x == y;
-
-        //private static readonly Func<ulong, ulong, bool> IsEquals = MathHelpers<ulong>.IsEquals;
 
         [Fact]
         public static void EqualsPerfomanceTest()
@@ -51,32 +48,9 @@ namespace Platform.Tests
                     result = Equals3(x, y);
             });
 
-            //if (!result)
-            //    result = MathHelpers<ulong>.IsEquals(x, y); // Ensure precompiled
-
-            //var ts4 = PerformanceHelpers.Measure(() =>
-            //{
-            //    for (int i = 0; i < N; i++)
-            //        result = MathHelpers<ulong>.IsEquals(x, y);
-            //});
-
-            //Func<ulong, ulong, bool> isEqualsReference = MathHelpers<ulong>.IsEquals;
-
-            //var ts9 = PerformanceHelpers.Measure(() =>
-            //{
-            //    for (int i = 0; i < N; i++)
-            //        result = isEqualsReference(x, y);
-            //});
-
-            //var ts10 = PerformanceHelpers.Measure(() =>
-            //{
-            //    for (int i = 0; i < N; i++)
-            //        result = IsEquals(x, y);
-            //});
-
             var equalityComparer1 = EqualityComparer<ulong>.Default;
 
-            var ts5 = PerformanceHelpers.Measure(() =>
+            var ts4 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
                     result = equalityComparer1.Equals(x, y);
@@ -84,7 +58,7 @@ namespace Platform.Tests
 
             var equalityComparer2 = new UInt64EqualityComparer();
 
-            var ts6 = PerformanceHelpers.Measure(() =>
+            var ts5 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
                     result = equalityComparer2.Equals(x, y);
@@ -92,7 +66,7 @@ namespace Platform.Tests
 
             Func<ulong, ulong, bool> equalityComparer3 = equalityComparer2.Equals;
 
-            var ts7 = PerformanceHelpers.Measure(() =>
+            var ts6 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
                     result = equalityComparer3(x, y);
@@ -100,7 +74,7 @@ namespace Platform.Tests
 
             var comparer = Comparer<ulong>.Default;
 
-            var ts8 = PerformanceHelpers.Measure(() =>
+            var ts7 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
                     result = comparer.Compare(x, y) == 0;
@@ -108,12 +82,10 @@ namespace Platform.Tests
 
             Assert.True(ts2 < ts1);
             Assert.True(ts3 < ts2);
-            //Assert.True(ts4 < ts2);
-            //Assert.True(ts6 < ts4);
-            Assert.True(ts6 < ts5);
-            Assert.True(ts6 < ts7);
+            Assert.True(ts5 < ts4);
+            Assert.True(ts5 < ts6);
 
-            Console.WriteLine($"{ts1} {ts2} {ts3} {ts5} {ts6} {ts7} {ts8} {result}");
+            Console.WriteLine($"{ts1} {ts2} {ts3} {ts4} {ts5} {ts6} {ts7} {result}");
         }
     }
 }

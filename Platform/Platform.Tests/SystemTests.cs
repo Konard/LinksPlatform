@@ -1,10 +1,5 @@
 ﻿using System;
-using System.Diagnostics;
 using Xunit;
-using Platform.Helpers;
-using Platform.Helpers.Numbers;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 
 namespace Platform.Tests
 {

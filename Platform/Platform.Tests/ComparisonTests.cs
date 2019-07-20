@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using Xunit;
 using Platform.Helpers;
-using Platform.Helpers.Numbers;
 
 namespace Platform.Tests
 {
@@ -47,32 +46,15 @@ namespace Platform.Tests
                     result = compareReference(x, y) >= 0;
             });
 
-            //if (!result)
-            //    result = MathHelpers<ulong>.GreaterOrEqualThan(x, y); // Ensure precompiled
-
-            //var ts4 = PerformanceHelpers.Measure(() =>
-            //{
-            //    for (int i = 0; i < N; i++)
-            //        result = MathHelpers<ulong>.GreaterOrEqualThan(x, y);
-            //});
-
-            //Func<ulong, ulong, bool> greaterOrEqualReference = MathHelpers<ulong>.GreaterOrEqualThan;
-
-            //var ts5 = PerformanceHelpers.Measure(() =>
-            //{
-            //    for (int i = 0; i < N; i++)
-            //        result = greaterOrEqualReference(x, y);
-            //});
-
             var comparer2 = new UInt64Comparer();
 
-            var ts6 = PerformanceHelpers.Measure(() =>
+            var ts4 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
                     result = comparer2.Compare(x, y) >= 0;
             });
 
-            Console.WriteLine($"{ts1} {ts2} {ts3} {ts6} {result}");
+            Console.WriteLine($"{ts1} {ts2} {ts3} {ts4} {result}");
         }
     }
 }
