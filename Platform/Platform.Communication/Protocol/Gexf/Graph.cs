@@ -37,17 +37,17 @@ namespace Platform.Communication.Protocol.Gexf
 
         public void WriteXml(XmlWriter writer)
         {
-            Action writeNodes = () =>
-                {
-                    for (var i = 0; i < Nodes.Count; i++)
-                        Nodes[i].WriteXml(writer);
-                };
+            void writeNodes()
+            {
+                for (var i = 0; i < Nodes.Count; i++)
+                    Nodes[i].WriteXml(writer);
+            }
 
-            Action writeEdges = () =>
-                {
-                    for (var i = 0; i < Edges.Count; i++)
-                        Edges[i].WriteXml(writer);
-                };
+            void writeEdges()
+            {
+                for (var i = 0; i < Edges.Count; i++)
+                    Edges[i].WriteXml(writer);
+            }
 
             WriteXml(writer, writeNodes, writeEdges, Mode, DefaultEdgeType);
         }

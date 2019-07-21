@@ -19,11 +19,6 @@ namespace Platform.Communication.Protocol.Udp
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static string ReceiveString(this UdpClient udp)
-        {
-            var bytes = udp.ReceiveAsync().AwaitResult().Buffer;
-            var message = DefaultEncoding.GetString(bytes);
-            return message;
-        }
+        public static string ReceiveString(this UdpClient udp) => DefaultEncoding.GetString(udp.ReceiveAsync().AwaitResult().Buffer);
     }
 }

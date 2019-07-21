@@ -10,15 +10,17 @@
     <AssemblyName>Platform.Communication</AssemblyName>
     <PackageId>Platform.Communication</PackageId>
     <PackageTags>Communication;Protocols;Gexf;Udp;UdpSender;UdpReceiver</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png</PackageIconUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/linksplatform/Documentation/18469f4d033ee9a5b7b84caab9c585acab2ac519/doc/Avatar-rainbow-icon-64x64.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Communication</PackageProjectUrl>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE</PackageLicenseUrl>
+    <PackageLicenseExpression>LGPL-3.0-only</PackageLicenseExpression>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>git://github.com/Konard/LinksPlatform</RepositoryUrl>
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
