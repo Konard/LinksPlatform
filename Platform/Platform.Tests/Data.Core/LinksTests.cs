@@ -11,7 +11,6 @@ using Platform.IO;
 using Platform.Ranges;
 using Platform.Random;
 using Platform.Helpers;
-using Platform.Helpers.Console;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
@@ -9,6 +9,10 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Platform.IO" Version="0.0.3" />
   </ItemGroup>
 
 </Project>

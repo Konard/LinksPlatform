@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <Description>LinksPlatform's Platform.Examples Class Library</Description>
@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.runner.utility" Version="2.4.1" />
+    <PackageReference Include="Platform.IO" Version="0.0.3" />
   </ItemGroup>
 
 </Project>
