@@ -5,13 +5,13 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Platform.Collections.Arrays;
-using Platform.Helpers;
 using Platform.Numbers;
-using Platform.Helpers.Random;
+using Platform.Ranges;
+using Platform.Random;
+using Platform.Helpers;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
-using Platform.Ranges;
 
 namespace Platform.Data.Core.Doublets
 {

@@ -159,7 +159,7 @@ namespace Platform.Sandbox
 
         private static void Links()
         {
-            var filename = (new Random(2)).Next(1, 99999).ToString();
+            var filename = (new System.Random(2)).Next(1, 99999).ToString();
 
             //if (File.Exists(filename))
             //    File.Delete(filename);

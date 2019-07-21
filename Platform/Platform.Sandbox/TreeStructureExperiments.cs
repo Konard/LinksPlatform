@@ -397,7 +397,7 @@ namespace Platform.Sandbox
 
             //for (; seed < 10000; seed++)
             //{
-            var rnd = new Random(seed);
+            var rnd = new System.Random(seed);
 
             // Fill the tree
 

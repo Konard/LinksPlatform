@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Xunit;
 using Platform.Collections;
-using Platform.Helpers.Random;
+using Platform.Random;
 
 namespace Platform.Tests.Data.Core
 {

@@ -8,11 +8,11 @@ using System.Threading.Tasks;
 using Xunit;
 using Platform.Disposables;
 using Platform.IO;
+using Platform.Ranges;
+using Platform.Random;
 using Platform.Helpers;
 using Platform.Helpers.Console;
-using Platform.Helpers.Random;
 using Platform.Data.Core.Doublets;
-using Platform.Ranges;
 
 namespace Platform.Tests.Data.Core
 {
@@ -35,7 +35,7 @@ namespace Platform.Tests.Data.Core
 
                 for (var N = 0; N < 100; N++)
                 {
-                    var random = new Random(N);
+                    var random = new System.Random(N);
 
                     var created = 0;
                     var deleted = 0;
@@ -43,12 +43,12 @@ namespace Platform.Tests.Data.Core
                     for (var i = 0; i < N; i++)
                     {
                         var linksCount = links.Count();
-                        var linksAddressRange = new Range<ulong>(1, linksCount);
-
+                        
                         var createPoint = random.NextBoolean();
 
                         if (linksCount > 2 && createPoint)
                         {
+                            var linksAddressRange = new Range<ulong>(1, linksCount);
                             var source = random.NextUInt64(linksAddressRange);
                             var target = random.NextUInt64(linksAddressRange); //-V3086
 
