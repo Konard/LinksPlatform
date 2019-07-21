@@ -32,10 +32,10 @@ namespace Platform.Data.Core.Collections.Trees
         protected abstract bool FirstIsToTheRightOfSecond(TElement first, TElement second);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetLeftOrDefault(TElement node) => GetLeftPointer(node) != IntPtr.Zero ? GetLeftValue(node) : default(TElement);
+        protected virtual TElement GetLeftOrDefault(TElement node) => GetLeftPointer(node) != IntPtr.Zero ? GetLeftValue(node) : default;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        protected virtual TElement GetRightOrDefault(TElement node) => GetRightPointer(node) != IntPtr.Zero ? GetRightValue(node) : default(TElement);
+        protected virtual TElement GetRightOrDefault(TElement node) => GetRightPointer(node) != IntPtr.Zero ? GetRightValue(node) : default;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         protected void IncrementSize(TElement node) => SetSize(node, Increment(GetSize(node)));
