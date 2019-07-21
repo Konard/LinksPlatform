@@ -1,6 +1,4 @@
-﻿using System;
-using System.Diagnostics;
-using Platform.Exceptions;
+﻿using System.Diagnostics;
 
 namespace Platform.Helpers.Console
 {
@@ -32,13 +30,5 @@ namespace Platform.Helpers.Console
 
         [Conditional("DEBUG")]
         public static void Debug(string format, params object[] args) => System.Console.WriteLine(format, args);
-
-        [Conditional("DEBUG")]
-        public static void EnableIgnoredExceptionsAutoPrint() => Global.IgnoredException += OnIgnoredException;
-
-        [Conditional("DEBUG")]
-        public static void DisableIgnoredExceptionsAutoPrint() => Global.IgnoredException -= OnIgnoredException;
-
-        private static void OnIgnoredException(object sender, Exception e) => System.Console.WriteLine(e.ToRecursiveString());
     }
 }
