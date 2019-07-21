@@ -26,7 +26,7 @@
     <PackageReference Include="Platform.Timestamps" Version="0.0.1" />
     <PackageReference Include="Platform.Random" Version="0.0.1" />
     <PackageReference Include="Platform.Memory" Version="0.1.0" />
-    <ProjectReference Include="../Platform.Communication/Platform.Communication.csproj" />
+    <PackageReference Include="Platform.Communication" Version="0.1.0" />
   </ItemGroup>
 
 </Project>
