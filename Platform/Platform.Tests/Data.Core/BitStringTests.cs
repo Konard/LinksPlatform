@@ -22,7 +22,7 @@ namespace Platform.Tests.Data.Core
 
             for (var i = 0; i < n; i++)
             {
-                var value = RandomHelpers.DefaultFactory.Next(0, 2) == 0;
+                var value = RandomHelpers.Default.Next(0, 2) == 0;
                 array.Set(i, value);
                 str.Set(i, value);
 

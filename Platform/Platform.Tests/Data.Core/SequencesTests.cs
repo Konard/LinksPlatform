@@ -753,7 +753,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             var strings = new List<string>();
 
             for (ulong i = 0; i < N; i++)
-                strings.Add(RandomHelpers.DefaultFactory.NextUInt64().ToString());
+                strings.Add(RandomHelpers.Default.NextUInt64().ToString());
 
             strings = strings.Distinct().ToList();
 

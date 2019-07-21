@@ -12,6 +12,7 @@ using Platform.Helpers;
 using Platform.Helpers.Console;
 using Platform.Helpers.Random;
 using Platform.Data.Core.Doublets;
+using Platform.Ranges;
 
 namespace Platform.Tests.Data.Core
 {
@@ -42,13 +43,14 @@ namespace Platform.Tests.Data.Core
                     for (var i = 0; i < N; i++)
                     {
                         var linksCount = links.Count();
+                        var linksAddressRange = new Range<ulong>(1, linksCount);
 
                         var createPoint = random.NextBoolean();
 
                         if (linksCount > 2 && createPoint)
                         {
-                            var source = random.NextUInt64(1, linksCount);
-                            var target = random.NextUInt64(1, linksCount); //-V3086
+                            var source = random.NextUInt64(linksAddressRange);
+                            var target = random.NextUInt64(linksAddressRange); //-V3086
 
                             var resultLink = links.CreateAndUpdate(source, target);
                             if (resultLink > linksCount)
@@ -775,8 +777,10 @@ namespace Platform.Tests.Data.Core
 
                 for (var i = iterations; i > 0; i--)
                 {
-                    var source = RandomHelpers.DefaultFactory.NextUInt64(Constants.MinPossibleIndex, maxLink);
-                    var target = RandomHelpers.DefaultFactory.NextUInt64(Constants.MinPossibleIndex, maxLink);
+                    var linksAddressRange = new Range<ulong>(Constants.MinPossibleIndex, maxLink);
+
+                    var source = RandomHelpers.Default.NextUInt64(linksAddressRange);
+                    var target = RandomHelpers.Default.NextUInt64(linksAddressRange);
 
                     counter += links.SearchOrDefault(source, target);
                 }

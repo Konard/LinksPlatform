@@ -6,6 +6,6 @@
     /// </remarks>
     public static class RandomHelpers
     {
-        public static readonly System.Random DefaultFactory = Singleton.Get(() => new System.Random((int)System.DateTime.UtcNow.Ticks));
+        public static readonly System.Random Default = new System.Random((int)System.DateTime.UtcNow.Ticks);
     }
 }

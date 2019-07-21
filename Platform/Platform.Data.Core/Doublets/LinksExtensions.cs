@@ -11,6 +11,7 @@ using Platform.Helpers.Random;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
 using Platform.Data.Core.Sequences;
+using Platform.Ranges;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -24,8 +25,10 @@ namespace Platform.Data.Core.Doublets
         {
             for (long i = 0; i < amountOfCreations; i++)
             {
-                Integer<TLink> source = RandomHelpers.DefaultFactory.NextUInt64((Integer<TLink>)links.Count());
-                Integer<TLink> target = RandomHelpers.DefaultFactory.NextUInt64((Integer<TLink>)links.Count());
+                var linksAddressRange = new Range<ulong>(0, (Integer<TLink>)links.Count());
+
+                Integer<TLink> source = RandomHelpers.Default.NextUInt64(linksAddressRange);
+                Integer<TLink> target = RandomHelpers.Default.NextUInt64(linksAddressRange);
 
                 links.CreateAndUpdate(source, target);
             }
@@ -35,8 +38,10 @@ namespace Platform.Data.Core.Doublets
         {
             for (long i = 0; i < amountOfSearches; i++)
             {
-                Integer<TLink> source = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<TLink>)links.Count());
-                Integer<TLink> target = RandomHelpers.DefaultFactory.NextUInt64(1, (Integer<TLink>)links.Count());
+                var linkAddressRange = new Range<ulong>(1, (Integer<TLink>)links.Count());
+
+                Integer<TLink> source = RandomHelpers.Default.NextUInt64(linkAddressRange);
+                Integer<TLink> target = RandomHelpers.Default.NextUInt64(linkAddressRange);
 
                 links.SearchOrDefault(source, target);
             }
@@ -48,7 +53,8 @@ namespace Platform.Data.Core.Doublets
 
             for (long i = 0; i < amountOfDeletions; i++)
             {
-                Integer<TLink> link = RandomHelpers.DefaultFactory.NextUInt64(min, (Integer<TLink>)links.Count());
+                var linksAddressRange = new Range<ulong>(min, (Integer<TLink>)links.Count());
+                Integer<TLink> link = RandomHelpers.Default.NextUInt64(linksAddressRange);
                 links.Delete(link);
                 if ((Integer<TLink>)links.Count() < min)
                     break;
