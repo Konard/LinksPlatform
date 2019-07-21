@@ -23,10 +23,7 @@
 
   <ItemGroup>
     <PackageReference Include="Platform.Threading" Version="0.0.3" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="../Platform.Helpers/Platform.Helpers.csproj" />
+    <PackageReference Include="Platform.Helpers" Version="0.1.0" />
   </ItemGroup>
 
 </Project>
