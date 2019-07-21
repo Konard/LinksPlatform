@@ -14,12 +14,9 @@ namespace Platform.Helpers
         private readonly bool _autoInclude;
         private readonly bool _autoExplore;
         private readonly Stack<object> _dependencies = new Stack<object>();
-
         private readonly HashSet<object> _excludes = new HashSet<object>();
         private readonly HashSet<object> _includes = new HashSet<object>();
-
         private readonly HashSet<object> _blocked = new HashSet<object>();
-
         private readonly Dictionary<Type, object> _resolutions = new Dictionary<Type, object>();
 
         public Scope()
@@ -96,8 +93,7 @@ namespace Platform.Helpers
             if (_autoInclude)
                 Include<T>();
 
-            T resolved;
-            if (!TryResolve(out resolved))
+            if (!TryResolve(out T resolved))
                 throw new Exception($"Dependency of type {typeof(T).Name} cannot be resolved.");
 
             if (!_autoInclude)
@@ -129,10 +125,9 @@ namespace Platform.Helpers
 
         public bool TryResolve<T>(out T resolved)
         {
-            resolved = default(T);
+            resolved = default;
 
-            object resolvedObject;
-            var result = TryResolve(typeof(T), out resolvedObject);
+            var result = TryResolve(typeof(T), out object resolvedObject);
 
             if (result) resolved = (T)resolvedObject;
             return result;
@@ -212,8 +207,7 @@ namespace Platform.Helpers
                 {
                     var resultConstructor = constructors[i];
 
-                    object[] arguments;
-                    if (!TryResolveConstructorArguments(resultConstructor, out arguments))
+                    if (!TryResolveConstructorArguments(resultConstructor, out object[] arguments))
                         continue;
 
                     resolved = resultConstructor.Invoke(arguments);
@@ -254,8 +248,7 @@ namespace Platform.Helpers
 
             for (var i = 0; i < parameters.Length; i++)
             {
-                object argument;
-                if (!TryResolve(parameters[i].ParameterType, out argument))
+                if (!TryResolve(parameters[i].ParameterType, out object argument))
                     return false;
 
                 Use(argument);

@@ -1,9 +1,10 @@
 ﻿using System.Collections.Generic;
 using Xunit;
 using Platform.Reflection;
-using Platform.Helpers;
 using Platform.Numbers;
 using Platform.Memory;
+using Platform.Helpers;
+using Platform.Helpers.Setters;
 using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core

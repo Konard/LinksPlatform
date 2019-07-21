@@ -7,11 +7,10 @@
     <VersionPrefix>0.1.0</VersionPrefix>
     <Authors>Konstantin Diachenko</Authors>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <AssemblyName>Platform.Helpers</AssemblyName>
     <PackageId>Platform.Helpers</PackageId>
-    <PackageTags>Helpers;Utilities;Extensions</PackageTags>
-    <PackageIconUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Avatar-rainbow.png</PackageIconUrl>
+    <PackageTags>LinksPlatform;Helpers;Utilities;Extensions</PackageTags>
+    <PackageIconUrl>https://raw.githubusercontent.com/linksplatform/Documentation/0a9177c11892ebb2fe467dc3ea9eaf5a5588f610/doc/Avatar-rainbow.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/Konard/LinksPlatform/tree/master/Platform/Platform.Helpers</PackageProjectUrl>
     <PackageLicenseUrl>https://raw.githubusercontent.com/Konard/LinksPlatform/master/LICENSE</PackageLicenseUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
@@ -20,14 +19,12 @@
     <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
     <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
     <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Platform.Disposables" Version="0.0.1" />
-    <PackageReference Include="Platform.Exceptions" Version="0.0.1" />
-    <PackageReference Include="Platform.Collections" Version="0.0.2" />
-    <PackageReference Include="Platform.Reflection" Version="0.0.1" />
-    <PackageReference Include="Platform.Threading" Version="0.0.2" />
+    <PackageReference Include="Platform.Reflection" Version="0.0.2" />
   </ItemGroup>
 
 </Project>

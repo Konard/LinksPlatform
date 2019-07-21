@@ -12,6 +12,7 @@ using Platform.Ranges;
 using Platform.Random;
 using Platform.Helpers;
 using Platform.Data.Core.Doublets;
+using Platform.Helpers.Counters;
 
 namespace Platform.Tests.Data.Core
 {

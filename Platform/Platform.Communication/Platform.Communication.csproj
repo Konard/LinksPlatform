@@ -22,11 +22,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Platform.Helpers/Platform.Helpers.csproj" />
+    <PackageReference Include="Platform.Threading" Version="0.0.3" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="System.Threading.Thread" Version="4.3.0" />
+    <ProjectReference Include="../Platform.Helpers/Platform.Helpers.csproj" />
   </ItemGroup>
 
 </Project>
