@@ -27,7 +27,7 @@
 
   <ItemGroup>
     <PackageReference Include="xunit.runner.utility" Version="2.4.1" />
-    <PackageReference Include="Platform.IO" Version="0.0.3" />
+    <PackageReference Include="Platform.IO" Version="0.0.4" />
   </ItemGroup>
 
 </Project>
