@@ -17,15 +17,13 @@ namespace Platform.Data.Core.Doublets
         public Hybrid(T value)
         {
             if (CachedTypeInfo<T>.IsSigned)
+            {
                 throw new NotSupportedException();
-
+            }
             Value = value;
         }
 
-        public Hybrid(object value)
-        {
-            Value = To.UnsignedAs<T>(Convert.ChangeType(value, CachedTypeInfo<T>.SignedVersion));
-        }
+        public Hybrid(object value) => Value = To.UnsignedAs<T>(Convert.ChangeType(value, CachedTypeInfo<T>.SignedVersion));
 
         public Hybrid(object value, bool isExternal)
         {
@@ -35,7 +33,6 @@ namespace Platform.Data.Core.Doublets
             var negate = typeof(MathHelpers).GetTypeInfo().GetMethod("Negate").MakeGenericMethod(signedType);
             var absoluteValue = abs.Invoke(null, new[] { signedValue });
             var resultValue = isExternal ? negate.Invoke(null, new[] { absoluteValue }) : absoluteValue;
-
             Value = To.UnsignedAs<T>(resultValue);
         }
 
@@ -75,9 +72,6 @@ namespace Platform.Data.Core.Doublets
 
         public static explicit operator sbyte(Hybrid<T> hybrid) => Convert.ToSByte(hybrid.AbsoluteValue);
 
-        public override string ToString()
-        {
-            return IsNothing ? (default(T) == null ? "Nothing" : default(T).ToString()) : IsExternal ? $"<{AbsoluteValue}>" : Value.ToString();
-        }
+        public override string ToString() => IsNothing ? (default(T) == null ? "Nothing" : default(T).ToString()) : IsExternal ? $"<{AbsoluteValue}>" : Value.ToString();
     }
 }

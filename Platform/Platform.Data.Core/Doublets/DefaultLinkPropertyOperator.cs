@@ -6,7 +6,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class DefaultLinkPropertyOperator<TLink> : LinksOperatorBase<TLink>, IPropertyOperator<TLink, TLink, TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         public DefaultLinkPropertyOperator(ILinks<TLink> links) : base(links)
         {
@@ -15,11 +15,15 @@ namespace Platform.Data.Core.Doublets
         public TLink GetValue(TLink @object, TLink property)
         {
             var objectProperty = Links.SearchOrDefault(@object, property);
-            if (EqualityComparer.Equals(objectProperty, default))
+            if (_equalityComparer.Equals(objectProperty, default))
+            {
                 return default;
+            }
             var valueLink = Links.All(Links.Constants.Any, objectProperty).SingleOrDefault();
             if (valueLink == null)
+            {
                 return default;
+            }
             var value = Links.GetTarget(valueLink[Links.Constants.IndexPart]);
             return value;
         }

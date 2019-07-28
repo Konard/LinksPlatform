@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Platform.Exceptions;
 using Platform.Collections;
 
 namespace Platform.Data.Core.Common
 {
     public static class Point<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsFullPoint(params TLink[] link) => IsFullPoint((IList<TLink>)link);
 
         public static bool IsFullPoint(IList<TLink> link)
         {
-            if (link.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(link));
+            Ensure.Always.ArgumentNotEmpty(link, nameof(link));
             if (link.Count <= 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(link), "Cannot determine link's pointness using only its identifier.");
+            }
             return IsFullPointUnchecked(link);
         }
 
@@ -26,7 +28,9 @@ namespace Platform.Data.Core.Common
         {
             var result = true;
             for (var i = 1; result && i < link.Count; i++)
-                result = EqualityComparer.Equals(link[0], link[i]);
+            {
+                result = _equalityComparer.Equals(link[0], link[i]);
+            }
             return result;
         }
 
@@ -35,10 +39,11 @@ namespace Platform.Data.Core.Common
 
         public static bool IsPartialPoint(IList<TLink> link)
         {
-            if (link.IsNullOrEmpty())
-                throw new ArgumentNullException(nameof(link));
+            Ensure.Always.ArgumentNotEmpty(link, nameof(link));
             if (link.Count <= 1)
+            {
                 throw new ArgumentOutOfRangeException(nameof(link), "Cannot determine link's pointness using only its identifier.");
+            }
             return IsPartialPointUnchecked(link);
         }
 
@@ -47,7 +52,9 @@ namespace Platform.Data.Core.Common
         {
             var result = false;
             for (var i = 1; !result && i < link.Count; i++)
-                result = EqualityComparer.Equals(link[0], link[i]);
+            {
+                result = _equalityComparer.Equals(link[0], link[i]);
+            }
             return result;
         }
     }
