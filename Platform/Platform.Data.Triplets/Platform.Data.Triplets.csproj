@@ -4,4 +4,10 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Platform.Data\Platform.Data.csproj" />
+    <PackageReference Include="Sigil.NetStandard" Version="4.8.0" />
+    <PackageReference Include="Platform.Communication" Version="0.1.1" />
+  </ItemGroup>
+
 </Project>
