@@ -7,7 +7,7 @@ using Platform.Disposables;
 using Platform.Collections.Arrays;
 using Platform.Helpers.Singletons;
 using Platform.Memory;
-using Platform.Data.Core.Exceptions;
+using Platform.Data.Exceptions;
 
 #pragma warning disable 0649
 #pragma warning disable 169

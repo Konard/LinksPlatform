@@ -9,7 +9,7 @@ using Platform.Numbers;
 using static Platform.Numbers.ArithmeticHelpers;
 using Platform.Unsafe;
 using Platform.Memory;
-using Platform.Data.Core.Exceptions;
+using Platform.Data.Exceptions;
 
 #pragma warning disable 0649
 #pragma warning disable 169

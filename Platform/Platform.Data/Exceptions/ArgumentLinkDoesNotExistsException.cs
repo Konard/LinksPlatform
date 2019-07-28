@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.Exceptions
+namespace Platform.Data.Exceptions
 {
     /// <remarks>
     /// TODO: Multilingual support for messages formats.

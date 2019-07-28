@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.Exceptions
+namespace Platform.Data.Exceptions
 {
     public class LinkWithSameValueAlreadyExistsException : Exception
     {
