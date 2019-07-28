@@ -2,7 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Platform.Exceptions;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -97,9 +97,9 @@ namespace Platform.Data.Core.Doublets
             yield return Target;
         }
 
-        public void Add(TLink item) => Throw.NotSupportedException();
+        public void Add(TLink item) => throw new NotSupportedException();
 
-        public void Clear() => Throw.NotSupportedException();
+        public void Clear() => throw new NotSupportedException();
 
         public bool Contains(TLink item) => IndexOf(item) > 0;
 
@@ -114,7 +114,7 @@ namespace Platform.Data.Core.Doublets
             array[arrayIndex] = Target;
         }
 
-        public bool Remove(TLink item) => Throw.NotSupportedExceptionAndReturn<bool>();
+        public bool Remove(TLink item) => Throw.A.NotSupportedExceptionAndReturn<bool>();
 
         public int Count => Length;
         public bool IsReadOnly => true;
@@ -127,9 +127,9 @@ namespace Platform.Data.Core.Doublets
             return -1;
         }
 
-        public void Insert(int index, TLink item) => Throw.NotSupportedException();
+        public void Insert(int index, TLink item) => throw new NotSupportedException();
 
-        public void RemoveAt(int index) => Throw.NotSupportedException();
+        public void RemoveAt(int index) => throw new NotSupportedException();
 
         public TLink this[int index]
         {
@@ -143,7 +143,7 @@ namespace Platform.Data.Core.Doublets
                     return Target;
                 throw new ArgumentOutOfRangeException(nameof(index));
             }
-            set { throw new NotSupportedException(); }
+            set => throw new NotSupportedException();
         }
 
         #endregion

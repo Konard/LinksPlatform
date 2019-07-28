@@ -373,8 +373,7 @@ namespace Platform.Data.Core.Triplets
 
         public static Link GetMapped(Int mappingIndex)
         {
-            Link mappedLink;
-            if (!TryGetMapped(mappingIndex, out mappedLink))
+            if (!TryGetMapped(mappingIndex, out Link mappedLink))
                 throw new Exception($"Mapped link with index {mappingIndex} is not set.");
             return mappedLink;
         }
@@ -406,8 +405,7 @@ namespace Platform.Data.Core.Triplets
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве нового значения.", nameof(newTarget));
 
             LinkIndex previousLinkIndex = link;
-            Int mappingIndex;
-            LinkToMappingIndex.TryGetValue(link, out mappingIndex);
+            LinkToMappingIndex.TryGetValue(link, out long mappingIndex);
             var previousDefinition = new LinkDefinition(link);
 
             link = UpdateLink(link, newSource, newLinker, newTarget);
@@ -427,8 +425,7 @@ namespace Platform.Data.Core.Triplets
                 return;
 
             LinkIndex previousLinkIndex = link;
-            Int mappingIndex;
-            LinkToMappingIndex.TryGetValue(link, out mappingIndex);
+            LinkToMappingIndex.TryGetValue(link, out long mappingIndex);
             var previousDefinition = new LinkDefinition(link);
 
             DeleteLink(link);

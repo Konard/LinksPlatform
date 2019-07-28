@@ -49,7 +49,7 @@ namespace Platform.Examples
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(ex.ToRecursiveString());
+                    Console.WriteLine(ex.ToStringWithAllInnerExceptions());
                 }
 
             }, token);
@@ -151,8 +151,7 @@ namespace Platform.Examples
 
             public void IncrementChildNameCount(string name)
             {
-                int count;
-                if (ChildrenNamesCounts.TryGetValue(name, out count))
+                if (ChildrenNamesCounts.TryGetValue(name, out int count))
                     ChildrenNamesCounts[name] = count + 1;
                 else
                     ChildrenNamesCounts[name] = 0;

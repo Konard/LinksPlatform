@@ -14,7 +14,7 @@ namespace Platform.Sandbox
 {
     internal class AllRepeatingSubstringsInString
     {
-        private static readonly string ExampleText =
+        private static readonly string _exampleText =
     @"([english version](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning))
 
 Обозначение пустоты, какое оно? Темнота ли это? Там где отсутствие света, отсутствие фотонов (носителей света)? Или это то, что полностью отражает свет? Пустой белый лист бумаги? Там где есть место для нового начала? Разве пустота это не характеристика пространства? Пространство это то, что можно чем-то наполнить?
@@ -70,11 +70,11 @@ namespace Platform.Sandbox
 [![анимация](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif ""анимация"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif)";
 
 
-        private static readonly string ExampleLoremIpsumText = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
+        private static readonly string _exampleLoremIpsumText = @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.";
 
         public static void Run()
         {
-            var text = ExampleLoremIpsumText;
+            var text = _exampleLoremIpsumText;
 
             var iterationsCounter = new IterationsCounter();
             iterationsCounter.WalkAll(text);
@@ -86,11 +86,11 @@ namespace Platform.Sandbox
         }
     }
 
-    public abstract class ConsolePrintedDublicateWalkerBase : DuplicateSegmentsWalkerBase<char, CharsSegment>
+    public abstract class ConsolePrintedDublicateWalkerBase : DuplicateSegmentsWalkerBase<char, CharSegment>
     {
-        protected override void OnDublicateFound(CharsSegment segment) => Console.WriteLine(segment);
+        protected override void OnDublicateFound(CharSegment segment) => Console.WriteLine(segment);
 
-        protected override CharsSegment CreateSegment(IList<char> elements, int offset, int length) => new CharsSegment(elements, offset, length);
+        protected override CharSegment CreateSegment(IList<char> elements, int offset, int length) => new CharSegment(elements, offset, length);
     }
 
     // Slow
@@ -106,7 +106,7 @@ namespace Platform.Sandbox
             base.WalkAll(elements);
         }
 
-        protected override long GetSegmentFrequency(CharsSegment segment)
+        protected override long GetSegmentFrequency(CharSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -121,9 +121,9 @@ namespace Platform.Sandbox
                 return 0;
         }
 
-        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _currentNode.Value = frequency;
+        protected override void SetSegmentFrequency(CharSegment segment, long frequency) => _currentNode.Value = frequency;
 
-        protected override void Iteration(CharsSegment segment)
+        protected override void Iteration(CharSegment segment)
         {
             _currentNode = _rootNode;
 
@@ -144,11 +144,11 @@ namespace Platform.Sandbox
             base.WalkAll(elements);
         }
 
-        protected override long GetSegmentFrequency(CharsSegment segment) => _cache.GetOrDefault(_currentKey);
+        protected override long GetSegmentFrequency(CharSegment segment) => _cache.GetOrDefault(_currentKey);
 
-        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _cache[_currentKey] = frequency;
+        protected override void SetSegmentFrequency(CharSegment segment, long frequency) => _cache[_currentKey] = frequency;
 
-        protected override void Iteration(CharsSegment segment)
+        protected override void Iteration(CharSegment segment)
         {
             _currentKey = segment;
 
@@ -199,7 +199,7 @@ namespace Platform.Sandbox
             Disposable.TryDispose(_memory);
         }
 
-        protected override long GetSegmentFrequency(CharsSegment segment)
+        protected override long GetSegmentFrequency(CharSegment segment)
         {
             for (int i = 0; i < segment.Length; i++)
             {
@@ -217,9 +217,9 @@ namespace Platform.Sandbox
                 return _fromNumberConverter.Convert(frequency);
         }
 
-        protected override void SetSegmentFrequency(CharsSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
+        protected override void SetSegmentFrequency(CharSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));
 
-        protected override void Iteration(CharsSegment segment)
+        protected override void Iteration(CharSegment segment)
         {
             _currentLink = _treeRoot;
 
@@ -227,7 +227,7 @@ namespace Platform.Sandbox
         }
     }
 
-    public class Walker4 : DictionaryBasedDuplicateSegmentsWalkerBase<char, CharsSegment>
+    public class Walker4 : DictionaryBasedDuplicateSegmentsWalkerBase<char, CharSegment>
     {
         public Walker4()
             : base(resetDictionaryOnEachWalk: true)
@@ -245,9 +245,9 @@ namespace Platform.Sandbox
             Console.WriteLine($"Unique string segments: {Dictionary.Count}. Total duplicates: {_totalDuplicates}.");
         }
 
-        protected override CharsSegment CreateSegment(IList<char> elements, int offset, int length) => new CharsSegment(elements, offset, length);
+        protected override CharSegment CreateSegment(IList<char> elements, int offset, int length) => new CharSegment(elements, offset, length);
 
-        protected override void OnDublicateFound(CharsSegment segment)
+        protected override void OnDublicateFound(CharSegment segment)
         {
             Console.WriteLine(segment);
             _totalDuplicates++;

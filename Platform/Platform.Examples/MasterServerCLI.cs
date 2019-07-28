@@ -80,7 +80,7 @@ namespace Platform.Examples
             }
             catch (Exception ex)
             {
-                Console.Write(ex.ToRecursiveString());
+                Console.Write(ex.ToStringWithAllInnerExceptions());
             }
         }
     }

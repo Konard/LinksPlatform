@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Interfaces;
 using Platform.Collections;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;

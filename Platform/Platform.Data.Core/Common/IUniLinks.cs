@@ -18,15 +18,16 @@ namespace Platform.Data.Core.Common
         /// TLink that represents True (was finished fully) or TLink that represents False (was stopped).
         /// This is done to assure ability to push up stop signal through recursion stack.
         /// </returns>
+        /// <remarks>
+        /// { 0, 0, 0 } => { itself, itself, itself } // create
+        /// { 1, any, any } => { itself, any, 3 } // update
+        /// { 3, any, any } => { 0, 0, 0 } // delete
+        /// </remarks>
         TLink Trigger(IList<TLink> patternOrCondition, Func<IList<TLink>, TLink> matchHandler,
                       IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutionHandler);
 
         TLink Trigger(IList<TLink> restriction, Func<IList<TLink>, IList<TLink>, TLink> matchedHandler,
               IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutedHandler);
-
-        // { 0, 0, 0 } => { itself, itself, itself } // create
-        // { 1, any, any } => { itself, any, 3 } // update
-        // { 3, any, any } => { 0, 0, 0 } // delete
     }
 
     /// <remarks>Extended with small optimization.</remarks>

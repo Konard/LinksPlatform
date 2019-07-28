@@ -52,8 +52,7 @@ namespace Platform.Data.Core.Triplets
                 return nullString;
             else
             {
-                string name;
-                if (this.TryGetName(out name))
+                if (this.TryGetName(out string name))
                     return name;
                 else
                     return ((long)_link).ToString();

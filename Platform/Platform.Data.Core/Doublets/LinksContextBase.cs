@@ -1,5 +1,5 @@
 ﻿using Platform.Disposables;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Memory;
 
 namespace Platform.Data.Core.Doublets

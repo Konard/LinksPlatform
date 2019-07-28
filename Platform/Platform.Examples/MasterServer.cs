@@ -4,13 +4,13 @@ using System.Text;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 
 namespace Platform.Examples
 {
     public class MasterServer
     {
-        private readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksConstants<bool, ulong, long> _constants = Default<LinksConstants<bool, ulong, long>>.Instance;
 
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;
@@ -80,7 +80,7 @@ namespace Platform.Examples
 
         private void Search(ulong[] sequence)
         {
-            var containsAny = Array.IndexOf(sequence, Constants.Any) >= 0;
+            var containsAny = Array.IndexOf(sequence, _constants.Any) >= 0;
             var containsZeroOrMany = Array.IndexOf(sequence, Sequences.ZeroOrMany) >= 0;
 
             if (containsZeroOrMany)
@@ -163,7 +163,7 @@ namespace Platform.Examples
                         }
                     }
                     else if (sequence[r] == '_')
-                        result[w++] = Constants.Any;
+                        result[w++] = _constants.Any;
                     else if (sequence[r] == '*')
                         result[w++] = Sequences.ZeroOrMany;
                     else

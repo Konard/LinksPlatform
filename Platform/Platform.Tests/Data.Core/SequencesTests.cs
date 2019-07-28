@@ -6,7 +6,7 @@ using Xunit;
 using Platform.Collections;
 using Platform.Random;
 using Platform.IO;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
@@ -20,7 +20,8 @@ namespace Platform.Tests.Data.Core
 
         static SequencesTests()
         {
-            BitString.Init();
+            // Trigger static constructor to not mess with perfomance measurements
+            _ = BitString.GetBitMaskFromIndex(1);
         }
 
         [Fact]

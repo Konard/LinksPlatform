@@ -8,7 +8,7 @@ using Platform.Collections.Arrays;
 using Platform.Numbers;
 using Platform.Ranges;
 using Platform.Random;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Helpers.Setters;
 using Platform.Data.Core.Common;
 using Platform.Data.Core.Exceptions;
@@ -127,11 +127,17 @@ namespace Platform.Data.Core.Doublets
         public static bool AnyLinkIsAny(this ILinks<ulong> links, params ulong[] sequence)
         {
             if (sequence == null)
+            {
                 return false;
-
+            }
+            var constants = links.Constants;
             for (var i = 0; i < sequence.Length; i++)
-                if (sequence[i] == Constants.Any) return true;
-
+            {
+                if (sequence[i] == constants.Any)
+                {
+                    return true;
+                }
+            }
             return false;
         }
 
@@ -400,7 +406,7 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<TLink> GetLink<TLink>(this ILinks<TLink> links, TLink link)
         {
-            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue, links.Constants.Break);
+            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue, links.Constants.Break, default);
             links.Each(linkPartsSetter.SetAndReturnTrue, link);
             return linkPartsSetter.Result;
         }
@@ -592,8 +598,9 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TLink SearchOrDefault<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
-            var setter = new Setter<TLink, TLink>(falseValue: links.Constants.Break);
-            links.Each(setter.SetFirstAndReturnFalse, links.Constants.Any, source, target);
+            var contants = links.Constants;
+            var setter = new Setter<TLink, TLink>(contants.Continue, contants.Break, default);
+            links.Each(setter.SetFirstAndReturnFalse, contants.Any, source, target);
             return setter.Result;
         }
 

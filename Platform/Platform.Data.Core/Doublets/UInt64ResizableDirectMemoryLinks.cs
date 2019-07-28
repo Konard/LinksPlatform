@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Disposables;
 using Platform.Collections.Arrays;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Memory;
 using Platform.Data.Core.Exceptions;
 

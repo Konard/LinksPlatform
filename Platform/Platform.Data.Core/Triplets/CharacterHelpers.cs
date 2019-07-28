@@ -89,8 +89,7 @@ namespace Platform.Data.Core.Triplets
 
         private static void CreateAlphabet(char[] lettersCharacters, string alphabetName, CharacterMapping mapping)
         {
-            Link alphabet;
-            if (Link.TryGetMapped(mapping, out alphabet))
+            if (Link.TryGetMapped(mapping, out Link alphabet))
             {
                 var letters = alphabet.Target;
 
@@ -121,8 +120,7 @@ namespace Platform.Data.Core.Triplets
                 for (var i = 0; i < lettersCharacters.Length; i++)
                 {
                     var lowerCaseCharacter = lettersCharacters[i];
-                    Link lowerCaseLink, upperCaseLink;
-                    SetLetterCodes(lettersLinks[i], lowerCaseCharacter, out lowerCaseLink, out upperCaseLink);
+                    SetLetterCodes(lettersLinks[i], lowerCaseCharacter, out Link lowerCaseLink, out Link upperCaseLink);
 
                     CharactersToLinks[lowerCaseCharacter] = lowerCaseLink;
                     LinksToCharacters[lowerCaseLink] = lowerCaseCharacter;
@@ -257,8 +255,7 @@ namespace Platform.Data.Core.Triplets
 
         public static char ToChar(Link link)
         {
-            char @char;
-            if (!LinksToCharacters.TryGetValue(link, out @char))
+            if (!LinksToCharacters.TryGetValue(link, out char @char))
                 throw new ArgumentOutOfRangeException(nameof(link), "Указанная связь не являяется символом.");
             return @char;
         }

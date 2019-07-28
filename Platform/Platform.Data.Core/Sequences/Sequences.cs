@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Platform.Collections;
 using Platform.Collections.Lists;
 using Platform.Threading.Synchronization;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Data.Core.Doublets;
 using LinkIndex = System.UInt64;
 
@@ -188,7 +188,7 @@ namespace Platform.Data.Core.Sequences
             else if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew)
                 return CompactCore(sequence);
 
-            if (sequenceRoot == default(LinkIndex))
+            if (sequenceRoot == default)
                 sequenceRoot = Options.LinksToSequenceConverter.Convert(sequence);
 
             if (Options.UseSequenceMarker)

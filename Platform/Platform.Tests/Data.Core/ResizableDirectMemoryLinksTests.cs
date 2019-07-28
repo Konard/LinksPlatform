@@ -1,6 +1,6 @@
 ﻿using System.IO;
 using Xunit;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Memory;
 using Platform.Data.Core.Doublets;
 

@@ -116,7 +116,7 @@ namespace Platform.Sandbox
                 if (sizeInItems < 16)
                     sizeInItems = 16;
                 else
-                    sizeInItems = sizeInItems * 2;
+                    sizeInItems *= 2;
 
                 var newSizeInBates = BasicTransactionsOffset + sizeInItems * TransactionItemSize;
 

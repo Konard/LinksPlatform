@@ -2,6 +2,7 @@
 using System.IO;
 using Xunit;
 using Platform.Helpers;
+using Platform.Helpers.Singletons;
 
 namespace Platform.Tests.Helpers
 {

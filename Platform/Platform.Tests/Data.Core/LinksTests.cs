@@ -11,14 +11,15 @@ using Platform.IO;
 using Platform.Ranges;
 using Platform.Random;
 using Platform.Helpers;
-using Platform.Data.Core.Doublets;
+using Platform.Helpers.Singletons;
 using Platform.Helpers.Counters;
+using Platform.Data.Core.Doublets;
 
 namespace Platform.Tests.Data.Core
 {
     public class LinksTests
     {
-        private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        private static readonly LinksConstants<bool, ulong, int> _constants = Default<LinksConstants<bool, ulong, int>>.Instance;
 
         private const long Iterations = 10 * 1024;
 
@@ -83,7 +84,7 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void CascadeUpdateTest()
         {
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             using (var scope = new TempLinksTestScope(useLog: true))
             {
@@ -157,7 +158,7 @@ namespace Platform.Tests.Data.Core
         public void TransactionUserCodeErrorNoDataSavedTest()
         {
             // User Code Error (Autoreverted), no data saved
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             TempLinksTestScope lastScope = null;
             try
@@ -206,7 +207,7 @@ namespace Platform.Tests.Data.Core
         public void TransactionUserCodeErrorSomeDataSavedTest()
         {
             // User Code Error (Autoreverted), some data saved
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             TempLinksTestScope lastScope = null;
             try
@@ -261,7 +262,7 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void TransactionCommit()
         {
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
@@ -291,7 +292,7 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void TransactionDamage()
         {
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
@@ -348,7 +349,7 @@ namespace Platform.Tests.Data.Core
             var tempDatabaseFilename = Path.GetTempFileName();
             var tempTransactionLogFilename = Path.GetTempFileName();
 
-            var itself = Constants.Itself;
+            var itself = _constants.Itself;
 
             // User Code Error (Autoreverted), some data saved
             try
@@ -404,8 +405,8 @@ namespace Platform.Tests.Data.Core
         [Fact]
         public void PathsTest()
         {
-            var source = Constants.SourcePart;
-            var target = Constants.TargetPart;
+            var source = _constants.SourcePart;
+            var target = _constants.TargetPart;
 
             using (var scope = new TempLinksTestScope())
             {
@@ -777,7 +778,7 @@ namespace Platform.Tests.Data.Core
 
                 for (var i = iterations; i > 0; i--)
                 {
-                    var linksAddressRange = new Range<ulong>(Constants.MinPossibleIndex, maxLink);
+                    var linksAddressRange = new Range<ulong>(_constants.MinPossibleIndex, maxLink);
 
                     var source = RandomHelpers.Default.NextUInt64(linksAddressRange);
                     var target = RandomHelpers.Default.NextUInt64(linksAddressRange);

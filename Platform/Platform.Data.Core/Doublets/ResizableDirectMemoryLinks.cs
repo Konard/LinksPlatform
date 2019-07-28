@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Platform.Disposables;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Collections.Arrays;
 using Platform.Numbers;
 using static Platform.Numbers.ArithmeticHelpers;

@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using Platform.Numbers;
 using Platform.Unsafe;
 using Platform.Collections.Methods.Trees;
+using System.Text;
 
 namespace Platform.Data.Core.Doublets
 {
@@ -282,15 +283,9 @@ namespace Platform.Data.Core.Doublets
                        (IsEquals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>()));
             }
 
-            protected override TLink GetTreeRoot()
-            {
-                return (Header + LinksHeader.FirstAsSourceOffset).GetValue<TLink>();
-            }
+            protected override TLink GetTreeRoot() => (Header + LinksHeader.FirstAsSourceOffset).GetValue<TLink>();
 
-            protected override TLink GetBasePartValue(TLink link)
-            {
-                return (Links.GetElement(LinkSizeInBytes, link) + Link.SourceOffset).GetValue<TLink>();
-            }
+            protected override TLink GetBasePartValue(TLink link) => (Links.GetElement(LinkSizeInBytes, link) + Link.SourceOffset).GetValue<TLink>();
 
             /// <summary>
             /// Выполняет поиск и возвращает индекс связи с указанными Source (началом) и Target (концом)
@@ -320,16 +315,12 @@ namespace Platform.Data.Core.Doublets
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool FirstIsToTheLeftOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget)
-            {
-                return LessThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
-            }
+            private bool FirstIsToTheLeftOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget) => LessThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && LessThan(firstTarget, secondTarget));
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private bool FirstIsToTheRightOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget)
-            {
-                return GreaterThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
-            }
+            private bool FirstIsToTheRightOfSecond(TLink firstSource, TLink firstTarget, TLink secondSource, TLink secondTarget) => GreaterThan(firstSource, secondSource) || (IsEquals(firstSource, secondSource) && GreaterThan(firstTarget, secondTarget));
+
+            protected override void PrintNodeValue(TLink node, StringBuilder sb) => throw new NotImplementedException();
         }
 
         private class LinksTargetsTreeMethods : LinksTreeMethodsBase
@@ -435,15 +426,11 @@ namespace Platform.Data.Core.Doublets
                        (IsEquals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>()));
             }
 
-            protected override TLink GetTreeRoot()
-            {
-                return (Header + LinksHeader.FirstAsTargetOffset).GetValue<TLink>();
-            }
+            protected override TLink GetTreeRoot() => (Header + LinksHeader.FirstAsTargetOffset).GetValue<TLink>();
 
-            protected override TLink GetBasePartValue(TLink link)
-            {
-                return (Links.GetElement(LinkSizeInBytes, link) + Link.TargetOffset).GetValue<TLink>();
-            }
+            protected override TLink GetBasePartValue(TLink link) => (Links.GetElement(LinkSizeInBytes, link) + Link.TargetOffset).GetValue<TLink>();
+
+            protected override void PrintNodeValue(TLink node, StringBuilder sb) => throw new NotImplementedException();
         }
     }
 }

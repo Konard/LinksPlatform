@@ -12,9 +12,7 @@ namespace Platform.Sandbox
         public void RunOne()
         {
             Console.Write("Введите начальную цифру (от 0 до 9): ");
-            int start;
-
-            if (int.TryParse(Console.ReadLine(), out start))
+            if (int.TryParse(Console.ReadLine(), out int start))
             {
                 if (start < 0 || start > 9)
                     Console.WriteLine("Можно использовать только цифры от 0 до 9.");
@@ -72,7 +70,7 @@ namespace Platform.Sandbox
                                return links.Constants.Continue;
 
                            if (stepsLeft == 0)
-                               counter.Count++;
+                               counter.Increment();
                            else
                            {
                                var target = link[links.Constants.TargetPart];

@@ -9,7 +9,8 @@ namespace Platform.Tests.Data.Core
     {
         static BitStringTests()
         {
-            BitString.Init();
+            // Trigger static constructor to not mess with perfomance measurements
+            _ = BitString.GetBitMaskFromIndex(1);
         }
 
         [Fact]

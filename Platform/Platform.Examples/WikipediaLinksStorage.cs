@@ -1,13 +1,11 @@
 ﻿using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 
 namespace Platform.Examples
 {
     public class WikipediaLinksStorage : IWikipediaStorage<ulong>
     {
-        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
-
         private readonly Sequences _sequences;
         private readonly SynchronizedLinks<ulong> _links;
         private ulong _elementMarker;

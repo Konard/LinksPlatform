@@ -48,8 +48,7 @@ namespace Platform.Data.Core.Triplets
                     if (link.Source == link || link.Linker == link || link.Target == link)
                         return false;
 
-                    string sourceName, linkerName, targetName;
-                    if (TryGetName(link.Source, out sourceName) && TryGetName(link.Linker, out linkerName) && TryGetName(link.Target, out targetName))
+                    if (TryGetName(link.Source, out string sourceName) && TryGetName(link.Linker, out string linkerName) && TryGetName(link.Target, out string targetName))
                     {
                         var sb = new StringBuilder();
                         sb.Append(sourceName).Append(' ').Append(linkerName).Append(' ').Append(targetName);

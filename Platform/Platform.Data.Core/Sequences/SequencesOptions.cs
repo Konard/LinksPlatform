@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers;
+using Platform.Helpers.Singletons;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
@@ -11,7 +11,6 @@ namespace Platform.Data.Core.Sequences
     public struct SequencesOptions<TLink> // TODO: To use type parameter <TLink> the ILinks<TLink> must contain GetConstants function.
     {
         private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
 
         public TLink SequenceMarkerLink;
         public bool UseCascadeUpdate;

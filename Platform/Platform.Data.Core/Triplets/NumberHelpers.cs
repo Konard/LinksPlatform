@@ -101,8 +101,7 @@ namespace Platform.Data.Core.Triplets
                 long number = 0;
                 for (var i = 0; i < numberParts.Count; i++)
                 {
-                    long numberPart;
-                    GoDownAndTakeIt(numberParts[i], out numberPart);
+                    GoDownAndTakeIt(numberParts[i], out long numberPart);
                     number += numberPart;
                 }
 
