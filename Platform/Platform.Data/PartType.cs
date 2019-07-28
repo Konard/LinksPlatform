@@ -1,6 +1,6 @@
 ﻿// ReSharper disable TypeParameterCanBeVariant
 
-namespace Platform.Data.Core.Common
+namespace Platform.Data
 {
     public enum PartType : ulong
     {
