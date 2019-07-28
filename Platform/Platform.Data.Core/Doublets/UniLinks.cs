@@ -5,7 +5,8 @@ using Platform.Collections;
 using Platform.Collections.Arrays;
 using Platform.Collections.Lists;
 using Platform.Helpers.Scopes;
-using Platform.Data.Core.Common;
+using Platform.Data.Universal;
+using Platform.Data.Constants;
 
 namespace Platform.Data.Core.Doublets
 {

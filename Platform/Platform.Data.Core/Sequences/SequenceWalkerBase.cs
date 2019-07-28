@@ -1,4 +1,5 @@
 ﻿using Platform.Data.Core.Doublets;
+using Platform.Data.Sequences;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 

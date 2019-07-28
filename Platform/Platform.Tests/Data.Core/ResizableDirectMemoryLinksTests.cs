@@ -4,6 +4,7 @@ using Platform.Helpers.Singletons;
 using Platform.Memory;
 using Platform.Data.Core.Doublets;
 using Platform.Data;
+using Platform.Data.Constants;
 
 namespace Platform.Tests.Data.Core
 {

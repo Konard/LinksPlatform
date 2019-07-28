@@ -7,6 +7,7 @@ using Platform.Helpers.Singletons;
 using Platform.Numbers;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Constants;
 
 namespace Platform.Data.Core.Sequences
 {

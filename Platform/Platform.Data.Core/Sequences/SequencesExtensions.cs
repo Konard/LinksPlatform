@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Platform.Data.Sequences;
+using System.Collections.Generic;
 
 namespace Platform.Data.Core.Sequences
 {

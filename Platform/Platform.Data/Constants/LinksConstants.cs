@@ -1,6 +1,6 @@
 ﻿using Platform.Numbers;
 
-namespace Platform.Data
+namespace Platform.Data.Constants
 {
     public interface ILinksDecisionConstants<TDecision>
     {

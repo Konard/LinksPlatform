@@ -2,7 +2,7 @@
 
 // ReSharper disable TypeParameterCanBeVariant
 
-namespace Platform.Data.Core.Common
+namespace Platform.Data.Universal
 {
     /// <remarks>
     /// Read/Write aliases for IUniLinks.

@@ -10,6 +10,7 @@ using Platform.Helpers;
 using Platform.Helpers.Singletons;
 using Platform.Numbers;
 using Platform.Data.Core.Doublets;
+using Platform.Data.Sequences;
 
 namespace Platform.Data.Core.Sequences
 {

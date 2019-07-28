@@ -1,6 +1,6 @@
 ﻿// ReSharper disable TypeParameterCanBeVariant
 
-namespace Platform.Data.Core.Common
+namespace Platform.Data.Universal
 {
     /// <remarks>Contains some optimizations of Out.</remarks>
     public interface IUniLinksIOWithExtensions<TLink> : IUniLinksIO<TLink>

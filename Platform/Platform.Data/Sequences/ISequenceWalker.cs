@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Sequences
 {
     public interface ISequenceWalker<TLink>
     {

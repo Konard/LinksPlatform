@@ -8,6 +8,8 @@ using Platform.Threading.Synchronization;
 using Platform.Helpers.Singletons;
 using Platform.Data.Core.Doublets;
 using LinkIndex = System.UInt64;
+using Platform.Data.Constants;
+using Platform.Data.Sequences;
 
 namespace Platform.Data.Core.Sequences
 {

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 // ReSharper disable TypeParameterCanBeVariant
 
-namespace Platform.Data.Core.Common
+namespace Platform.Data.Universal
 {
     /// <remarks>Minimal sufficient universal Links API (for bulk operations).</remarks>
     public partial interface IUniLinks<TLink>
