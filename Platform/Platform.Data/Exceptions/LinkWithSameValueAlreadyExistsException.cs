@@ -4,8 +4,10 @@ namespace Platform.Data.Exceptions
 {
     public class LinkWithSameValueAlreadyExistsException : Exception
     {
-        private const string DefaultMessage = "Связь с таким же значением уже существует.";
+        public static readonly string DefaultMessage = "Связь с таким же значением уже существует.";
 
-        public LinkWithSameValueAlreadyExistsException(string message = DefaultMessage) : base(message) { }
+        public LinkWithSameValueAlreadyExistsException(string message) : base(message) { }
+
+        public LinkWithSameValueAlreadyExistsException() : base(DefaultMessage) { }
     }
 }

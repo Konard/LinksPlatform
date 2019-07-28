@@ -2,9 +2,6 @@
 
 namespace Platform.Data.Exceptions
 {
-    /// <remarks>
-    /// TODO: Multilingual support for messages formats.
-    /// </remarks>
     public class ArgumentLinkDoesNotExistsException<TLink> : ArgumentException
     {
         public ArgumentLinkDoesNotExistsException(TLink link, string paramName) : base(FormatMessage(link, paramName), paramName) { }

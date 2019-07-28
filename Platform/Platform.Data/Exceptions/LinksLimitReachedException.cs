@@ -4,11 +4,13 @@ namespace Platform.Data.Exceptions
 {
     public class LinksLimitReachedException : Exception
     {
-        private const string DefaultMessage = "Достигнут лимит количества связей в хранилище.";
+        public static readonly string DefaultMessage = "Достигнут лимит количества связей в хранилище.";
+
+        public LinksLimitReachedException(string message) : base(message) { }
 
         public LinksLimitReachedException(ulong limit) : this(FormatMessage(limit)) { }
 
-        public LinksLimitReachedException(string message = DefaultMessage) : base(message) { }
+        public LinksLimitReachedException() : base(DefaultMessage) { }
 
         private static string FormatMessage(ulong limit) => $"Достигнут лимит количества связей в хранилище ({limit}).";
     }
