@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using Platform.Data.Core.Sequences;
+using Platform.Data.Sequences;
 
 namespace Platform.Data.Core.Triplets
 {

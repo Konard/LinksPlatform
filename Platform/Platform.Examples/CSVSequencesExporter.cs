@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Platform.Collections.Lists;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Data.Sequences;
 
 namespace Platform.Examples
 {

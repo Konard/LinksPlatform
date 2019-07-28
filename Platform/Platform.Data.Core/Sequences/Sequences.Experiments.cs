@@ -9,6 +9,7 @@ using Platform.Numbers;
 using Platform.Data.Exceptions;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
+using Platform.Data.Sequences;
 
 namespace Platform.Data.Core.Sequences
 {

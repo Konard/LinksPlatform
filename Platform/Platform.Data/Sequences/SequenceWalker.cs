@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Sequences
 {
     /// <remarks>
     /// Реализованный внутри алгоритм наглядно показывает,

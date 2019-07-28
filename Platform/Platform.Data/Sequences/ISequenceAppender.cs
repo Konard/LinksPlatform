@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Sequences
+﻿namespace Platform.Data.Sequences
 {
     public interface ISequenceAppender<TLink>
     {

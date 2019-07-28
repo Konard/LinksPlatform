@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Sequences
 {
     /// <remarks>
     /// Реализованный внутри алгоритм наглядно показывает,
@@ -44,7 +44,7 @@ namespace Platform.Data.Core.Sequences
                     exited++;
                     var source = getSource(element);
                     var target = getTarget(element);
-                    if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
+                    if ((isElement(source) || exited == 1 && !canEnter(source)) && !visit(source))
                     {
                         return false;
                     }
@@ -74,7 +74,7 @@ namespace Platform.Data.Core.Sequences
                         exited++;
                         var source = getSource(element);
                         var target = getTarget(element);
-                        if ((isElement(source) || (exited == 1 && !canEnter(source))) && !visit(source))
+                        if ((isElement(source) || exited == 1 && !canEnter(source)) && !visit(source))
                         {
                             return false;
                         }

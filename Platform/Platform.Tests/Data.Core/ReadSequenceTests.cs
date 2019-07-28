@@ -5,6 +5,7 @@ using System.Linq;
 using Xunit;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Data.Sequences;
 
 namespace Platform.Tests.Data.Core
 {

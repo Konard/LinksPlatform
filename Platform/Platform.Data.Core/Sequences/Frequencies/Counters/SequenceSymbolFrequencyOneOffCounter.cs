@@ -2,6 +2,7 @@
 using Platform.Interfaces;
 using Platform.Numbers;
 using Platform.Data.Core.Doublets;
+using Platform.Data.Sequences;
 
 namespace Platform.Data.Core.Sequences.Frequencies.Counters
 {
