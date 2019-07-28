@@ -26,7 +26,7 @@
     <PackageReference Include="Platform.Timestamps" Version="0.0.2" />
     <PackageReference Include="Platform.Random" Version="0.0.2" />
     <PackageReference Include="Platform.Collections.Methods" Version="0.0.3" />
-    <PackageReference Include="Platform.Memory" Version="0.1.0" />
+    <PackageReference Include="Platform.Memory" Version="0.1.1" />
     <PackageReference Include="Platform.Communication" Version="0.1.0" />
   </ItemGroup>
 
