@@ -3,16 +3,10 @@ using Xunit;
 using Platform.Collections;
 using Platform.Random;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Collections
 {
     public class BitStringTests
     {
-        static BitStringTests()
-        {
-            // Trigger static constructor to not mess with perfomance measurements
-            _ = BitString.GetBitMaskFromIndex(1);
-        }
-
         [Fact]
         public void BitGetSetTest()
         {
