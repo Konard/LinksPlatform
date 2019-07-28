@@ -49,7 +49,7 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public partial class Sequences : ISequences<ulong> // IList<string>, IList<ulong[]> (после завершения реализации Sequences)
     {
-        private static readonly LinksConstants<bool, ulong, long> _constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksCombinedConstants<bool, ulong, long> _constants = Default<LinksCombinedConstants<bool, ulong, long>>.Instance;
 
         /// <summary>Возвращает значение ulong, обозначающее любое количество связей.</summary>
         public const ulong ZeroOrMany = ulong.MaxValue;

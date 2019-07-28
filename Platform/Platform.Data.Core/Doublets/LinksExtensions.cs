@@ -18,7 +18,7 @@ namespace Platform.Data.Core.Doublets
 {
     public static class LinksExtensions
     {
-        public static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        public static readonly LinksCombinedConstants<bool, ulong, int> Constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
 
         public static void UseUnicode(this ILinks<ulong> links) => UnicodeMap.InitNew(links);
 

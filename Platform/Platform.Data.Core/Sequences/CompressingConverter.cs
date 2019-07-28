@@ -18,7 +18,7 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public class CompressingConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
-        private static readonly LinksConstants<bool, TLink, long> _constants = Default<LinksConstants<bool, TLink, long>>.Instance;
+        private static readonly LinksCombinedConstants<bool, TLink, long> _constants = Default<LinksCombinedConstants<bool, TLink, long>>.Instance;
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
         private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 

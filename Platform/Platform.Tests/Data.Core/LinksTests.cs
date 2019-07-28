@@ -20,7 +20,7 @@ namespace Platform.Tests.Data.Core
 {
     public class LinksTests
     {
-        private static readonly LinksConstants<bool, ulong, int> _constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        private static readonly LinksCombinedConstants<bool, ulong, int> _constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
 
         private const long Iterations = 10 * 1024;
 

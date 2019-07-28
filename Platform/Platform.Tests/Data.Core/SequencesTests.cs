@@ -17,7 +17,7 @@ namespace Platform.Tests.Data.Core
 {
     public class SequencesTests
     {
-        private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        private static readonly LinksCombinedConstants<bool, ulong, int> Constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
 
         static SequencesTests()
         {
@@ -509,7 +509,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
                                 
-                var constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+                var constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
                 
                 var sequences = compressor3;
                 //var meaningRoot = links.CreatePoint();

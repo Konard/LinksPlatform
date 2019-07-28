@@ -15,7 +15,7 @@ namespace Platform.Data.Core.Doublets
     {
         public static readonly Link<TLink> Null = new Link<TLink>();
 
-        private static readonly LinksConstants<bool, TLink, int> _constants = Default<LinksConstants<bool, TLink, int>>.Instance;
+        private static readonly LinksCombinedConstants<bool, TLink, int> _constants = Default<LinksCombinedConstants<bool, TLink, int>>.Instance;
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private const int Length = 3;

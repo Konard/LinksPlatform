@@ -10,7 +10,7 @@ namespace Platform.Tests.Data.Core
 {
     public static class ResizableDirectMemoryLinksTests
     {
-        private static readonly LinksConstants<ulong, ulong, int> Constants = Default<LinksConstants<ulong, ulong, int>>.Instance;
+        private static readonly LinksCombinedConstants<ulong, ulong, int> Constants = Default<LinksCombinedConstants<ulong, ulong, int>>.Instance;
 
         [Fact]
         public static void BasicFileMappedMemoryTest()

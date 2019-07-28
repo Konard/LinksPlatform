@@ -187,7 +187,7 @@ namespace Platform.Data.Core.Doublets
 
         public ResizableDirectMemoryLinks(IResizableDirectMemory memory, long memoryReservationStep)
         {
-            Constants = Default<LinksConstants<TLink, TLink, int>>.Instance;
+            Constants = Default<LinksCombinedConstants<TLink, TLink, int>>.Instance;
             _memory = memory;
             _memoryReservationStep = memoryReservationStep;
             if (memory.ReservedCapacity < memoryReservationStep)

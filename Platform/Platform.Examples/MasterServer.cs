@@ -12,7 +12,7 @@ namespace Platform.Examples
 {
     public class MasterServer
     {
-        private static readonly LinksConstants<bool, ulong, long> _constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksCombinedConstants<bool, ulong, long> _constants = Default<LinksCombinedConstants<bool, ulong, long>>.Instance;
 
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;
