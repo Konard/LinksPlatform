@@ -23,6 +23,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.ConsoleTermin
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data", "Platform.Data\Platform.Data.csproj", "{8D31BA13-557C-458A-B5B1-EE2E4DDD764B}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.Doublets", "Platform.Data.Doublets\Platform.Data.Doublets.csproj", "{7FA8AB3D-68BF-4ABB-8B5F-E3F7F45250C8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Platform.Data.Triplets", "Platform.Data.Triplets\Platform.Data.Triplets.csproj", "{7B0B2E2C-D5E3-4602-BD57-37A94172F24C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -69,6 +73,14 @@ Global
 		{8D31BA13-557C-458A-B5B1-EE2E4DDD764B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8D31BA13-557C-458A-B5B1-EE2E4DDD764B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8D31BA13-557C-458A-B5B1-EE2E4DDD764B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FA8AB3D-68BF-4ABB-8B5F-E3F7F45250C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FA8AB3D-68BF-4ABB-8B5F-E3F7F45250C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FA8AB3D-68BF-4ABB-8B5F-E3F7F45250C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FA8AB3D-68BF-4ABB-8B5F-E3F7F45250C8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B0B2E2C-D5E3-4602-BD57-37A94172F24C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B0B2E2C-D5E3-4602-BD57-37A94172F24C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B0B2E2C-D5E3-4602-BD57-37A94172F24C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B0B2E2C-D5E3-4602-BD57-37A94172F24C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

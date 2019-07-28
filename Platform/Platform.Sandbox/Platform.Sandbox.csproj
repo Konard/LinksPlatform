@@ -9,7 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj" />
     <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
     <ProjectReference Include="..\Platform.Tests\Platform.Tests.csproj" />
   </ItemGroup>
