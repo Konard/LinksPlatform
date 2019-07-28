@@ -4,7 +4,7 @@ using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public class TempLinksTestScope : DisposableBase
     {

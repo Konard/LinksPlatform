@@ -8,7 +8,7 @@ using Platform.Helpers.Setters;
 using Platform.Data;
 using Platform.Data.Doublets;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public static class DoubletLinksTests
     {
@@ -165,8 +165,8 @@ namespace Platform.Tests.Data.Core
 
             var link1 = new Link<T>(links.GetLink(linkAddress1));
 
-            Assert.True(equalityComparer.Equals(link1.Source, (T)h106E));
-            Assert.True(equalityComparer.Equals(link1.Target, (T)h108E));
+            Assert.True(equalityComparer.Equals(link1.Source, h106E));
+            Assert.True(equalityComparer.Equals(link1.Target, h108E));
 
             // Create Link (Internal -> External)
             var linkAddress2 = links.Create();
@@ -176,7 +176,7 @@ namespace Platform.Tests.Data.Core
             var link2 = new Link<T>(links.GetLink(linkAddress2));
 
             Assert.True(equalityComparer.Equals(link2.Source, linkAddress1));
-            Assert.True(equalityComparer.Equals(link2.Target, (T)h108E));
+            Assert.True(equalityComparer.Equals(link2.Target, h108E));
 
             // Create Link (Internal -> Internal)
             var linkAddress3 = links.Create();

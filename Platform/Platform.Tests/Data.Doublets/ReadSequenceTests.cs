@@ -7,7 +7,7 @@ using Platform.Data.Sequences;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public class ReadSequenceTests
     {
@@ -37,19 +37,19 @@ namespace Platform.Tests.Data.Core
 
                 var sw3 = Stopwatch.StartNew();
                 var readSequence2 = new List<ulong>();
-                SequenceWalker.WalkRight(balancedVariant, 
-                                         links.GetSource, 
+                SequenceWalker.WalkRight(balancedVariant,
+                                         links.GetSource,
                                          links.GetTarget,
                                          links.IsPartialPoint,
                                          readSequence2.Add);
                 sw3.Stop();
 
                 Assert.True(sequence.SequenceEqual(readSequence1));
-                
-                Assert.True(sequence.SequenceEqual(readSequence2)); 
-             
+
+                Assert.True(sequence.SequenceEqual(readSequence2));
+
                 // Assert.True(sw2.Elapsed < sw3.Elapsed);
-                
+
                 Console.WriteLine($"Stack-based walker: {sw3.Elapsed}, Level-based reader: {sw2.Elapsed}");
 
                 for (var i = 0; i < sequenceLength; i++)

@@ -16,7 +16,7 @@ using Platform.Helpers.Counters;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public class LinksTests
     {
@@ -45,7 +45,7 @@ namespace Platform.Tests.Data.Core
                     for (var i = 0; i < N; i++)
                     {
                         var linksCount = links.Count();
-                        
+
                         var createPoint = random.NextBoolean();
 
                         if (linksCount > 2 && createPoint)

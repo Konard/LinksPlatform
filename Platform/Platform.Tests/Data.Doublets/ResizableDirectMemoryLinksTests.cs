@@ -6,7 +6,7 @@ using Platform.Data;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public static class ResizableDirectMemoryLinksTests
     {

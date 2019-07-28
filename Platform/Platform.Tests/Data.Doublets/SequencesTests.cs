@@ -13,7 +13,7 @@ using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
-namespace Platform.Tests.Data.Core
+namespace Platform.Tests.Data.Doublets
 {
     public class SequencesTests
     {
@@ -508,9 +508,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 
                 var compressor2 = scope2.Sequences;
                 var compressor3 = scope3.Sequences;
-                                
+
                 var constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
-                
+
                 var sequences = compressor3;
                 //var meaningRoot = links.CreatePoint();
                 //var unaryOne = links.CreateAndUpdate(meaningRoot, constants.Itself);
@@ -527,7 +527,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var linkFrequenciesCache3 = new LinkFrequenciesCache<ulong>(scope3.Links.Unsync, totalSequenceSymbolFrequencyCounter);
 
                 var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<ulong>(linkFrequenciesCache3);
-                
+
                 var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(scope3.Links.Unsync, linkToItsFrequencyNumberConverter);
                 var optimalVariantConverter = new OptimalVariantConverter<ulong>(scope3.Links.Unsync, sequenceToItsLocalElementLevelsConverter);
 
@@ -558,7 +558,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var initialCount2 = scope2.Links.Unsync.Count();
 
                 var sw2 = Stopwatch.StartNew();
-                
+
                 for (int i = START; i < END; i++)
                 {
                     compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);
@@ -572,7 +572,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 }
 
                 var initialCount3 = scope3.Links.Unsync.Count();
-                                
+
                 var sw3 = Stopwatch.StartNew();
 
                 for (int i = START; i < END; i++)
@@ -581,7 +581,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     compressed3[i] = optimalVariantConverter.Convert(arrays[i]);
                 }
 
-                var elapsed3 = sw3.Elapsed;                
+                var elapsed3 = sw3.Elapsed;
 
                 Console.WriteLine($"Compressor: {elapsed1}, Balanced variant: {elapsed2}, Optimal variant: {elapsed3}");
 
@@ -597,7 +597,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links.Unsync);
 
                     var decompress2 = UnicodeMap.FromSequenceLinkToString(sequence2, scope2.Links.Unsync);
-                    
+
                     var decompress3 = UnicodeMap.FromSequenceLinkToString(sequence3, scope3.Links.Unsync);
 
                     var structure1 = scope1.Links.Unsync.FormatStructure(sequence1, link => link.IsPartialPoint());
@@ -612,12 +612,12 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     Assert.True(strings[i] == decompress1 && decompress1 == decompress2);
                     Assert.True(strings[i] == decompress3 && decompress3 == decompress2);
                 }
-                                               
+
                 Assert.True((int)(scope1.Links.Unsync.Count() - initialCount1) < totalCharacters);
                 Assert.True((int)(scope2.Links.Unsync.Count() - initialCount2) < totalCharacters);
                 Assert.True((int)(scope3.Links.Unsync.Count() - initialCount3) < totalCharacters);
 
-                Console.WriteLine($"{(double)(scope1.Links.Unsync.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Unsync.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Unsync.Count() - initialCount3) / totalCharacters}");                
+                Console.WriteLine($"{(double)(scope1.Links.Unsync.Count() - initialCount1) / totalCharacters} | {(double)(scope2.Links.Unsync.Count() - initialCount2) / totalCharacters} | {(double)(scope3.Links.Unsync.Count() - initialCount3) / totalCharacters}");
 
                 Assert.True(scope1.Links.Unsync.Count() - initialCount1 < scope2.Links.Unsync.Count() - initialCount2);
                 Assert.True(scope3.Links.Unsync.Count() - initialCount3 < scope2.Links.Unsync.Count() - initialCount2);
@@ -633,7 +633,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var duplicates1 = duplicateCounter1.Count();
 
                 ConsoleHelpers.Debug("------");
-                
+
                 var duplicates2 = duplicateCounter2.Count();
 
                 ConsoleHelpers.Debug("------");
