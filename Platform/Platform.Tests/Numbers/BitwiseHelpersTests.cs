@@ -2,7 +2,7 @@
 using System;
 using Platform.Numbers;
 
-namespace Platform.Tests.Helpers
+namespace Platform.Tests.Numbers
 {
     public class BitwiseHelpersTests
     {
@@ -24,7 +24,7 @@ namespace Platform.Tests.Helpers
                 uint secondValue = 1543;
 
                 // Pack (join) two values at the same time
-                uint value = (secondValue << 1) | firstValue;
+                uint value = secondValue << 1 | firstValue;
 
                 uint unpackagedFirstValue = value & 1;
                 uint unpackagedSecondValue = (value & 0xFFFFFFFE) >> 1;
@@ -52,7 +52,7 @@ namespace Platform.Tests.Helpers
                 uint secondValue = 1543;
 
                 // Pack (join) two values at the same time
-                uint value = (secondValue << 1) | firstValue;
+                uint value = secondValue << 1 | firstValue;
 
                 uint unpackagedFirstValue = value & 1;
                 uint unpackagedSecondValue = (value & 0xFFFFFFFE) >> 1;
@@ -80,7 +80,7 @@ namespace Platform.Tests.Helpers
                 uint secondValue = 1543;
 
                 // Pack (join) two values at the same time
-                uint value = (secondValue << 1) | firstValue;
+                uint value = secondValue << 1 | firstValue;
 
                 uint unpackagedFirstValue = value & 1;
                 uint unpackagedSecondValue = (value & 0xFFFFFFFE) >> 1;
@@ -124,7 +124,7 @@ namespace Platform.Tests.Helpers
 
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = ~(sourceMask << shift);
-            return (target & targetMask) | ((source & sourceMask) << shift);
+            return target & targetMask | (source & sourceMask) << shift;
         }
 
         private uint PartialRead(uint target, int shift, int limit)
@@ -178,7 +178,7 @@ namespace Platform.Tests.Helpers
             return new Tuple<uint, int>(targetMask, shift);
         }
 
-        private uint PartialWrite(uint target, uint targetMask, uint source, uint sourceMask, int shift) => (target & targetMask) | ((source & sourceMask) << shift);
+        private uint PartialWrite(uint target, uint targetMask, uint source, uint sourceMask, int shift) => target & targetMask | (source & sourceMask) << shift;
 
         private uint PartialWrite(uint target, uint source, Tuple<uint, uint, int> masksAndShift) => PartialWrite(target, masksAndShift.Item1, source, masksAndShift.Item2, masksAndShift.Item3);
 

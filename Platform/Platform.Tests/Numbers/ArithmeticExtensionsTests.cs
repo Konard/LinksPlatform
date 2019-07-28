@@ -1,7 +1,7 @@
 ﻿using Xunit;
 using Platform.Numbers;
 
-namespace Platform.Tests.Helpers
+namespace Platform.Tests.Numbers
 {
     public class ArithmeticExtensionsTests
     {

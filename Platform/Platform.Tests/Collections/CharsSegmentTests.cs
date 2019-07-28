@@ -1,7 +1,7 @@
 ﻿using Platform.Collections.Segments;
 using Xunit;
 
-namespace Platform.Tests.Helpers
+namespace Platform.Tests.Collections
 {
     public class CharsSegmentTests
     {

@@ -2,7 +2,7 @@
 using Xunit;
 using Platform.Unsafe;
 
-namespace Platform.Tests.Helpers
+namespace Platform.Tests.Unsafe
 {
     public class IntPtrExtensionsTests
     {

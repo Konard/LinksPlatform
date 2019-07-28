@@ -5,7 +5,7 @@ using Platform.Collections;
 using Platform.Collections.Lists;
 using Platform.Reflection;
 
-namespace Platform.Tests.Helpers
+namespace Platform.Tests.Reflection
 {
     public class ReflectionTests
     {
