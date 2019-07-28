@@ -42,5 +42,8 @@ namespace Platform.Tests.Data.Core
             File.Delete(TempFilename);
             File.Delete(TempTransactionLogFilename);
         }
+
+        // TODO: THIS IS EXCEPTION WORKAROUND, REMOVE IT THEN https://github.com/linksplatform/Disposables/issues/13 FIXED
+        protected override bool AllowMultipleDisposeCalls => true;
     }
 }
