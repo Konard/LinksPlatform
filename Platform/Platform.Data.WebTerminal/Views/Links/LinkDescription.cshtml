@@ -1,5 +1,4 @@
 ﻿@model Link
-
 <span class="link" title="@Model.ToString()">
     <sub>@Model.ToIndex()</sub>
     <span class="source">@Html.ActionLink(Model.Source.ToString(), "Index", "Links", new { Id = Model.Source.ToInt() }, null)</span>

@@ -1,5 +1,4 @@
 ﻿@model List<LinkModel>
-
 @if (Model.Count > 0)
 {
     <ul>
@@ -11,11 +10,9 @@
                         @Html.Partial("LinkRefererDescription", item.Link)
                     </a>
                 </div>
-
                 @if (item.ReferersModels.Count > 0)
                 {
                     @Html.Partial("InfiniteLinkReferersList", item.ReferersModels)
-                    ;
                 }
             </li>
         }

@@ -28,22 +28,18 @@ namespace Platform.Examples
             _convertUnicodeLinksToCharacters = convertUnicodeLinksToCharacters;
             _referenceByLines = referenceByLines;
             _visited = new HashSet<ulong>();
-
             using (var file = File.OpenWrite(path))
             using (var writer = new StreamWriter(file, Encoding.UTF8))
             {
                 _linksCounter = 1;
                 _linesCounter = 0;
-
                 _links.Each(link =>
                 {
                     if (cancellationToken.IsCancellationRequested)
                     {
                         return _links.Constants.Break;
                     }
-
                     var linkIndex = link[_links.Constants.IndexPart];
-
                     if (!_unicodeMapped || _linksCounter > UnicodeMap.MapSize)
                     {
                         if (Visit(linkIndex))
@@ -51,7 +47,6 @@ namespace Platform.Examples
                             WriteLink(writer, link);
                         }
                     }
-
                     _linksCounter++;
                     return _links.Constants.Continue;
                 });
@@ -65,7 +60,6 @@ namespace Platform.Examples
             {
                 _addressToLineNumber.Add(linkIndex, (ulong)(_linesCounter + 1));
             }
-
             return result;
         }
 
@@ -79,29 +73,23 @@ namespace Platform.Examples
         {
             const char comma = ',';
             const char doubleQuote = '"';
-
             if (_unicodeMapped && _convertUnicodeLinksToCharacters && link <= UnicodeMap.MapSize)
             {
                 var character = UnicodeMap.FromLinkToChar(link);
-
                 if (character == comma)
                 {
                     return "\",\"";
                 }
-
                 if (character == doubleQuote)
                 {
                     return "\"\"\"\"";
                 }
-
                 return $"\"{character}\"";
             }
-
             if (_referenceByLines)
             {
                 link = _addressToLineNumber[link];
             }
-
             return link.ToString();
         }
     }

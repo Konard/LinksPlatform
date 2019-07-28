@@ -18,10 +18,7 @@ namespace Platform.Examples
     {
         private readonly IWikipediaStorage<ulong> _storage;
 
-        public WikipediaImporter(IWikipediaStorage<ulong> storage)
-        {
-            _storage = storage;
-        }
+        public WikipediaImporter(IWikipediaStorage<ulong> storage) => _storage = storage;
 
         public Task Import(string file, CancellationToken token)
         {
@@ -39,7 +36,6 @@ namespace Platform.Examples
                 //    for (var i = 0; i < 500; i++)
                 //        rawWriter.WriteLine(lines[i]);
                 //}
-
                 try
                 {
                     var document = _storage.CreateDocument(file);
@@ -61,86 +57,58 @@ namespace Platform.Examples
         {
             var parentContexts = new Stack<ElementContext>();
             var elements = new Stack<string>(); // Path
-
             // TODO: If path was loaded previously, skip it.
-
             while (reader.Read())
             {
                 if (token.IsCancellationRequested)
                 {
                     return;
                 }
-
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
                         var elementName = reader.Name;
-
                         context.IncrementChildNameCount(elementName);
-
                         elementName = $"{elementName}[{context.ChildrenNamesCounts[elementName]}]";
-
                         if (!reader.IsEmptyElement)
                         {
                             elements.Push(elementName);
-
-                            ConsoleHelpers.Debug("{0} starting...",
-                                elements.Count <= 20 ? ToXPath(elements) : elementName); // XPath
-
+                            ConsoleHelpers.Debug("{0} starting...", elements.Count <= 20 ? ToXPath(elements) : elementName); // XPath
                             var element = _storage.CreateElement(name: elementName);
-
                             parentContexts.Push(context);
                             _storage.AttachElementToParent(elementToAttach: element, parent: context.Parent);
-
                             context = new ElementContext(element);
                         }
                         else
                         {
                             ConsoleHelpers.Debug("{0} finished.", elementName);
                         }
-
                         break;
-
                     case XmlNodeType.EndElement:
-
-                        ConsoleHelpers.Debug("{0} finished.",
-                            elements.Count <= 20 ? ToXPath(elements) : elements.Peek()); // XPath
-
+                        ConsoleHelpers.Debug("{0} finished.", elements.Count <= 20 ? ToXPath(elements) : elements.Peek()); // XPath
                         var topElement = elements.Pop();
-
                         // Restoring scope
                         context = parentContexts.Pop();
-
                         if (topElement.StartsWith("page"))
                         {
                             //if (context.ChildrenNamesCounts["page"] % 100 == 0)
                             Console.WriteLine(topElement);
                         }
-
                         break;
 
                     case XmlNodeType.Text:
                         ConsoleHelpers.Debug("Starting text element...");
-
                         var content = reader.Value;
-                            
                         ConsoleHelpers.Debug("Content: {0}{1}", content.Truncate(50), content.Length >= 50 ? "..." : "");
-
                         var textElement = _storage.CreateTextElement(content: content);
-
                         _storage.AttachElementToParent(textElement, context.Parent);
-
                         ConsoleHelpers.Debug("Text element finished.");
-
                         break;
                 }
             }
         }
 
-        private string ToXPath(Stack<string> path)
-        {
-            return string.Join("/", path.Reverse());
-        }
+        private string ToXPath(Stack<string> path) => string.Join("/", path.Reverse());
 
         private struct ElementContext
         {

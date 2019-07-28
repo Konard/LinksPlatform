@@ -1,5 +1,4 @@
 ﻿@model List<LinkModel>
-
 <ul>
 @foreach (var item in Model)
 {
@@ -9,10 +8,9 @@
                 @Html.Partial("LinkRefererDescription", item.Link)
             </a>
         </div>
-    
         @if (item.ReferersModels.Count > 0)
         {
-            @Html.Partial("LinkReferersList", item.ReferersModels);
+            @Html.Partial("LinkReferersList", item.ReferersModels)
         }
     </li>
 }

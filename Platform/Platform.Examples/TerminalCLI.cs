@@ -19,7 +19,6 @@ namespace Platform.Examples
                 {
                     Console.WriteLine("Welcome to terminal.");
                     Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
-
                     while (cancellation.NoCancellationRequested)
                     {
                         while (Console.KeyAvailable)
@@ -34,7 +33,6 @@ namespace Platform.Examples
                                 cancellation.ForceCancellation();
                             }
                         }
-
                         while (receiver.Available > 0)
                         {
                             var message = receiver.ReceiveString();
@@ -43,10 +41,8 @@ namespace Platform.Examples
                                 Console.WriteLine($"<- {message}");
                             }
                         }
-
                         ThreadHelpers.Sleep();
                     }
-
                     Console.WriteLine("Terminal stopped.");
                 }
             }

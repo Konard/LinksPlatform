@@ -35,15 +35,10 @@ namespace Platform.Examples
             else
             {
                 messageHandler("Contents:");
-
                 var linksTotalLength = _links.Count().ToString("0").Length;
-
                 var printFormatBase = new string('0', linksTotalLength);
-
                 // Выделить код по печати одной связи в Extensions
-
                 var printFormat = string.Format("\t[{{0:{0}}}]: {{1:{0}}} -> {{2:{0}}} {{3}}", printFormatBase);
-
                 for (var link = UnicodeMap.LastCharLink + 1; link <= _links.Count(); link++)
                 {
                     messageHandler(string.Format(printFormat, link, _links.GetSource(link), _links.GetTarget(link),
@@ -62,38 +57,28 @@ namespace Platform.Examples
                 {
                     escape++;
                 }
-
                 return escape % 2 == 0;
             }
             return false;
         }
 
-        public void Create(string message)
-        {
-            Create(ProcessSequence(message, forSearch: false));
-        }
+        public void Create(string message) => Create(ProcessSequence(message, forSearch: false));
 
         private void Create(ulong[] sequence)
         {
             var link = _sequences.Create(sequence);
-
             _sender.Send($"Sequence with balanced variant at {link} created.");
         }
 
-        public void Search(string message)
-        {
-            Search(ProcessSequence(message, forSearch: true));
-        }
+        public void Search(string message) => Search(ProcessSequence(message, forSearch: true));
 
         private void Search(ulong[] sequence)
         {
             var containsAny = Array.IndexOf(sequence, _constants.Any) >= 0;
             var containsZeroOrMany = Array.IndexOf(sequence, Sequences.ZeroOrMany) >= 0;
-
             if (containsZeroOrMany)
             {
                 var patternMatched = _sequences.MatchPattern(sequence);
-
                 _sender.Send($"{patternMatched.Count} sequences matched pattern.");
                 foreach (var result in patternMatched)
                 {
@@ -104,7 +89,6 @@ namespace Platform.Examples
             if (!containsZeroOrMany)
             {
                 var fullyMatched = _sequences.Each(sequence);
-
                 _sender.Send($"{fullyMatched.Count} sequences matched fully.");
                 foreach (var result in fullyMatched)
                 {
@@ -115,17 +99,13 @@ namespace Platform.Examples
             if (!containsAny && !containsZeroOrMany)
             {
                 var partiallyMatched = _sequences.GetAllPartiallyMatchingSequences1(sequence);
-
                 _sender.Send($"{partiallyMatched.Count} sequences matched partially.");
                 foreach (var result in partiallyMatched)
                 {
                     var sequenceMarker = _sequences.IsSequence(result) ? "[S]" : "[P]";
                     _sender.Send($"\t{result}: {_sequences.FormatSequence(result, AppendLinkToString, true)} {sequenceMarker}");
                 }
-
-
                 var allConnections = _sequences.GetAllConnections(sequence);
-
                 _sender.Send($"{allConnections.Count} sequences connects query elements.");
                 foreach (var result in allConnections)
                 {
@@ -142,7 +122,6 @@ namespace Platform.Examples
             {
                 sequenceLength--;
             }
-
             var w = 0;
             for (var r = 0; r < sequenceLength; r++)
             {
@@ -159,9 +138,7 @@ namespace Platform.Examples
                     w++;
                 }
             }
-
             var result = new ulong[w];
-
             w = 0;
             if (forSearch)
             {
@@ -207,15 +184,11 @@ namespace Platform.Examples
                     }
                 }
             }
-
             return result;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private static bool IsEscape(char c)
-        {
-            return c == '\\' || c == '~';
-        }
+        private static bool IsEscape(char c) => c == '\\' || c == '~';
 
         private static void AppendLinkToString(StringBuilder sb, ulong link)
         {

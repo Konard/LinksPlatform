@@ -11,9 +11,7 @@ namespace Platform.Examples
         {
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var exportTo = ConsoleHelpers.GetOrReadArgument(1, "Export to", args);
-
             File.Create(exportTo).Dispose();
-
             if (!File.Exists(linksFile))
             {
                 Console.WriteLine("Entered links file does not exists.");
@@ -28,13 +26,10 @@ namespace Platform.Examples
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
-
                     var exporter = new GEXFExporter<ulong>(syncLinks);
-
                     exporter.Export(exportTo);
                 }
             }
-
             ConsoleHelpers.PressAnyKeyToContinue();
         }
     }

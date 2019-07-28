@@ -4,9 +4,6 @@ namespace Platform.Data.MasterServer
 {
     public class Program
     {
-        public static void Main(string[] args)
-        {
-            new MasterServerCLI().Run(args);
-        }
+        public static void Main(string[] args) => new MasterServerCLI().Run(args);
     }
 }

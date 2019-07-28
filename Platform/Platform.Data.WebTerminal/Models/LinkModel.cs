@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Platform.Data.Triplets;
+using Platform.Threading;
 
 namespace Platform.Data.WebTerminal.Models
 {
@@ -8,10 +9,7 @@ namespace Platform.Data.WebTerminal.Models
         public Link Link { get; set; }
         public List<LinkModel> ReferersModels { get; set; }
 
-        public LinkModel(Link link)
-            : this(link, new List<LinkModel>())
-        {
-        }
+        public LinkModel(Link link) : this(link, new List<LinkModel>()) { }
 
         public LinkModel(Link link, List<LinkModel> referersModels)
         {
@@ -21,26 +19,24 @@ namespace Platform.Data.WebTerminal.Models
 
         public static LinkModel CreateLinkModel(Link link, int nestingLevel = 5)
         {
-            //ThreadHelpers.SyncInvokeWithExtendedStack(() =>
-            //{
-            const int currentLevel = 0;
-            var visitedLinks = new HashSet<Link>();
-            var result = CreateLinkModel(link, visitedLinks, currentLevel, nestingLevel);
-            //});
-
+            LinkModel result = null;
+            ThreadHelpers.SyncInvokeWithExtendedStack(() =>
+            {
+                const int currentLevel = 0;
+                var visitedLinks = new HashSet<Link>();
+                result = CreateLinkModel(link, visitedLinks, currentLevel, nestingLevel);
+            });
             return result;
         }
 
         private static LinkModel CreateLinkModel(Link link, HashSet<Link> visitedLinks, int currentLevel, int maxLevel)
         {
             var model = new LinkModel(link);
-
             if (currentLevel < maxLevel)
             {
                 if (currentLevel == 0 || link.TotalReferers < 10)
                 {
                     currentLevel++;
-
                     link.WalkThroughReferers(referer =>
                     {
                         if (link != referer && visitedLinks.Add(referer))
@@ -48,11 +44,9 @@ namespace Platform.Data.WebTerminal.Models
                             model.ReferersModels.Add(CreateLinkModel(referer, visitedLinks, currentLevel, maxLevel));
                         }
                     });
-
                     model.ReferersModels.Sort((x, y) => x.Link.ToInt().CompareTo(y.Link.ToInt()));
                 }
             }
-
             return model;
         }
     }

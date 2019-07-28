@@ -9,7 +9,6 @@ namespace Platform.Examples
         public void Run(params string[] args)
         {
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(0, "Wikipedia xml file", args);
-
             if (!File.Exists(wikipediaFile))
             {
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
@@ -22,7 +21,6 @@ namespace Platform.Examples
                     wikipediaPagesCounter.Count(wikipediaFile, cancellation.Token).Wait();
                 }
             }
-
             ConsoleHelpers.PressAnyKeyToContinue();
         }
     }

@@ -12,22 +12,18 @@ namespace Platform.Examples
     {
         // We use consoleLock because messages can arrive in parallel, so we want to make sure we get
         // consistent console output.
-        private readonly object consoleLock = new object();
+        private readonly object _consoleLock = new object();
+
+        // Use an event to know when we're done
+        private readonly ManualResetEvent _finished = new ManualResetEvent(false);
 
         public bool Succeed { get; private set; }
 
-        // Use an event to know when we're done
-        private readonly ManualResetEvent finished = new ManualResetEvent(false);
-
-        public XUnitTestsRunnerCLI()
-        {
-            Succeed = true;
-        }
+        public XUnitTestsRunnerCLI() => Succeed = true;
 
         public void Run(params string[] args)
         {
             var location = System.Reflection.Assembly.GetEntryAssembly().Location;
-
             string testAssembly;
             if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
             {
@@ -37,9 +33,7 @@ namespace Platform.Examples
             {
                 testAssembly = location;
             }
-
             var typeName = args.Length >= 2 && !string.IsNullOrWhiteSpace(args[1]) ? args[1] : null;
-
             using (var runner = AssemblyRunner.WithoutAppDomain(testAssembly))
             {
                 runner.OnDiscoveryComplete = OnDiscoveryComplete;
@@ -48,13 +42,10 @@ namespace Platform.Examples
                 runner.OnTestFailed = OnTestFailed;
                 runner.OnTestSkipped = OnTestSkipped;
                 runner.OnErrorMessage = OnErrorMessage;
-
                 Console.WriteLine("Discovering...");
                 runner.Start(typeName);
-
-                finished.WaitOne();
-                finished.Dispose();
-
+                _finished.WaitOne();
+                _finished.Dispose();
                 if (runner.Status != AssemblyRunnerStatus.Idle)
                 {
                     Console.WriteLine("Waiting to get Idle..");
@@ -62,7 +53,6 @@ namespace Platform.Examples
                     {
                         ThreadHelpers.Sleep();
                     }
-
                     Console.WriteLine("Idle status reached.");
                 }
             }
@@ -70,7 +60,7 @@ namespace Platform.Examples
 
         private void OnDiscoveryComplete(DiscoveryCompleteInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.WriteLine($"Running {info.TestCasesToRun} of {info.TestCasesDiscovered} tests...");
             }
@@ -78,17 +68,16 @@ namespace Platform.Examples
 
         private void OnExecutionComplete(ExecutionCompleteInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.WriteLine($"Finished: {info.TotalTests} tests in {Math.Round(info.ExecutionTime, 3)}s ({info.TestsFailed} failed, {info.TestsSkipped} skipped)");
             }
-
-            finished.Set();
+            _finished.Set();
         }
 
         private void OnTestPassed(TestPassedInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.ForegroundColor = ConsoleColor.Green;
                 Console.WriteLine($"[PASSED] {info.TestDisplayName}: {info.ExecutionTime}");
@@ -98,25 +87,22 @@ namespace Platform.Examples
 
         private void OnTestFailed(TestFailedInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
-
                 Console.WriteLine("[FAIL] {0}: {1}", info.TestDisplayName, info.ExceptionMessage);
                 if (info.ExceptionStackTrace != null)
                 {
                     Console.WriteLine(info.ExceptionStackTrace);
                 }
-
                 Console.ResetColor();
             }
-
             Succeed = false;
         }
 
         private void OnTestSkipped(TestSkippedInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.ForegroundColor = ConsoleColor.Yellow;
                 Console.WriteLine("[SKIP] {0}: {1}", info.TestDisplayName, info.SkipReason);
@@ -126,15 +112,14 @@ namespace Platform.Examples
 
         private void OnErrorMessage(ErrorMessageInfo info)
         {
-            lock (consoleLock)
+            lock (_consoleLock)
             {
                 Console.ForegroundColor = ConsoleColor.Red;
                 Console.WriteLine($"[ERROR] {info.ExceptionType}: {info.ExceptionMessage}");
                 Console.ResetColor();
             }
-
             Succeed = false;
-            finished.Set();
+            _finished.Set();
         }
     }
 }

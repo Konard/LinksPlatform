@@ -13,7 +13,6 @@ namespace Platform.Data.WebTerminal.Controllers
             {
                 id = Net.Link;
             }
-
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
             return View("Index", model);
@@ -25,7 +24,6 @@ namespace Platform.Data.WebTerminal.Controllers
             {
                 id = Net.Link;
             }
-
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
             return View("Infinite", model);

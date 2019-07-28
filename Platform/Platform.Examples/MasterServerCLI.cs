@@ -28,26 +28,19 @@ namespace Platform.Examples
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     var unicodeMap = new UnicodeMap(syncLinks);
                     unicodeMap.Init();
-
                     var sequences = new Sequences(syncLinks, new SequencesOptions<ulong> { UseSequenceMarker = true, SequenceMarkerLink = 65537, UseCompression = true });
-
                     Console.WriteLine("Links server started.");
                     Console.WriteLine("Press CTRL+C or ESC to stop server.");
-
                     using (var sender = new UdpSender(8888))
                     {
                         var masterServer = new MasterServer(links, sequences, sender);
-
                         masterServer.PrintContents(Console.WriteLine);
-
                         void handleMessage(string message)
                         {
                             if (!string.IsNullOrWhiteSpace(message))
                             {
                                 message = message.Trim();
-
                                 Console.WriteLine($"<- {message}");
-
                                 if (masterServer.IsSearch(message))
                                 {
                                     masterServer.Search(message);
@@ -58,7 +51,6 @@ namespace Platform.Examples
                                 }
                             }
                         }
-
                         //using (var receiver = new UdpReceiver(7777, handleMessage))
                         using (var receiver = new UdpClient(7777))
                         {
@@ -68,7 +60,6 @@ namespace Platform.Examples
                                 {
                                     handleMessage(receiver.ReceiveString());
                                 }
-
                                 while (Console.KeyAvailable)
                                 {
                                     var info = Console.ReadKey(true);
@@ -77,10 +68,8 @@ namespace Platform.Examples
                                         cancellation.ForceCancellation();
                                     }
                                 }
-
                                 ThreadHelpers.Sleep();
                             }
-
                             Console.WriteLine("Links server stopped.");
                         }
                     }

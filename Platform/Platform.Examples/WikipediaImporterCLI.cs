@@ -31,11 +31,9 @@ namespace Platform.Examples
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     links.UseUnicode();
-
                     var sequences = new Sequences(syncLinks, new SequencesOptions<ulong> { UseCompression = true });
                     var wikipediaStorage = new WikipediaLinksStorage(sequences);
                     var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
-
                     wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
                 }
             }

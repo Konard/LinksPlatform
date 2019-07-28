@@ -15,20 +15,16 @@ namespace Platform.Examples
         {
             _sequences = sequences;
             _links = sequences.Links;
-
             InitConstants();
         }
 
         private void InitConstants()
         {
             var markerIndex = UnicodeMap.LastCharLink + 1;
-
             _elementMarker = CreateConstant(markerIndex++);
             _textElementMarker = CreateConstant(markerIndex++);
-
             // Reserve 100 more
             _documentMarker = CreateConstant(markerIndex++);
-            
             for (var i = 0; i < 99; i++)
             {
                 CreateConstant(markerIndex++);
@@ -41,29 +37,18 @@ namespace Platform.Examples
             {
                 _links.Create();
             }
-
             return markerIndex;
         }
 
-        public ulong CreateDocument(string name)
-        {
-            return Create(_documentMarker, name);
-        }
+        public ulong CreateDocument(string name) => Create(_documentMarker, name);
 
-        public ulong CreateElement(string name)
-        {
-            return Create(_elementMarker, name);
-        }
+        public ulong CreateElement(string name) => Create(_elementMarker, name);
 
-        public ulong CreateTextElement(string content)
-        {
-            return Create(_textElementMarker, content);
-        }
+        public ulong CreateTextElement(string content) => Create(_textElementMarker, content);
 
         private ulong Create(ulong marker, string content)
         {
             var contentSequence = CreateSequence1(content);
-
             return _links.CreateAndUpdate(marker, contentSequence);
         }
 
@@ -81,10 +66,7 @@ namespace Platform.Examples
             return contentSequence;
         }
 
-        public void AttachElementToParent(ulong elementToAttach, ulong parent)
-        {
-            _links.CreateAndUpdate(parent, elementToAttach);
-        }
+        public void AttachElementToParent(ulong elementToAttach, ulong parent) => _links.CreateAndUpdate(parent, elementToAttach);
     }
 }
 

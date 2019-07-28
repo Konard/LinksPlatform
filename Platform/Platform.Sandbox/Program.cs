@@ -4,7 +4,7 @@ using System.IO;
 using Platform.Examples;
 using Platform.Tests;
 using Platform.Tests.Collections;
-using Platform.Tests.Data.Core;
+using Platform.Tests.Data.Doublets;
 
 namespace Platform.Sandbox
 {

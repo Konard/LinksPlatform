@@ -1,13 +1,7 @@
-﻿using System;
-using System.Reflection;
-using System.Collections.Generic;
+﻿using System.Reflection;
 using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
 
 using Platform.Data.Triplets;
 
@@ -18,18 +12,14 @@ namespace Platform.Data.WebTerminal
         public static void Main(string[] args)
         {
             var databaseFile = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly().Location), @"data.dat");
-
+#if DEBUG
             File.Delete(databaseFile);
-
+#endif
             Link.StartMemoryManager(databaseFile);
-
             CreateWebHostBuilder(args).Build().Run();
-
             Link.StopMemoryManager();
         }
 
-        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) => WebHost.CreateDefaultBuilder(args).UseStartup<Startup>();
     }
 }

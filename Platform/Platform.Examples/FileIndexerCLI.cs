@@ -12,7 +12,6 @@ namespace Platform.Examples
         {
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var fileToIndex = ConsoleHelpers.GetOrReadArgument(1, "File to index", args);
-
             if (!File.Exists(fileToIndex))
             {
                 Console.WriteLine("Entered file to index does not exists.");
@@ -27,15 +26,12 @@ namespace Platform.Examples
                     links.UseUnicode();
                     UnicodeMap.InitNew(syncLinks);
                     var indexer = new SequencesIndexer<ulong>(syncLinks);
-
                     var fileIndexer = new FileIndexer(syncLinks, indexer);
-
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
                     //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
                     fileIndexer.IndexParallel(fileToIndex, cancellation.Token);
                 }
             }
-
             ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
