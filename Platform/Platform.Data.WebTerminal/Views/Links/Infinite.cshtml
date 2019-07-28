@@ -23,9 +23,9 @@
         <ul>
             <li>
                 <div class="item">
-                    @Html.Partial("LinkDescription", Model.Link)
+                    <partial name="LinkDescription" model="Model.Link" />
                 </div>
-                @Html.Partial("InfiniteLinkReferersList", Model.ReferersModels)
+                <partial name="InfiniteLinkReferersList" model="Model.ReferersModels" />
             </li>
         </ul>
     </div>
