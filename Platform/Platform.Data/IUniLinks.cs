@@ -6,13 +6,13 @@ using System.Collections.Generic;
 namespace Platform.Data.Core.Common
 {
     /// <remarks>Minimal sufficient universal Links API (for bulk operations).</remarks>
-    internal partial interface IUniLinks<TLink>
+    public partial interface IUniLinks<TLink>
     {
         IList<IList<IList<TLink>>> Trigger(IList<TLink> condition, IList<TLink> substitution);
     }
 
     /// <remarks>Minimal sufficient universal Links API (for step by step operations).</remarks>
-    internal partial interface IUniLinks<TLink>
+    public partial interface IUniLinks<TLink>
     {
         /// <returns>
         /// TLink that represents True (was finished fully) or TLink that represents False (was stopped).
@@ -31,7 +31,7 @@ namespace Platform.Data.Core.Common
     }
 
     /// <remarks>Extended with small optimization.</remarks>
-    internal partial interface IUniLinks<TLink>
+    public partial interface IUniLinks<TLink>
     {
         /// <remarks>
         /// Something simple should be simple and optimized.
@@ -43,7 +43,7 @@ namespace Platform.Data.Core.Common
     /// In/Out aliases for IUniLinks.
     /// TLink can be any number type of any size.
     /// </remarks>
-    internal interface IUniLinksIO<TLink>
+    public interface IUniLinksIO<TLink>
     {
         /// <remarks>
         /// default(TLink) means any link.
@@ -82,7 +82,7 @@ namespace Platform.Data.Core.Common
         TLink In(TLink[] before, TLink[] after);
     }
 
-    internal enum PartType : ulong
+    public enum PartType : ulong
     {
         LinkIndexOrId = 0,
         LinkSourceOrFirst = 1,
@@ -91,7 +91,7 @@ namespace Platform.Data.Core.Common
     }
 
     /// <remarks>Contains some optimizations of Out.</remarks>
-    internal interface IUniLinksIOWithExtensions<TLink> : IUniLinksIO<TLink>
+    public interface IUniLinksIOWithExtensions<TLink> : IUniLinksIO<TLink>
     {
         /// <remarks>
         /// default(TLink) means nothing or null.
@@ -117,7 +117,7 @@ namespace Platform.Data.Core.Common
     /// <remarks>
     /// Get/Set aliases for IUniLinks.
     /// </remarks>
-    internal interface IUniLinksGS<TLink>
+    public interface IUniLinksGS<TLink>
     {
         TLink Get(ulong partType, TLink link);
         bool Get(Func<TLink, bool> handler, params TLink[] pattern);
@@ -127,7 +127,7 @@ namespace Platform.Data.Core.Common
     /// <remarks>
     /// Read/Write aliases for IUniLinks.
     /// </remarks>
-    internal interface IUniLinksRW<TLink>
+    public interface IUniLinksRW<TLink>
     {
         TLink Read(ulong partType, TLink link);
         bool Read(Func<TLink, bool> handler, params TLink[] pattern);
@@ -137,7 +137,7 @@ namespace Platform.Data.Core.Common
     /// <remarks>
     /// CRUD aliases for IUniLinks.
     /// </remarks>
-    internal interface IUniLinksCRUD<TLink>
+    public interface IUniLinksCRUD<TLink>
     {
         TLink Read(ulong partType, TLink link);
         bool Read(Func<TLink, bool> handler, params TLink[] pattern);

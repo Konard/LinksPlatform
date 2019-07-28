@@ -549,7 +549,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            Visitor wrapper = x => walker(x);
+            void wrapper(ulong x) => walker(x);
 
             WalkThroughAllReferersBySource(this, wrapper);
             WalkThroughAllReferersByLinker(this, wrapper);
@@ -561,7 +561,7 @@ namespace Platform.Data.Core.Triplets
             if (LinkDoesNotExist(this))
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
 
-            StopableVisitor wrapper = x => walker(x) ? 1 : 0;
+            long wrapper(ulong x) => walker(x) ? 1 : 0;
 
             WalkThroughReferersBySource(this, wrapper);
             WalkThroughReferersByLinker(this, wrapper);

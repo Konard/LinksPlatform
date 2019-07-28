@@ -384,7 +384,7 @@ namespace Platform.Data.Core.Sequences
 
                     var linksInSequence = new HashSet<ulong>(sequence);
 
-                    Action<ulong> handler = result =>
+                    void handler(ulong result)
                     {
                         var filterPosition = 0;
 
@@ -412,7 +412,7 @@ namespace Platform.Data.Core.Sequences
                         {
                             results.Add(result);
                         }
-                    };
+                    }
 
                     if (sequence.Length >= 2)
                         StepRight(handler, sequence[0], sequence[1]);
@@ -932,11 +932,11 @@ namespace Platform.Data.Core.Sequences
         // причём достаточно одного бита для хранения перехода влево или вправо
         private void AllUsagesCore(ulong link, HashSet<ulong> usages)
         {
-            Func<ulong, bool> handler = doublet =>
+            bool handler(ulong doublet)
             {
                 if (usages.Add(doublet)) AllUsagesCore(doublet, usages);
                 return true;
-            };
+            }
             Links.Unsync.Each(link, Constants.Any, handler);
             Links.Unsync.Each(Constants.Any, link, handler);
         }
@@ -954,11 +954,11 @@ namespace Platform.Data.Core.Sequences
 
         private void AllBottomUsagesCore(ulong link, HashSet<ulong> visits, HashSet<ulong> usages)
         {
-            Func<ulong, bool> handler = doublet =>
+            bool handler(ulong doublet)
             {
                 if (visits.Add(doublet)) AllBottomUsagesCore(doublet, visits, usages);
                 return true;
-            };
+            }
 
             if (Links.Unsync.Count(Constants.Any, link) == 0)
                 usages.Add(link);
@@ -986,7 +986,7 @@ namespace Platform.Data.Core.Sequences
 
         private bool AllUsagesCore1(ulong link, HashSet<ulong> usages, Func<ulong, bool> outerHandler)
         {
-            Func<ulong, bool> handler = doublet =>
+            bool handler(ulong doublet)
             {
                 if (usages.Add(doublet))
                 {
@@ -997,7 +997,7 @@ namespace Platform.Data.Core.Sequences
                         return false;
                 }
                 return true;
-            };
+            }
             return Links.Unsync.Each(link, Constants.Any, handler)
                 && Links.Unsync.Each(Constants.Any, link, handler);
         }
@@ -1039,12 +1039,12 @@ namespace Platform.Data.Core.Sequences
 
                     var visitedChildren = new HashSet<ulong>();
 
-                    Func<ulong, bool> linkCalculator = child =>
+                    bool linkCalculator(ulong child)
                     {
                         if (link != child && visitedChildren.Add(child))
                             total += _totals[child] == 0 ? 1 : _totals[child];
                         return true;
-                    };
+                    }
 
                     _links.Unsync.Each(link, Constants.Any, linkCalculator);
                     _links.Unsync.Each(Constants.Any, link, linkCalculator);
@@ -1087,16 +1087,16 @@ namespace Platform.Data.Core.Sequences
                 Func<ulong, ulong> getSource = _links.Unsync.GetSource;
                 Func<ulong, ulong> getTarget = _links.Unsync.GetTarget;
                 Func<ulong, bool> isElement = IsElement;
-                Action<ulong> visitLeaf = (parent) =>
+                void visitLeaf(ulong parent)
                 {
                     if (link != parent)
                         _totals[parent]++;
-                };
-                Action<ulong> visitNode = (parent) =>
+                }
+                void visitNode(ulong parent)
                 {
                     if (link != parent)
                         _totals[parent]++;
-                };
+                }
 
                 var stack = new Stack();
                 var element = link;
