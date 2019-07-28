@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class LinksSelfReferenceResolver<TLink> : LinksDecoratorBase<TLink>
     {
@@ -12,9 +12,9 @@ namespace Platform.Data.Core.Doublets
         public override TLink Each(Func<IList<TLink>, TLink> handler, IList<TLink> restrictions)
         {
             if (!_equalityComparer.Equals(Constants.Any, Constants.Itself)
-                && ((restrictions.Count > Constants.IndexPart && _equalityComparer.Equals(restrictions[Constants.IndexPart], Constants.Itself))
-                 || (restrictions.Count > Constants.SourcePart && _equalityComparer.Equals(restrictions[Constants.SourcePart], Constants.Itself))
-                 || (restrictions.Count > Constants.TargetPart && _equalityComparer.Equals(restrictions[Constants.TargetPart], Constants.Itself))))
+                && (restrictions.Count > Constants.IndexPart && _equalityComparer.Equals(restrictions[Constants.IndexPart], Constants.Itself)
+                 || restrictions.Count > Constants.SourcePart && _equalityComparer.Equals(restrictions[Constants.SourcePart], Constants.Itself)
+                 || restrictions.Count > Constants.TargetPart && _equalityComparer.Equals(restrictions[Constants.TargetPart], Constants.Itself)))
             {
                 return Constants.Continue;
             }

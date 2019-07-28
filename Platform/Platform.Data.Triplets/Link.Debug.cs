@@ -3,7 +3,7 @@ using System.Diagnostics;
 
 #pragma warning disable IDE0051 // Remove unused private members
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public partial struct Link
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     /// <remarks>
     /// TODO: Может стоит попробовать ref во всех методах (IRefEqualityComparer)
@@ -17,6 +17,6 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         public bool Equals(Doublet<T> x, Doublet<T> y) => _equalityComparer.Equals(x.Source, y.Source) && _equalityComparer.Equals(x.Target, y.Target);
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public int GetHashCode(Doublet<T> obj) => unchecked((obj.Source.GetHashCode() << 15) ^ obj.Target.GetHashCode());
+        public int GetHashCode(Doublet<T> obj) => unchecked(obj.Source.GetHashCode() << 15 ^ obj.Target.GetHashCode());
     }
 }

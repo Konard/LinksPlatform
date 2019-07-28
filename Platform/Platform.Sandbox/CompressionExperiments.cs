@@ -8,10 +8,10 @@ using System.Runtime.CompilerServices;
 using Platform.Collections;
 using Platform.Threading;
 using Platform.Helpers.Singletons;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.Frequencies.Cache;
-using Platform.Data.Core.Sequences.Frequencies.Counters;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
+using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
 namespace Platform.Sandbox
 {

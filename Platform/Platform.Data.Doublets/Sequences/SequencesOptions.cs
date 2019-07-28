@@ -1,12 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences.Frequencies.Cache;
-using Platform.Data.Core.Sequences.Frequencies.Counters;
 using Platform.Data.Sequences;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
+using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public struct SequencesOptions<TLink> // TODO: To use type parameter <TLink> the ILinks<TLink> must contain GetConstants function.
     {

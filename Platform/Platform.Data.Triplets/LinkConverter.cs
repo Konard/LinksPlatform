@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public static class LinkConverter
     {

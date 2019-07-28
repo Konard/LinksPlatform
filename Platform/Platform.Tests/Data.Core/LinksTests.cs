@@ -13,8 +13,8 @@ using Platform.Random;
 using Platform.Helpers;
 using Platform.Helpers.Singletons;
 using Platform.Helpers.Counters;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Constants;
+using Platform.Data.Doublets;
 
 namespace Platform.Tests.Data.Core
 {

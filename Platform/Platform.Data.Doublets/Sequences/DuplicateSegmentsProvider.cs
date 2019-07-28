@@ -9,10 +9,9 @@ using Platform.Collections.Segments.Walkers;
 using Platform.Helpers;
 using Platform.Helpers.Singletons;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class DuplicateSegmentsProvider<TLink> : DictionaryBasedDuplicateSegmentsWalkerBase<TLink>, IProvider<IList<KeyValuePair<IList<TLink>, IList<TLink>>>>
     {
@@ -117,7 +116,7 @@ namespace Platform.Data.Core.Sequences
             }
             if (_sequences is Sequences sequencesExperiments)
             {
-                var partiallyMatched = sequencesExperiments.GetAllPartiallyMatchingSequences4((HashSet<ulong>)(object)readAsElement, (IList<ulong>)(object)segment);
+                var partiallyMatched = sequencesExperiments.GetAllPartiallyMatchingSequences4((HashSet<ulong>)(object)readAsElement, (IList<ulong>)segment);
                 foreach (var partiallyMatchedSequence in partiallyMatched)
                 {
                     TLink sequenceIndex = (Integer<TLink>)partiallyMatchedSequence;

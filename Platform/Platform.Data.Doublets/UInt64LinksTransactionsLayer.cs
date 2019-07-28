@@ -10,7 +10,7 @@ using Platform.Timestamps;
 using Platform.Unsafe;
 using Platform.IO;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class UInt64LinksTransactionsLayer : LinksDisposableDecoratorBase<ulong> //-V3073
     {

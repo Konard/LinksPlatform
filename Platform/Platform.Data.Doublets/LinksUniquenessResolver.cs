@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class LinksUniquenessResolver<TLink> : LinksDecoratorBase<TLink>
     {
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
-        public LinksUniquenessResolver(ILinks<TLink> links) : base(links) {}
+        public LinksUniquenessResolver(ILinks<TLink> links) : base(links) { }
 
         public override TLink Update(IList<TLink> restrictions)
         {

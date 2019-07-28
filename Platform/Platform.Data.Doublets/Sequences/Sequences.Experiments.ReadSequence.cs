@@ -2,11 +2,10 @@
 using System;
 using System.Runtime.CompilerServices;
 #if USEARRAYPOOL
-using Platform.Helpers.Collections;
+using Platform.Collections;
 #endif
-using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     partial class Sequences
     {

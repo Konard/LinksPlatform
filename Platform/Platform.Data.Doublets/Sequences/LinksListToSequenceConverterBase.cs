@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public abstract class LinksListToSequenceConverterBase<TLink> : IConverter<IList<TLink>, TLink>
     {

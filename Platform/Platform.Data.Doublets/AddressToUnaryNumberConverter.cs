@@ -3,7 +3,7 @@ using Platform.Interfaces;
 using Platform.Reflection;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class AddressToUnaryNumberConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
@@ -25,7 +25,7 @@ namespace Platform.Data.Core.Doublets
                         ? _powerOf2ToUnaryNumberConverter.Convert(i)
                         : Links.GetOrCreate(_powerOf2ToUnaryNumberConverter.Convert(i), target);
                 }
-                number = (Integer<TLink>)(((ulong)(Integer<TLink>)number) >> 1); // Should be BitwiseHelpers.ShiftRight(number, 1);
+                number = (Integer<TLink>)((ulong)(Integer<TLink>)number >> 1); // Should be BitwiseHelpers.ShiftRight(number, 1);
                 if (_equalityComparer.Equals(number, default))
                 {
                     break;

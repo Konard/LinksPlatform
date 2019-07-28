@@ -1,8 +1,8 @@
 ﻿using Xunit;
 using Platform.Helpers.Scopes;
 using Platform.Memory;
-using Platform.Data.Core.Doublets;
 using Platform.Data;
+using Platform.Data.Doublets;
 
 namespace Platform.Tests.Helpers
 {

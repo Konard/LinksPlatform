@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Data.Core.Sequences.Frequencies.Cache;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class LinkToItsFrequencyNumberConveter<TLink> : LinksOperatorBase<TLink>, IConverter<Doublet<TLink>, TLink>
     {

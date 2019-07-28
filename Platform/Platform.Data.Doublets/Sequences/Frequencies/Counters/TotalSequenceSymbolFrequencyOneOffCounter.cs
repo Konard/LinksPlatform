@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Counters
+namespace Platform.Data.Doublets.Sequences.Frequencies.Counters
 {
     public class TotalSequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {
@@ -25,7 +24,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
 
         public TLink Count()
         {
-            if ((_comparer.Compare(_total, default) > 0) || _visits.Count > 0)
+            if (_comparer.Compare(_total, default) > 0 || _visits.Count > 0)
             {
                 return _total;
             }

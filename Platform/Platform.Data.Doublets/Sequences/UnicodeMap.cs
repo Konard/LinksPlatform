@@ -3,10 +3,9 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.CompilerServices;
 using System.Text;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class UnicodeMap
     {
@@ -36,7 +35,7 @@ namespace Platform.Data.Core.Sequences
             var firstLink = _links.CreatePoint();
             if (firstLink != FirstCharLink)
             {
-                _links.Delete(firstLink);                
+                _links.Delete(firstLink);
             }
             else
             {
@@ -49,8 +48,8 @@ namespace Platform.Data.Core.Sequences
                     {
                         throw new Exception("Unable to initialize UTF 16 table.");
                     }
-                }                
-            }            
+                }
+            }
         }
 
         // 0 - null link

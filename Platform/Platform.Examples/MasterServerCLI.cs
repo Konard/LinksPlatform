@@ -5,8 +5,8 @@ using Platform.Exceptions;
 using Platform.Threading;
 using Platform.IO;
 using Platform.Communication.Protocol.Udp;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Examples
 {

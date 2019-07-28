@@ -2,9 +2,9 @@
 using Xunit;
 using Platform.Helpers.Singletons;
 using Platform.Memory;
-using Platform.Data.Core.Doublets;
 using Platform.Data;
 using Platform.Data.Constants;
+using Platform.Data.Doublets;
 
 namespace Platform.Tests.Data.Core
 {

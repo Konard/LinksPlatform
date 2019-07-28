@@ -3,9 +3,8 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Interfaces;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     /// <remarks>
     /// Can be used to operate with many CompressingConverters (to keep global frequencies data between them).
@@ -100,8 +99,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
                     var frequency = value.Frequency;
                     var count = _frequencyCounter.Count(linkIndex);
                     // TODO: Why `frequency` always greater than `count` by 1?
-                    if (((_comparer.Compare(frequency, count) > 0) && (_comparer.Compare(ArithmeticHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0))
-                     || ((_comparer.Compare(count, frequency) > 0) && (_comparer.Compare(ArithmeticHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)))
+                    if (_comparer.Compare(frequency, count) > 0 && _comparer.Compare(ArithmeticHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0
+                     || _comparer.Compare(count, frequency) > 0 && _comparer.Compare(ArithmeticHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)
                     {
                         throw new Exception("Frequencies validation failed.");
                     }

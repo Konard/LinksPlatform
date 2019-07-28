@@ -2,7 +2,7 @@
 using Platform.Interfaces;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class UnaryNumberToAddressAddOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
@@ -28,7 +28,7 @@ namespace Platform.Data.Core.Doublets
             var number = Integer<TLink>.One;
             for (var i = 1; i < 64; i++)
             {
-                _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), number = (Integer<TLink>)(((ulong)(Integer<TLink>)number) * 2UL));
+                _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), number = (Integer<TLink>)((ulong)(Integer<TLink>)number * 2UL));
             }
         }
 

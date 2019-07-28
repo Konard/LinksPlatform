@@ -6,7 +6,7 @@ using Platform.Ranges;
 using Platform.Helpers.Singletons;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <summary>
     /// Структура описывающая уникальную связь.
@@ -22,7 +22,7 @@ namespace Platform.Data.Core.Doublets
         public readonly ulong Target;
 
         public static readonly UInt64Link Null = new UInt64Link();
-        
+
         public UInt64Link(params ulong[] values)
         {
             Index = values.Length > _constants.IndexPart ? values[_constants.IndexPart] : _constants.Null;

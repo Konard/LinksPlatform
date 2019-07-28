@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using System.Text;
-using Platform.Data.Core.Triplets;
+using Platform.Data.Triplets;
 
 namespace Platform.Sandbox
 {

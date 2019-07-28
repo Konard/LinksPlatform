@@ -6,7 +6,7 @@ using Platform.Ranges;
 using Platform.Helpers.Singletons;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <summary>
     /// Структура описывающая уникальную связь.
@@ -70,7 +70,7 @@ namespace Platform.Data.Core.Doublets
 
         public static string ToString(TLink source, TLink target) => $"({source}->{target})";
 
-        public static implicit operator TLink[] (Link<TLink> link) => link.ToArray();
+        public static implicit operator TLink[](Link<TLink> link) => link.ToArray();
 
         public static implicit operator Link<TLink>(TLink[] linkArray) => new Link<TLink>(linkArray);
 

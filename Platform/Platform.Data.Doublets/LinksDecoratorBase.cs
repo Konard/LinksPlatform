@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public abstract class LinksDecoratorBase<T> : ILinks<T>
     {

@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using Platform.Disposables;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences;
 using Platform.Data;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Tests.Data.Core
 {

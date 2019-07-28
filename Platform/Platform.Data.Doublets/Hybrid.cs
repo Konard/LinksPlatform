@@ -4,7 +4,7 @@ using Platform.Reflection;
 using Platform.Converters;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class Hybrid<T>
     {
@@ -72,6 +72,6 @@ namespace Platform.Data.Core.Doublets
 
         public static explicit operator sbyte(Hybrid<T> hybrid) => Convert.ToSByte(hybrid.AbsoluteValue);
 
-        public override string ToString() => IsNothing ? (default(T) == null ? "Nothing" : default(T).ToString()) : IsExternal ? $"<{AbsoluteValue}>" : Value.ToString();
+        public override string ToString() => IsNothing ? default(T) == null ? "Nothing" : default(T).ToString() : IsExternal ? $"<{AbsoluteValue}>" : Value.ToString();
     }
 }

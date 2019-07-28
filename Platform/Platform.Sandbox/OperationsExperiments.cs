@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using Platform.Data.Core.Triplets;
+using Platform.Data.Triplets;
 using Sigil;
 using Sigil.NonGeneric;
 using Label = System.Reflection.Emit.Label;

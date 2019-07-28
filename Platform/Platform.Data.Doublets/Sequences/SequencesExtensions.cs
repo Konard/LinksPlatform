@@ -1,7 +1,7 @@
 ﻿using Platform.Data.Sequences;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public static class SequencesExtensions
     {

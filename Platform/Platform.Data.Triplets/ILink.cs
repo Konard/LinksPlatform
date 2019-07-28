@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     internal partial interface ILink<TLink>
         where TLink : ILink<TLink>

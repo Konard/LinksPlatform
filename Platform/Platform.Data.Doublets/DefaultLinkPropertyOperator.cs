@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class DefaultLinkPropertyOperator<TLink> : LinksOperatorBase<TLink>, IPropertyOperator<TLink, TLink, TLink>
     {

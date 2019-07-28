@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Sequences.Frequencies.Cache
+﻿namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     // TODO: Move to Platform.Data.Doublets
     public struct Doublet<T>

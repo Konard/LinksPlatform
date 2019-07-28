@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Data.Constants;
+using Platform.Data.Doublets;
 using Platform.Data.Sequences;
 using Platform.Threading.Synchronization;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <remarks>
     /// TODO: Autogeneration of synchronized wrapper (decorator).

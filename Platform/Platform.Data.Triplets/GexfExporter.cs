@@ -8,7 +8,7 @@ using Platform.Communication.Protocol.Gexf;
 
 using GexfNode = Platform.Communication.Protocol.Gexf.Node;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public static class GexfExporter
     {

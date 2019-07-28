@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public static class NumberHelpers
     {

@@ -2,13 +2,13 @@
 using Platform.Collections.Arrays;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class LinksCascadeDependenciesResolver<TLink> : LinksDecoratorBase<TLink>
     {
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
-        public LinksCascadeDependenciesResolver(ILinks<TLink> links) : base(links) {}
+        public LinksCascadeDependenciesResolver(ILinks<TLink> links) : base(links) { }
 
         public override void Delete(TLink link)
         {

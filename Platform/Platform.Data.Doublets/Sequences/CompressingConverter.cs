@@ -5,11 +5,10 @@ using Platform.Interfaces;
 using Platform.Collections;
 using Platform.Helpers.Singletons;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Constants;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     /// <remarks>
     /// TODO: Возможно будет лучше если алгоритм будет выполняться полностью изолированно от Links на этапе сжатия.
@@ -206,8 +205,8 @@ namespace Platform.Data.Core.Sequences
             var frequency = data.Frequency;
             var maxFrequency = _maxDoubletData.Frequency;
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
-            if ((_comparer.Compare(frequency, _minFrequencyToCompress) > 0) &&
-               ((_comparer.Compare(maxFrequency, frequency) < 0) || (_equalityComparer.Equals(maxFrequency, frequency) && (_comparer.Compare(ArithmeticHelpers.Add(doublet.Source, doublet.Target), ArithmeticHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+            if (_comparer.Compare(frequency, _minFrequencyToCompress) > 0 &&
+               (_comparer.Compare(maxFrequency, frequency) < 0 || _equalityComparer.Equals(maxFrequency, frequency) && _comparer.Compare(ArithmeticHelpers.Add(doublet.Source, doublet.Target), ArithmeticHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

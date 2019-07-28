@@ -8,10 +8,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Data.Core\Platform.Data.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\Platform.Data.Doublets\Platform.Data.Doublets.csproj" />
+    <PackageReference Include="Platform.Communication" Version="0.1.1" />
     <PackageReference Include="Platform.IO" Version="0.0.4" />
   </ItemGroup>
 

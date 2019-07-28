@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     public class LinkFrequency<TLink>
     {

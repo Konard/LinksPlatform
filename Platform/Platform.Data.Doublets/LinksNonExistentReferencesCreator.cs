@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <remarks>
     /// Not practical if newSource and newTarget are too big.
@@ -9,7 +9,7 @@ namespace Platform.Data.Core.Doublets
     /// </remarks>
     public class LinksNonExistentReferencesCreator<T> : LinksDecoratorBase<T>
     {
-        public LinksNonExistentReferencesCreator(ILinks<T> links) : base(links) {}
+        public LinksNonExistentReferencesCreator(ILinks<T> links) : base(links) { }
 
         public override T Update(IList<T> restrictions)
         {

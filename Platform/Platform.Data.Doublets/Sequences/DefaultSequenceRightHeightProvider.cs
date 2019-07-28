@@ -1,8 +1,7 @@
 ﻿using Platform.Interfaces;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class DefaultSequenceRightHeightProvider<TLink> : LinksOperatorBase<TLink>, ISequenceHeightProvider<TLink>
     {
@@ -14,7 +13,7 @@ namespace Platform.Data.Core.Sequences
         {
             var height = default(TLink);
             var pairOrElement = sequence;
-            while(!_elementMatcher.IsMatched(pairOrElement))
+            while (!_elementMatcher.IsMatched(pairOrElement))
             {
                 pairOrElement = Links.GetTarget(pairOrElement);
                 height = ArithmeticHelpers.Increment(height);

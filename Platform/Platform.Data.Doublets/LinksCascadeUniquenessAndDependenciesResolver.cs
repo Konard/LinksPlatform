@@ -2,7 +2,7 @@
 using Platform.Collections.Arrays;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class LinksCascadeUniquenessAndDependenciesResolver<TLink> : LinksUniquenessResolver<TLink>
     {

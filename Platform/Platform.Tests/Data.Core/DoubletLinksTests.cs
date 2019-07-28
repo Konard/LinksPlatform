@@ -5,8 +5,8 @@ using Platform.Numbers;
 using Platform.Memory;
 using Platform.Helpers.Scopes;
 using Platform.Helpers.Setters;
-using Platform.Data.Core.Doublets;
 using Platform.Data;
+using Platform.Data.Doublets;
 
 namespace Platform.Tests.Data.Core
 {

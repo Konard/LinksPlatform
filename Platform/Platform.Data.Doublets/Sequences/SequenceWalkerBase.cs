@@ -1,9 +1,8 @@
-﻿using Platform.Data.Core.Doublets;
-using Platform.Data.Sequences;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public abstract class SequenceWalkerBase<TLink> : LinksOperatorBase<TLink>, ISequenceWalker<TLink>
     {

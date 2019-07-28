@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public static class LinkExtensions
     {
@@ -42,7 +42,7 @@ namespace Platform.Data.Core.Triplets
                         str = LinkConverter.ToChar(link).ToString();
                         return true;
                     }
-                    else if (TryGetSpecificName(link, out str))
+                    else if (link.TryGetSpecificName(out str))
                     {
                         return true;
                     }
@@ -52,7 +52,7 @@ namespace Platform.Data.Core.Triplets
                         return false;
                     }
 
-                    if (TryGetName(link.Source, out string sourceName) && TryGetName(link.Linker, out string linkerName) && TryGetName(link.Target, out string targetName))
+                    if (link.Source.TryGetName(out string sourceName) && link.Linker.TryGetName(out string linkerName) && link.Target.TryGetName(out string targetName))
                     {
                         var sb = new StringBuilder();
                         sb.Append(sourceName).Append(' ').Append(linkerName).Append(' ').Append(targetName);

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
 using Platform.Collections.Stacks;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class DefaultSequenceAppender<TLink> : LinksOperatorBase<TLink>, ISequenceAppender<TLink>
     {

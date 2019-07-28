@@ -1,6 +1,6 @@
 ﻿using System;
 using Sigil;
-using Platform.Data.Core.Triplets;
+using Platform.Data.Triplets;
 
 namespace Platform.Sandbox
 {

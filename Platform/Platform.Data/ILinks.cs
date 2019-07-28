@@ -10,7 +10,6 @@ namespace Platform.Data
     /// <remarks>
     /// Этот интерфейс в данный момент не зависит от размера содержимого связи, а значит подходит как для дуплетов, так и для триплетов и т.п.
     /// Возможно этот интерфейс подходит даже для Sequences.
-    /// TODO: Этот интерфейс можно перенести в пространство имён Platform.Data.Core или Platform.Data.Core.Common
     /// </remarks>
     public interface ILinks<TLink>
     {

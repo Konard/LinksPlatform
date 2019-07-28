@@ -7,11 +7,10 @@ using System.Text;
 using Platform.Collections;
 using Platform.Numbers;
 using Platform.Data.Exceptions;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences.Frequencies.Counters;
 using Platform.Data.Sequences;
+using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     partial class Sequences
     {

@@ -8,7 +8,7 @@ using Platform.Helpers.Scopes;
 using Platform.Data.Universal;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <remarks>
     /// What does empty pattern (for condition or substitution) mean? Nothing or Everything?

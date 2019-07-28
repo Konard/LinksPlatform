@@ -3,7 +3,7 @@ using Platform.Interfaces;
 using Platform.Reflection;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public class UnaryNumberToAddressOrOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
@@ -36,7 +36,7 @@ namespace Platform.Data.Core.Doublets
                     powerOf2Index = _unaryNumberPowerOf2Indicies[Links.GetSource(source)];
                     source = Links.GetTarget(source);
                 }
-                target = (Integer<TLink>)(((ulong)(Integer<TLink>)target) | (1UL << powerOf2Index)); // MathHelpers.Or(target, MathHelpers.ShiftLeft(One, powerOf2Index));
+                target = (Integer<TLink>)((ulong)(Integer<TLink>)target | 1UL << powerOf2Index); // MathHelpers.Or(target, MathHelpers.ShiftLeft(One, powerOf2Index));
             }
             return target;
         }

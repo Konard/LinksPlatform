@@ -11,10 +11,10 @@ using Platform.Random;
 using Platform.Helpers.Singletons;
 using Platform.Helpers.Setters;
 using Platform.Data.Exceptions;
-using Platform.Data.Core.Sequences;
 using Platform.Data.Constants;
+using Platform.Data.Doublets.Sequences;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public static class LinksExtensions
     {
@@ -241,7 +241,7 @@ namespace Platform.Data.Core.Doublets
         {
             var constants = links.Constants;
             var comparer = Comparer<TLink>.Default;
-            return (comparer.Compare(constants.MinPossibleIndex, reference) >= 0) && (comparer.Compare(reference, constants.MaxPossibleIndex) <= 0);
+            return comparer.Compare(constants.MinPossibleIndex, reference) >= 0 && comparer.Compare(reference, constants.MaxPossibleIndex) <= 0;
         }
 
         #region Points

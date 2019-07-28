@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Doublets
+﻿namespace Platform.Data.Doublets
 {
     public static class StackExtensions
     {

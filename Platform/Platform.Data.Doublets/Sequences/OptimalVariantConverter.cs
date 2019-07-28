@@ -1,9 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using Platform.Interfaces;
-using Platform.Data.Core.Doublets;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class OptimalVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
@@ -12,7 +11,7 @@ namespace Platform.Data.Core.Sequences
 
         private readonly IConverter<IList<TLink>> _sequenceToItsLocalElementLevelsConverter;
 
-        public OptimalVariantConverter(ILinks<TLink> links, IConverter<IList<TLink>> sequenceToItsLocalElementLevelsConverter) : base(links) 
+        public OptimalVariantConverter(ILinks<TLink> links, IConverter<IList<TLink>> sequenceToItsLocalElementLevelsConverter) : base(links)
             => _sequenceToItsLocalElementLevelsConverter = sequenceToItsLocalElementLevelsConverter;
 
         public override TLink Convert(IList<TLink> sequence)

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Data.Constants;
 using Platform.Disposables;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     public abstract class LinksDisposableDecoratorBase<T> : DisposableBase, ILinks<T>
     {

@@ -1,6 +1,6 @@
 ﻿using Platform.Threading;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     public enum NetMapping : long
     {

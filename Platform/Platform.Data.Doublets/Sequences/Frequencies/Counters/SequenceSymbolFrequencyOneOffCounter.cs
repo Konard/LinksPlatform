@@ -1,10 +1,9 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 using Platform.Numbers;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Counters
+namespace Platform.Data.Doublets.Sequences.Frequencies.Counters
 {
     public class SequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {

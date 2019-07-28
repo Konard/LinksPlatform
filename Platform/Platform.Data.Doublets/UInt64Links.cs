@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Collections;
 using Platform.Collections.Arrays;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <summary>
     /// Представляет объект для работы с базой данных (файлом) в формате Links (массива взаимосвязей).

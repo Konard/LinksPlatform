@@ -2,7 +2,7 @@
 using System.Linq;
 using Platform.Interfaces;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     public class DuplicateSegmentsCounter<TLink> : ICounter<int>
     {

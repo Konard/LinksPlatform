@@ -1,4 +1,4 @@
-﻿namespace Platform.Data.Core.Doublets
+﻿namespace Platform.Data.Doublets
 {
     public class NonNullContentsLinkDeletionResolver<T> : LinksDecoratorBase<T>
     {

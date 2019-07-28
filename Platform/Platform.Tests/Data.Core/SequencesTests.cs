@@ -7,17 +7,17 @@ using Platform.Collections;
 using Platform.Random;
 using Platform.IO;
 using Platform.Helpers.Singletons;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences;
-using Platform.Data.Core.Sequences.Frequencies.Cache;
-using Platform.Data.Core.Sequences.Frequencies.Counters;
 using Platform.Data.Constants;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
+using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
 namespace Platform.Tests.Data.Core
 {
     public class SequencesTests
     {
-        private static readonly LinksCombinedConstants<bool, ulong, int> Constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
+        private static readonly LinksCombinedConstants<bool, ulong, int> _constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
 
         static SequencesTests()
         {
@@ -377,7 +377,7 @@ namespace Platform.Tests.Data.Core
         }
 
         /// <summary>Imported from https://raw.githubusercontent.com/wiki/Konard/LinksPlatform/%D0%9E-%D1%82%D0%BE%D0%BC%2C-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D1%91-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D0%BB%D0%BE%D1%81%D1%8C.md</summary>
-        private static readonly string ExampleText =
+        private static readonly string _exampleText =
             @"([english version](https://github.com/Konard/LinksPlatform/wiki/About-the-beginning))
 
 Обозначение пустоты, какое оно? Темнота ли это? Там где отсутствие света, отсутствие фотонов (носителей света)? Или это то, что полностью отражает свет? Пустой белый лист бумаги? Там где есть место для нового начала? Разве пустота это не характеристика пространства? Пространство это то, что можно чем-то наполнить?
@@ -433,7 +433,7 @@ namespace Platform.Tests.Data.Core
 [![анимация](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif ""анимация"")](https://raw.githubusercontent.com/Konard/LinksPlatform/master/doc/Intro/intro-animation-500.gif)";
 
 
-        private static readonly string ExampleLoremIpsumText =
+        private static readonly string _exampleLoremIpsumText =
             @"Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.";
 
@@ -470,8 +470,8 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 Assert.True(links.GetSource(links.GetTarget(compressedVariant)) == sequence[2]);
                 Assert.True(links.GetTarget(links.GetTarget(compressedVariant)) == sequence[3]);
 
-                var source = Constants.SourcePart;
-                var target = Constants.TargetPart;
+                var source = _constants.SourcePart;
+                var target = _constants.TargetPart;
 
                 Assert.True(links.GetByKeys(compressedVariant, source, source) == sequence[0]);
                 Assert.True(links.GetByKeys(compressedVariant, source, target) == sequence[1]);
@@ -489,7 +489,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
         [Fact]
         public static void CompressionEfficiencyTest()
         {
-            var strings = ExampleLoremIpsumText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            var strings = _exampleLoremIpsumText.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
             var totalCharacters = arrays.Select(x => x.Length).Sum();
 
@@ -744,7 +744,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var sequence1 = compressed1[i];
                     var sequence2 = compressed2[i];
 
-                    if (sequence1 != Constants.Null && sequence2 != Constants.Null)
+                    if (sequence1 != _constants.Null && sequence2 != _constants.Null)
                     {
                         var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
 
@@ -841,7 +841,7 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var sequence1 = compressed1[i];
                     var sequence2 = compressed2[i];
 
-                    if (sequence1 != Constants.Null && sequence2 != Constants.Null)
+                    if (sequence1 != _constants.Null && sequence2 != _constants.Null)
                     {
                         var decompress1 = UnicodeMap.FromSequenceLinkToString(sequence1, scope1.Links);
 

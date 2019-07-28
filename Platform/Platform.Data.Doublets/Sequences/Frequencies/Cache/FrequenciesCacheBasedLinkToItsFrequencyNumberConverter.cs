@@ -1,6 +1,6 @@
 ﻿using Platform.Interfaces;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     public class FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<TLink> : IConverter<Doublet<TLink>, TLink>
     {

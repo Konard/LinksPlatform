@@ -1,6 +1,6 @@
 ﻿using Platform.Interfaces;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Counters
+namespace Platform.Data.Doublets.Sequences.Frequencies.Counters
 {
     public class TotalMarkedSequenceSymbolFrequencyCounter<TLink> : ICounter<TLink, TLink>
     {

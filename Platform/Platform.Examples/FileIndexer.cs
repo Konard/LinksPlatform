@@ -5,8 +5,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using Platform.Threading;
 using Platform.IO;
-using Platform.Data.Core.Doublets;
-using Platform.Data.Core.Sequences;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Examples
 {

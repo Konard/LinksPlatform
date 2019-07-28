@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
 {
     public class FrequenciesCacheBasedLinkFrequencyIncrementer<TLink> : IIncrementer<IList<TLink>>
     {

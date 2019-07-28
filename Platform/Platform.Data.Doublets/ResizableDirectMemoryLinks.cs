@@ -11,6 +11,7 @@ using Platform.Unsafe;
 using Platform.Memory;
 using Platform.Data.Exceptions;
 using Platform.Data.Constants;
+using Platform.Data.Doublets;
 
 #pragma warning disable 0649
 #pragma warning disable 169
@@ -21,7 +22,7 @@ using Platform.Data.Constants;
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedMember.Local
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data.Doublets
 {
     /// <remarks>
     /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).

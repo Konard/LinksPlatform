@@ -1,8 +1,7 @@
 ﻿using System.Collections.Generic;
-using Platform.Data.Core.Doublets;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Core.Sequences
+namespace Platform.Data.Doublets.Sequences
 {
     // TODO: Rename file to SequencesIndexer.cs
     public class SequencesIndexer<TLink>

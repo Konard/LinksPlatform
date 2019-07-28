@@ -1,7 +1,7 @@
 ﻿using Platform.Interfaces;
 using Platform.Numbers;
 
-namespace Platform.Data.Core.Sequences.Frequencies.Counters
+namespace Platform.Data.Doublets.Sequences.Frequencies.Counters
 {
     public class TotalMarkedSequenceSymbolFrequencyOneOffCounter<TLink> : TotalSequenceSymbolFrequencyOneOffCounter<TLink>
     {

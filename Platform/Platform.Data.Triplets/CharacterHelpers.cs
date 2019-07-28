@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Triplets
+namespace Platform.Data.Triplets
 {
     // TODO: Split logic of Latin and Cyrillic alphabets into different files if possible
     public static class CharacterHelpers
@@ -122,7 +122,7 @@ namespace Platform.Data.Core.Triplets
                 for (var i = 0; i < lettersCharacters.Length; i++)
                 {
                     var lowerCaseCharacter = lettersCharacters[i];
-                    var upperCaseCharacter = Char.ToUpper(lowerCaseCharacter);
+                    var upperCaseCharacter = char.ToUpper(lowerCaseCharacter);
                     if (lowerCaseCharacter != upperCaseCharacter)
                     {
                         lettersLinks[i].SetName("{" + upperCaseCharacter + " " + lowerCaseCharacter + "}");
@@ -200,13 +200,13 @@ namespace Platform.Data.Core.Triplets
 
         private static Link CreateSimpleCharacterLink(char character) => Link.Create(Net.Character, Net.ThatHas, Link.Create(Net.Code, Net.ThatIsRepresentedBy, LinkConverter.FromNumber(character)));
 
-        private static bool IsLetterOfLatinAlphabet(char character) 
-            => (character >= FirstLowerСaseLatinLetter && character <= LastLowerСaseLatinLetter)
-            || (character >= FirstUpperСaseLatinLetter && character <= LastUpperСaseLatinLetter);
+        private static bool IsLetterOfLatinAlphabet(char character)
+            => character >= FirstLowerСaseLatinLetter && character <= LastLowerСaseLatinLetter
+            || character >= FirstUpperСaseLatinLetter && character <= LastUpperСaseLatinLetter;
 
-        private static bool IsLetterOfCyrillicAlphabet(char character) 
-            => (character >= FirstLowerCaseCyrillicLetter && character <= LastLowerCaseCyrillicLetter)
-            || (character >= FirstUpperCaseCyrillicLetter && character <= LastUpperCaseCyrillicLetter)
+        private static bool IsLetterOfCyrillicAlphabet(char character)
+            => character >= FirstLowerCaseCyrillicLetter && character <= LastLowerCaseCyrillicLetter
+            || character >= FirstUpperCaseCyrillicLetter && character <= LastUpperCaseCyrillicLetter
             || character == YoLowerCaseCyrillicLetter || character == YoUpperCaseCyrillicLetter;
 
         public static Link FromChar(char character)
