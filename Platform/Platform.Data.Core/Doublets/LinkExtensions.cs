@@ -1,6 +1,4 @@
-﻿using Platform.Data.Core.Common;
-
-namespace Platform.Data.Core.Doublets
+﻿namespace Platform.Data.Core.Doublets
 {
     public static class LinkExtensions
     {

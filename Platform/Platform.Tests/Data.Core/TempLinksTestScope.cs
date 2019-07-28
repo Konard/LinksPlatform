@@ -2,6 +2,7 @@
 using Platform.Disposables;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences;
+using Platform.Data;
 
 namespace Platform.Tests.Data.Core
 {

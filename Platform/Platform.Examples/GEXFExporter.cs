@@ -5,6 +5,7 @@ using Platform.Numbers;
 using Platform.Communication.Protocol.Gexf;
 using Node = Platform.Communication.Protocol.Gexf.Node;
 using Platform.Data.Core.Doublets;
+using Platform.Data;
 
 namespace Platform.Examples
 {

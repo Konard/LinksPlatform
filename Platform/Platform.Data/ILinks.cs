@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Core.Doublets
+namespace Platform.Data
 {
     /// <summary>
     /// Представляет интерфейс для работы с данными в формате Links (хранилища взаимосвязей).

@@ -6,6 +6,7 @@ using Platform.Memory;
 using Platform.Helpers.Scopes;
 using Platform.Helpers.Setters;
 using Platform.Data.Core.Doublets;
+using Platform.Data;
 
 namespace Platform.Tests.Data.Core
 {

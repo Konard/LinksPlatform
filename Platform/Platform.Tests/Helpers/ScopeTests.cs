@@ -2,6 +2,7 @@
 using Platform.Helpers.Scopes;
 using Platform.Memory;
 using Platform.Data.Core.Doublets;
+using Platform.Data;
 
 namespace Platform.Tests.Helpers
 {

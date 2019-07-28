@@ -4,7 +4,7 @@ using System.Runtime.CompilerServices;
 using Platform.Exceptions;
 using Platform.Collections;
 
-namespace Platform.Data.Core.Common
+namespace Platform.Data
 {
     public static class Point<TLink>
     {
