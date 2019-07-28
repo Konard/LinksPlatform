@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Platform.Exceptions;
+using Platform.Ranges;
 using Platform.Helpers.Singletons;
 
 namespace Platform.Data.Core.Doublets
@@ -13,8 +14,8 @@ namespace Platform.Data.Core.Doublets
     {
         public static readonly Link<TLink> Null = new Link<TLink>();
 
-        private static readonly LinksConstants<bool, TLink, int> Constants = Default<LinksConstants<bool, TLink, int>>.Instance;
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly LinksConstants<bool, TLink, int> _constants = Default<LinksConstants<bool, TLink, int>>.Instance;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private const int Length = 3;
 
@@ -24,16 +25,16 @@ namespace Platform.Data.Core.Doublets
 
         public Link(params TLink[] values)
         {
-            Index = values.Length > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
-            Source = values.Length > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
-            Target = values.Length > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
+            Index = values.Length > _constants.IndexPart ? values[_constants.IndexPart] : _constants.Null;
+            Source = values.Length > _constants.SourcePart ? values[_constants.SourcePart] : _constants.Null;
+            Target = values.Length > _constants.TargetPart ? values[_constants.TargetPart] : _constants.Null;
         }
 
         public Link(IList<TLink> values)
         {
-            Index = values.Count > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
-            Source = values.Count > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
-            Target = values.Count > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
+            Index = values.Count > _constants.IndexPart ? values[_constants.IndexPart] : _constants.Null;
+            Source = values.Count > _constants.SourcePart ? values[_constants.SourcePart] : _constants.Null;
+            Target = values.Count > _constants.TargetPart ? values[_constants.TargetPart] : _constants.Null;
         }
 
         public Link(TLink index, TLink source, TLink target)
@@ -44,7 +45,7 @@ namespace Platform.Data.Core.Doublets
         }
 
         public Link(TLink source, TLink target)
-            : this(Constants.Null, source, target)
+            : this(_constants.Null, source, target)
         {
             Source = source;
             Target = target;
@@ -52,22 +53,17 @@ namespace Platform.Data.Core.Doublets
 
         public static Link<TLink> Create(TLink source, TLink target) => new Link<TLink>(source, target);
 
-        public override int GetHashCode()
-        {
-            var hash = 17;
-            hash = hash * 31 + Index.GetHashCode();
-            hash = hash * 31 + Source.GetHashCode();
-            hash = hash * 31 + Target.GetHashCode();
-            return hash;
-        }
+        public override int GetHashCode() => (Index, Source, Target).GetHashCode();
 
-        public bool IsNull() => EqualityComparer.Equals(Index, Constants.Null) && EqualityComparer.Equals(Source, Constants.Null) && EqualityComparer.Equals(Target, Constants.Null);
+        public bool IsNull() => _equalityComparer.Equals(Index, _constants.Null) &&
+                                _equalityComparer.Equals(Source, _constants.Null) &&
+                             _equalityComparer.Equals(Target, _constants.Null);
 
         public override bool Equals(object other) => other is Link<TLink> && Equals((Link<TLink>)other);
 
-        public bool Equals(Link<TLink> other) => EqualityComparer.Equals(Index, other.Index) &&
-                                             EqualityComparer.Equals(Source, other.Source) &&
-                                             EqualityComparer.Equals(Target, other.Target);
+        public bool Equals(Link<TLink> other) => _equalityComparer.Equals(Index, other.Index) &&
+                                                 _equalityComparer.Equals(Source, other.Source) &&
+                                                 _equalityComparer.Equals(Target, other.Target);
 
         public static string ToString(TLink index, TLink source, TLink target) => $"({index}: {source}->{target})";
 
@@ -77,16 +73,16 @@ namespace Platform.Data.Core.Doublets
 
         public static implicit operator Link<TLink>(TLink[] linkArray) => new Link<TLink>(linkArray);
 
-        #region IList
-
-        public override string ToString() => EqualityComparer.Equals(Index, Constants.Null) ? ToString(Source, Target) : ToString(Index, Source, Target);
-
         public TLink[] ToArray()
         {
             var array = new TLink[Length];
             CopyTo(array, 0);
             return array;
         }
+
+        #region IList
+
+        public override string ToString() => _equalityComparer.Equals(Index, _constants.Null) ? ToString(Source, Target) : ToString(Index, Source, Target);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -105,10 +101,12 @@ namespace Platform.Data.Core.Doublets
 
         public void CopyTo(TLink[] array, int arrayIndex)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-            if (arrayIndex + Length > array.Length) throw new ArgumentException();
-
+            Ensure.Always.ArgumentNotNull(array, nameof(array));
+            Ensure.Always.ArgumentInRange(arrayIndex, new Range<int>(0, array.Length - 1), nameof(arrayIndex));
+            if (arrayIndex + Length > array.Length)
+            {
+                throw new InvalidOperationException();
+            }
             array[arrayIndex++] = Index;
             array[arrayIndex++] = Source;
             array[arrayIndex] = Target;
@@ -121,9 +119,18 @@ namespace Platform.Data.Core.Doublets
 
         public int IndexOf(TLink item)
         {
-            if (EqualityComparer.Equals(Index, item)) return Constants.IndexPart;
-            if (EqualityComparer.Equals(Source, item)) return Constants.SourcePart;
-            if (EqualityComparer.Equals(Target, item)) return Constants.TargetPart;
+            if (_equalityComparer.Equals(Index, item))
+            {
+                return _constants.IndexPart;
+            }
+            if (_equalityComparer.Equals(Source, item))
+            {
+                return _constants.SourcePart;
+            }
+            if (_equalityComparer.Equals(Target, item))
+            {
+                return _constants.TargetPart;
+            }
             return -1;
         }
 
@@ -135,13 +142,20 @@ namespace Platform.Data.Core.Doublets
         {
             get
             {
-                if (index == Constants.IndexPart)
+                Ensure.Always.ArgumentInRange(index, new Range<int>(0, Length - 1), nameof(index));
+                if (index == _constants.IndexPart)
+                {
                     return Index;
-                if (index == Constants.SourcePart)
+                }
+                if (index == _constants.SourcePart)
+                {
                     return Source;
-                if (index == Constants.TargetPart)
+                }
+                if (index == _constants.TargetPart)
+                {
                     return Target;
-                throw new ArgumentOutOfRangeException(nameof(index));
+                }
+                throw new NotSupportedException(); // Impossible path due to Ensure.ArgumentInRange
             }
             set => throw new NotSupportedException();
         }

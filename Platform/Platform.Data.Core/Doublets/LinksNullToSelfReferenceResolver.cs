@@ -4,7 +4,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class LinksNullToSelfReferenceResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         public LinksNullToSelfReferenceResolver(ILinks<TLink> links) : base(links) {}
 
@@ -16,9 +16,8 @@ namespace Platform.Data.Core.Doublets
 
         public override TLink Update(IList<TLink> restrictions)
         {
-            restrictions[Constants.SourcePart] = EqualityComparer.Equals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
-            restrictions[Constants.TargetPart] = EqualityComparer.Equals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
-
+            restrictions[Constants.SourcePart] = _equalityComparer.Equals(restrictions[Constants.SourcePart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.SourcePart];
+            restrictions[Constants.TargetPart] = _equalityComparer.Equals(restrictions[Constants.TargetPart], Constants.Null) ? restrictions[Constants.IndexPart] : restrictions[Constants.TargetPart];
             return base.Update(restrictions);
         }
     }

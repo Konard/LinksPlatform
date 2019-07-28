@@ -15,7 +15,9 @@ namespace Platform.Sandbox
             if (int.TryParse(Console.ReadLine(), out int start))
             {
                 if (start < 0 || start > 9)
+                {
                     Console.WriteLine("Можно использовать только цифры от 0 до 9.");
+                }
                 else
                 {
                     var total = Calculate(start, StepsFor7DigitPhoneNumbers);
@@ -23,7 +25,9 @@ namespace Platform.Sandbox
                 }
             }
             else
+            {
                 Console.WriteLine("Распознать число в введённых данных не удалось.");
+            }
 
             Console.ReadKey();
         }
@@ -67,10 +71,14 @@ namespace Platform.Sandbox
             links.Each(link =>
                        {
                            if (links.IsFullPoint(link[links.Constants.IndexPart]))
+                           {
                                return links.Constants.Continue;
+                           }
 
                            if (stepsLeft == 0)
+                           {
                                counter.Increment();
+                           }
                            else
                            {
                                var target = link[links.Constants.TargetPart];
@@ -85,7 +93,9 @@ namespace Platform.Sandbox
         {
             // Создадим точки в графе для каждой цифры
             for (int i = 0; i < digits.Length; i++)
+            {
                 digits[i] = links.CreatePoint();
+            }
         }
 
         private static void SetSteps(ILinks<ulong> links, ulong[] digits)

@@ -24,7 +24,5 @@ namespace Platform.Data.Core.Doublets
         public virtual T Update(IList<T> restrictions) => Links.Update(restrictions);
 
         public virtual void Delete(T link) => Links.Delete(link);
-
-        //public T Trigger(IList<T> restriction, Func<IList<T>, IList<T>, T> matchedHandler, IList<T> substitution, Func<IList<T>, IList<T>, T> substitutedHandler) => Links.Trigger(restriction, matchedHandler, substitution, substitutedHandler);
     }
 }

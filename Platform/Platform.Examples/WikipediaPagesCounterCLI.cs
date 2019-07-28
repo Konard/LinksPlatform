@@ -11,7 +11,9 @@ namespace Platform.Examples
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(0, "Wikipedia xml file", args);
 
             if (!File.Exists(wikipediaFile))
+            {
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
+            }
             else
             {
                 using (var cancellation = new ConsoleCancellationHandler())

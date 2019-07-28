@@ -8,8 +8,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
     {
         private readonly ICreteriaMatcher<TLink> _markedSequenceMatcher;
 
-        public TotalMarkedSequenceSymbolFrequencyOneOffCounter(ILinks<TLink> links, ICreteriaMatcher<TLink> markedSequenceMatcher, TLink symbol)
-            : base(links, symbol)
+        public TotalMarkedSequenceSymbolFrequencyOneOffCounter(ILinks<TLink> links, ICreteriaMatcher<TLink> markedSequenceMatcher, TLink symbol) : base(links, symbol)
             => _markedSequenceMatcher = markedSequenceMatcher;
 
         protected override void CountSequenceSymbolFrequency(TLink link)

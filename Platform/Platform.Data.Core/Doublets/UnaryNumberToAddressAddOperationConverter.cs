@@ -6,7 +6,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class UnaryNumberToAddressAddOperationConverter<TLink> : LinksOperatorBase<TLink>, IConverter<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private Dictionary<TLink, TLink> _unaryToUInt64;
         private readonly TLink _unaryOne;
@@ -20,28 +20,34 @@ namespace Platform.Data.Core.Doublets
 
         private void InitUnaryToUInt64()
         {
-            _unaryToUInt64 = new Dictionary<TLink, TLink>();
-            _unaryToUInt64.Add(_unaryOne, Integer<TLink>.One);
-
+            _unaryToUInt64 = new Dictionary<TLink, TLink>
+            {
+                { _unaryOne, Integer<TLink>.One }
+            };
             var unary = _unaryOne;
             var number = Integer<TLink>.One;
-
             for (var i = 1; i < 64; i++)
+            {
                 _unaryToUInt64.Add(unary = Links.GetOrCreate(unary, unary), number = (Integer<TLink>)(((ulong)(Integer<TLink>)number) * 2UL));
+            }
         }
 
         public TLink Convert(TLink unaryNumber)
         {
-            if (EqualityComparer.Equals(unaryNumber, default))
+            if (_equalityComparer.Equals(unaryNumber, default))
+            {
                 return default;
-            if (EqualityComparer.Equals(unaryNumber, _unaryOne))
+            }
+            if (_equalityComparer.Equals(unaryNumber, _unaryOne))
+            {
                 return Integer<TLink>.One;
-
+            }
             var source = Links.GetSource(unaryNumber);
             var target = Links.GetTarget(unaryNumber);
-
-            if (EqualityComparer.Equals(source, target))
+            if (_equalityComparer.Equals(source, target))
+            {
                 return _unaryToUInt64[unaryNumber];
+            }
             else
             {
                 var result = _unaryToUInt64[source];

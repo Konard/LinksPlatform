@@ -14,7 +14,11 @@ namespace Platform.Data.WebTerminal.Controllers
         // GET: /Links/
         public IActionResult Index(long id = 0)
         {
-            if (id == 0) id = Net.Link;
+            if (id == 0)
+            {
+                id = Net.Link;
+            }
+
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
             return View("Index", model);
@@ -22,7 +26,11 @@ namespace Platform.Data.WebTerminal.Controllers
 
         public IActionResult Infinite(long id = 0)
         {
-            if (id == 0) id = Net.Link;
+            if (id == 0)
+            {
+                id = Net.Link;
+            }
+
             var link = Link.Restore(id);
             var model = LinkModel.CreateLinkModel(link);
             return View("Infinite", model);

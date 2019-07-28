@@ -110,7 +110,7 @@ namespace Platform.Sandbox
 
                 var unpack = UnicodeMap.FromSequenceLinkToString(responseLink2, syncLinks);
 
-                Global.Trash = (unpack == pageContents);
+                Global.Trash = unpack == pageContents;
 
                 var totalLinks = syncLinks.Count() - UnicodeMap.MapSize;
 
@@ -203,11 +203,16 @@ namespace Platform.Sandbox
             string pageContents;
 
             if (File.Exists(pageCacheFile))
+            {
                 pageContents = File.ReadAllText(pageCacheFile);
+            }
             else
             {
                 using (var client = new HttpClient())
+                {
                     pageContents = client.GetStringAsync(url).AwaitResult();
+                }
+
                 File.WriteAllText(pageCacheFile, pageContents);
             }
             return pageContents;
@@ -220,10 +225,14 @@ namespace Platform.Sandbox
         public static ulong[] PrecompressSequence1(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
             if (sequence.IsNullOrEmpty())
+            {
                 return null;
+            }
 
             if (sequence.Length == 1)
+            {
                 return sequence;
+            }
 
             var newLength = sequence.Length;
 
@@ -243,8 +252,15 @@ namespace Platform.Sandbox
                 {
                     var startIndex = i - 1;
 
-                    while (i < copy.Length && copy[i] == 0) i++;
-                    if (i == copy.Length) break;
+                    while (i < copy.Length && copy[i] == 0)
+                    {
+                        i++;
+                    }
+
+                    if (i == copy.Length)
+                    {
+                        break;
+                    }
 
                     var doublet = new UInt64Link(copy[startIndex], copy[i]);
 
@@ -261,7 +277,9 @@ namespace Platform.Sandbox
                         doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
+                    {
                         doubletsFrequencies.Add(doublet, 1);
+                    }
                 }
 
                 if (!maxDoublet.IsNull())
@@ -275,8 +293,15 @@ namespace Platform.Sandbox
                         {
                             var startIndex = i - 1;
 
-                            while (i < copy.Length && copy[i] == 0) i++;
-                            if (i == copy.Length) break;
+                            while (i < copy.Length && copy[i] == 0)
+                            {
+                                i++;
+                            }
+
+                            if (i == copy.Length)
+                            {
+                                break;
+                            }
 
                             if (copy[i] == maxDoublet.Target)
                             {
@@ -298,7 +323,10 @@ namespace Platform.Sandbox
             {
                 final[j++] = copy[i - 1];
 
-                while (i < copy.Length && copy[i] == 0) i++;
+                while (i < copy.Length && copy[i] == 0)
+                {
+                    i++;
+                }
             }
 
             //var finalSequence = new ulong[groupedSequence.Count];
@@ -320,10 +348,14 @@ namespace Platform.Sandbox
         public static ulong[] PrecompressSequence2(this SynchronizedLinks<ulong> links, ulong[] sequence)
         {
             if (sequence.IsNullOrEmpty())
+            {
                 return null;
+            }
 
             if (sequence.Length == 1)
+            {
                 return sequence;
+            }
 
             var newLength = sequence.Length;
             var copy = new ulong[sequence.Length];
@@ -353,7 +385,9 @@ namespace Platform.Sandbox
                     doubletsFrequencies[doublet] = newFrequency;
                 }
                 else
+                {
                     doubletsFrequencies.Add(doublet, 1);
+                }
             }
 
             while (!maxDoublet.IsNull())
@@ -369,8 +403,15 @@ namespace Platform.Sandbox
 
                     if (copy[startIndex] == maxDoubletSource)
                     {
-                        while (i < copy.Length && copy[i] == 0) i++;
-                        if (i == copy.Length) break;
+                        while (i < copy.Length && copy[i] == 0)
+                        {
+                            i++;
+                        }
+
+                        if (i == copy.Length)
+                        {
+                            break;
+                        }
 
                         if (copy[i] == maxDoublet.Target)
                         {
@@ -389,7 +430,11 @@ namespace Platform.Sandbox
                             if (startIndex > 0)
                             {
                                 var previous = startIndex - 1;
-                                while (previous >= 0 && copy[previous] == 0) previous--;
+                                while (previous >= 0 && copy[previous] == 0)
+                                {
+                                    previous--;
+                                }
+
                                 if (previous >= 0)
                                 {
                                     ulong frequency;
@@ -399,22 +444,32 @@ namespace Platform.Sandbox
                                     {
                                         //doubletsFrequencies[nextOldDoublet]--;
                                         if (doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
+                                        {
                                             doubletsFrequencies[nextOldDoublet] = frequency - 1;
+                                        }
                                     }
 
                                     var nextNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
                                     //doubletsFrequencies[nextNewDoublet]++;
                                     if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
+                                    {
                                         doubletsFrequencies[nextNewDoublet] = frequency + 1;
+                                    }
                                     else
+                                    {
                                         doubletsFrequencies.Add(nextNewDoublet, 1);
+                                    }
                                 }
                             }
 
                             if (i < copy.Length)
                             {
                                 var next = i;
-                                while (next < copy.Length && copy[next] == 0) next++;
+                                while (next < copy.Length && copy[next] == 0)
+                                {
+                                    next++;
+                                }
+
                                 if (next < copy.Length)
                                 {
                                     ulong frequency;
@@ -424,15 +479,21 @@ namespace Platform.Sandbox
                                     {
                                         //doubletsFrequencies[nextOldDoublet]--;
                                         if (doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
+                                        {
                                             doubletsFrequencies[nextOldDoublet] = frequency - 1;
+                                        }
                                     }
 
                                     var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
                                     //doubletsFrequencies[nextNewDoublet]++;
                                     if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
+                                    {
                                         doubletsFrequencies[nextNewDoublet] = frequency + 1;
+                                    }
                                     else
+                                    {
                                         doubletsFrequencies.Add(nextNewDoublet, 1);
+                                    }
                                 }
                             }
                         }
@@ -515,7 +576,10 @@ namespace Platform.Sandbox
             {
                 final[j++] = copy[i - 1];
 
-                while (i < copy.Length && copy[i] == 0) i++;
+                while (i < copy.Length && copy[i] == 0)
+                {
+                    i++;
+                }
             }
 
             //var finalSequence = new ulong[groupedSequence.Count];
@@ -575,9 +639,13 @@ namespace Platform.Sandbox
                     frequency--;
 
                     if (frequency == 0)
+                    {
                         _doubletsFrequencies.Remove(doublet);
+                    }
                     else
+                    {
                         _doubletsFrequencies[doublet] = frequency;
+                    }
                 }
                 //return frequency;
             }
@@ -589,10 +657,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress0(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var oldLength = sequence.Length;
                 var newLength = sequence.Length;
@@ -678,10 +750,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress1(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var newLength = sequence.Length;
                 var copy = new ulong[sequence.Length];
@@ -706,7 +782,9 @@ namespace Platform.Sandbox
                         _doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
+                    {
                         _doubletsFrequencies.Add(doublet, 1);
+                    }
                 }
 
                 while (!_maxDoublet.IsNull())
@@ -726,8 +804,15 @@ namespace Platform.Sandbox
 
                         if (copy[startIndex] == maxDoubletSource)
                         {
-                            while (i < copy.Length && copy[i] == 0) i++;
-                            if (i == copy.Length) break;
+                            while (i < copy.Length && copy[i] == 0)
+                            {
+                                i++;
+                            }
+
+                            if (i == copy.Length)
+                            {
+                                break;
+                            }
 
                             if (copy[i] == maxDoublet.Target)
                             {
@@ -755,7 +840,11 @@ namespace Platform.Sandbox
                                 if (startIndex > 0)
                                 {
                                     var previous = startIndex - 1;
-                                    while (previous >= 0 && copy[previous] == 0) previous--;
+                                    while (previous >= 0 && copy[previous] == 0)
+                                    {
+                                        previous--;
+                                    }
+
                                     if (previous >= 0)
                                     {
                                         var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
@@ -765,9 +854,13 @@ namespace Platform.Sandbox
                                             if (_doubletsFrequencies.TryGetValue(previousOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
+                                                {
                                                     _doubletsFrequencies.Remove(previousOldDoublet);
+                                                }
                                                 else
+                                                {
                                                     _doubletsFrequencies[previousOldDoublet] = frequency - 1;
+                                                }
 
                                                 //if(!maxDoublet.Equals(previousOldDoublet))
                                                 //    UpdateMaxDoublet2(previousOldDoublet, frequency - 1);
@@ -783,14 +876,20 @@ namespace Platform.Sandbox
                                             //UpdateMaxDoublet(previousNewDoublet, frequency + 1);
                                         }
                                         else
+                                        {
                                             _doubletsFrequencies.Add(previousNewDoublet, 1);
+                                        }
                                     }
                                 }
 
                                 if (i < copy.Length)
                                 {
                                     var next = i;
-                                    while (next < copy.Length && copy[next] == 0) next++;
+                                    while (next < copy.Length && copy[next] == 0)
+                                    {
+                                        next++;
+                                    }
+
                                     if (next < copy.Length)
                                     {
                                         var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
@@ -800,9 +899,13 @@ namespace Platform.Sandbox
                                             if (_doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
+                                                {
                                                     _doubletsFrequencies.Remove(nextOldDoublet);
+                                                }
                                                 else
+                                                {
                                                     _doubletsFrequencies[nextOldDoublet] = frequency - 1;
+                                                }
 
                                                 //if (!maxDoublet.Equals(nextOldDoublet))
                                                 //    UpdateMaxDoublet2(nextOldDoublet, frequency - 1);
@@ -818,7 +921,9 @@ namespace Platform.Sandbox
                                             //UpdateMaxDoublet(nextNewDoublet, frequency + 1);
                                         }
                                         else
+                                        {
                                             _doubletsFrequencies.Add(nextNewDoublet, 1);
+                                        }
                                     }
                                 }
                             }
@@ -844,7 +949,9 @@ namespace Platform.Sandbox
                     _maxFrequency = 1;
 
                     foreach (var doubletsFrequency in _doubletsFrequencies)
+                    {
                         UpdateMaxDoublet(doubletsFrequency.Key, doubletsFrequency.Value);
+                    }
 
                     //_maxDoublet = Link.Null;
                     //_maxFrequency = 1;
@@ -905,8 +1012,15 @@ namespace Platform.Sandbox
                 var j = 0;
                 for (var i = 0; i < copy.Length; i++)
                 {
-                    while (i < copy.Length && copy[i] == 0) i++;
-                    if (i == copy.Length) break;
+                    while (i < copy.Length && copy[i] == 0)
+                    {
+                        i++;
+                    }
+
+                    if (i == copy.Length)
+                    {
+                        break;
+                    }
 
                     final[j++] = copy[i];
                 }
@@ -932,10 +1046,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress2(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var newLength = sequence.Length;
                 var copy = new ulong[sequence.Length];
@@ -960,7 +1078,9 @@ namespace Platform.Sandbox
                         _doubletsFrequencies[doublet] = newFrequency;
                     }
                     else
+                    {
                         _doubletsFrequencies.Add(doublet, 1);
+                    }
                 }
 
                 //var tempDoublet = new Link();
@@ -985,12 +1105,22 @@ namespace Platform.Sandbox
                             i++;
                             startIndex++;
                         }
-                        if (startIndex == copy.Length - 1) break;
+                        if (startIndex == copy.Length - 1)
+                        {
+                            break;
+                        }
 
                         if (copy[startIndex] == maxDoubletSource)
                         {
-                            while (i < copy.Length && copy[i] == 0) i++;
-                            if (i == copy.Length) break;
+                            while (i < copy.Length && copy[i] == 0)
+                            {
+                                i++;
+                            }
+
+                            if (i == copy.Length)
+                            {
+                                break;
+                            }
 
                             if (copy[i] == maxDoublet.Target)
                             {
@@ -1007,9 +1137,13 @@ namespace Platform.Sandbox
 
                                 var frequency = _doubletsFrequencies[maxDoublet];
                                 if (frequency == 1)
+                                {
                                     _doubletsFrequencies.Remove(maxDoublet);
+                                }
                                 else
+                                {
                                     _doubletsFrequencies[maxDoublet] = frequency - 1;
+                                }
 
                                 //UpdateMaxDoublet2(maxDoublet, frequency);
 
@@ -1018,7 +1152,11 @@ namespace Platform.Sandbox
                                 if (startIndex > 0)
                                 {
                                     var previous = startIndex - 1;
-                                    while (previous >= 0 && copy[previous] == 0) previous--;
+                                    while (previous >= 0 && copy[previous] == 0)
+                                    {
+                                        previous--;
+                                    }
+
                                     if (previous >= 0)
                                     {
                                         var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
@@ -1028,9 +1166,13 @@ namespace Platform.Sandbox
                                             if (_doubletsFrequencies.TryGetValue(previousOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
+                                                {
                                                     _doubletsFrequencies.Remove(previousOldDoublet);
+                                                }
                                                 else
+                                                {
                                                     _doubletsFrequencies[previousOldDoublet] = frequency - 1;
+                                                }
 
                                                 //if(!maxDoublet.Equals(previousOldDoublet))
                                                 //    UpdateMaxDoublet2(previousOldDoublet, frequency - 1);
@@ -1047,14 +1189,20 @@ namespace Platform.Sandbox
                                             UpdateMaxDoublet(previousNewDoublet, frequency + 1);
                                         }
                                         else
+                                        {
                                             _doubletsFrequencies.Add(previousNewDoublet, 1);
+                                        }
                                     }
                                 }
 
                                 if (i < copy.Length)
                                 {
                                     var next = i;
-                                    while (next < copy.Length && copy[next] == 0) next++;
+                                    while (next < copy.Length && copy[next] == 0)
+                                    {
+                                        next++;
+                                    }
+
                                     if (next < copy.Length)
                                     {
                                         var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
@@ -1064,9 +1212,13 @@ namespace Platform.Sandbox
                                             if (_doubletsFrequencies.TryGetValue(nextOldDoublet, out frequency))
                                             {
                                                 if (frequency == 1)
+                                                {
                                                     _doubletsFrequencies.Remove(nextOldDoublet);
+                                                }
                                                 else
+                                                {
                                                     _doubletsFrequencies[nextOldDoublet] = frequency - 1;
+                                                }
 
                                                 //if (!maxDoublet.Equals(nextOldDoublet))
                                                 //    UpdateMaxDoublet2(nextOldDoublet, frequency - 1);
@@ -1083,15 +1235,24 @@ namespace Platform.Sandbox
                                             UpdateMaxDoublet(nextNewDoublet, frequency + 1);
                                         }
                                         else
+                                        {
                                             _doubletsFrequencies.Add(nextNewDoublet, 1);
+                                        }
                                     }
                                 }
                             }
                         }
                         else
                         {
-                            while (i < copy.Length && copy[i] == 0) i++;
-                            if (i == copy.Length) break;
+                            while (i < copy.Length && copy[i] == 0)
+                            {
+                                i++;
+                            }
+
+                            if (i == copy.Length)
+                            {
+                                break;
+                            }
 
                             //tempDoublet.Source = copy[startIndex];
                             //tempDoublet.Target = copy[i];
@@ -1101,7 +1262,9 @@ namespace Platform.Sandbox
                             //if (!maxDoublet.Equals(doublet))
                             //{
                             if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
+                            {
                                 UpdateMaxDoublet(doublet, frequency);
+                            }
                             //}
                         }
                     }
@@ -1123,8 +1286,15 @@ namespace Platform.Sandbox
                 var j = 0;
                 for (var i = 0; i < copy.Length; i++)
                 {
-                    while (i < copy.Length && copy[i] == 0) i++;
-                    if (i == copy.Length) break;
+                    while (i < copy.Length && copy[i] == 0)
+                    {
+                        i++;
+                    }
+
+                    if (i == copy.Length)
+                    {
+                        break;
+                    }
 
                     final[j++] = copy[i];
                 }
@@ -1139,10 +1309,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress3(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var oldLength = sequence.Length;
                 var newLength = sequence.Length;
@@ -1260,10 +1434,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress4(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var oldLength = sequence.Length;
                 var newLength = sequence.Length;
@@ -1344,7 +1522,10 @@ namespace Platform.Sandbox
                             if (_maxDoublet.IsNull()) // 4 sec
                             {
                                 var doublet = new UInt64Link(copy[r], copy[r + 1]);
-                                if (!set.Add(doublet)) _maxDoublet = doublet;
+                                if (!set.Add(doublet))
+                                {
+                                    _maxDoublet = doublet;
+                                }
                             }
                             copy[w++] = copy[r];
 
@@ -1411,10 +1592,14 @@ namespace Platform.Sandbox
             public ulong[] Precompress5(ulong[] sequence)
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return null;
+                }
 
                 if (sequence.Length == 1)
+                {
                     return sequence;
+                }
 
                 var oldLength = sequence.Length;
                 var newLength = sequence.Length;
@@ -1582,7 +1767,9 @@ namespace Platform.Sandbox
                     if (frequency > 1)
                     {
                         if (_maxFrequency > frequency)
+                        {
                             continue;
+                        }
 
                         if (_maxFrequency < frequency)
                         {

@@ -16,7 +16,9 @@ namespace Platform.Tests.Data.Core
             var tempFilename = Path.GetTempFileName();
 
             using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(tempFilename))
+            {
                 memoryAdapter.TestBasicMemoryOperations();
+            }
 
             File.Delete(tempFilename);
         }
@@ -26,7 +28,9 @@ namespace Platform.Tests.Data.Core
         {
             using (var memory = new HeapResizableDirectMemory(UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
             using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(memory, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+            {
                 memoryAdapter.TestBasicMemoryOperations();
+            }
         }
 
         private static void TestBasicMemoryOperations(this ILinks<ulong> memoryAdapter)
@@ -40,7 +44,9 @@ namespace Platform.Tests.Data.Core
         {
             using (var memory = new HeapResizableDirectMemory(UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
             using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(memory, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep))
+            {
                 memoryAdapter.TestNonexistentReferences();
+            }
         }
 
         private static void TestNonexistentReferences(this ILinks<ulong> memoryAdapter)

@@ -30,9 +30,13 @@ namespace Platform.Examples
 
             string testAssembly;
             if (args.Length > 0 && !string.IsNullOrWhiteSpace(args[0]))
+            {
                 testAssembly = args[0];
+            }
             else
+            {
                 testAssembly = location;
+            }
 
             var typeName = args.Length >= 2 && !string.IsNullOrWhiteSpace(args[1]) ? args[1] : null;
 
@@ -55,7 +59,10 @@ namespace Platform.Examples
                 {
                     Console.WriteLine("Waiting to get Idle..");
                     while (runner.Status != AssemblyRunnerStatus.Idle) //-V3022
+                    {
                         ThreadHelpers.Sleep();
+                    }
+
                     Console.WriteLine("Idle status reached.");
                 }
             }
@@ -64,13 +71,17 @@ namespace Platform.Examples
         private void OnDiscoveryComplete(DiscoveryCompleteInfo info)
         {
             lock (consoleLock)
+            {
                 Console.WriteLine($"Running {info.TestCasesToRun} of {info.TestCasesDiscovered} tests...");
+            }
         }
 
         private void OnExecutionComplete(ExecutionCompleteInfo info)
         {
             lock (consoleLock)
+            {
                 Console.WriteLine($"Finished: {info.TotalTests} tests in {Math.Round(info.ExecutionTime, 3)}s ({info.TestsFailed} failed, {info.TestsSkipped} skipped)");
+            }
 
             finished.Set();
         }
@@ -93,7 +104,9 @@ namespace Platform.Examples
 
                 Console.WriteLine("[FAIL] {0}: {1}", info.TestDisplayName, info.ExceptionMessage);
                 if (info.ExceptionStackTrace != null)
+                {
                     Console.WriteLine(info.ExceptionStackTrace);
+                }
 
                 Console.ResetColor();
             }

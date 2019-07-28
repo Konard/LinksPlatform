@@ -49,9 +49,13 @@ namespace Platform.Examples
                                 Console.WriteLine($"<- {message}");
 
                                 if (masterServer.IsSearch(message))
+                                {
                                     masterServer.Search(message);
+                                }
                                 else
+                                {
                                     masterServer.Create(message);
+                                }
                             }
                         }
 
@@ -61,13 +65,17 @@ namespace Platform.Examples
                             while (cancellation.NoCancellationRequested)
                             {
                                 while (receiver.Available > 0)
+                                {
                                     handleMessage(receiver.ReceiveString());
+                                }
 
                                 while (Console.KeyAvailable)
                                 {
                                     var info = Console.ReadKey(true);
                                     if (info.Key == ConsoleKey.Escape)
+                                    {
                                         cancellation.ForceCancellation();
+                                    }
                                 }
 
                                 ThreadHelpers.Sleep();

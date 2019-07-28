@@ -22,7 +22,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
 
@@ -50,7 +52,9 @@ namespace Platform.Tests.Data.Core
                 Console.WriteLine($"Stack-based walker: {sw3.Elapsed}, Level-based reader: {sw2.Elapsed}");
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
     }

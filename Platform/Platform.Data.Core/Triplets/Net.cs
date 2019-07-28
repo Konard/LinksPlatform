@@ -97,10 +97,7 @@ namespace Platform.Data.Core.Triplets
         public static Link LowerCase;
         public static Link Code;
 
-        static Net()
-        {
-            Create();
-        }
+        static Net() => Create();
 
         public static Link CreateThing() => Link.Create(Link.Itself, IsA, Thing);
 

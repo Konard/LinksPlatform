@@ -112,8 +112,16 @@ namespace Platform.Tests.Helpers
         // TODO: Can be optimized using precalculation of TargetMask and SourceMask
         private uint PartialWrite(uint target, uint source, int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = ~(sourceMask << shift);
             return (target & targetMask) | ((source & sourceMask) << shift);
@@ -121,8 +129,16 @@ namespace Platform.Tests.Helpers
 
         private uint PartialRead(uint target, int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = sourceMask << shift;
             return (target & targetMask) >> shift;
@@ -130,8 +146,16 @@ namespace Platform.Tests.Helpers
 
         private Tuple<uint, uint, int> GetWriteMasksAndShift(int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = ~(sourceMask << shift);
             return new Tuple<uint, uint, int>(targetMask, sourceMask, shift);
@@ -139,8 +163,16 @@ namespace Platform.Tests.Helpers
 
         private Tuple<uint, int> GetReadMaskAndShift(int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = sourceMask << shift;
             return new Tuple<uint, int>(targetMask, shift);

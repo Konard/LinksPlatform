@@ -12,7 +12,9 @@ namespace Platform.Tests
         public void UsingSupportsNullTest()
         {
             using (var disposable = null as IDisposable)
+            {
                 Assert.True(disposable == null);
+            }
         }
 
         [Fact]
@@ -63,8 +65,16 @@ namespace Platform.Tests
 
         private uint PartialWrite(uint target, uint source, int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = ~(sourceMask << shift);
             return (target & targetMask) | ((source & sourceMask) << shift);
@@ -72,8 +82,16 @@ namespace Platform.Tests
 
         private uint PartialRead(uint target, int shift, int limit)
         {
-            if (shift < 0) shift = 32 + shift;
-            if (limit < 0) limit = 32 + limit;
+            if (shift < 0)
+            {
+                shift = 32 + shift;
+            }
+
+            if (limit < 0)
+            {
+                limit = 32 + limit;
+            }
+
             var sourceMask = ~(uint.MaxValue << limit) & uint.MaxValue;
             var targetMask = sourceMask << shift;
             return (target & targetMask) >> shift;

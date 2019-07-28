@@ -54,13 +54,11 @@ namespace Platform.Data.Core.Triplets
                 if (subJoint != null && subJoint != subject)
                 {
                     Link.Update(ref subject, subJoint, Net.And, subject.Target);
-
                     //var prev = Link.Search(@object, Net.And, subject);
                     //if (prev != null)
                     //{
                     //    Link.Update(ref prev, subJoint, Net.And, subject.Target);
                     //}
-
                     return;
                 }
             }
@@ -97,7 +95,6 @@ namespace Platform.Data.Core.Triplets
         //                    // пути с меньшим весом на использование путей с большим весом. (Это и технически эффективнее и более оправдано
         //                    // с точки зрения смысла).
 
-        //                    // А пока спать.
         //                    // Положительный эффект текущей реализации, что она быстро "успокаивается" набирает критическую массу
         //                    // и перестаёт вести себя не предсказуемо
 
@@ -114,7 +111,6 @@ namespace Platform.Data.Core.Triplets
         //                    //    }
         //                    //    return prev;
         //                    //}
-
         //                    //return Link.Create(subJoint, Net.And, second.Target);
         //                }
         //                else
@@ -171,20 +167,15 @@ namespace Platform.Data.Core.Triplets
             //    }
             //}
             //return first & second;
-
-
             //long totalDoublets = Net.And.ReferersByLinkerCount;
-
             if (first == null || second == null)
             {
             }
-
             var directConnection = Link.Search(first, Net.And, second);
             if (directConnection == null)
             {
                 directConnection = TryReconstructConnection(first, second);
             }
-
             Link rightCrossConnection = null;
             if (second.Linker == Net.And)
             {
@@ -198,7 +189,6 @@ namespace Platform.Data.Core.Triplets
                     rightCrossConnection = TryReconstructConnection(first, second.Source);
                 }
             }
-
             Link leftCrossConnection = null;
             if (first.Linker == Net.And)
             {
@@ -212,12 +202,10 @@ namespace Platform.Data.Core.Triplets
                     leftCrossConnection = TryReconstructConnection(first.Target, second);
                 }
             }
-
             // Наверное имеет смысл только в "безвыходной" ситуации
             //if (directConnection == null && rightCrossConnection == null && leftCrossConnection == null)
             //{
             //    directConnection = TryReconstructConnection(first, second);
-
             //    // Может давать более агрессивное сжатие, но теряется стабильность
             //    //if (directConnection == null)
             //    //{
@@ -242,7 +230,6 @@ namespace Platform.Data.Core.Triplets
             //    //    //}
             //    //}
             //}
-
             //Link middleCrossConnection = null;
             //if (second.Linker == Net.And && first.Linker == Net.And)
             //{
@@ -256,86 +243,89 @@ namespace Platform.Data.Core.Triplets
             //if (middleCrossConnection != null)
             //{
             //}
-
             if (directConnection != null
-             && (rightCrossConnection == null || directConnection.TotalReferers >= rightCrossConnection.TotalReferers)
-             && (leftCrossConnection == null || directConnection.TotalReferers >= leftCrossConnection.TotalReferers))
+            && (rightCrossConnection == null || directConnection.TotalReferers >= rightCrossConnection.TotalReferers)
+            && (leftCrossConnection == null || directConnection.TotalReferers >= leftCrossConnection.TotalReferers))
             {
                 if (rightCrossConnection != null)
                 {
                     var prev = Link.Search(rightCrossConnection, Net.And, second.Target);
                     if (prev != null && directConnection != prev)
+                    {
                         Link.Update(ref prev, first, Net.And, second);
-
+                    }
                     if (rightCrossConnection.TotalReferers == 0)
+                    {
                         Link.Delete(ref rightCrossConnection);
+                    }
                 }
                 if (leftCrossConnection != null)
                 {
                     var prev = Link.Search(first.Source, Net.And, leftCrossConnection);
                     if (prev != null && directConnection != prev)
+                    {
                         Link.Update(ref prev, first, Net.And, second);
-
+                    }
                     if (leftCrossConnection.TotalReferers == 0)
+                    {
                         Link.Delete(ref leftCrossConnection);
+                    }
                 }
-
                 TryReconstructConnection(first, second);
-
                 return directConnection;
             }
             else if (rightCrossConnection != null
-                  && (directConnection == null || rightCrossConnection.TotalReferers >= directConnection.TotalReferers)
-                  && (leftCrossConnection == null || rightCrossConnection.TotalReferers >= leftCrossConnection.TotalReferers))
+                 && (directConnection == null || rightCrossConnection.TotalReferers >= directConnection.TotalReferers)
+                 && (leftCrossConnection == null || rightCrossConnection.TotalReferers >= leftCrossConnection.TotalReferers))
             {
                 if (directConnection != null)
                 {
                     var prev = Link.Search(first, Net.And, second);
                     if (prev != null && rightCrossConnection != prev)
+                    {
                         Link.Update(ref prev, rightCrossConnection, Net.And, second.Target);
+                    }
                 }
                 if (leftCrossConnection != null)
                 {
                     var prev = Link.Search(first.Source, Net.And, leftCrossConnection);
                     if (prev != null && rightCrossConnection != prev)
+                    {
                         Link.Update(ref prev, rightCrossConnection, Net.And, second.Target);
+                    }
                 }
-
                 //TryReconstructConnection(first, second.Source);
                 //TryReconstructConnection(rightCrossConnection, second.Target); // ухудшает стабильность
-
                 var resultConnection = rightCrossConnection & second.Target;
-
                 //if (second.TotalReferers == 0)
                 //    Link.Delete(ref second);
-
                 return resultConnection;
             }
             else if (leftCrossConnection != null
-                  && (directConnection == null || leftCrossConnection.TotalReferers >= directConnection.TotalReferers)
-                  && (rightCrossConnection == null || leftCrossConnection.TotalReferers >= rightCrossConnection.TotalReferers))
+                 && (directConnection == null || leftCrossConnection.TotalReferers >= directConnection.TotalReferers)
+                 && (rightCrossConnection == null || leftCrossConnection.TotalReferers >= rightCrossConnection.TotalReferers))
             {
                 if (directConnection != null)
                 {
                     var prev = Link.Search(first, Net.And, second);
                     if (prev != null && leftCrossConnection != prev)
+                    {
                         Link.Update(ref prev, first.Source, Net.And, leftCrossConnection);
+                    }
                 }
                 if (rightCrossConnection != null)
                 {
                     var prev = Link.Search(rightCrossConnection, Net.And, second.Target);
                     if (prev != null && rightCrossConnection != prev)
+                    {
                         Link.Update(ref prev, first.Source, Net.And, leftCrossConnection);
+                    }
                 }
-
                 //TryReconstructConnection(first.Target, second);
                 //TryReconstructConnection(first.Source, leftCrossConnection); // ухудшает стабильность
-
                 var resultConnection = first.Source & leftCrossConnection;
-
                 //if (first.TotalReferers == 0)
                 //    Link.Delete(ref first);
-
                 return resultConnection;
             }
             else
@@ -353,31 +343,25 @@ namespace Platform.Data.Core.Triplets
                     return first.Source & leftCrossConnection;
                 }
             }
-
             // Можно фиксировать по окончанию каждой из веток, какой эффект от неё происходит (на сколько уменьшается/увеличивается количество связей)
-
             directConnection = first & second;
-
             //long difference = Net.And.ReferersByLinkerCount - totalDoublets;
             //if (difference != 1)
             //{
             //    Console.WriteLine(Net.And.ReferersByLinkerCount - totalDoublets);
             //}
-
             return directConnection;
         }
 
         private static Link TryReconstructConnection(Link first, Link second)
         {
             Link directConnection = null;
-
             if (second.ReferersBySourceCount < first.ReferersBySourceCount)
             {
                 //  o_|      x_o ... 
                 // x_|        |___|
                 //
                 // <-
-
                 second.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 1 && couple.ReferersBySourceCount == 0)
@@ -386,13 +370,13 @@ namespace Platform.Data.Core.Triplets
                         if (neighbour.Linker == Net.And && neighbour.Source == first)
                         {
                             if (directConnection == null)
+                            {
                                 directConnection = first & second;
-
+                            }
                             Link.Update(ref neighbour, directConnection, Net.And, couple.Target);
                             //Link.Delete(ref couple); // Можно заменить удалением couple
                         }
                     }
-
                     if (couple.Linker == Net.And)
                     {
                         var neighbour = couple.FirstRefererByTarget;
@@ -409,7 +393,6 @@ namespace Platform.Data.Core.Triplets
                 // x_|       |___|
                 //
                 // ->
-
                 first.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
@@ -420,8 +403,9 @@ namespace Platform.Data.Core.Triplets
                             if (neighbour.ReferersByTargetCount == 1 && neighbour.ReferersBySourceCount == 0)
                             {
                                 if (directConnection == null)
+                                {
                                     directConnection = first & second;
-
+                                }
                                 Link.Update(ref couple, directConnection, Net.And, neighbour.Target);
                                 //Link.Delete(ref neighbour);
                             }
@@ -436,7 +420,6 @@ namespace Platform.Data.Core.Triplets
                 //  |_o      |___|
                 //
                 //   <-
-
                 second.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
@@ -447,8 +430,9 @@ namespace Platform.Data.Core.Triplets
                             if (neighbour.ReferersByTargetCount == 0 && neighbour.ReferersBySourceCount == 1)
                             {
                                 if (directConnection == null)
+                                {
                                     directConnection = first & second;
-
+                                }
                                 Link.Update(ref couple, neighbour.Source, Net.And, directConnection);
                                 //Link.Delete(ref neighbour);
                             }
@@ -462,7 +446,6 @@ namespace Platform.Data.Core.Triplets
                 //  |_o      |___|
                 //
                 //   ->
-
                 first.WalkThroughReferersAsTarget((couple) =>
                 {
                     if (couple.Linker == Net.And && couple.ReferersByTargetCount == 0 && couple.ReferersBySourceCount == 1)
@@ -471,20 +454,19 @@ namespace Platform.Data.Core.Triplets
                         if (neighbour.Linker == Net.And && neighbour.Target == second)
                         {
                             if (directConnection == null)
+                            {
                                 directConnection = first & second;
-
+                            }
                             Link.Update(ref neighbour, couple.Source, Net.And, directConnection);
                             Link.Delete(ref couple);
                         }
                     }
                 });
             }
-
             if (directConnection != null)
             {
                 CompressionsCount++;
             }
-
             return directConnection;
         }
 
@@ -494,12 +476,10 @@ namespace Platform.Data.Core.Triplets
         ////    if (rightSubJoint != null && rightSubJoint != right)
         ////    {
         ////        long rightSubJointReferers = rightSubJoint.TotalReferers;
-
         ////        Link leftSubJoint = Link.Search(left.Target, Net.And, right);
         ////        if (leftSubJoint != null && leftSubJoint != left)
         ////        {
         ////            long leftSubJointReferers = leftSubJoint.TotalReferers;
-
         ////            if (leftSubJointReferers > rightSubJointReferers)
         ////            {
         ////                long leftReferers = left.TotalReferers;
@@ -514,7 +494,6 @@ namespace Platform.Data.Core.Triplets
         ////                }
         ////            }
         ////        }
-
         ////        long rightReferers = right.TotalReferers;
         ////        if (rightReferers > 0)
         ////        {
@@ -528,26 +507,18 @@ namespace Platform.Data.Core.Triplets
         ////    }
         ////    return Link.Create(left, Net.And, right);
         ////}
-
         //public static Link CombinedJoin(Link left, Link right)
         //{
         //    long leftReferers = left.TotalReferers;
-
         //    Link leftSubJoint = Link.Search(left.Target, Net.And, right);
         //    if (leftSubJoint != null && leftSubJoint != left)
         //    {
         //        long leftSubJointReferers = leftSubJoint.TotalReferers;
-
         //    }
-
-
         //    long rightReferers = left.TotalReferers;
-
         //    Link rightSubJoint = Link.Search(left, Net.And, right.Source);
         //    long rightSubJointReferers = rightSubJoint != null ? rightSubJoint.TotalReferers : long.MinValue;
-
         //}
-
         //public static Link LeftJoinUnsafe(Link subject, Link @object)
         //{
         //    if (subject.Linker == Net.And && subject.ReferersBySourceCount == 0 && subject.ReferersByTargetCount == 0)
@@ -571,10 +542,8 @@ namespace Platform.Data.Core.Triplets
         //    {
         //        int j = (i + ChunkSize - 1);
         //        j = j < links.Count ? j : (links.Count - 1);
-
         //        Link subElement = links[j];
         //        while (--j >= i) LeftJoin(ref subElement, links[j]);
-
         //        RightJoin(ref element, subElement);
         //    }
         //    return element;
@@ -587,10 +556,8 @@ namespace Platform.Data.Core.Triplets
         //    {
         //        int j = (i + ChunkSize - 1);
         //        j = j < links.Length ? j : (links.Length - 1);
-
         //        Link subElement = links[j];
         //        while (--j >= i) LeftJoin(ref subElement, links[j]);
-
         //        RightJoin(ref element, subElement);
         //    }
         //    return element;
@@ -603,19 +570,16 @@ namespace Platform.Data.Core.Triplets
         //    {
         //        int j = (i + ChunkSize - 1);
         //        j = j < links.Count ? j : (links.Count - 1);
-
         //        Link subElement = links[j];
         //        while (--j >= i)
         //        {
         //            Link x = links[j];
         //            subElement = CombinedJoin(ref x, ref subElement);
         //        }
-
         //        element = CombinedJoin(ref element, ref subElement);
         //    }
         //    return element;
         //}
-
         //public static Link FromList(IList<Link> links)
         //{
         //    int i = 0;
@@ -645,7 +609,6 @@ namespace Platform.Data.Core.Triplets
         //    while (--i >= 0) element = LinkConverterOld.ConnectLinks2(links[i], element, links, ref i);
         //    return element;
         //}
-
         //public static Link FromList(Link[] links)
         //{
         //    int i = links.Length - 1;
@@ -653,7 +616,6 @@ namespace Platform.Data.Core.Triplets
         //    while (--i >= 0) element = LinkConverterOld.ConnectLinks2(links[i], element, links, ref i);
         //    return element;
         //}
-
         //public static Link FromList(List<Link> links)
         //{
         //    Link element = links[0];
@@ -661,15 +623,12 @@ namespace Platform.Data.Core.Triplets
         //    {
         //        int j = (i + ChunkSize - 1);
         //        j = j < links.Count ? j : (links.Count - 1);
-
         //        Link subElement = links[j];
         //        while (--j >= i) subElement = CombinedJoin(links[j], subElement);
-
         //        element = CombinedJoin(element, subElement);
         //    }
         //    return element;
         //}
-
         //public static Link FromList(Link[] links)
         //{
         //    Link element = links[0];
@@ -677,31 +636,24 @@ namespace Platform.Data.Core.Triplets
         //    {
         //        int j = (i + ChunkSize - 1);
         //        j = j < links.Length ? j : (links.Length - 1);
-
         //        Link subElement = links[j];
         //        while (--j >= i) subElement = CombinedJoin(links[j], subElement);
-
         //        element = CombinedJoin(element, subElement);
         //    }
         //    return element;
         //}
-
         //public static Link FromList(IList<Link> links)
         //{
         //    int leftBound = 0;
         //    int rightBound = links.Count - 1;
-
         //    if (leftBound == rightBound)
         //    {
         //        return links[0];
         //    }
-
         //    Link left = links[leftBound];
         //    Link right = links[rightBound];
-
         //    long leftReferers = left.ReferersBySourceCount + left.ReferersByTargetCount;
         //    long rightReferers = right.ReferersBySourceCount + right.ReferersByTargetCount;
-
         //    while (true)
         //    {
         //        //if (rightBound % 2 != leftBound % 2)
@@ -716,16 +668,13 @@ namespace Platform.Data.Core.Triplets
         //            else
         //            {
         //                Link nextRight = links[nextRightBound];
-
         //                right = CombinedJoin(ref nextRight, ref right);
-
         //                rightReferers = right.ReferersBySourceCount + right.ReferersByTargetCount;
         //            }
         //        }
         //        else
         //        {
         //            int nextLeftBound = ++leftBound;
-
         //            if (nextLeftBound == rightBound)
         //            {
         //                return CombinedJoin(ref left, ref right);
@@ -733,15 +682,12 @@ namespace Platform.Data.Core.Triplets
         //            else
         //            {
         //                Link nextLeft = links[nextLeftBound];
-
         //                left = CombinedJoin(ref left, ref nextLeft);
-
         //                leftReferers = left.ReferersBySourceCount + left.ReferersByTargetCount;
         //            }
         //        }
         //    }
         //}
-
         //public static Link FromList(IList<Link> links)
         //{
         //    int i = links.Count - 1;
@@ -769,7 +715,10 @@ namespace Platform.Data.Core.Triplets
         {
             var i = links.Length - 1;
             var element = links[i];
-            while (--i >= 0) element = CombinedJoin(ref links[i], ref element); // LeftJoin(ref element, links[i]);
+            while (--i >= 0)
+            {
+                element = CombinedJoin(ref links[i], ref element); // LeftJoin(ref element, links[i]);
+            }
             return element;
         }
     }

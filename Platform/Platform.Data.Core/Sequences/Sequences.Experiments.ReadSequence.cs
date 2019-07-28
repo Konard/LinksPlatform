@@ -18,7 +18,9 @@ namespace Platform.Data.Core.Sequences
             array[0] = sequence;
 
             if (isElement(sequence))
+            {
                 return array;
+            }
 
             bool hasElements;
             do
@@ -35,12 +37,16 @@ namespace Platform.Data.Core.Sequences
                 {
                     var candidate = array[i];
                     if (candidate == 0)
+                    {
                         continue;
+                    }
 
                     var doubletOffset = i * 2;
 
                     if (isElement(candidate))
+                    {
                         nextArray[doubletOffset] = candidate;
+                    }
                     else
                     {
                         var link = links.GetLink(candidate);
@@ -49,7 +55,9 @@ namespace Platform.Data.Core.Sequences
                         nextArray[doubletOffset] = linkSource;
                         nextArray[doubletOffset + 1] = linkTarget;
                         if (!hasElements)
+                        {
                             hasElements = !(isElement(linkSource) && isElement(linkTarget));
+                        }
                     }
                 }
 
@@ -64,9 +72,13 @@ namespace Platform.Data.Core.Sequences
             var filledElementsCount = CountFilledElements(array);
 
             if (filledElementsCount == array.Length)
+            {
                 return array;
+            }
             else
+            {
                 return CopyFilledElements(array, filledElementsCount);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -74,8 +86,12 @@ namespace Platform.Data.Core.Sequences
         {
             var finalArray = new ulong[filledElementsCount];
             for (int i = 0, j = 0; i < array.Length; i++)
+            {
                 if (array[i] > 0)
+                {
                     finalArray[j++] = array[i];
+                }
+            }
 
 #if USEARRAYPOOL
                 ArrayPool.Free(array);
@@ -88,8 +104,13 @@ namespace Platform.Data.Core.Sequences
         {
             var count = 0;
             for (var i = 0; i < array.Length; i++)
+            {
                 if (array[i] > 0)
+                {
                     count++;
+                }
+            }
+
             return count;
         }
     }

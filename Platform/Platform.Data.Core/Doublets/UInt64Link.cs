@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using Platform.Exceptions;
+using Platform.Ranges;
 using Platform.Helpers.Singletons;
 
 namespace Platform.Data.Core.Doublets
@@ -11,7 +12,7 @@ namespace Platform.Data.Core.Doublets
     /// </summary>
     public struct UInt64Link : IEquatable<UInt64Link>, IList<ulong>
     {
-        private static readonly LinksConstants<bool, ulong, int> Constants = Default<LinksConstants<bool, ulong, int>>.Instance;
+        private static readonly LinksConstants<bool, ulong, int> _constants = Default<LinksConstants<bool, ulong, int>>.Instance;
 
         private const int Length = 3;
 
@@ -21,19 +22,18 @@ namespace Platform.Data.Core.Doublets
 
         public static readonly UInt64Link Null = new UInt64Link();
         
-
         public UInt64Link(params ulong[] values)
         {
-            Index = values.Length > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
-            Source = values.Length > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
-            Target = values.Length > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
+            Index = values.Length > _constants.IndexPart ? values[_constants.IndexPart] : _constants.Null;
+            Source = values.Length > _constants.SourcePart ? values[_constants.SourcePart] : _constants.Null;
+            Target = values.Length > _constants.TargetPart ? values[_constants.TargetPart] : _constants.Null;
         }
 
         public UInt64Link(IList<ulong> values)
         {
-            Index = values.Count > Constants.IndexPart ? values[Constants.IndexPart] : Constants.Null;
-            Source = values.Count > Constants.SourcePart ? values[Constants.SourcePart] : Constants.Null;
-            Target = values.Count > Constants.TargetPart ? values[Constants.TargetPart] : Constants.Null;
+            Index = values.Count > _constants.IndexPart ? values[_constants.IndexPart] : _constants.Null;
+            Source = values.Count > _constants.SourcePart ? values[_constants.SourcePart] : _constants.Null;
+            Target = values.Count > _constants.TargetPart ? values[_constants.TargetPart] : _constants.Null;
         }
 
         public UInt64Link(ulong index, ulong source, ulong target)
@@ -44,7 +44,7 @@ namespace Platform.Data.Core.Doublets
         }
 
         public UInt64Link(ulong source, ulong target)
-            : this(Constants.Null, source, target)
+            : this(_constants.Null, source, target)
         {
             Source = source;
             Target = target;
@@ -52,16 +52,11 @@ namespace Platform.Data.Core.Doublets
 
         public static UInt64Link Create(ulong source, ulong target) => new UInt64Link(source, target);
 
-        public override int GetHashCode()
-        {
-            var hash = 17;
-            hash = hash * 31 + Index.GetHashCode();
-            hash = hash * 31 + Source.GetHashCode();
-            hash = hash * 31 + Target.GetHashCode();
-            return hash;
-        }
+        public override int GetHashCode() => (Index, Source, Target).GetHashCode();
 
-        public bool IsNull() => Index == Constants.Null && Source == Constants.Null && Target == Constants.Null;
+        public bool IsNull() => Index == _constants.Null &&
+                                Source == _constants.Null &&
+                                Target == _constants.Null;
 
         public override bool Equals(object other) => other is UInt64Link && Equals((UInt64Link)other);
 
@@ -77,16 +72,16 @@ namespace Platform.Data.Core.Doublets
 
         public static implicit operator UInt64Link(ulong[] linkArray) => new UInt64Link(linkArray);
 
-        #region IList
-
-        public override string ToString() => Index == Constants.Null ? ToString(Source, Target) : ToString(Index, Source, Target);
-
         public ulong[] ToArray()
         {
             var array = new ulong[Length];
             CopyTo(array, 0);
             return array;
         }
+
+        #region IList
+
+        public override string ToString() => Index == _constants.Null ? ToString(Source, Target) : ToString(Index, Source, Target);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -105,10 +100,12 @@ namespace Platform.Data.Core.Doublets
 
         public void CopyTo(ulong[] array, int arrayIndex)
         {
-            if (array == null) throw new ArgumentNullException(nameof(array));
-            if (arrayIndex < 0) throw new ArgumentOutOfRangeException(nameof(arrayIndex));
-            if (arrayIndex + Length > array.Length) throw new ArgumentException();
-
+            Ensure.Always.ArgumentNotNull(array, nameof(array));
+            Ensure.Always.ArgumentInRange(arrayIndex, new Range<int>(0, array.Length - 1), nameof(arrayIndex));
+            if (arrayIndex + Length > array.Length)
+            {
+                throw new ArgumentException();
+            }
             array[arrayIndex++] = Index;
             array[arrayIndex++] = Source;
             array[arrayIndex] = Target;
@@ -121,9 +118,19 @@ namespace Platform.Data.Core.Doublets
 
         public int IndexOf(ulong item)
         {
-            if (Index == item) return Constants.IndexPart;
-            if (Source == item) return Constants.SourcePart;
-            if (Target == item) return Constants.TargetPart;
+            if (Index == item)
+            {
+                return _constants.IndexPart;
+            }
+            if (Source == item)
+            {
+                return _constants.SourcePart;
+            }
+            if (Target == item)
+            {
+                return _constants.TargetPart;
+            }
+
             return -1;
         }
 
@@ -135,13 +142,20 @@ namespace Platform.Data.Core.Doublets
         {
             get
             {
-                if (index == Constants.IndexPart)
+                Ensure.Always.ArgumentInRange(index, new Range<int>(0, Length - 1), nameof(index));
+                if (index == _constants.IndexPart)
+                {
                     return Index;
-                if (index == Constants.SourcePart)
+                }
+                if (index == _constants.SourcePart)
+                {
                     return Source;
-                if (index == Constants.TargetPart)
+                }
+                if (index == _constants.TargetPart)
+                {
                     return Target;
-                throw new ArgumentOutOfRangeException(nameof(index));
+                }
+                throw new NotSupportedException(); // Impossible path due to Ensure.ArgumentInRange
             }
             set => throw new NotSupportedException();
         }

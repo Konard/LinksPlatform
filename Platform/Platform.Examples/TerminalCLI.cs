@@ -26,16 +26,22 @@ namespace Platform.Examples
                         {
                             var line = Console.ReadLine();
                             if (!string.IsNullOrWhiteSpace(line))
+                            {
                                 sender.Send(line);
+                            }
                             else
+                            {
                                 cancellation.ForceCancellation();
+                            }
                         }
 
                         while (receiver.Available > 0)
                         {
                             var message = receiver.ReceiveString();
                             if (!string.IsNullOrWhiteSpace(message))
+                            {
                                 Console.WriteLine($"<- {message}");
+                            }
                         }
 
                         ThreadHelpers.Sleep();

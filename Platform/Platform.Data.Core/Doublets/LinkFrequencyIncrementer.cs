@@ -16,10 +16,12 @@ namespace Platform.Data.Core.Doublets
         }
 
         /// <remarks>Sequence itseft is not changed, only frequency of its doublets is incremented.</remarks>
-        public IList<TLink> Increment(IList<TLink> sequence)
+        public IList<TLink> Increment(IList<TLink> sequence) // TODO: May be move to ILinksExtensions or make SequenceDoubletsFrequencyIncrementer
         {
             for (var i = 1; i < sequence.Count; i++)
+            {
                 Increment(Links.GetOrCreate(sequence[i - 1], sequence[i]));
+            }
             return sequence;
         }
 

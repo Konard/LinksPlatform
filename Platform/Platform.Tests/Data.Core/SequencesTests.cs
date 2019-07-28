@@ -36,7 +36,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var sw1 = Stopwatch.StartNew();
                 var results1 = sequences.CreateAllVariants1(sequence); sw1.Stop();
@@ -48,7 +50,9 @@ namespace Platform.Tests.Data.Core
                 Assert.True(sw1.Elapsed > sw2.Elapsed);
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
 
                 Assert.True(links.Count() == 0);
             }
@@ -107,7 +111,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var createResults = sequences.CreateAllVariants2(sequence).Distinct().ToArray();
 
@@ -143,7 +149,9 @@ namespace Platform.Tests.Data.Core
                 Assert.True(intersection3.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -159,7 +167,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
 
@@ -183,7 +193,9 @@ namespace Platform.Tests.Data.Core
                 //Assert.True(sw1.Elapsed < sw2.Elapsed);
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -199,7 +211,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
@@ -237,7 +251,9 @@ namespace Platform.Tests.Data.Core
                 Assert.True(intersection4.Count == createResults.Length);
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -253,7 +269,9 @@ namespace Platform.Tests.Data.Core
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var balancedVariantConverter = new BalancedVariantConverter<ulong>(links);
 
@@ -274,7 +292,9 @@ namespace Platform.Tests.Data.Core
                 Assert.True(searchResults2.Count == 1 && balancedVariant == searchResults2.First());
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -325,7 +345,9 @@ namespace Platform.Tests.Data.Core
                 Assert.Contains(balancedVariant, matchedSequences4);
 
                 for (var i = 0; i < sequence.Length; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -537,12 +559,16 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var sw2 = Stopwatch.StartNew();
                 
                 for (int i = START; i < END; i++)
+                {
                     compressed2[i] = balancedVariantConverter2.Convert(arrays[i]);
+                }
 
                 var elapsed2 = sw2.Elapsed;
 
                 for (int i = START; i < END; i++)
+                {
                     linkFrequenciesCache3.IncrementFrequencies(arrays[i]);
+                }
 
                 var initialCount3 = scope3.Links.Unsync.Count();
                                 
@@ -633,7 +659,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             var strings = new List<string>();
 
             for (ulong i = minNumbers; i < maxNumbers; i++)
+            {
                 strings.Add(i.ToString());
+            }
 
             var arrays = strings.Select(UnicodeMap.FromStringToLinkArray).ToArray();
             var totalCharacters = arrays.Select(x => x.Length).Sum();
@@ -677,7 +705,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var second = compressor1.Create(arrays[i]);
 
                     if (first == second)
+                    {
                         compressed1[i] = first;
+                    }
                     else
                     {
                         // TODO: Find a solution for this case
@@ -696,7 +726,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                     var second = balancedVariantConverter.Convert(arrays[i]);
 
                     if (first == second)
+                    {
                         compressed2[i] = first;
+                    }
                 }
 
                 var elapsed2 = sw2.Elapsed;
@@ -754,7 +786,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
             var strings = new List<string>();
 
             for (ulong i = 0; i < N; i++)
+            {
                 strings.Add(RandomHelpers.Default.NextUInt64().ToString());
+            }
 
             strings = strings.Distinct().ToList();
 
@@ -779,7 +813,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var END = arrays.Length;
 
                 for (int i = START; i < END; i++)
+                {
                     compressed1[i] = compressor1.Create(arrays[i]);
+                }
 
                 var elapsed1 = sw1.Elapsed;
 
@@ -788,7 +824,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 var sw2 = Stopwatch.StartNew();
 
                 for (int i = START; i < END; i++)
+                {
                     compressed2[i] = balancedVariantConverter.Convert(arrays[i]);
+                }
 
                 var elapsed2 = sw2.Elapsed;
 
@@ -840,14 +878,18 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
                 Global.Trash = createResults;
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -863,7 +905,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var createResults = sequences.CreateAllVariants2(sequence);
                 var reverseResults = sequences.CreateAllVariants2(sequence.Reverse().ToArray());
@@ -902,7 +946,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 }
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
 
@@ -918,7 +964,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
 
                 var sequence = new ulong[sequenceLength];
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     sequence[i] = links.Create();
+                }
 
                 var createResults = sequences.CreateAllVariants2(sequence);
 
@@ -939,7 +987,9 @@ Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliqu
                 }
 
                 for (var i = 0; i < sequenceLength; i++)
+                {
                     links.Delete(sequence[i]);
+                }
             }
         }
     }

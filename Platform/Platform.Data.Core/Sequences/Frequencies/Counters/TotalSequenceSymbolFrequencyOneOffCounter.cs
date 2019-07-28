@@ -7,8 +7,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
 {
     public class TotalSequenceSymbolFrequencyOneOffCounter<TLink> : ICounter<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 
         protected readonly ILinks<TLink> _links;
         protected readonly TLink _symbol;
@@ -25,9 +25,10 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
 
         public TLink Count()
         {
-            if ((Comparer.Compare(_total, default) > 0) || _visits.Count > 0)
+            if ((_comparer.Compare(_total, default) > 0) || _visits.Count > 0)
+            {
                 return _total;
-
+            }
             CountCore(_symbol);
             return _total;
         }
@@ -35,11 +36,14 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
         private void CountCore(TLink link)
         {
             var any = _links.Constants.Any;
-
-            if (EqualityComparer.Equals(_links.Count(any, link), default))
+            if (_equalityComparer.Equals(_links.Count(any, link), default))
+            {
                 CountSequenceSymbolFrequency(link);
+            }
             else
+            {
                 _links.Each(EachElementHandler, any, link);
+            }
         }
 
         protected virtual void CountSequenceSymbolFrequency(TLink link)
@@ -53,7 +57,9 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
             var constants = _links.Constants;
             var doubletIndex = doublet[constants.IndexPart];
             if (_visits.Add(doubletIndex))
+            {
                 CountCore(doubletIndex);
+            }
             return constants.Continue;
         }
     }

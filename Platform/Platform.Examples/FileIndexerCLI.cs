@@ -14,7 +14,9 @@ namespace Platform.Examples
             var fileToIndex = ConsoleHelpers.GetOrReadArgument(1, "File to index", args);
 
             if (!File.Exists(fileToIndex))
+            {
                 Console.WriteLine("Entered file to index does not exists.");
+            }
             else
             {
                 using (var cancellation = new ConsoleCancellationHandler())

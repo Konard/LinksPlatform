@@ -6,7 +6,7 @@ namespace Platform.Data.Core.Sequences
 {
     public class MarkedSequenceMatcher<TLink> : ICreteriaMatcher<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private readonly ILinks<TLink> _links;
         private readonly TLink _sequenceMarkerLink;
@@ -17,8 +17,8 @@ namespace Platform.Data.Core.Sequences
             _sequenceMarkerLink = sequenceMarkerLink;
         }
 
-        public bool IsMatched(TLink sequenceCandidate) =>
-            EqualityComparer.Equals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
-        || !EqualityComparer.Equals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
+        public bool IsMatched(TLink sequenceCandidate)
+            => _equalityComparer.Equals(_links.GetSource(sequenceCandidate), _sequenceMarkerLink)
+           || !_equalityComparer.Equals(_links.SearchOrDefault(_sequenceMarkerLink, sequenceCandidate), _links.Constants.Null);
     }
 }

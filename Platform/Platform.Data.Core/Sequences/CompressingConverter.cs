@@ -17,9 +17,9 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public class CompressingConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
-        private static readonly LinksConstants<bool, TLink, long> Constants = Default<LinksConstants<bool, TLink, long>>.Instance;
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+        private static readonly LinksConstants<bool, TLink, long> _constants = Default<LinksConstants<bool, TLink, long>>.Instance;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 
         private readonly IConverter<IList<TLink>, TLink> _baseConverter;
         private readonly LinkFrequenciesCache<TLink> _doubletFrequenciesCache;
@@ -57,12 +57,12 @@ namespace Platform.Data.Core.Sequences
         {
             _baseConverter = baseConverter;
             _doubletFrequenciesCache = doubletFrequenciesCache;
-
-            if (Comparer.Compare(minFrequencyToCompress, Integer<TLink>.One) < 0) minFrequencyToCompress = Integer<TLink>.One;
+            if (_comparer.Compare(minFrequencyToCompress, Integer<TLink>.One) < 0)
+            {
+                minFrequencyToCompress = Integer<TLink>.One;
+            }
             _minFrequencyToCompress = minFrequencyToCompress;
-
             _doInitialFrequenciesIncrement = doInitialFrequenciesIncrement;
-
             ResetMaxDoublet();
         }
 
@@ -75,82 +75,78 @@ namespace Platform.Data.Core.Sequences
         private IList<TLink> Compress(IList<TLink> sequence)
         {
             if (sequence.IsNullOrEmpty())
+            {
                 return null;
-
+            }
             if (sequence.Count == 1)
+            {
                 return sequence;
-
+            }
             if (sequence.Count == 2)
+            {
                 return new[] { Links.GetOrCreate(sequence[0], sequence[1]) };
-
+            }
             // TODO: arraypool with min size (to improve cache locality)
             var copy = new HalfDoublet[sequence.Count];
-
             Doublet<TLink> doublet;
-
             for (var i = 1; i < sequence.Count; i++)
             {
                 doublet.Source = sequence[i - 1];
                 doublet.Target = sequence[i];
-
                 LinkFrequency<TLink> data;
-
                 if (_doInitialFrequenciesIncrement)
+                {
                     data = _doubletFrequenciesCache.IncrementFrequency(ref doublet);
+                }
                 else
                 {
                     data = _doubletFrequenciesCache.GetFrequency(ref doublet);
                     if (data == null)
+                    {
                         throw new NotSupportedException("If you ask not to increment frequencies, it is expected that all frequencies for the sequence are prepared.");
+                    }
                 }
-
                 copy[i - 1].Element = sequence[i - 1];
                 copy[i - 1].DoubletData = data;
-
                 UpdateMaxDoublet(ref doublet, data);
             }
             copy[sequence.Count - 1].Element = sequence[sequence.Count - 1];
             copy[sequence.Count - 1].DoubletData = new LinkFrequency<TLink>();
-
-            if (Comparer.Compare(_maxDoubletData.Frequency, default) > 0)
+            if (_comparer.Compare(_maxDoubletData.Frequency, default) > 0)
             {
                 var newLength = ReplaceDoublets(copy);
-
                 sequence = new TLink[newLength];
-
                 for (int i = 0; i < newLength; i++)
+                {
                     sequence[i] = copy[i].Element;
+                }
             }
-
             return sequence;
         }
 
         /// <remarks>
-        /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding .
+        /// Original algorithm idea: https://en.wikipedia.org/wiki/Byte_pair_encoding
         /// </remarks>
         private int ReplaceDoublets(HalfDoublet[] copy)
         {
             var oldLength = copy.Length;
             var newLength = copy.Length;
-
-            while (Comparer.Compare(_maxDoubletData.Frequency, default) > 0)
+            while (_comparer.Compare(_maxDoubletData.Frequency, default) > 0)
             {
                 var maxDoubletSource = _maxDoublet.Source;
                 var maxDoubletTarget = _maxDoublet.Target;
-
-                if (EqualityComparer.Equals(_maxDoubletData.Link, Constants.Null))
+                if (_equalityComparer.Equals(_maxDoubletData.Link, _constants.Null))
+                {
                     _maxDoubletData.Link = Links.GetOrCreate(maxDoubletSource, maxDoubletTarget);
-
+                }
                 var maxDoubletReplacementLink = _maxDoubletData.Link;
-
                 oldLength--;
                 var oldLengthMinusTwo = oldLength - 1;
-
                 // Substitute all usages
                 int w = 0, r = 0; // (r == read, w == write)
                 for (; r < oldLength; r++)
                 {
-                    if (EqualityComparer.Equals(copy[r].Element, maxDoubletSource) && EqualityComparer.Equals(copy[r + 1].Element, maxDoubletTarget))
+                    if (_equalityComparer.Equals(copy[r].Element, maxDoubletSource) && _equalityComparer.Equals(copy[r + 1].Element, maxDoubletTarget))
                     {
                         if (r > 0)
                         {
@@ -164,7 +160,6 @@ namespace Platform.Data.Core.Sequences
                             copy[r + 1].DoubletData.DecrementFrequency();
                             copy[w].DoubletData = _doubletFrequenciesCache.IncrementFrequency(maxDoubletReplacementLink, next);
                         }
-
                         copy[w++].Element = maxDoubletReplacementLink;
                         r++;
                         newLength--;
@@ -174,15 +169,14 @@ namespace Platform.Data.Core.Sequences
                         copy[w++] = copy[r];
                     }
                 }
-                if (w < newLength) copy[w] = copy[r];
-
+                if (w < newLength)
+                {
+                    copy[w] = copy[r];
+                }
                 oldLength = newLength;
-
                 ResetMaxDoublet();
-
                 UpdateMaxDoublet(copy, newLength);
             }
-
             return newLength;
         }
 
@@ -197,12 +191,10 @@ namespace Platform.Data.Core.Sequences
         private void UpdateMaxDoublet(HalfDoublet[] copy, int length)
         {
             Doublet<TLink> doublet;
-
             for (var i = 1; i < length; i++)
             {
                 doublet.Source = copy[i - 1].Element;
                 doublet.Target = copy[i].Element;
-
                 UpdateMaxDoublet(ref doublet, copy[i - 1].DoubletData);
             }
         }
@@ -212,10 +204,9 @@ namespace Platform.Data.Core.Sequences
         {
             var frequency = data.Frequency;
             var maxFrequency = _maxDoubletData.Frequency;
-
             //if (frequency > _minFrequencyToCompress && (maxFrequency < frequency || (maxFrequency == frequency && doublet.Source + doublet.Target < /* gives better compression string data (and gives collisions quickly) */ _maxDoublet.Source + _maxDoublet.Target))) 
-            if ((Comparer.Compare(frequency, _minFrequencyToCompress) > 0) &&
-               ((Comparer.Compare(maxFrequency, frequency) < 0) || (EqualityComparer.Equals(maxFrequency, frequency) && (Comparer.Compare(ArithmeticHelpers.Add(doublet.Source, doublet.Target), ArithmeticHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
+            if ((_comparer.Compare(frequency, _minFrequencyToCompress) > 0) &&
+               ((_comparer.Compare(maxFrequency, frequency) < 0) || (_equalityComparer.Equals(maxFrequency, frequency) && (_comparer.Compare(ArithmeticHelpers.Add(doublet.Source, doublet.Target), ArithmeticHelpers.Add(_maxDoublet.Source, _maxDoublet.Target)) > 0)))) /* gives better stability and better compression on sequent data and even on rundom numbers data (but gives collisions anyway) */
             {
                 _maxDoublet = doublet;
                 _maxDoubletData = data;

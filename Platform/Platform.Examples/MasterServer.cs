@@ -27,7 +27,9 @@ namespace Platform.Examples
         public void PrintContents(Action<string> messageHandler)
         {
             if (_links.Count() == UnicodeMap.LastCharLink)
+            {
                 messageHandler("Database is empty.");
+            }
             else
             {
                 messageHandler("Contents:");
@@ -55,7 +57,10 @@ namespace Platform.Examples
             {
                 var escape = 0;
                 while (--i >= 0 && IsEscape(message[i]))
+                {
                     escape++;
+                }
+
                 return escape % 2 == 0;
             }
             return false;
@@ -131,7 +136,11 @@ namespace Platform.Examples
         private ulong[] ProcessSequence(string sequence, bool forSearch = false)
         {
             var sequenceLength = sequence.Length;
-            if (forSearch) sequenceLength--;
+            if (forSearch)
+            {
+                sequenceLength--;
+            }
+
             var w = 0;
             for (var r = 0; r < sequenceLength; r++)
             {
@@ -144,7 +153,9 @@ namespace Platform.Examples
                     }
                 }
                 else
+                {
                     w++;
+                }
             }
 
             var result = new ulong[w];
@@ -163,11 +174,17 @@ namespace Platform.Examples
                         }
                     }
                     else if (sequence[r] == '_')
+                    {
                         result[w++] = _constants.Any;
+                    }
                     else if (sequence[r] == '*')
+                    {
                         result[w++] = Sequences.ZeroOrMany;
+                    }
                     else
+                    {
                         result[w++] = UnicodeMap.FromCharToLink(sequence[r]);
+                    }
                 }
             }
             else
@@ -183,7 +200,9 @@ namespace Platform.Examples
                         }
                     }
                     else
+                    {
                         result[w++] = UnicodeMap.FromCharToLink(sequence[r]);
+                    }
                 }
             }
 
@@ -199,9 +218,13 @@ namespace Platform.Examples
         private static void AppendLinkToString(StringBuilder sb, ulong link)
         {
             if (link <= (char.MaxValue + 1))
+            {
                 sb.Append(UnicodeMap.FromLinkToChar(link));
+            }
             else
+            {
                 sb.Append($"({link})");
+            }
         }
     }
 }

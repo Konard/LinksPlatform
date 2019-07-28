@@ -17,7 +17,7 @@ namespace Platform.Data.Core.Doublets
     /// </remarks>
     internal class UniLinks<TLink> : LinksDecoratorBase<TLink>, IUniLinks<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         public UniLinks(ILinks<TLink> links)
             : base(links)
@@ -36,10 +36,8 @@ namespace Platform.Data.Core.Doublets
             }
         }
 
-        private static readonly TLink NullConstant = Use<ILinksCombinedConstants<TLink, TLink, int>>.Single.Null;
-        private static readonly IList<TLink> NullLink = new List<TLink> { NullConstant, NullConstant, NullConstant };
-
-
+        public static readonly TLink NullConstant = Use<ILinksCombinedConstants<TLink, TLink, int>>.Single.Null;
+        public static readonly IList<TLink> NullLink = new List<TLink> { NullConstant, NullConstant, NullConstant };
 
         // TODO: Подумать о том, как реализовать древовидный Restriction и Substitution (Links-Expression)
 
@@ -152,10 +150,7 @@ namespace Platform.Data.Core.Doublets
 
             ////    }
             ////}
-
-
             ////return Constants.Continue;
-
 
             //if (restriction.IsNullOrEmpty()) // Create
             //{
@@ -238,16 +233,15 @@ namespace Platform.Data.Core.Doublets
             //        }
             //    }
             //}
-
-
-
             return Constants.Continue;
         }
 
         public TLink Trigger(IList<TLink> patternOrCondition, Func<IList<TLink>, TLink> matchHandler, IList<TLink> substitution, Func<IList<TLink>, IList<TLink>, TLink> substitutionHandler)
         {
             if (patternOrCondition.IsNullOrEmpty() && substitution.IsNullOrEmpty())
+            {
                 return Constants.Continue;
+            }
             else if (patternOrCondition.EqualTo(substitution)) // Should be Each here TODO: Check if it is a correct condition
             {
                 // Or it only applies to trigger without matchHandler.
@@ -256,28 +250,33 @@ namespace Platform.Data.Core.Doublets
             else if (!substitution.IsNullOrEmpty()) // Creation
             {
                 var before = ArrayPool<TLink>.Empty;
-
                 // Что должно означать False здесь? Остановиться (перестать идти) или пропустить (пройти мимо) или пустить (взять)?
-                if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
+                if (matchHandler != null && _equalityComparer.Equals(matchHandler(before), Constants.Break))
+                {
                     return Constants.Break;
-
+                }
                 var after = (IList<TLink>)substitution.ToArray();
-
-                if (EqualityComparer.Equals(after[0], default))
+                if (_equalityComparer.Equals(after[0], default))
                 {
                     var newLink = Links.Create();
                     after[0] = newLink;
                 }
-
                 if (substitution.Count == 1)
+                {
                     after = Links.GetLink(substitution[0]);
+                }
                 else if (substitution.Count == 3)
+                {
                     Links.Update(after);
+                }
                 else
+                {
                     throw new NotSupportedException();
-
+                }
                 if (matchHandler != null)
+                {
                     return substitutionHandler(before, after);
+                }
                 return Constants.Continue;
             }
             else if (!patternOrCondition.IsNullOrEmpty()) // Deletion
@@ -286,21 +285,23 @@ namespace Platform.Data.Core.Doublets
                 {
                     var linkToDelete = patternOrCondition[0];
                     var before = Links.GetLink(linkToDelete);
-
-                    if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && _equalityComparer.Equals(matchHandler(before), Constants.Break))
+                    {
                         return Constants.Break;
-
+                    }
                     var after = ArrayPool<TLink>.Empty;
-
                     Links.Update(linkToDelete, Constants.Null, Constants.Null);
                     Links.Delete(linkToDelete);
-
                     if (matchHandler != null)
+                    {
                         return substitutionHandler(before, after);
+                    }
                     return Constants.Continue;
                 }
                 else
+                {
                     throw new NotSupportedException();
+                }
             }
             else // Replace / Update
             {
@@ -308,21 +309,20 @@ namespace Platform.Data.Core.Doublets
                 {
                     var linkToUpdate = patternOrCondition[0];
                     var before = Links.GetLink(linkToUpdate);
-
-                    if (matchHandler != null && EqualityComparer.Equals(matchHandler(before), Constants.Break))
+                    if (matchHandler != null && _equalityComparer.Equals(matchHandler(before), Constants.Break))
+                    {
                         return Constants.Break;
-
+                    }
                     var after = (IList<TLink>)substitution.ToArray(); //-V3125
-
-                    if (EqualityComparer.Equals(after[0], default))
+                    if (_equalityComparer.Equals(after[0], default))
+                    {
                         after[0] = linkToUpdate;
-
+                    }
                     if (substitution.Count == 1)
                     {
-                        if (!EqualityComparer.Equals(substitution[0], linkToUpdate))
+                        if (!_equalityComparer.Equals(substitution[0], linkToUpdate))
                         {
                             after = Links.GetLink(substitution[0]);
-
                             Links.Update(linkToUpdate, Constants.Null, Constants.Null);
                             Links.Delete(linkToUpdate);
                         }
@@ -332,14 +332,19 @@ namespace Platform.Data.Core.Doublets
                         Links.Update(after);
                     }
                     else
+                    {
                         throw new NotSupportedException();
-
+                    }
                     if (matchHandler != null)
+                    {
                         return substitutionHandler(before, after);
+                    }
                     return Constants.Continue;
                 }
                 else
+                {
                     throw new NotSupportedException();
+                }
             }
         }
 
@@ -356,15 +361,12 @@ namespace Platform.Data.Core.Doublets
         public IList<IList<IList<TLink>>> Trigger(IList<TLink> condition, IList<TLink> substitution)
         {
             var changes = new List<IList<IList<TLink>>>();
-
             Trigger(condition, AlwaysContinue, substitution, (before, after) =>
             {
                 var change = new[] { before, after };
                 changes.Add(change);
-
                 return Constants.Continue;
             });
-
             return changes;
         }
 

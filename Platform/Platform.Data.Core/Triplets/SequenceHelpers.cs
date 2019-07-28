@@ -20,20 +20,16 @@ namespace Platform.Data.Core.Triplets
         public static string FormatSequence(Link sequence)
         {
             var visitedElements = 0;
-
             var sb = new StringBuilder();
-
             sb.Append('{');
-
             StopableSequenceWalker.WalkRight(sequence, x => x.Source, x => x.Target, x => x.Linker != Net.And, element =>
             {
                 if (visitedElements > 0)
+                {
                     sb.Append(',');
-
+                }
                 sb.Append(element.ToString());
-
                 visitedElements++;
-
                 if (visitedElements < MaxSequenceFormatSize)
                 {
                     return true;
@@ -44,9 +40,7 @@ namespace Platform.Data.Core.Triplets
                     return false;
                 }
             });
-
             sb.Append('}');
-
             return sb.ToString();
         }
 
@@ -56,13 +50,10 @@ namespace Platform.Data.Core.Triplets
             {
                 throw new Exception("Подпоследовательности с одним элементом не поддерживаются.");
             }
-
             var leftBound = 0;
             var rightBound = links.Length - 1;
-
             var left = links[leftBound++];
             var right = links[rightBound--];
-
             var results = new List<Link>();
             CollectMatchingSequences(left, leftBound, links, right, rightBound, ref results);
             return results;
@@ -72,11 +63,9 @@ namespace Platform.Data.Core.Triplets
         {
             var leftLinkTotalReferers = leftLink.ReferersBySourceCount + leftLink.ReferersByTargetCount;
             var rightLinkTotalReferers = rightLink.ReferersBySourceCount + rightLink.ReferersByTargetCount;
-
             if (leftLinkTotalReferers <= rightLinkTotalReferers)
             {
                 var nextLeftLink = middleLinks[leftBound];
-
                 var elements = GetRightElements(leftLink, nextLeftLink);
                 if (leftBound <= rightBound)
                 {
@@ -104,9 +93,7 @@ namespace Platform.Data.Core.Triplets
             else
             {
                 var nextRightLink = middleLinks[rightBound];
-
                 var elements = GetLeftElements(rightLink, nextRightLink);
-
                 if (leftBound <= rightBound)
                 {
                     for (var i = elements.Length - 1; i >= 0; i--)
@@ -135,25 +122,24 @@ namespace Platform.Data.Core.Triplets
         public static Link[] GetRightElements(Link startLink, Link rightLink)
         {
             var result = new Link[4];
-
             TryStepRight(startLink, rightLink, result, 0);
-
             startLink.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
+                    {
                         if (TryStepRight(couple, rightLink, result, 2))
+                        {
                             return Link.Stop;
-
+                        }
+                    }
                     return Link.Continue;
                 });
-
             return result;
         }
 
         public static bool TryStepRight(Link startLink, Link rightLink, Link[] result, int offset)
         {
             var added = 0;
-
             startLink.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
@@ -163,44 +149,45 @@ namespace Platform.Data.Core.Triplets
                         {
                             result[offset] = couple;
                             if (++added == 2)
+                            {
                                 return Link.Stop;
+                            }
                         }
                         else if (coupleTarget.Linker == Net.And && coupleTarget.Source == rightLink)
                         {
                             result[offset + 1] = couple;
                             if (++added == 2)
+                            {
                                 return Link.Stop;
+                            }
                         }
                     }
-
                     return Link.Continue;
                 });
-
             return added > 0;
         }
 
         public static Link[] GetLeftElements(Link startLink, Link leftLink)
         {
             var result = new Link[4];
-
             TryStepLeft(startLink, leftLink, result, 0);
-
             startLink.WalkThroughReferersAsSource(couple =>
                 {
                     if (couple.Linker == Net.And)
+                    {
                         if (TryStepLeft(couple, leftLink, result, 2))
+                        {
                             return Link.Stop;
-
+                        }
+                    }
                     return Link.Continue;
                 });
-
             return result;
         }
 
         public static bool TryStepLeft(Link startLink, Link leftLink, Link[] result, int offset)
         {
             var added = 0;
-
             startLink.WalkThroughReferersAsTarget(couple =>
                 {
                     if (couple.Linker == Net.And)
@@ -210,19 +197,21 @@ namespace Platform.Data.Core.Triplets
                         {
                             result[offset] = couple;
                             if (++added == 2)
+                            {
                                 return Link.Stop;
+                            }
                         }
                         else if (coupleSource.Linker == Net.And && coupleSource.Target == leftLink)
                         {
                             result[offset + 1] = couple;
                             if (++added == 2)
+                            {
                                 return Link.Stop;
+                            }
                         }
                     }
-
                     return Link.Continue;
                 });
-
             return added > 0;
         }
     }

@@ -4,7 +4,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class LinksDependenciesValidator<T> : LinksDecoratorBase<T>
     {
-        public LinksDependenciesValidator(ILinks<T> links) : base(links) {}
+        public LinksDependenciesValidator(ILinks<T> links) : base(links) { }
 
         public override T Update(IList<T> restrictions)
         {

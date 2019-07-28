@@ -38,8 +38,10 @@ namespace Platform.Examples
                 while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
                 {
                     if (lastCharOfPreviousChunk != '\0')
+                    {
                         _links.GetOrCreate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
                             UnicodeMap.FromCharToLink(buffer[0]));
+                    }
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
 
@@ -72,8 +74,10 @@ namespace Platform.Examples
                 while (!cancellationToken.IsCancellationRequested && (readChars = reader.Read(buffer, 0, stepSize)) > 0) // localSteps * stepSize
                 {
                     if (lastCharOfPreviousChunk != '\0')
+                    {
                         _links.GetOrCreate(UnicodeMap.FromCharToLink(lastCharOfPreviousChunk),
                             UnicodeMap.FromCharToLink(buffer[0]));
+                    }
 
                     lastCharOfPreviousChunk = buffer[readChars - 1];
 
@@ -87,7 +91,10 @@ namespace Platform.Examples
                         _indexer.BulkIndex(linkArray);
                     });
 
-                    if (tasks.Count > 3) await tasks.AwaitOne();
+                    if (tasks.Count > 3)
+                    {
+                        await tasks.AwaitOne();
+                    }
 
                     Console.WriteLine($"chars: {(ulong)steps * stepSize + (ulong)readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
 
@@ -119,7 +126,9 @@ namespace Platform.Examples
                 }
 
                 if (string.IsNullOrWhiteSpace(line))
+                {
                     return;
+                }
 
                 // NewLine -> First Character
                 _links.GetOrCreate(UnicodeMap.FromCharToLink('\n'), UnicodeMap.FromCharToLink(line[0]));
@@ -136,7 +145,9 @@ namespace Platform.Examples
                 Interlocked.Increment(ref linesToPrint);
 
                 if (totalChars % printStepSize == 0)
+                {
                     Console.WriteLine($"Parsed {totalChars}/{totalSize} chars, links: {totalLinks}");
+                }
             });
         }
     }

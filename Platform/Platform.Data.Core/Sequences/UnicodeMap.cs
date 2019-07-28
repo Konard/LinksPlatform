@@ -9,18 +9,14 @@ namespace Platform.Data.Core.Sequences
 {
     public class UnicodeMap
     {
-        public const ulong FirstCharLink = 1;
-        public const ulong LastCharLink = FirstCharLink + char.MaxValue;
-        public const long MapSize = 1 + char.MaxValue;
+        public static readonly ulong FirstCharLink = 1;
+        public static readonly ulong LastCharLink = FirstCharLink + char.MaxValue;
+        public static readonly ulong MapSize = 1 + char.MaxValue;
 
         private readonly ILinks<ulong> _links;
-
         private bool _initialized;
 
-        public UnicodeMap(ILinks<ulong> links)
-        {
-            _links = links;
-        }
+        public UnicodeMap(ILinks<ulong> links) => _links = links;
 
         public static UnicodeMap InitNew(ILinks<ulong> links)
         {
@@ -32,12 +28,11 @@ namespace Platform.Data.Core.Sequences
         public void Init()
         {
             if (_initialized)
+            {
                 return;
-
+            }
             _initialized = true;
-
             var firstLink = _links.CreatePoint();
-
             if (firstLink != FirstCharLink)
             {
                 _links.Delete(firstLink);                
@@ -50,7 +45,9 @@ namespace Platform.Data.Core.Sequences
                     var createdLink = _links.CreatePoint();
                     _links.Update(createdLink, firstLink, createdLink);
                     if (createdLink != i)
+                    {
                         throw new Exception("Unable to initialize UTF 16 table.");
+                    }
                 }                
             }            
         }
@@ -61,7 +58,7 @@ namespace Platform.Data.Core.Sequences
         // 65536 (0(1) + 65535 = 65536 possible values)
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static ulong FromCharToLink(char character) => ((ulong)character + 1);
+        public static ulong FromCharToLink(char character) => (ulong)character + 1;
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static char FromLinkToChar(ulong link) => (char)(link - 1);
@@ -72,17 +69,16 @@ namespace Platform.Data.Core.Sequences
         public static string FromLinksToString(IList<ulong> linksList)
         {
             var sb = new StringBuilder();
-
             for (int i = 0; i < linksList.Count; i++)
+            {
                 sb.Append(FromLinkToChar(linksList[i]));
-
+            }
             return sb.ToString();
         }
 
         public static string FromSequenceLinkToString(ulong link, ILinks<ulong> links)
         {
             var sb = new StringBuilder();
-
             if (links.Exists(link))
             {
                 StopableSequenceWalker.WalkRight(link, links.GetSource, links.GetTarget,
@@ -92,7 +88,6 @@ namespace Platform.Data.Core.Sequences
                         return true;
                     });
             }
-
             return sb.ToString();
         }
 
@@ -103,7 +98,9 @@ namespace Platform.Data.Core.Sequences
             // char array to ulong array
             var linksSequence = new ulong[count];
             for (var i = 0; i < count; i++)
+            {
                 linksSequence[i] = FromCharToLink(chars[i]);
+            }
             return linksSequence;
         }
 
@@ -112,20 +109,19 @@ namespace Platform.Data.Core.Sequences
             // char array to ulong array
             var linksSequence = new ulong[sequence.Length];
             for (var i = 0; i < sequence.Length; i++)
+            {
                 linksSequence[i] = FromCharToLink(sequence[i]);
+            }
             return linksSequence;
         }
 
         public static List<ulong[]> FromStringToLinkArrayGroups(string sequence)
         {
             var result = new List<ulong[]>();
-
             var offset = 0;
-
             while (offset < sequence.Length)
             {
                 var currentCategory = CharUnicodeInfo.GetUnicodeCategory(sequence[offset]);
-
                 var relativeLength = 1;
                 var absoluteLength = offset + relativeLength;
                 while (absoluteLength < sequence.Length &&
@@ -134,34 +130,29 @@ namespace Platform.Data.Core.Sequences
                     relativeLength++;
                     absoluteLength++;
                 }
-
                 // char array to ulong array
                 var innerSequence = new ulong[relativeLength];
                 var maxLength = offset + relativeLength;
                 for (var i = offset; i < maxLength; i++)
+                {
                     innerSequence[i - offset] = FromCharToLink(sequence[i]);
+                }
                 result.Add(innerSequence);
-
                 offset += relativeLength;
             }
-
             return result;
         }
 
         public static List<ulong[]> FromLinkArrayToLinkArrayGroups(ulong[] array)
         {
             var result = new List<ulong[]>();
-
             var offset = 0;
-
             while (offset < array.Length)
             {
                 var relativeLength = 1;
-
                 if (array[offset] <= LastCharLink)
                 {
                     var currentCategory = CharUnicodeInfo.GetUnicodeCategory(FromLinkToChar(array[offset]));
-
                     var absoluteLength = offset + relativeLength;
                     while (absoluteLength < array.Length &&
                            array[absoluteLength] <= LastCharLink &&
@@ -180,17 +171,16 @@ namespace Platform.Data.Core.Sequences
                         absoluteLength++;
                     }
                 }
-
                 // copy array
                 var innerSequence = new ulong[relativeLength];
                 var maxLength = offset + relativeLength;
                 for (var i = offset; i < maxLength; i++)
+                {
                     innerSequence[i - offset] = array[i];
+                }
                 result.Add(innerSequence);
-
                 offset += relativeLength;
             }
-
             return result;
         }
     }

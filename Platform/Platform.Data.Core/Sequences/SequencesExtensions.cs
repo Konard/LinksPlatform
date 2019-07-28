@@ -7,13 +7,11 @@ namespace Platform.Data.Core.Sequences
         public static TLink Create<TLink>(this ISequences<TLink> sequences, IList<TLink[]> groupedSequence)
         {
             var finalSequence = new TLink[groupedSequence.Count];
-
             for (var i = 0; i < finalSequence.Length; i++)
             {
                 var part = groupedSequence[i];
                 finalSequence[i] = part.Length == 1 ? part[0] : sequences.Create(part);
             }
-
             return sequences.Create(finalSequence);
         }
     }

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Helpers.Singletons;
 using Platform.Data.Core.Doublets;
 using Platform.Data.Core.Sequences.Frequencies.Cache;
 using Platform.Data.Core.Sequences.Frequencies.Counters;
@@ -10,7 +9,7 @@ namespace Platform.Data.Core.Sequences
 {
     public struct SequencesOptions<TLink> // TODO: To use type parameter <TLink> the ILinks<TLink> must contain GetConstants function.
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         public TLink SequenceMarkerLink;
         public bool UseCascadeUpdate;
@@ -35,20 +34,26 @@ namespace Platform.Data.Core.Sequences
         {
             if (UseSequenceMarker)
             {
-                if (EqualityComparer.Equals(SequenceMarkerLink, links.Constants.Null))
+                if (_equalityComparer.Equals(SequenceMarkerLink, links.Constants.Null))
+                {
                     SequenceMarkerLink = links.CreatePoint();
+                }
                 else
                 {
                     if (!links.Exists(SequenceMarkerLink))
                     {
                         var link = links.CreatePoint();
-                        if (!EqualityComparer.Equals(link, SequenceMarkerLink))
+                        if (!_equalityComparer.Equals(link, SequenceMarkerLink))
+                        {
                             throw new Exception("Cannot recreate sequence marker link.");
+                        }
                     }
                 }
 
                 if (MarkedSequenceMatcher == null)
+                {
                     MarkedSequenceMatcher = new MarkedSequenceMatcher<TLink>(links, SequenceMarkerLink);
+                }
             }
 
             var balancedVariantConverter = new BalancedVariantConverter<TLink>(links);
@@ -59,9 +64,13 @@ namespace Platform.Data.Core.Sequences
                 {
                     ICounter<TLink, TLink> totalSequenceSymbolFrequencyCounter;
                     if (UseSequenceMarker)
+                    {
                         totalSequenceSymbolFrequencyCounter = new TotalMarkedSequenceSymbolFrequencyCounter<TLink>(links, MarkedSequenceMatcher);
+                    }
                     else
+                    {
                         totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<TLink>(links);
+                    }
 
                     var doubletFrequenciesCache = new LinkFrequenciesCache<TLink>(links, totalSequenceSymbolFrequencyCounter);
 
@@ -72,17 +81,23 @@ namespace Platform.Data.Core.Sequences
             else
             {
                 if (LinksToSequenceConverter == null)
+                {
                     LinksToSequenceConverter = balancedVariantConverter;
+                }
             }
 
             if (UseIndex && Indexer == null)
+            {
                 Indexer = new SequencesIndexer<TLink>(links);
+            }
         }
 
         public void ValidateOptions()
         {
             if (UseGarbageCollection && !UseSequenceMarker)
+            {
                 throw new NotSupportedException("To use garbage collection UseSequenceMarker option must be on.");
+            }
         }
     }
 }

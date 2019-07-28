@@ -27,8 +27,8 @@ namespace Platform.Data.Core.Doublets
     /// </remarks>
     public partial class ResizableDirectMemoryLinks<TLink> : DisposableBase, ILinks<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 
         /// <summary>Возвращает размер одной связи в байтах.</summary>
         public static readonly int LinkSizeInBytes = StructureHelpers.SizeOf<Link>();
@@ -187,18 +187,15 @@ namespace Platform.Data.Core.Doublets
         public ResizableDirectMemoryLinks(IResizableDirectMemory memory, long memoryReservationStep)
         {
             Constants = Default<LinksConstants<TLink, TLink, int>>.Instance;
-
             _memory = memory;
             _memoryReservationStep = memoryReservationStep;
-
             if (memory.ReservedCapacity < memoryReservationStep)
+            {
                 memory.ReservedCapacity = memoryReservationStep;
-
+            }
             SetPointers(_memory);
-
             // Гарантия корректности _memory.UsedCapacity относительно _header->AllocatedLinks
             _memory.UsedCapacity = (long)(Integer<TLink>)LinksHeader.GetAllocatedLinks(_header) * LinkSizeInBytes + LinkHeaderSizeInBytes;
-
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
             LinksHeader.SetReservedLinks(_header, (Integer<TLink>)((_memory.ReservedCapacity - LinkHeaderSizeInBytes) / LinkSizeInBytes));
         }
@@ -210,40 +207,46 @@ namespace Platform.Data.Core.Doublets
         {
             // Если нет ограничений, тогда возвращаем общее число связей находящихся в хранилище.
             if (restrictions.Count == 0)
+            {
                 return Total;
+            }
             if (restrictions.Count == 1)
             {
                 var index = restrictions[Constants.IndexPart];
-
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
+                {
                     return Total;
-
+                }
                 return Exists(index) ? Integer<TLink>.One : Integer<TLink>.Zero;
             }
             if (restrictions.Count == 2)
             {
                 var index = restrictions[Constants.IndexPart];
                 var value = restrictions[1];
-
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
                 {
-                    if (EqualityComparer.Equals(value, Constants.Any))
+                    if (_equalityComparer.Equals(value, Constants.Any))
+                    {
                         return Total; // Any - как отсутствие ограничения
-
+                    }
                     return Add(_sourcesTreeMethods.CalculateReferences(value), _targetsTreeMethods.CalculateReferences(value));
                 }
                 else
                 {
                     if (!Exists(index))
+                    {
                         return Integer<TLink>.Zero;
-
-                    if (EqualityComparer.Equals(value, Constants.Any))
+                    }
+                    if (_equalityComparer.Equals(value, Constants.Any))
+                    {
                         return Integer<TLink>.One;
-
+                    }
                     var storedLinkValue = GetLinkUnsafe(index);
-                    if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
-                        EqualityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
+                        _equalityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    {
                         return Integer<TLink>.One;
+                    }
                     return Integer<TLink>.Zero;
                 }
             }
@@ -253,46 +256,61 @@ namespace Platform.Data.Core.Doublets
                 var source = restrictions[Constants.SourcePart];
                 var target = restrictions[Constants.TargetPart];
 
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
                 {
-                    if (EqualityComparer.Equals(source, Constants.Any) && EqualityComparer.Equals(target, Constants.Any))
+                    if (_equalityComparer.Equals(source, Constants.Any) && _equalityComparer.Equals(target, Constants.Any))
+                    {
                         return Total;
-                    else if (EqualityComparer.Equals(source, Constants.Any))
+                    }
+                    else if (_equalityComparer.Equals(source, Constants.Any))
+                    {
                         return _targetsTreeMethods.CalculateReferences(target);
-                    else if (EqualityComparer.Equals(target, Constants.Any))
+                    }
+                    else if (_equalityComparer.Equals(target, Constants.Any))
+                    {
                         return _sourcesTreeMethods.CalculateReferences(source);
+                    }
                     else //if(source != Any && target != Any)
                     {
                         // Эквивалент Exists(source, target) => Count(Any, source, target) > 0
                         var link = _sourcesTreeMethods.Search(source, target);
-                        return EqualityComparer.Equals(link, Constants.Null) ? Integer<TLink>.Zero : Integer<TLink>.One;
+                        return _equalityComparer.Equals(link, Constants.Null) ? Integer<TLink>.Zero : Integer<TLink>.One;
                     }
                 }
                 else
                 {
                     if (!Exists(index))
-                        return Integer<TLink>.Zero;
-
-                    if (EqualityComparer.Equals(source, Constants.Any) && EqualityComparer.Equals(target, Constants.Any))
-                        return Integer<TLink>.One;
-
-                    var storedLinkValue = GetLinkUnsafe(index);
-
-                    if (!EqualityComparer.Equals(source, Constants.Any) && !EqualityComparer.Equals(target, Constants.Any))
                     {
-                        if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), source) &&
-                            EqualityComparer.Equals(Link.GetTarget(storedLinkValue), target))
-                            return Integer<TLink>.One;
                         return Integer<TLink>.Zero;
                     }
-
-                    var value = default(TLink);
-                    if (EqualityComparer.Equals(source, Constants.Any)) value = target;
-                    if (EqualityComparer.Equals(target, Constants.Any)) value = source;
-
-                    if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
-                        EqualityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    if (_equalityComparer.Equals(source, Constants.Any) && _equalityComparer.Equals(target, Constants.Any))
+                    {
                         return Integer<TLink>.One;
+                    }
+                    var storedLinkValue = GetLinkUnsafe(index);
+                    if (!_equalityComparer.Equals(source, Constants.Any) && !_equalityComparer.Equals(target, Constants.Any))
+                    {
+                        if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), source) &&
+                            _equalityComparer.Equals(Link.GetTarget(storedLinkValue), target))
+                        {
+                            return Integer<TLink>.One;
+                        }
+                        return Integer<TLink>.Zero;
+                    }
+                    var value = default(TLink);
+                    if (_equalityComparer.Equals(source, Constants.Any))
+                    {
+                        value = target;
+                    }
+                    if (_equalityComparer.Equals(target, Constants.Any))
+                    {
+                        value = source;
+                    }
+                    if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
+                        _equalityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    {
+                        return Integer<TLink>.One;
+                    }
                     return Integer<TLink>.Zero;
                 }
             }
@@ -304,52 +322,61 @@ namespace Platform.Data.Core.Doublets
         {
             if (restrictions.Count == 0)
             {
-                for (TLink link = Integer<TLink>.One; Comparer.Compare(link, (TLink)(Integer<TLink>)LinksHeader.GetAllocatedLinks(_header)) <= 0; link = Increment(link))
-                    if (Exists(link))
-                        if (EqualityComparer.Equals(handler(GetLinkStruct(link)), Constants.Break))
-                            return Constants.Break;
+                for (TLink link = Integer<TLink>.One; _comparer.Compare(link, (TLink)(Integer<TLink>)LinksHeader.GetAllocatedLinks(_header)) <= 0; link = Increment(link))
+                {
+                    if (Exists(link) && _equalityComparer.Equals(handler(GetLinkStruct(link)), Constants.Break))
+                    {
+                        return Constants.Break;
+                    }
+                }
 
                 return Constants.Continue;
             }
             if (restrictions.Count == 1)
             {
                 var index = restrictions[Constants.IndexPart];
-
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
+                {
                     return Each(handler, ArrayPool<TLink>.Empty);
-
+                }
                 if (!Exists(index))
+                {
                     return Constants.Continue;
-
+                }
                 return handler(GetLinkStruct(index));
             }
             if (restrictions.Count == 2)
             {
                 var index = restrictions[Constants.IndexPart];
                 var value = restrictions[1];
-
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
                 {
-                    if (EqualityComparer.Equals(value, Constants.Any))
+                    if (_equalityComparer.Equals(value, Constants.Any))
+                    {
                         return Each(handler, ArrayPool<TLink>.Empty);
-
-                    if (EqualityComparer.Equals(Each(handler, new[] { index, value, Constants.Any }), Constants.Break))
+                    }
+                    if (_equalityComparer.Equals(Each(handler, new[] { index, value, Constants.Any }), Constants.Break))
+                    {
                         return Constants.Break;
-
+                    }
                     return Each(handler, new[] { index, Constants.Any, value });
                 }
                 else
                 {
                     if (!Exists(index))
+                    {
                         return Constants.Continue;
-
-                    if (EqualityComparer.Equals(value, Constants.Any))
+                    }
+                    if (_equalityComparer.Equals(value, Constants.Any))
+                    {
                         return handler(GetLinkStruct(index));
-
+                    }
                     var storedLinkValue = GetLinkUnsafe(index);
-                    if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
-                        EqualityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
+                        _equalityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    {
                         return handler(GetLinkStruct(index));
+                    }
                     return Constants.Continue;
                 }
             }
@@ -358,47 +385,60 @@ namespace Platform.Data.Core.Doublets
                 var index = restrictions[Constants.IndexPart];
                 var source = restrictions[Constants.SourcePart];
                 var target = restrictions[Constants.TargetPart];
-
-                if (EqualityComparer.Equals(index, Constants.Any))
+                if (_equalityComparer.Equals(index, Constants.Any))
                 {
-                    if (EqualityComparer.Equals(source, Constants.Any) && EqualityComparer.Equals(target, Constants.Any))
+                    if (_equalityComparer.Equals(source, Constants.Any) && _equalityComparer.Equals(target, Constants.Any))
+                    {
                         return Each(handler, ArrayPool<TLink>.Empty);
-                    else if (EqualityComparer.Equals(source, Constants.Any))
+                    }
+                    else if (_equalityComparer.Equals(source, Constants.Any))
+                    {
                         return _targetsTreeMethods.EachReference(target, handler);
-                    else if (EqualityComparer.Equals(target, Constants.Any))
+                    }
+                    else if (_equalityComparer.Equals(target, Constants.Any))
+                    {
                         return _sourcesTreeMethods.EachReference(source, handler);
+                    }
                     else //if(source != Any && target != Any)
                     {
                         var link = _sourcesTreeMethods.Search(source, target);
-
-                        return EqualityComparer.Equals(link, Constants.Null) ? Constants.Continue : handler(GetLinkStruct(link));
+                        return _equalityComparer.Equals(link, Constants.Null) ? Constants.Continue : handler(GetLinkStruct(link));
                     }
                 }
                 else
                 {
                     if (!Exists(index))
-                        return Constants.Continue;
-
-                    if (EqualityComparer.Equals(source, Constants.Any) && EqualityComparer.Equals(target, Constants.Any))
-                        return handler(GetLinkStruct(index));
-
-                    var storedLinkValue = GetLinkUnsafe(index);
-
-                    if (!EqualityComparer.Equals(source, Constants.Any) && !EqualityComparer.Equals(target, Constants.Any))
                     {
-                        if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), source) &&
-                            EqualityComparer.Equals(Link.GetTarget(storedLinkValue), target))
-                            return handler(GetLinkStruct(index));
                         return Constants.Continue;
                     }
-
-                    var value = default(TLink);
-                    if (EqualityComparer.Equals(source, Constants.Any)) value = target;
-                    if (EqualityComparer.Equals(target, Constants.Any)) value = source;
-
-                    if (EqualityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
-                        EqualityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    if (_equalityComparer.Equals(source, Constants.Any) && _equalityComparer.Equals(target, Constants.Any))
+                    {
                         return handler(GetLinkStruct(index));
+                    }
+                    var storedLinkValue = GetLinkUnsafe(index);
+                    if (!_equalityComparer.Equals(source, Constants.Any) && !_equalityComparer.Equals(target, Constants.Any))
+                    {
+                        if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), source) &&
+                            _equalityComparer.Equals(Link.GetTarget(storedLinkValue), target))
+                        {
+                            return handler(GetLinkStruct(index));
+                        }
+                        return Constants.Continue;
+                    }
+                    var value = default(TLink);
+                    if (_equalityComparer.Equals(source, Constants.Any))
+                    {
+                        value = target;
+                    }
+                    if (_equalityComparer.Equals(target, Constants.Any))
+                    {
+                        value = source;
+                    }
+                    if (_equalityComparer.Equals(Link.GetSource(storedLinkValue), value) ||
+                        _equalityComparer.Equals(Link.GetTarget(storedLinkValue), value))
+                    {
+                        return handler(GetLinkStruct(index));
+                    }
                     return Constants.Continue;
                 }
             }
@@ -413,17 +453,25 @@ namespace Platform.Data.Core.Doublets
         {
             var linkIndex = values[Constants.IndexPart];
             var link = GetLinkUnsafe(linkIndex);
-
             // Будет корректно работать только в том случае, если пространство выделенной связи предварительно заполнено нулями
-            if (!EqualityComparer.Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Detach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
-            if (!EqualityComparer.Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Detach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
-
+            if (!_equalityComparer.Equals(Link.GetSource(link), Constants.Null))
+            {
+                _sourcesTreeMethods.Detach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            }
+            if (!_equalityComparer.Equals(Link.GetTarget(link), Constants.Null))
+            {
+                _targetsTreeMethods.Detach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
+            }
             Link.SetSource(link, values[Constants.SourcePart]);
             Link.SetTarget(link, values[Constants.TargetPart]);
-
-            if (!EqualityComparer.Equals(Link.GetSource(link), Constants.Null)) _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
-            if (!EqualityComparer.Equals(Link.GetTarget(link), Constants.Null)) _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
-
+            if (!_equalityComparer.Equals(Link.GetSource(link), Constants.Null))
+            {
+                _sourcesTreeMethods.Attach(LinksHeader.GetFirstAsSourcePointer(_header), linkIndex);
+            }
+            if (!_equalityComparer.Equals(Link.GetTarget(link), Constants.Null))
+            {
+                _targetsTreeMethods.Attach(LinksHeader.GetFirstAsTargetPointer(_header), linkIndex);
+            }
             return linkIndex;
         }
 
@@ -446,41 +494,42 @@ namespace Platform.Data.Core.Doublets
         public TLink Create()
         {
             var freeLink = LinksHeader.GetFirstFreeLink(_header);
-
-            if (!EqualityComparer.Equals(freeLink, Constants.Null))
+            if (!_equalityComparer.Equals(freeLink, Constants.Null))
+            {
                 _unusedLinksListMethods.Detach(freeLink);
+            }
             else
             {
-                if (Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Constants.MaxPossibleIndex) > 0)
+                if (_comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Constants.MaxPossibleIndex) > 0)
+                {
                     throw new LinksLimitReachedException((Integer<TLink>)Constants.MaxPossibleIndex);
-
-                if (Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Decrement(LinksHeader.GetReservedLinks(_header))) >= 0)
+                }
+                if (_comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Decrement(LinksHeader.GetReservedLinks(_header))) >= 0)
                 {
                     _memory.ReservedCapacity += _memoryReservationStep;
                     SetPointers(_memory);
                     LinksHeader.SetReservedLinks(_header, (Integer<TLink>)(_memory.ReservedCapacity / LinkSizeInBytes));
                 }
-
                 LinksHeader.SetAllocatedLinks(_header, Increment(LinksHeader.GetAllocatedLinks(_header)));
                 _memory.UsedCapacity += LinkSizeInBytes;
                 freeLink = LinksHeader.GetAllocatedLinks(_header);
             }
-
             return freeLink;
         }
 
         public void Delete(TLink link)
         {
-            if (Comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) < 0)
+            if (_comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) < 0)
+            {
                 _unusedLinksListMethods.AttachAsFirst(link);
-            else if (EqualityComparer.Equals(link, LinksHeader.GetAllocatedLinks(_header)))
+            }
+            else if (_equalityComparer.Equals(link, LinksHeader.GetAllocatedLinks(_header)))
             {
                 LinksHeader.SetAllocatedLinks(_header, Decrement(LinksHeader.GetAllocatedLinks(_header)));
                 _memory.UsedCapacity -= LinkSizeInBytes;
-
                 // Убираем все связи, находящиеся в списке свободных в конце файла, до тех пор, пока не дойдём до первой существующей связи
                 // Позволяет оптимизировать количество выделенных связей (AllocatedLinks)
-                while ((Comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Integer<TLink>.Zero) > 0) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
+                while ((_comparer.Compare(LinksHeader.GetAllocatedLinks(_header), Integer<TLink>.Zero) > 0) && IsUnusedLink(LinksHeader.GetAllocatedLinks(_header)))
                 {
                     _unusedLinksListMethods.Detach(LinksHeader.GetAllocatedLinks(_header));
 
@@ -502,7 +551,6 @@ namespace Platform.Data.Core.Doublets
             if (memory == null)
             {
                 _header = _links = IntPtr.Zero;
-
                 _unusedLinksListMethods = null;
                 _targetsTreeMethods = null;
                 _unusedLinksListMethods = null;
@@ -510,7 +558,6 @@ namespace Platform.Data.Core.Doublets
             else
             {
                 _header = _links = memory.Pointer;
-
                 _sourcesTreeMethods = new LinksSourcesTreeMethods(this);
                 _targetsTreeMethods = new LinksTargetsTreeMethods(this);
                 _unusedLinksListMethods = new UnusedLinksListMethods(_links, _header);
@@ -520,14 +567,14 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool Exists(TLink link)
         {
-            return (Comparer.Compare(link, Constants.MinPossibleIndex) >= 0) && (Comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) <= 0) && !IsUnusedLink(link);
+            return (_comparer.Compare(link, Constants.MinPossibleIndex) >= 0) && (_comparer.Compare(link, LinksHeader.GetAllocatedLinks(_header)) <= 0) && !IsUnusedLink(link);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool IsUnusedLink(TLink link)
         {
-            return EqualityComparer.Equals(LinksHeader.GetFirstFreeLink(_header), link)
-                   || (EqualityComparer.Equals(Link.GetSizeAsSource(GetLinkUnsafe(link)), Constants.Null) && !EqualityComparer.Equals(Link.GetSource(GetLinkUnsafe(link)), Constants.Null));
+            return _equalityComparer.Equals(LinksHeader.GetFirstFreeLink(_header), link)
+                   || (_equalityComparer.Equals(Link.GetSizeAsSource(GetLinkUnsafe(link)), Constants.Null) && !_equalityComparer.Equals(Link.GetSource(GetLinkUnsafe(link)), Constants.Null));
         }
 
         #region Disposable
@@ -537,7 +584,9 @@ namespace Platform.Data.Core.Doublets
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             if (!wasDisposed)
+            {
                 SetPointers(null);
+            }
             Disposable.TryDispose(_memory);
         }
 

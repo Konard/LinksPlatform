@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Ranges;
 using Platform.Collections.Arrays;
 using Platform.Numbers;
-using Platform.Ranges;
 using Platform.Random;
 using Platform.Helpers.Singletons;
 using Platform.Helpers.Setters;
@@ -27,10 +27,8 @@ namespace Platform.Data.Core.Doublets
             for (long i = 0; i < amountOfCreations; i++)
             {
                 var linksAddressRange = new Range<ulong>(0, (Integer<TLink>)links.Count());
-
                 Integer<TLink> source = RandomHelpers.Default.NextUInt64(linksAddressRange);
                 Integer<TLink> target = RandomHelpers.Default.NextUInt64(linksAddressRange);
-
                 links.CreateAndUpdate(source, target);
             }
         }
@@ -40,10 +38,8 @@ namespace Platform.Data.Core.Doublets
             for (long i = 0; i < amountOfSearches; i++)
             {
                 var linkAddressRange = new Range<ulong>(1, (Integer<TLink>)links.Count());
-
                 Integer<TLink> source = RandomHelpers.Default.NextUInt64(linkAddressRange);
                 Integer<TLink> target = RandomHelpers.Default.NextUInt64(linkAddressRange);
-
                 links.SearchOrDefault(source, target);
             }
         }
@@ -51,14 +47,15 @@ namespace Platform.Data.Core.Doublets
         public static void RunRandomDeletions<TLink>(this ILinks<TLink> links, long amountOfDeletions)
         {
             var min = (ulong)amountOfDeletions > (Integer<TLink>)links.Count() ? 1 : (Integer<TLink>)links.Count() - (ulong)amountOfDeletions;
-
             for (long i = 0; i < amountOfDeletions; i++)
             {
                 var linksAddressRange = new Range<ulong>(min, (Integer<TLink>)links.Count());
                 Integer<TLink> link = RandomHelpers.Default.NextUInt64(linksAddressRange);
                 links.Delete(link);
                 if ((Integer<TLink>)links.Count() < min)
+                {
                     break;
+                }
             }
         }
 
@@ -72,56 +69,64 @@ namespace Platform.Data.Core.Doublets
         {
             var equalityComparer = EqualityComparer<TLink>.Default;
             var comparer = Comparer<TLink>.Default;
-
             for (var i = links.Count(); comparer.Compare(i, default) > 0; i = ArithmeticHelpers.Decrement(i))
             {
                 links.Delete(i);
                 if (!equalityComparer.Equals(links.Count(), ArithmeticHelpers.Decrement(i)))
+                {
                     i = links.Count();
+                }
             }
         }
 
         public static TLink First<TLink>(this ILinks<TLink> links)
         {
             TLink firstLink = default;
-
             var equalityComparer = EqualityComparer<TLink>.Default;
-
             if (equalityComparer.Equals(links.Count(), default))
+            {
                 throw new Exception("В хранилище нет связей.");
-
+            }
             links.Each(links.Constants.Any, links.Constants.Any, link =>
             {
                 firstLink = link[links.Constants.IndexPart];
                 return links.Constants.Break;
             });
-
             if (equalityComparer.Equals(firstLink, default))
+            {
                 throw new Exception("В процессе поиска по хранилищу не было найдено связей.");
-
+            }
             return firstLink;
         }
 
         public static void EnsureEachLinkExists(this ILinks<ulong> links, IList<ulong> sequence)
         {
             if (sequence == null)
+            {
                 return;
-
+            }
             for (var i = 0; i < sequence.Count; i++)
+            {
                 if (!links.Exists(sequence[i]))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
-                                                                        $"sequence[{i}]");
+                {
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], $"sequence[{i}]");
+                }
+            }
         }
 
         public static void EnsureEachLinkIsAnyOrExists(this ILinks<ulong> links, IList<ulong> sequence)
         {
             if (sequence == null)
+            {
                 return;
-
+            }
             for (var i = 0; i < sequence.Count; i++)
+            {
                 if (sequence[i] != Constants.Any && !links.Exists(sequence[i]))
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i],
-                                                                        $"sequence[{i}]");
+                {
+                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], $"sequence[{i}]");
+                }
+            }
         }
 
         public static bool AnyLinkIsAny(this ILinks<ulong> links, params ulong[] sequence)
@@ -145,9 +150,7 @@ namespace Platform.Data.Core.Doublets
         {
             var sb = new StringBuilder();
             var visited = new HashSet<ulong>();
-
             links.AppendStructure(sb, visited, linkIndex, isElement, (innerSb, link) => innerSb.Append(link.Index), renderIndex, renderDebug);
-
             return sb.ToString();
         }
 
@@ -155,71 +158,81 @@ namespace Platform.Data.Core.Doublets
         {
             var sb = new StringBuilder();
             var visited = new HashSet<ulong>();
-
             links.AppendStructure(sb, visited, linkIndex, isElement, appendElement, renderIndex, renderDebug);
-
             return sb.ToString();
         }
 
         public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, HashSet<ulong> visited, ulong linkIndex, Func<UInt64Link, bool> isElement, Action<StringBuilder, UInt64Link> appendElement, bool renderIndex = false, bool renderDebug = false)
         {
             if (sb == null)
+            {
                 throw new ArgumentNullException(nameof(sb));
-
+            }
             if (linkIndex == Constants.Null || linkIndex == Constants.Any || linkIndex == Constants.Itself)
+            {
                 return;
-
+            }
             if (links.Exists(linkIndex))
             {
                 if (visited.Add(linkIndex))
                 {
                     sb.Append('(');
-
                     var link = new UInt64Link(links.GetLink(linkIndex));
-
                     if (renderIndex)
                     {
                         sb.Append(link.Index);
                         sb.Append(':');
                     }
-
                     if (link.Source == link.Index)
+                    {
                         sb.Append(link.Index);
+                    }
                     else
                     {
                         var source = new UInt64Link(links.GetLink(link.Source));
                         if (isElement(source))
+                        {
                             appendElement(sb, source);
+                        }
                         else
+                        {
                             links.AppendStructure(sb, visited, source.Index, isElement, appendElement, renderIndex);
+                        }
                     }
-
                     sb.Append(' ');
-
                     if (link.Target == link.Index)
+                    {
                         sb.Append(link.Index);
+                    }
                     else
                     {
                         var target = new UInt64Link(links.GetLink(link.Target));
                         if (isElement(target))
+                        {
                             appendElement(sb, target);
+                        }
                         else
+                        {
                             links.AppendStructure(sb, visited, target.Index, isElement, appendElement, renderIndex);
+                        }
                     }
-
                     sb.Append(')');
                 }
                 else
                 {
                     if (renderDebug)
+                    {
                         sb.Append('*');
+                    }
                     sb.Append(linkIndex);
                 }
             }
             else
             {
                 if (renderDebug)
+                {
                     sb.Append('~');
+                }
                 sb.Append(linkIndex);
             }
         }
@@ -261,7 +274,6 @@ namespace Platform.Data.Core.Doublets
             return Point<T>.IsFullPoint(links.GetLink(link));
         }
 
-
         /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
         /// <param name="links">Хранилище связей.</param>
         /// <param name="link">Индекс проверяемой связи.</param>
@@ -290,31 +302,30 @@ namespace Platform.Data.Core.Doublets
         public static bool CheckPathExistance<TLink>(this ILinks<TLink> links, params TLink[] path)
         {
             var current = path[0];
-
             //EnsureLinkExists(current, "path");
             if (!links.Exists(current))
+            {
                 return false;
-
+            }
             var equalityComparer = EqualityComparer<TLink>.Default;
-
             for (var i = 1; i < path.Length; i++)
             {
                 var next = path[i];
-
                 var values = links.GetLink(current);
                 var source = values[Constants.SourcePart];
                 var target = values[Constants.TargetPart];
-
                 if (equalityComparer.Equals(source, target) && equalityComparer.Equals(source, next))
+                {
                     //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
                     return false;
+                }
                 if (!equalityComparer.Equals(next, source) && !equalityComparer.Equals(next, target))
+                {
                     //throw new Exception(string.Format("Невозможно продолжить путь через элемент пути {0}", next));
                     return false;
-
+                }
                 current = next;
             }
-
             return true;
         }
 
@@ -324,10 +335,11 @@ namespace Platform.Data.Core.Doublets
         public static TLink GetByKeys<TLink>(this ILinks<TLink> links, TLink root, params int[] path)
         {
             links.EnsureLinkExists(root, "root");
-
             var currentLink = root;
             for (var i = 0; i < path.Length; i++)
+            {
                 currentLink = links.GetLink(currentLink)[path[i]];
+            }
             return currentLink;
         }
 
@@ -335,18 +347,18 @@ namespace Platform.Data.Core.Doublets
         {
             var source = Constants.SourcePart;
             var target = Constants.TargetPart;
-
             if (!MathHelpers.IsPowerOfTwo(size))
+            {
                 throw new ArgumentOutOfRangeException(nameof(size), "Sequences with sizes other than powers of two are not supported.");
-
+            }
             var path = new BitArray(BitConverter.GetBytes(index));
             var length = BitwiseHelpers.GetLowestBitPosition(size);
-
             links.EnsureLinkExists(root, "root");
-
             var currentLink = root;
             for (var i = length - 1; i >= 0; i--)
+            {
                 currentLink = links.GetLink(currentLink)[path[i] ? target : source];
+            }
             return currentLink;
         }
 
@@ -453,16 +465,13 @@ namespace Platform.Data.Core.Doublets
         public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
         {
             var constants = links.Constants;
-
             int listSize = (Integer<TLink>)links.Count(restrictions);
             var list = new IList<TLink>[listSize];
-
             if (listSize > 0)
             {
                 var filler = new ArrayFiller<IList<TLink>, TLink>(list, links.Constants.Continue);
                 links.Each(filler.AddAndReturnConstant, restrictions);
             }
-
             return list;
         }
 
@@ -485,12 +494,17 @@ namespace Platform.Data.Core.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Exists<TLink>(this ILinks<TLink> links, TLink source, TLink target) => Comparer<TLink>.Default.Compare(links.Count(links.Constants.Any, source, target), default) > 0;
 
+        #region Ensure
+        // TODO: May be move to EnsureExtensions or make it both there and here
+
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link)
         {
             if (!links.Exists(link))
+            {
                 throw new ArgumentLinkDoesNotExistsException<TLink>(link);
+            }
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -498,28 +512,36 @@ namespace Platform.Data.Core.Doublets
         public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link, string argumentName)
         {
             if (!links.Exists(link))
+            {
                 throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureInnerReferenceExists<TLink>(this ILinks<TLink> links, TLink reference, string argumentName)
         {
             if (links.IsInnerReference(reference) && !links.Exists(reference))
+            {
                 throw new ArgumentLinkDoesNotExistsException<TLink>(reference, argumentName);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureInnerReferenceExists<TLink>(this ILinks<TLink> links, IList<TLink> restrictions, string argumentName)
         {
             for (int i = 0; i < restrictions.Count; i++)
+            {
                 links.EnsureInnerReferenceExists(restrictions[i], argumentName);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureLinkIsAnyOrExists<TLink>(this ILinks<TLink> links, IList<TLink> restrictions)
         {
             for (int i = 0; i < restrictions.Count; i++)
+            {
                 links.EnsureLinkIsAnyOrExists(restrictions[i], nameof(restrictions));
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -527,7 +549,9 @@ namespace Platform.Data.Core.Doublets
         {
             var equalityComparer = EqualityComparer<TLink>.Default;
             if (!equalityComparer.Equals(link, links.Constants.Any) && !links.Exists(link))
+            {
                 throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -535,7 +559,9 @@ namespace Platform.Data.Core.Doublets
         {
             var equalityComparer = EqualityComparer<TLink>.Default;
             if (!equalityComparer.Equals(link, links.Constants.Itself) && !links.Exists(link))
+            {
                 throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
+            }
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -543,41 +569,44 @@ namespace Platform.Data.Core.Doublets
         public static void EnsureDoesNotExists<TLink>(this ILinks<TLink> links, TLink source, TLink target)
         {
             if (links.Exists(source, target))
+            {
                 throw new LinkWithSameValueAlreadyExistsException();
+            }
         }
+
+        /// <param name="links">Хранилище связей.</param>
+        public static void EnsureNoDependencies<TLink>(this ILinks<TLink> links, TLink link)
+        {
+            if (links.DependenciesExist(link))
+            {
+                throw new ArgumentLinkHasDependenciesException<TLink>(link);
+            }
+        }
+
+        #endregion
 
         /// <param name="links">Хранилище связей.</param>
         public static ulong DependenciesCount<TLink>(this ILinks<TLink> links, TLink link)
         {
             var constants = links.Constants;
-
             var values = links.GetLink(link);
-
             ulong referencesAsSource = (Integer<TLink>)links.Count(constants.Any, link, constants.Any);
-
             var equalityComparer = EqualityComparer<TLink>.Default;
-
             if (equalityComparer.Equals(values[Constants.SourcePart], link))
+            {
                 referencesAsSource--;
-
+            }
             ulong referencesAsTarget = (Integer<TLink>)links.Count(constants.Any, constants.Any, link);
-
             if (equalityComparer.Equals(values[Constants.TargetPart], link))
+            {
                 referencesAsTarget--;
-
+            }
             return referencesAsSource + referencesAsTarget;
         }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool DependenciesExist<TLink>(this ILinks<TLink> links, TLink link) => links.DependenciesCount(link) > 0;
-
-        /// <param name="links">Хранилище связей.</param>
-        public static void EnsureNoDependencies<TLink>(this ILinks<TLink> links, TLink link)
-        {
-            if (links.DependenciesExist(link))
-                throw new ArgumentLinkHasDependenciesException<TLink>(link);
-        }
 
         /// <param name="links">Хранилище связей.</param>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -639,11 +668,17 @@ namespace Platform.Data.Core.Doublets
         public static TLink Update<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
         {
             if (restrictions.Length == 2)
+            {
                 return links.Merge(restrictions[0], restrictions[1]);
+            }
             if (restrictions.Length == 4)
+            {
                 return links.UpdateOrCreateOrGet(restrictions[0], restrictions[1], restrictions[2], restrictions[3]);
+            }
             else
+            {
                 return links.Update(restrictions);
+            }
         }
 
         /// <param name="links">Хранилище связей.</param>
@@ -656,27 +691,25 @@ namespace Platform.Data.Core.Doublets
         public static void EnsureCreated<TLink>(this ILinks<TLink> links, Func<TLink> creator, params TLink[] addresses)
         {
             var constants = links.Constants;
-
             var nonExistentAddresses = new HashSet<ulong>(addresses.Where(x => !links.Exists(x)).Select(x => (ulong)(Integer<TLink>)x));
             if (nonExistentAddresses.Count > 0)
             {
                 var max = nonExistentAddresses.Max();
-
                 // TODO: Эту верхнюю границу нужно разрешить переопределять (проверить применяется ли эта логика)
                 max = Math.Min(max, (Integer<TLink>)constants.MaxPossibleIndex);
-
                 var createdLinks = new List<TLink>();
-
                 var equalityComparer = EqualityComparer<TLink>.Default;
-
                 TLink createdLink;
                 while (!equalityComparer.Equals(createdLink = creator(), (TLink)(Integer<TLink>)max))
+                {
                     createdLinks.Add(createdLink);
-
+                }
                 for (var i = 0; i < createdLinks.Count; i++)
                 {
                     if (!nonExistentAddresses.Contains((Integer<TLink>)createdLinks[i]))
+                    {
                         links.Delete(createdLinks[i]);
+                    }
                 }
             }
         }
@@ -693,7 +726,9 @@ namespace Platform.Data.Core.Doublets
         {
             var link = links.SearchOrDefault(source, target);
             if (EqualityComparer<TLink>.Default.Equals(link, default))
+            {
                 link = links.CreateAndUpdate(source, target);
+            }
             return link;
         }
 
@@ -713,9 +748,13 @@ namespace Platform.Data.Core.Doublets
             var equalityComparer = EqualityComparer<TLink>.Default;
             var link = links.SearchOrDefault(source, target);
             if (equalityComparer.Equals(link, default))
+            {
                 return links.CreateAndUpdate(newSource, newTarget);
+            }
             if (equalityComparer.Equals(newSource, source) && equalityComparer.Equals(newTarget, target))
+            {
                 return link;
+            }
             return links.Update(link, newSource, newTarget);
         }
 
@@ -742,7 +781,9 @@ namespace Platform.Data.Core.Doublets
         public static void DeleteMany<TLink>(this ILinks<TLink> links, IList<TLink> deletedLinks)
         {
             for (int i = 0; i < deletedLinks.Count; i++)
+            {
                 links.Delete(deletedLinks[i]);
+            }
         }
 
         // Replace one link with another (replaced link is deleted, children are updated or deleted)
@@ -750,12 +791,12 @@ namespace Platform.Data.Core.Doublets
         {
             var equalityComparer = EqualityComparer<TLink>.Default;
             if (equalityComparer.Equals(linkIndex, newLink))
+            {
                 return newLink;
-
+            }
             var constants = links.Constants;
             ulong referencesAsSourceCount = (Integer<TLink>)links.Count(constants.Any, linkIndex, constants.Any);
             ulong referencesAsTargetCount = (Integer<TLink>)links.Count(constants.Any, constants.Any, linkIndex);
-
             var isStandalonePoint = Point<TLink>.IsFullPoint(links.GetLink(linkIndex)) && referencesAsSourceCount == 1 && referencesAsTargetCount == 1;
             if (!isStandalonePoint)
             {
@@ -764,28 +805,32 @@ namespace Platform.Data.Core.Doublets
                 {
                     var references = ArrayPool.Allocate<TLink>((long)totalReferences);
                     var referencesFiller = new ArrayFiller<TLink, TLink>(references, links.Constants.Continue);
-
                     links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, linkIndex, constants.Any);
                     links.Each(referencesFiller.AddFirstAndReturnConstant, constants.Any, constants.Any, linkIndex);
-
                     for (ulong i = 0; i < referencesAsSourceCount; i++)
                     {
                         var reference = references[i];
-                        if (equalityComparer.Equals(reference, linkIndex)) continue;
+                        if (equalityComparer.Equals(reference, linkIndex))
+                        {
+                            continue;
+                        }
+
                         links.Update(reference, newLink, links.GetTarget(reference));
                     }
                     for (var i = (long)referencesAsSourceCount; i < references.Length; i++)
                     {
                         var reference = references[i];
-                        if (equalityComparer.Equals(reference, linkIndex)) continue;
+                        if (equalityComparer.Equals(reference, linkIndex))
+                        {
+                            continue;
+                        }
+
                         links.Update(reference, links.GetSource(reference), newLink);
                     }
                     ArrayPool.Free(references);
                 }
             }
-
             links.Delete(linkIndex);
-
             return newLink;
         }
     }

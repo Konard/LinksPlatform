@@ -55,7 +55,9 @@ namespace Platform.Tests.Data.Core
 
                             var resultLink = links.CreateAndUpdate(source, target);
                             if (resultLink > linksCount)
+                            {
                                 created++;
+                            }
                         }
                         else
                         {
@@ -612,7 +614,9 @@ namespace Platform.Tests.Data.Core
 
                 // Тестируем саму функцию
                 for (ulong i = 0; i < Iterations; i++)
+                {
                     counter += links.GetSource(firstLink);
+                }
 
                 var elapsedTime = sw.Elapsed;
 
@@ -677,7 +681,9 @@ namespace Platform.Tests.Data.Core
                 var sw = Stopwatch.StartNew();
 
                 for (ulong i = 0; i < Iterations; i++)
+                {
                     counter += links.GetTarget(firstLink);
+                }
 
                 var elapsedTime = sw.Elapsed;
 

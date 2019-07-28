@@ -5,7 +5,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class Stack<TLink> : IStack<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private readonly ILinks<TLink> _links;
         private readonly TLink _stack;
@@ -18,16 +18,16 @@ namespace Platform.Data.Core.Doublets
 
         private TLink GetStackMarker() => _links.GetSource(_stack);
 
-        private TLink GetTopDoublet() => _links.GetTarget(_stack);
+        private TLink GetTop() => _links.GetTarget(_stack);
 
-        public TLink Peek() => _links.GetTarget(GetTopDoublet());
+        public TLink Peek() => _links.GetTarget(GetTop());
 
         public TLink Pop()
         {
             var element = Peek();
-            if (!EqualityComparer.Equals(element, _stack))
+            if (!_equalityComparer.Equals(element, _stack))
             {
-                var top = GetTopDoublet();
+                var top = GetTop();
                 var previousTop = _links.GetSource(top);
                 _links.Update(_stack, GetStackMarker(), previousTop);
                 _links.Delete(top);
@@ -35,6 +35,6 @@ namespace Platform.Data.Core.Doublets
             return element;
         }
 
-        public void Push(TLink element) => _links.Update(_stack, GetStackMarker(), _links.GetOrCreate(GetTopDoublet(), element));
+        public void Push(TLink element) => _links.Update(_stack, GetStackMarker(), _links.GetOrCreate(GetTop(), element));
     }
 }

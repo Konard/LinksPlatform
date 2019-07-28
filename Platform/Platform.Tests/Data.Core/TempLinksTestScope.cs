@@ -26,7 +26,9 @@ namespace Platform.Tests.Data.Core
 
             Links = new SynchronizedLinks<ulong>(new UInt64Links(MemoryAdapter));
             if (useSequences)
+            {
                 Sequences = new Sequences(Links, sequencesOptions);
+            }
         }
 
         protected override void DisposeCore(bool manual, bool wasDisposed)
@@ -34,7 +36,9 @@ namespace Platform.Tests.Data.Core
             Disposable.TryDispose(Links.Unsync);
 
             if (!wasDisposed && _deleteFiles)
+            {
                 DeleteFiles();
+            }
         }
 
         public void DeleteFiles()

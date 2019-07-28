@@ -27,34 +27,40 @@ namespace Platform.Data.Core.Sequences
         {
             var stack = new Stack<TLink>();
             var element = sequence;
-
             if (isElement(element))
+            {
                 visit(element);
+            }
             else
+            {
                 while (true)
                 {
                     if (isElement(element))
                     {
                         if (stack.Count == 0)
+                        {
                             break;
-
+                        }
                         element = stack.Pop();
-
                         var source = getSource(element);
                         var target = getTarget(element);
-
-                        if (isElement(source)) visit(source);
-                        if (isElement(target)) visit(target);
-
+                        if (isElement(source))
+                        {
+                            visit(source);
+                        }
+                        if (isElement(target))
+                        {
+                            visit(target);
+                        }
                         element = target;
                     }
                     else
                     {
                         stack.Push(element);
-
                         element = getSource(element);
                     }
                 }
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -62,34 +68,40 @@ namespace Platform.Data.Core.Sequences
         {
             var stack = new Stack<TLink>();
             var element = sequence;
-
             if (isElement(element))
+            {
                 visit(element);
+            }
             else
+            {
                 while (true)
                 {
                     if (isElement(element))
                     {
                         if (stack.Count == 0)
+                        {
                             break;
-
+                        }
                         element = stack.Pop();
-
                         var source = getSource(element);
                         var target = getTarget(element);
-
-                        if (isElement(target)) visit(target);
-                        if (isElement(source)) visit(source);
-
+                        if (isElement(target))
+                        {
+                            visit(target);
+                        }
+                        if (isElement(source))
+                        {
+                            visit(source);
+                        }
                         element = source;
                     }
                     else
                     {
                         stack.Push(element);
-
                         element = getTarget(element);
                     }
                 }
+            }
         }
     }
 }

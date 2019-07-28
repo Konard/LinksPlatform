@@ -33,19 +33,25 @@ namespace Platform.Tests
             var ts1 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = Equals1(x, y);
+                }
             });
 
             var ts2 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = Equals2(x, y);
+                }
             });
 
             var ts3 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = Equals3(x, y);
+                }
             });
 
             var equalityComparer1 = EqualityComparer<ulong>.Default;
@@ -53,7 +59,9 @@ namespace Platform.Tests
             var ts4 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = equalityComparer1.Equals(x, y);
+                }
             });
 
             var equalityComparer2 = new UInt64EqualityComparer();
@@ -61,7 +69,9 @@ namespace Platform.Tests
             var ts5 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = equalityComparer2.Equals(x, y);
+                }
             });
 
             Func<ulong, ulong, bool> equalityComparer3 = equalityComparer2.Equals;
@@ -69,7 +79,9 @@ namespace Platform.Tests
             var ts6 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = equalityComparer3(x, y);
+                }
             });
 
             var comparer = Comparer<ulong>.Default;
@@ -77,7 +89,9 @@ namespace Platform.Tests
             var ts7 = PerformanceHelpers.Measure(() =>
             {
                 for (int i = 0; i < N; i++)
+                {
                     result = comparer.Compare(x, y) == 0;
+                }
             });
 
             Assert.True(ts2 < ts1);

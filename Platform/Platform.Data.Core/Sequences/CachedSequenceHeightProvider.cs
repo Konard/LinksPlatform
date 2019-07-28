@@ -6,7 +6,7 @@ namespace Platform.Data.Core.Sequences
 {
     public class CachedSequenceHeightProvider<TLink> : LinksOperatorBase<TLink>, ISequenceHeightProvider<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private readonly TLink _heightPropertyMarker;
         private readonly ISequenceHeightProvider<TLink> _baseHeightProvider;
@@ -34,14 +34,16 @@ namespace Platform.Data.Core.Sequences
         {
             TLink height;
             var heightValue = _propertyOperator.GetValue(sequence, _heightPropertyMarker);
-            if (EqualityComparer.Equals(heightValue, default))
+            if (_equalityComparer.Equals(heightValue, default))
             {
                 height = _baseHeightProvider.Get(sequence);
                 heightValue = _addressToUnaryNumberConverter.Convert(height);
                 _propertyOperator.SetValue(sequence, _heightPropertyMarker, heightValue);
             }
             else
+            {
                 height = _unaryNumberToAddressConverter.Convert(heightValue);
+            }
             return height;
         }
     }

@@ -14,8 +14,9 @@ namespace Platform.Data.Core.Sequences.Frequencies.Counters
         public override TLink Count()
         {
             if (!_markedSequenceMatcher.IsMatched(_sequenceLink))
+            {
                 return default;
-
+            }
             return base.Count();
         }
     }

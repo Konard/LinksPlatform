@@ -10,7 +10,10 @@ namespace Platform.Data.Core.Triplets
         {
             var i = links.Count - 1;
             var element = links[i];
-            while (--i >= 0) element = links[i] & element;
+            while (--i >= 0)
+            {
+                element = links[i] & element;
+            }
             return element;
         }
 
@@ -18,7 +21,10 @@ namespace Platform.Data.Core.Triplets
         {
             var i = links.Length - 1;
             var element = links[i];
-            while (--i >= 0) element = links[i] & element;
+            while (--i >= 0)
+            {
+                element = links[i] & element;
+            }
             return element;
         }
 
@@ -66,35 +72,35 @@ namespace Platform.Data.Core.Triplets
         public static Link FromObjectsToSequence<T>(T[] objects, int takeFrom, int takeUntil, Func<T, Link> converter)
         {
             var length = takeUntil - takeFrom;
-
             if (length <= 0)
+            {
                 throw new ArgumentOutOfRangeException(nameof(takeUntil), "Нельзя преобразовать пустой список к связям.");
-
+            }
             var copy = new Link[length];
-
             for (int i = takeFrom, j = 0; i < takeUntil; i++, j++)
+            {
                 copy[j] = converter(objects[i]);
-
+            }
             return FromList(copy);
         }
 
         public static Link FromChars(string str)
         {
             var copy = new Link[str.Length];
-
             for (var i = 0; i < copy.Length; i++)
+            {
                 copy[i] = FromChar(str[i]);
-
+            }
             return FromList(copy);
         }
 
         public static Link FromString(string str)
         {
             var copy = new Link[str.Length];
-
             for (var i = 0; i < copy.Length; i++)
+            {
                 copy[i] = FromChar(str[i]);
-
+            }
             var strLink = Link.Create(Net.String, Net.ThatConsistsOf, FromList(copy));
             return strLink;
         }
@@ -102,8 +108,9 @@ namespace Platform.Data.Core.Triplets
         public static string ToString(Link link)
         {
             if (link.IsString())
+            {
                 return ToString(ToList(link.Target));
-
+            }
             throw new ArgumentOutOfRangeException(nameof(link), "Specified link is not a string.");
         }
 
@@ -111,8 +118,9 @@ namespace Platform.Data.Core.Triplets
         {
             var chars = new char[charLinks.Count];
             for (var i = 0; i < charLinks.Count; i++)
+            {
                 chars[i] = ToChar(charLinks[i]);
-
+            }
             return new string(chars);
         }
     }

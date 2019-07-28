@@ -47,7 +47,7 @@ namespace Platform.Data.Core.Sequences
     /// </remarks>
     public partial class Sequences : ISequences<ulong> // IList<string>, IList<ulong[]> (после завершения реализации Sequences)
     {
-        private static readonly LinksConstants<bool, ulong, long> Constants = Default<LinksConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksConstants<bool, ulong, long> _constants = Default<LinksConstants<bool, ulong, long>>.Instance;
 
         /// <summary>Возвращает значение ulong, обозначающее любое количество связей.</summary>
         public const ulong ZeroOrMany = ulong.MaxValue;
@@ -76,8 +76,9 @@ namespace Platform.Data.Core.Sequences
             return Sync.ExecuteReadOperation(() =>
             {
                 if (Options.UseSequenceMarker)
+                {
                     return Options.MarkedSequenceMatcher.IsMatched(sequence);
-
+                }
                 return !Links.Unsync.IsPartialPoint(sequence);
             });
         }
@@ -86,8 +87,9 @@ namespace Platform.Data.Core.Sequences
         private ulong GetSequenceByElements(ulong sequence)
         {
             if (Options.UseSequenceMarker)
+            {
                 return Links.SearchOrDefault(Options.SequenceMarkerLink, sequence);
-
+            }
             return sequence;
         }
 
@@ -96,13 +98,15 @@ namespace Platform.Data.Core.Sequences
             if (Options.UseSequenceMarker)
             {
                 var linkContents = new UInt64Link(Links.GetLink(sequence));
-
                 if (linkContents.Source == Options.SequenceMarkerLink)
+                {
                     return linkContents.Target;
+                }
                 if (linkContents.Target == Options.SequenceMarkerLink)
+                {
                     return linkContents.Source;
+                }
             }
-
             return sequence;
         }
 
@@ -111,47 +115,52 @@ namespace Platform.Data.Core.Sequences
         public ulong Count(params ulong[] sequence)
         {
             if (sequence.Length == 0)
-                return Links.Count(Constants.Any, Options.SequenceMarkerLink, Constants.Any);
-
+            {
+                return Links.Count(_constants.Any, Options.SequenceMarkerLink, _constants.Any);
+            }
             if (sequence.Length == 1) // Первая связь это адрес
             {
-                if (sequence[0] == Constants.Null)
+                if (sequence[0] == _constants.Null)
+                {
                     return 0;
-
-                if (sequence[0] == Constants.Any)
+                }
+                if (sequence[0] == _constants.Any)
+                {
                     return Count();
-
+                }
                 if (Options.UseSequenceMarker)
-                    return Links.Count(Constants.Any, Options.SequenceMarkerLink, sequence[0]);
-
+                {
+                    return Links.Count(_constants.Any, Options.SequenceMarkerLink, sequence[0]);
+                }
                 return Links.Exists(sequence[0]) ? 1UL : 0;
             }
-
             throw new NotImplementedException();
         }
 
         private ulong CountReferences(params ulong[] restrictions)
         {
             if (restrictions.Length == 0)
+            {
                 return 0;
-
+            }
             if (restrictions.Length == 1) // Первая связь это адрес
             {
-                if (restrictions[0] == Constants.Null)
+                if (restrictions[0] == _constants.Null)
+                {
                     return 0;
-
+                }
                 if (Options.UseSequenceMarker)
                 {
                     var elementsLink = GetSequenceElements(restrictions[0]);
                     var sequenceLink = GetSequenceByElements(elementsLink);
-                    if (sequenceLink != Constants.Null)
+                    if (sequenceLink != _constants.Null)
+                    {
                         return Links.Count(sequenceLink) + Links.Count(elementsLink) - 1;
+                    }
                     return Links.Count(elementsLink);
                 }
-
                 return Links.Count(restrictions[0]);
             }
-
             throw new NotImplementedException();
         }
 
@@ -164,10 +173,10 @@ namespace Platform.Data.Core.Sequences
             return Sync.ExecuteWriteOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
-                    return Constants.Null;
-
+                {
+                    return _constants.Null;
+                }
                 Links.EnsureEachLinkExists(sequence);
-
                 return CreateCore(sequence);
             });
         }
@@ -175,29 +184,32 @@ namespace Platform.Data.Core.Sequences
         private ulong CreateCore(params ulong[] sequence)
         {
             if (Options.UseIndex)
+            {
                 Options.Indexer.Index(sequence);
-
+            }
             var sequenceRoot = default(ulong);
-
             if (Options.EnforceSingleSequenceVersionOnWriteBasedOnExisting)
             {
                 var matches = Each(sequence);
                 if (matches.Count > 0)
+                {
                     sequenceRoot = matches[0];
+                }
             }
             else if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew)
+            {
                 return CompactCore(sequence);
-
+            }
             if (sequenceRoot == default)
+            {
                 sequenceRoot = Options.LinksToSequenceConverter.Convert(sequence);
-
+            }
             if (Options.UseSequenceMarker)
+            {
                 Links.Unsync.CreateAndUpdate(Options.SequenceMarkerLink, sequenceRoot);
-
+            }
             return sequenceRoot; // Возвращаем корень последовательности (т.е. сами элементы)
         }
-
-
 
         #endregion
 
@@ -215,25 +227,27 @@ namespace Platform.Data.Core.Sequences
             return Sync.ExecuteReadOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
+                {
                     return true;
-
+                }
                 Links.EnsureEachLinkIsAnyOrExists(sequence);
-
                 if (sequence.Count == 1)
                 {
                     var link = sequence[0];
-
-                    if (link == Constants.Any)
-                        return Links.Unsync.Each(Constants.Any, Constants.Any, handler);
-
+                    if (link == _constants.Any)
+                    {
+                        return Links.Unsync.Each(_constants.Any, _constants.Any, handler);
+                    }
                     return handler(link);
                 }
                 if (sequence.Count == 2)
+                {
                     return Links.Unsync.Each(sequence[0], sequence[1], handler);
-
+                }
                 if (Options.UseIndex && !Options.Indexer.CheckIndex(sequence))
+                {
                     return false;
-
+                }
                 return EachCore(handler, sequence);
             });
         }
@@ -241,45 +255,48 @@ namespace Platform.Data.Core.Sequences
         private bool EachCore(Func<ulong, bool> handler, IList<ulong> sequence)
         {
             var matcher = new Matcher(this, sequence, new HashSet<LinkIndex>(), handler);
-
             // TODO: Find out why matcher.HandleFullMatched executed twice for the same sequence Id.
-
             Func<ulong, bool> innerHandler = Options.UseSequenceMarker ? (Func<ulong, bool>)matcher.HandleFullMatchedSequence : matcher.HandleFullMatched;
-
             //if (sequence.Length >= 2)
             if (!StepRight(innerHandler, sequence[0], sequence[1]))
+            {
                 return false;
-
+            }
             var last = sequence.Count - 2;
             for (var i = 1; i < last; i++)
+            {
                 if (!PartialStepRight(innerHandler, sequence[i], sequence[i + 1]))
+                {
                     return false;
-
+                }
+            }
             if (sequence.Count >= 3)
+            {
                 if (!StepLeft(innerHandler, sequence[sequence.Count - 2], sequence[sequence.Count - 1]))
+                {
                     return false;
-
+                }
+            }
             return true;
         }
 
         private bool PartialStepRight(Func<ulong, bool> handler, ulong left, ulong right)
         {
-            return Links.Unsync.Each(Constants.Any, left, doublet =>
+            return Links.Unsync.Each(_constants.Any, left, doublet =>
             {
                 if (!StepRight(handler, doublet, right))
+                {
                     return false;
-
+                }
                 if (left != doublet)
+                {
                     return PartialStepRight(handler, doublet, right);
-
+                }
                 return true;
             });
         }
 
-        private bool StepRight(Func<ulong, bool> handler, ulong left, ulong right)
-        {
-            return Links.Unsync.Each(left, Constants.Any, rightStep => TryStepRightUp(handler, right, rightStep));
-        }
+        private bool StepRight(Func<ulong, bool> handler, ulong left, ulong right) => Links.Unsync.Each(left, _constants.Any, rightStep => TryStepRightUp(handler, right, rightStep));
 
         private bool TryStepRightUp(Func<ulong, bool> handler, ulong right, ulong stepFrom)
         {
@@ -290,17 +307,14 @@ namespace Platform.Data.Core.Sequences
                 upStep = firstSource;
                 firstSource = Links.Unsync.GetSource(upStep);
             }
-
             if (firstSource == right)
+            {
                 return handler(stepFrom);
-
+            }
             return true;
         }
 
-        private bool StepLeft(Func<ulong, bool> handler, ulong left, ulong right)
-        {
-            return Links.Unsync.Each(Constants.Any, right, leftStep => TryStepLeftUp(handler, left, leftStep));
-        }
+        private bool StepLeft(Func<ulong, bool> handler, ulong left, ulong right) => Links.Unsync.Each(_constants.Any, right, leftStep => TryStepLeftUp(handler, left, leftStep));
 
         private bool TryStepLeftUp(Func<ulong, bool> handler, ulong left, ulong stepFrom)
         {
@@ -311,10 +325,10 @@ namespace Platform.Data.Core.Sequences
                 upStep = firstTarget;
                 firstTarget = Links.Unsync.GetTarget(upStep);
             }
-
             if (firstTarget == left)
+            {
                 return handler(stepFrom);
-
+            }
             return true;
         }
 
@@ -325,22 +339,22 @@ namespace Platform.Data.Core.Sequences
         public ulong Update(ulong[] sequence, ulong[] newSequence)
         {
             if (sequence.IsNullOrEmpty() && newSequence.IsNullOrEmpty())
-                return Constants.Null;
-
+            {
+                return _constants.Null;
+            }
             if (sequence.IsNullOrEmpty())
+            {
                 return Create(newSequence);
-
+            }
             if (newSequence.IsNullOrEmpty())
             {
                 Delete(sequence);
-                return Constants.Null;
+                return _constants.Null;
             }
-
             return Sync.ExecuteWriteOperation(() =>
             {
                 Links.EnsureEachLinkIsAnyOrExists(sequence);
                 Links.EnsureEachLinkExists(newSequence);
-
                 return UpdateCore(sequence, newSequence);
             });
         }
@@ -349,17 +363,23 @@ namespace Platform.Data.Core.Sequences
         {
             ulong bestVariant;
             if (Options.EnforceSingleSequenceVersionOnWriteBasedOnNew && !sequence.EqualTo(newSequence))
+            {
                 bestVariant = CompactCore(newSequence);
+            }
             else
+            {
                 bestVariant = CreateCore(newSequence);
-
+            }
             // TODO: Check all options only ones before loop execution
             // Возможно нужно две версии Each, возвращающий фактические последовательности и с маркером,
             // или возможно даже возвращать и тот и тот вариант. С другой стороны все варианты можно получить имея только фактические последовательности.
             foreach (var variant in Each(sequence))
+            {
                 if (variant != bestVariant)
+                {
                     UpdateOneCore(variant, bestVariant);
-
+                }
+            }
             return bestVariant;
         }
 
@@ -370,17 +390,16 @@ namespace Platform.Data.Core.Sequences
                 var sequenceElements = GetSequenceElements(sequence);
                 var sequenceElementsContents = new UInt64Link(Links.GetLink(sequenceElements));
                 var sequenceLink = GetSequenceByElements(sequenceElements);
-
                 var newSequenceElements = GetSequenceElements(newSequence);
                 var newSequenceLink = GetSequenceByElements(newSequenceElements);
-
                 if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
                 {
-                    if (sequenceLink != Constants.Null)
+                    if (sequenceLink != _constants.Null)
+                    {
                         Links.Unsync.Merge(sequenceLink, newSequenceLink);
+                    }
                     Links.Unsync.Merge(sequenceElements, newSequenceElements);
                 }
-
                 ClearGarbage(sequenceElementsContents.Source);
                 ClearGarbage(sequenceElementsContents.Target);
             }
@@ -390,21 +409,23 @@ namespace Platform.Data.Core.Sequences
                 {
                     var sequenceElements = GetSequenceElements(sequence);
                     var sequenceLink = GetSequenceByElements(sequenceElements);
-
                     var newSequenceElements = GetSequenceElements(newSequence);
                     var newSequenceLink = GetSequenceByElements(newSequenceElements);
-
                     if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
                     {
-                        if (sequenceLink != Constants.Null)
+                        if (sequenceLink != _constants.Null)
+                        {
                             Links.Unsync.Merge(sequenceLink, newSequenceLink);
+                        }
                         Links.Unsync.Merge(sequenceElements, newSequenceElements);
                     }
                 }
                 else
                 {
                     if (Options.UseCascadeUpdate || CountReferences(sequence) == 0)
+                    {
                         Links.Unsync.Merge(sequence, newSequence);
+                    }
                 }
             }
         }
@@ -419,7 +440,9 @@ namespace Platform.Data.Core.Sequences
             {
                 // TODO: Check all options only ones before loop execution
                 foreach (var linkToDelete in Each(sequence))
+                {
                     DeleteOneCore(linkToDelete);
+                }
             });
         }
 
@@ -430,14 +453,14 @@ namespace Platform.Data.Core.Sequences
                 var sequenceElements = GetSequenceElements(link);
                 var sequenceElementsContents = new UInt64Link(Links.GetLink(sequenceElements));
                 var sequenceLink = GetSequenceByElements(sequenceElements);
-
                 if (Options.UseCascadeDelete || CountReferences(link) == 0)
                 {
-                    if (sequenceLink != Constants.Null)
+                    if (sequenceLink != _constants.Null)
+                    {
                         Links.Unsync.Delete(sequenceLink);
+                    }
                     Links.Unsync.Delete(link);
                 }
-
                 ClearGarbage(sequenceElementsContents.Source);
                 ClearGarbage(sequenceElementsContents.Target);
             }
@@ -447,18 +470,21 @@ namespace Platform.Data.Core.Sequences
                 {
                     var sequenceElements = GetSequenceElements(link);
                     var sequenceLink = GetSequenceByElements(sequenceElements);
-
                     if (Options.UseCascadeDelete || CountReferences(link) == 0)
                     {
-                        if (sequenceLink != Constants.Null)
+                        if (sequenceLink != _constants.Null)
+                        {
                             Links.Unsync.Delete(sequenceLink);
+                        }
                         Links.Unsync.Delete(link);
                     }
                 }
                 else
                 {
                     if (Options.UseCascadeDelete || CountReferences(link) == 0)
+                    {
                         Links.Unsync.Delete(link);
+                    }
                 }
             }
         }
@@ -479,19 +505,16 @@ namespace Platform.Data.Core.Sequences
             return Sync.ExecuteWriteOperation(() =>
             {
                 if (sequence.IsNullOrEmpty())
-                    return Constants.Null;
-
+                {
+                    return _constants.Null;
+                }
                 Links.EnsureEachLinkExists(sequence);
-
                 return CompactCore(sequence);
             });
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private ulong CompactCore(params ulong[] sequence)
-        {
-            return UpdateCore(sequence, sequence);
-        }
+        private ulong CompactCore(params ulong[] sequence) => UpdateCore(sequence, sequence);
 
         #endregion
 
@@ -501,12 +524,7 @@ namespace Platform.Data.Core.Sequences
         /// TODO: Добавить дополнительный обработчик / событие CanBeDeleted которое можно определить извне или в унаследованном классе
         /// </remarks>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private bool IsGarbage(ulong link)
-        {
-            return link != Options.SequenceMarkerLink
-                && !Links.Unsync.IsPartialPoint(link)
-                && Links.Count(link) == 0;
-        }
+        private bool IsGarbage(ulong link) => link != Options.SequenceMarkerLink && !Links.Unsync.IsPartialPoint(link) && Links.Count(link) == 0;
 
         private void ClearGarbage(ulong link)
         {
@@ -530,8 +548,12 @@ namespace Platform.Data.Core.Sequences
                 var links = Links.Unsync;
                 var walker = new RightSequenceWalker<ulong>(links);
                 foreach (var part in walker.Walk(sequence))
+                {
                     if (!handler(links.GetIndex(part)))
+                    {
                         return false;
+                    }
+                }
                 return true;
             });
         }
@@ -551,7 +573,7 @@ namespace Platform.Data.Core.Sequences
             {
                 _sequences = sequences;
                 _patternSequence = patternSequence;
-                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != Constants.Any && x != ZeroOrMany));
+                _linksInSequence = new HashSet<LinkIndex>(patternSequence.Where(x => x != _constants.Any && x != ZeroOrMany));
                 _results = results;
                 _stopableHandler = stopableHandler;
                 _readAsElements = readAsElements;
@@ -562,11 +584,13 @@ namespace Platform.Data.Core.Sequences
             public bool FullMatch(LinkIndex sequenceToMatch)
             {
                 _filterPosition = 0;
-
                 foreach (var part in Walk(sequenceToMatch))
+                {
                     if (!FullMatchCore(Links.GetIndex(part)))
+                    {
                         break;
-
+                    }
+                }
                 return _filterPosition == _patternSequence.Count;
             }
 
@@ -577,14 +601,12 @@ namespace Platform.Data.Core.Sequences
                     _filterPosition = -2; // Длиннее чем нужно
                     return false;
                 }
-
-                if (_patternSequence[_filterPosition] != Constants.Any &&
-                    element != _patternSequence[_filterPosition])
+                if (_patternSequence[_filterPosition] != _constants.Any
+                 && element != _patternSequence[_filterPosition])
                 {
                     _filterPosition = -1;
                     return false; // Начинается/Продолжается иначе
                 }
-
                 _filterPosition++;
                 return true;
             }
@@ -592,21 +614,27 @@ namespace Platform.Data.Core.Sequences
             public void AddFullMatchedToResults(ulong sequenceToMatch)
             {
                 if (FullMatch(sequenceToMatch))
+                {
                     _results.Add(sequenceToMatch);
+                }
             }
 
             public bool HandleFullMatched(ulong sequenceToMatch)
             {
                 if (FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
+                {
                     return _stopableHandler(sequenceToMatch);
+                }
                 return true;
             }
 
             public bool HandleFullMatchedSequence(ulong sequenceToMatch)
             {
                 var sequence = _sequences.GetSequenceByElements(sequenceToMatch);
-                if (sequence != Constants.Null && FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
+                if (sequence != _constants.Null && FullMatch(sequenceToMatch) && _results.Add(sequenceToMatch))
+                {
                     return _stopableHandler(sequence);
+                }
                 return true;
             }
 
@@ -616,64 +644,81 @@ namespace Platform.Data.Core.Sequences
             public bool PartialMatch(LinkIndex sequenceToMatch)
             {
                 _filterPosition = -1;
-
                 foreach (var part in Walk(sequenceToMatch))
+                {
                     if (!PartialMatchCore(Links.GetIndex(part)))
+                    {
                         break;
-
+                    }
+                }
                 return _filterPosition == _patternSequence.Count - 1;
             }
 
             private bool PartialMatchCore(LinkIndex element)
             {
                 if (_filterPosition == (_patternSequence.Count - 1))
+                {
                     return false; // Нашлось
-
+                }
                 if (_filterPosition >= 0)
                 {
                     if (element == _patternSequence[_filterPosition + 1])
+                    {
                         _filterPosition++;
+                    }
                     else
+                    {
                         _filterPosition = -1;
+                    }
                 }
-
                 if (_filterPosition < 0)
                 {
                     if (element == _patternSequence[0])
+                    {
                         _filterPosition = 0;
+                    }
                 }
-
                 return true; // Ищем дальше
             }
 
             public void AddPartialMatchedToResults(ulong sequenceToMatch)
             {
                 if (PartialMatch(sequenceToMatch))
+                {
                     _results.Add(sequenceToMatch);
+                }
             }
 
             public bool HandlePartialMatched(ulong sequenceToMatch)
             {
                 if (PartialMatch(sequenceToMatch))
+                {
                     return _stopableHandler(sequenceToMatch);
+                }
                 return true;
             }
 
             public void AddAllPartialMatchedToResults(IEnumerable<ulong> sequencesToMatch)
             {
                 foreach (var sequenceToMatch in sequencesToMatch)
+                {
                     if (PartialMatch(sequenceToMatch))
+                    {
                         _results.Add(sequenceToMatch);
+                    }
+                }
             }
 
             public void AddAllPartialMatchedToResultsAndReadAsElements(IEnumerable<ulong> sequencesToMatch)
             {
                 foreach (var sequenceToMatch in sequencesToMatch)
+                {
                     if (PartialMatch(sequenceToMatch))
                     {
                         _readAsElements.Add(sequenceToMatch);
                         _results.Add(sequenceToMatch);
                     }
+                }
             }
         }
 

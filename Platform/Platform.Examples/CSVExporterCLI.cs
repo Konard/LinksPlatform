@@ -24,9 +24,13 @@ namespace Platform.Examples
             File.Create(exportTo).Dispose();
 
             if (!File.Exists(linksFile))
+            {
                 Console.WriteLine("Entered links file does not exists.");
+            }
             else if (!File.Exists(exportTo))
+            {
                 Console.WriteLine("Entered exported file cannot be created.");
+            }
             else
             {
                 using (var cancellation = new ConsoleCancellationHandler())

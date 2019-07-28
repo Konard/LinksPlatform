@@ -13,12 +13,12 @@ namespace Platform.Data.Core.Triplets
             return link; // Chaining
         }
 
-        private static readonly HashSet<Link> LinksWithNamesGatheringProcess = new HashSet<Link>();
+        private static readonly HashSet<Link> _linksWithNamesGatheringProcess = new HashSet<Link>();
 
         public static bool TryGetName(this Link link, out string str)
         {
             // Защита от зацикливания
-            if (!LinksWithNamesGatheringProcess.Add(link))
+            if (!_linksWithNamesGatheringProcess.Add(link))
             {
                 str = "...";
                 return true;
@@ -43,10 +43,14 @@ namespace Platform.Data.Core.Triplets
                         return true;
                     }
                     else if (TryGetSpecificName(link, out str))
+                    {
                         return true;
+                    }
 
                     if (link.Source == link || link.Linker == link || link.Target == link)
+                    {
                         return false;
+                    }
 
                     if (TryGetName(link.Source, out string sourceName) && TryGetName(link.Linker, out string linkerName) && TryGetName(link.Target, out string targetName))
                     {
@@ -61,7 +65,7 @@ namespace Platform.Data.Core.Triplets
             }
             finally
             {
-                LinksWithNamesGatheringProcess.Remove(link);
+                _linksWithNamesGatheringProcess.Remove(link);
             }
         }
 
@@ -110,9 +114,13 @@ namespace Platform.Data.Core.Triplets
             if (link.Linker == Net.IsA)
             {
                 if (link.Target == @class)
+                {
                     return true;
+                }
                 else
+                {
                     return link.Target.Is(@class);
+                }
             }
             return false;
         }
@@ -121,26 +129,20 @@ namespace Platform.Data.Core.Triplets
         // Нужно изменить определение чара, идеально: char consists of sum of [8, 64].
         public static bool IsChar(this Link link) => CharacterHelpers.IsChar(link);
 
-        public static bool IsGroup(this Link link) => link != null
-                                                   && link.Source == Net.Group
-                                                   && link.Linker == Net.ThatConsistsOf;
+        public static bool IsGroup(this Link link) => link != null && link.Source == Net.Group && link.Linker == Net.ThatConsistsOf;
 
-        public static bool IsSum(this Link link) => link != null
-                                                 && link.Source == Net.Sum
-                                                 && link.Linker == Net.Of;
+        public static bool IsSum(this Link link) => link != null && link.Source == Net.Sum && link.Linker == Net.Of;
 
-        public static bool IsString(this Link link) => link != null
-                                                    && link.Source == Net.String
-                                                    && link.Linker == Net.ThatConsistsOf;
+        public static bool IsString(this Link link) => link != null && link.Source == Net.String && link.Linker == Net.ThatConsistsOf;
 
-        public static bool IsName(this Link link) => link != null
-                                                  && link.Source == Net.Name
-                                                  && link.Linker == Net.Of;
+        public static bool IsName(this Link link) => link != null && link.Source == Net.Name && link.Linker == Net.Of;
 
         public static Link[] GetArrayOfRererersBySource(this Link link)
         {
             if (link == null)
+            {
                 return new Link[0];
+            }
             else
             {
                 var array = new Link[link.ReferersBySourceCount];
@@ -153,7 +155,9 @@ namespace Platform.Data.Core.Triplets
         public static Link[] GetArrayOfRererersByLinker(this Link link)
         {
             if (link == null)
+            {
                 return new Link[0];
+            }
             else
             {
                 var array = new Link[link.ReferersByLinkerCount];
@@ -166,7 +170,9 @@ namespace Platform.Data.Core.Triplets
         public static Link[] GetArrayOfRererersByTarget(this Link link)
         {
             if (link == null)
+            {
                 return new Link[0];
+            }
             else
             {
                 var array = new Link[link.ReferersByTargetCount];

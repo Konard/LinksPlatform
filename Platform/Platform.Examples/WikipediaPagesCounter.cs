@@ -36,7 +36,9 @@ namespace Platform.Examples
                     var context = new RootElementContext();
 
                     using (var reader = XmlReader.Create(file))
+                    {
                         Read(reader, token, context);
+                    }
 
                     Console.WriteLine($"Total pages: {context.TotalPages}, total content length: {context.TotalContentsLength}.");
                 }
@@ -59,7 +61,9 @@ namespace Platform.Examples
             while (reader.Read())
             {
                 if (token.IsCancellationRequested)
+                {
                     return;
+                }
 
                 switch (reader.NodeType)
                 {
@@ -110,7 +114,9 @@ namespace Platform.Examples
                             //    selfCancel = true;
 
                             if (context.ChildrenNamesCounts["page"] % 10000 == 0)
+                            {
                                 Console.WriteLine(topElement);
+                            }
                         }
 
                         break;
@@ -148,9 +154,13 @@ namespace Platform.Examples
             public void IncrementChildNameCount(string name)
             {
                 if (ChildrenNamesCounts.TryGetValue(name, out int count))
+                {
                     ChildrenNamesCounts[name] = count + 1;
+                }
                 else
+                {
                     ChildrenNamesCounts[name] = 0;
+                }
             }
         }
 

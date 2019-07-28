@@ -13,8 +13,8 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
     /// </remarks>
     public class LinkFrequenciesCache<TLink> : LinksOperatorBase<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 
         private readonly Dictionary<Doublet<TLink>, LinkFrequency<TLink>> _doubletsCache;
         private readonly ICounter<TLink, TLink> _frequencyCounter;
@@ -30,7 +30,6 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         public LinkFrequency<TLink> GetFrequency(TLink source, TLink target)
         {
             var doublet = new Doublet<TLink>(source, target);
-
             return GetFrequency(ref doublet);
         }
 
@@ -44,21 +43,24 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         public void IncrementFrequencies(IList<TLink> sequence)
         {
             for (var i = 1; i < sequence.Count; i++)
+            {
                 IncrementFrequency(sequence[i - 1], sequence[i]);
+            }
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public LinkFrequency<TLink> IncrementFrequency(TLink source, TLink target)
         {
             var doublet = new Doublet<TLink>(source, target);
-
             return IncrementFrequency(ref doublet);
         }
 
         public void PrintFrequencies(IList<TLink> sequence)
         {
             for (var i = 1; i < sequence.Count; i++)
+            {
                 PrintFrequency(sequence[i - 1], sequence[i]);
+            }
         }
 
         public void PrintFrequency(TLink source, TLink target)
@@ -71,16 +73,17 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
         public LinkFrequency<TLink> IncrementFrequency(ref Doublet<TLink> doublet)
         {
             if (_doubletsCache.TryGetValue(doublet, out LinkFrequency<TLink> data))
+            {
                 data.IncrementFrequency();
+            }
             else
             {
                 var link = Links.SearchOrDefault(doublet.Source, doublet.Target);
-
                 data = new LinkFrequency<TLink>(Integer<TLink>.One, link);
-
-                if (!EqualityComparer.Equals(link, default))
+                if (!_equalityComparer.Equals(link, default))
+                {
                     data.Frequency = ArithmeticHelpers.Add(data.Frequency, _frequencyCounter.Count(link));
-
+                }
                 _doubletsCache.Add(doublet, data);
             }
             return data;
@@ -91,18 +94,17 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
             foreach (var entry in _doubletsCache)
             {
                 var value = entry.Value;
-
                 var linkIndex = value.Link;
-
-                if (!EqualityComparer.Equals(linkIndex, default))
+                if (!_equalityComparer.Equals(linkIndex, default))
                 {
                     var frequency = value.Frequency;
                     var count = _frequencyCounter.Count(linkIndex);
-
                     // TODO: Why `frequency` always greater than `count` by 1?
-                    if (((Comparer.Compare(frequency, count) > 0) && (Comparer.Compare(ArithmeticHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0))
-                     || ((Comparer.Compare(count, frequency) > 0) && (Comparer.Compare(ArithmeticHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)))
+                    if (((_comparer.Compare(frequency, count) > 0) && (_comparer.Compare(ArithmeticHelpers.Subtract(frequency, count), Integer<TLink>.One) > 0))
+                     || ((_comparer.Compare(count, frequency) > 0) && (_comparer.Compare(ArithmeticHelpers.Subtract(count, frequency), Integer<TLink>.One) > 0)))
+                    {
                         throw new Exception("Frequencies validation failed.");
+                    }
                 }
                 //else
                 //{

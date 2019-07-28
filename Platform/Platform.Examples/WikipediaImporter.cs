@@ -45,7 +45,9 @@ namespace Platform.Examples
                     var document = _storage.CreateDocument(file);
 
                     using (var reader = XmlReader.Create(file))
+                    {
                         Read(reader, token, new ElementContext(document));
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -65,7 +67,9 @@ namespace Platform.Examples
             while (reader.Read())
             {
                 if (token.IsCancellationRequested)
+                {
                     return;
+                }
 
                 switch (reader.NodeType)
                 {
@@ -152,9 +156,13 @@ namespace Platform.Examples
             public void IncrementChildNameCount(string name)
             {
                 if (ChildrenNamesCounts.TryGetValue(name, out int count))
+                {
                     ChildrenNamesCounts[name] = count + 1;
+                }
                 else
+                {
                     ChildrenNamesCounts[name] = 0;
+                }
             }
         }
     }

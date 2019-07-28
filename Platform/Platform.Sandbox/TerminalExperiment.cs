@@ -24,7 +24,9 @@ namespace Platform.Sandbox
                 var readMessage = Console.ReadLine();
 
                 if (string.Compare("exit", readMessage, ignoreCase: true) == 0)
+                {
                     break;
+                }
 
                 Console.Write("<- ");
                 Console.WriteLine(readMessage);

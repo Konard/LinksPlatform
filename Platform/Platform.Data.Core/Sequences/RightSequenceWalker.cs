@@ -24,7 +24,9 @@ namespace Platform.Data.Core.Sequences
             {
                 var partLink = Links.GetLink(element[i]);
                 if (IsElement(partLink))
+                {
                     yield return partLink;
+                }
             }
         }
     }

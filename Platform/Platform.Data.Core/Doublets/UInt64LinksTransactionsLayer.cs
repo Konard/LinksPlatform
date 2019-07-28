@@ -142,7 +142,9 @@ namespace Platform.Data.Core.Doublets
                 _layer = layer;
 
                 if (_layer._currentTransactionId != 0)
+                {
                     throw new NotSupportedException("Nested transactions not supported.");
+                }
 
                 IsCommitted = false;
                 IsReverted = false;
@@ -175,7 +177,9 @@ namespace Platform.Data.Core.Doublets
                 _transitions.CopyTo(transitionsToRevert, 0);
 
                 for (var i = transitionsToRevert.Length - 1; i >= 0; i--)
+                {
                     _layer.RevertTransition(transitionsToRevert[i]);
+                }
 
                 IsReverted = true;
             }
@@ -189,8 +193,15 @@ namespace Platform.Data.Core.Doublets
 
             public static void EnsureTransactionAllowsWriteOperations(Transaction transaction)
             {
-                if (transaction.IsReverted) throw new InvalidOperationException("Transation is reverted.");
-                if (transaction.IsCommitted) throw new InvalidOperationException("Transation is commited.");
+                if (transaction.IsReverted)
+                {
+                    throw new InvalidOperationException("Transation is reverted.");
+                }
+
+                if (transaction.IsCommitted)
+                {
+                    throw new InvalidOperationException("Transation is commited.");
+                }
             }
 
             protected override void DisposeCore(bool manual, bool wasDisposed)
@@ -198,7 +209,9 @@ namespace Platform.Data.Core.Doublets
                 if (!wasDisposed && _layer != null && !_layer.IsDisposed)
                 {
                     if (!IsCommitted && !IsReverted)
+                    {
                         Revert();
+                    }
 
                     _layer.ResetCurrentTransation();
                 }
@@ -208,7 +221,7 @@ namespace Platform.Data.Core.Doublets
             protected override bool AllowMultipleDisposeCalls => true;
         }
 
-        private static readonly TimeSpan DefaultPushDelay = TimeSpan.FromSeconds(0.1);
+        public static readonly TimeSpan DefaultPushDelay = TimeSpan.FromSeconds(0.1);
 
         private readonly string _logAddress;
         private readonly FileStream _log;
@@ -225,7 +238,9 @@ namespace Platform.Data.Core.Doublets
             : base(links)
         {
             if (string.IsNullOrWhiteSpace(logAddress))
+            {
                 throw new ArgumentNullException(nameof(logAddress));
+            }
 
             // В первой строке файла хранится последняя закоммиченную транзакцию.
             // При запуске это используется для проверки удачного закрытия файла лога.
@@ -242,7 +257,9 @@ namespace Platform.Data.Core.Doublets
             }
 
             if (lastCommitedTransition.Equals(default(Transition)))
+            {
                 FileHelpers.WriteFirst(logAddress, lastCommitedTransition);
+            }
 
             _lastCommitedTransition = lastCommitedTransition;
 
@@ -293,7 +310,11 @@ namespace Platform.Data.Core.Doublets
 
         private void CommitTransition(Transition transition)
         {
-            if (_currentTransaction != null) Transaction.EnsureTransactionAllowsWriteOperations(_currentTransaction);
+            if (_currentTransaction != null)
+            {
+                Transaction.EnsureTransactionAllowsWriteOperations(_currentTransaction);
+            }
+
             var transitions = GetCurrentTransitions();
             transitions.Enqueue(transition);
         }
@@ -301,11 +322,17 @@ namespace Platform.Data.Core.Doublets
         private void RevertTransition(Transition transition)
         {
             if (transition.After.IsNull()) // Revert Deletion with Creation
+            {
                 Links.Create();
+            }
             else if (transition.Before.IsNull()) // Revert Creation with Deletion
+            {
                 Links.Delete(transition.After.Index);
+            }
             else // Revert Update
+            {
                 Links.Update(new[] { transition.After.Index, transition.Before.Source, transition.Before.Target });
+            }
         }
 
         private void ResetCurrentTransation()
@@ -317,7 +344,10 @@ namespace Platform.Data.Core.Doublets
 
         private void PushTransitions()
         {
-            if (_log == null || _transitions == null) return;
+            if (_log == null || _transitions == null)
+            {
+                return;
+            }
 
             for (var i = 0; i < _transitions.Count; i++)
             {
@@ -353,7 +383,9 @@ namespace Platform.Data.Core.Doublets
                     pusher.Wait();
                 }
                 if (_transitions != null)
+                {
                     PushTransitions();
+                }
 
                 Disposable.TryDispose(_log);
 
@@ -369,7 +401,9 @@ namespace Platform.Data.Core.Doublets
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {
             if (!wasDisposed)
+            {
                 DisposeTransitions();
+            }
 
             base.DisposeCore(manual, wasDisposed);
         }

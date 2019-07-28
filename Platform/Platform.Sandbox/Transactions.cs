@@ -114,9 +114,13 @@ namespace Platform.Sandbox
             if ((CurrentState.FileEndOffset - BasicTransactionsOffset) / TransactionItemSize == sizeInItems)
             {
                 if (sizeInItems < 16)
+                {
                     sizeInItems = 16;
+                }
                 else
+                {
                     sizeInItems *= 2;
+                }
 
                 var newSizeInBates = BasicTransactionsOffset + sizeInItems * TransactionItemSize;
 
@@ -143,7 +147,9 @@ namespace Platform.Sandbox
         static void OpenFile(long sizeInBytes = 0)
         {
             if (sizeInBytes < BasicTransactionsOffset)
+            {
                 sizeInBytes = BasicTransactionsOffset;
+            }
 
             long savedSizeInBytes = 0;
             if (File.Exists(TransactionsFileName))
@@ -153,7 +159,9 @@ namespace Platform.Sandbox
             }
 
             if (sizeInBytes < savedSizeInBytes)
+            {
                 sizeInBytes = savedSizeInBytes;
+            }
 
             Log = MemoryMappedFile.CreateFromFile(TransactionsFileName, FileMode.OpenOrCreate, TransactionsMapName, sizeInBytes);
             LogAccessor = Log.CreateViewAccessor();

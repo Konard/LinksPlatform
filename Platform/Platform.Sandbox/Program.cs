@@ -159,7 +159,7 @@ namespace Platform.Sandbox
 
         private static void Links()
         {
-            var filename = (new System.Random(2)).Next(1, 99999).ToString();
+            var filename = new System.Random(2).Next(1, 99999).ToString();
 
             //if (File.Exists(filename))
             //    File.Delete(filename);
@@ -167,7 +167,9 @@ namespace Platform.Sandbox
             //ConceptTest.TestGexf(filename);
 
             if (File.Exists(filename))
+            {
                 File.Delete(filename);
+            }
 
             Console.ReadKey();
         }

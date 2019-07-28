@@ -116,9 +116,13 @@ namespace Platform.Sandbox
             }
 
             if (_currentNode.Value is int)
+            {
                 return (int)_currentNode.Value;
+            }
             else
+            {
                 return 0;
+            }
         }
 
         protected override void SetSegmentFrequency(CharSegment segment, long frequency) => _currentNode.Value = frequency;
@@ -212,9 +216,13 @@ namespace Platform.Sandbox
             var frequency = _propertyOperator.GetValue(_currentLink, _frequencyProperty);
 
             if (frequency == _links.Constants.Null)
+            {
                 return 0;
+            }
             else
+            {
                 return _fromNumberConverter.Convert(frequency);
+            }
         }
 
         protected override void SetSegmentFrequency(CharSegment segment, long frequency) => _propertyOperator.SetValue(_currentLink, _frequencyProperty, _toNumberConverter.Convert((uint)frequency));

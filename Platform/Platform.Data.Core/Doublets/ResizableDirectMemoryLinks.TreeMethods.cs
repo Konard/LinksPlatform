@@ -37,8 +37,9 @@ namespace Platform.Data.Core.Doublets
                 {
                     var root = GetTreeRoot();
                     if (GreaterOrEqualThan(index, GetSize(root)))
+                    {
                         return GetZero();
-
+                    }
                     while (!EqualToZero(root))
                     {
                         var left = GetLeftOrDefault(root);
@@ -48,10 +49,10 @@ namespace Platform.Data.Core.Doublets
                             root = left;
                             continue;
                         }
-
                         if (IsEquals(index, leftSize))
+                        {
                             return root;
-
+                        }
                         root = GetRightOrDefault(root);
                         index = Subtract(index, Increment(leftSize));
                     }
@@ -64,33 +65,29 @@ namespace Platform.Data.Core.Doublets
             {
                 var root = GetTreeRoot();
                 var total = GetSize(root);
-
                 var totalRightIgnore = GetZero();
-
                 while (!EqualToZero(root))
                 {
                     var @base = GetBasePartValue(root);
-
                     if (LessOrEqualThan(@base, link))
+                    {
                         root = GetRightOrDefault(root);
+                    }
                     else
                     {
                         totalRightIgnore = Add(totalRightIgnore, Increment(GetRightSize(root)));
-
                         root = GetLeftOrDefault(root);
                     }
                 }
-
                 root = GetTreeRoot();
-
                 var totalLeftIgnore = GetZero();
-
                 while (!EqualToZero(root))
                 {
                     var @base = GetBasePartValue(root);
-
                     if (GreaterOrEqualThan(@base, link))
+                    {
                         root = GetLeftOrDefault(root);
+                    }
                     else
                     {
                         totalLeftIgnore = Add(totalLeftIgnore, Increment(GetLeftSize(root)));
@@ -98,17 +95,16 @@ namespace Platform.Data.Core.Doublets
                         root = GetRightOrDefault(root);
                     }
                 }
-
                 return Subtract(Subtract(total, totalRightIgnore), totalLeftIgnore);
             }
 
             public TLink EachReference(TLink link, Func<IList<TLink>, TLink> handler)
             {
                 var root = GetTreeRoot();
-
                 if (EqualToZero(root))
+                {
                     return _constants.Continue;
-
+                }
                 TLink first = GetZero(), current = root;
                 while (!EqualToZero(current))
                 {
@@ -116,68 +112,34 @@ namespace Platform.Data.Core.Doublets
                     if (GreaterOrEqualThan(@base, link))
                     {
                         if (IsEquals(@base, link))
+                        {
                             first = current;
+                        }
                         current = GetLeftOrDefault(current);
                     }
                     else
+                    {
                         current = GetRightOrDefault(current);
+                    }
                 }
-
                 if (!EqualToZero(first))
                 {
                     current = first;
                     while (true)
                     {
                         if (IsEquals(handler(_memory.GetLinkStruct(current)), _constants.Break))
+                        {
                             return _constants.Break;
+                        }
                         current = GetNext(current);
                         if (EqualToZero(current) || !IsEquals(GetBasePartValue(current), link))
+                        {
                             break;
+                        }
                     }
                 }
-
                 return _constants.Continue;
             }
-
-            //[MethodImpl(MethodImplOptions.AggressiveInlining)]
-            //public bool EachReference(T source, Func<T, bool> handler)
-            //{
-            //    return EachReferenceCore(source, GetTreeRoot(), handler);
-            //}
-
-            // TODO: 1. Move target, handler to separate object. 2. Use stack or walker 3. Use low-level MSIL stack.
-            //private bool EachReferenceCore(T @base, T link, Func<T, bool> handler)
-            //{
-            //    if (EqualToZero(link))
-            //        return true;
-
-            //    var linkBase = GetBasePartValue(link);
-
-            //    var breakConstant = Constants.Break;
-
-            //    if (GreaterThan(linkBase, @base))
-            //    {
-            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
-            //            return false;
-            //    }
-            //    else if (LessThan(linkBase, @base))
-            //    {
-            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
-            //            return false;
-            //    }
-            //    else //if (linkSource == source)
-            //    {
-            //        if (handler(link) == breakConstant)
-            //            return false;
-
-            //        if (EachReferenceCore(@base, GetLeftOrDefault(link), handler) == breakConstant)
-            //            return false;
-            //        if (EachReferenceCore(@base, GetRightOrDefault(link), handler) == breakConstant)
-            //            return false;
-            //    }
-
-            //    return true;
-            //}
         }
 
         private class LinksSourcesTreeMethods : LinksTreeMethodsBase
@@ -186,18 +148,6 @@ namespace Platform.Data.Core.Doublets
                 : base(memory)
             {
             }
-
-            //protected override IntPtr GetLeft(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
-
-            //protected override IntPtr GetRight(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset;
-
-            //protected override T GetSize(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).GetValue<T>();
-
-            //protected override void SetLeft(T node, T left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset).SetValue(left);
-
-            //protected override void SetRight(T node, T right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsSourceOffset).SetValue(right);
-
-            //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsSourceOffset).SetValue(size);
 
             protected override IntPtr GetLeftPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsSourceOffset;
 
@@ -269,7 +219,6 @@ namespace Platform.Data.Core.Doublets
             {
                 var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>();
                 var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>();
-
                 return LessThan(firstSource, secondSource) ||
                        (IsEquals(firstSource, secondSource) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>()));
             }
@@ -278,7 +227,6 @@ namespace Platform.Data.Core.Doublets
             {
                 var firstSource = (Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>();
                 var secondSource = (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>();
-
                 return GreaterThan(firstSource, secondSource) ||
                        (IsEquals(firstSource, secondSource) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>()));
             }
@@ -297,20 +245,23 @@ namespace Platform.Data.Core.Doublets
             public TLink Search(TLink source, TLink target)
             {
                 var root = GetTreeRoot();
-
                 while (!EqualToZero(root))
                 {
                     var rootSource = (Links.GetElement(LinkSizeInBytes, root) + Link.SourceOffset).GetValue<TLink>();
                     var rootTarget = (Links.GetElement(LinkSizeInBytes, root) + Link.TargetOffset).GetValue<TLink>();
-
                     if (FirstIsToTheLeftOfSecond(source, target, rootSource, rootTarget)) // node.Key < root.Key
+                    {
                         root = GetLeftOrDefault(root);
+                    }
                     else if (FirstIsToTheRightOfSecond(source, target, rootSource, rootTarget)) // node.Key > root.Key
+                    {
                         root = GetRightOrDefault(root);
+                    }
                     else // node.Key == root.Key
+                    {
                         return root;
+                    }
                 }
-
                 return GetZero();
             }
 
@@ -329,18 +280,6 @@ namespace Platform.Data.Core.Doublets
                 : base(memory)
             {
             }
-
-            //protected override IntPtr GetLeft(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
-
-            //protected override IntPtr GetRight(T node) => Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset;
-
-            //protected override T GetSize(T node) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).GetValue<T>();
-
-            //protected override void SetLeft(T node, T left) => (Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset).SetValue(left);
-
-            //protected override void SetRight(T node, T right) => (Links.GetElement(LinkSizeInBytes, node) + Link.RightAsTargetOffset).SetValue(right);
-
-            //protected override void SetSize(T node, T size) => (Links.GetElement(LinkSizeInBytes, node) + Link.SizeAsTargetOffset).SetValue(size);
 
             protected override IntPtr GetLeftPointer(TLink node) => Links.GetElement(LinkSizeInBytes, node) + Link.LeftAsTargetOffset;
 
@@ -412,7 +351,6 @@ namespace Platform.Data.Core.Doublets
             {
                 var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>();
                 var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>();
-
                 return LessThan(firstTarget, secondTarget) ||
                        (IsEquals(firstTarget, secondTarget) && LessThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>()));
             }
@@ -421,7 +359,6 @@ namespace Platform.Data.Core.Doublets
             {
                 var firstTarget = (Links.GetElement(LinkSizeInBytes, first) + Link.TargetOffset).GetValue<TLink>();
                 var secondTarget = (Links.GetElement(LinkSizeInBytes, second) + Link.TargetOffset).GetValue<TLink>();
-
                 return GreaterThan(firstTarget, secondTarget) ||
                        (IsEquals(firstTarget, secondTarget) && GreaterThan((Links.GetElement(LinkSizeInBytes, first) + Link.SourceOffset).GetValue<TLink>(), (Links.GetElement(LinkSizeInBytes, second) + Link.SourceOffset).GetValue<TLink>()));
             }

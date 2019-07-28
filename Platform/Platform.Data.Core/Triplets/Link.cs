@@ -151,9 +151,9 @@ namespace Platform.Data.Core.Triplets
 
         #region Static Fields
 
-        private static readonly object LockObject = new object();
-        private static bool MemoryManagerIsReady;
-        private static readonly Dictionary<ulong, long> LinkToMappingIndex = new Dictionary<ulong, long>();
+        private static readonly object _lockObject = new object();
+        private static bool _memoryManagerIsReady;
+        private static readonly Dictionary<ulong, long> _linkToMappingIndex = new Dictionary<ulong, long>();
 
         #endregion
 
@@ -203,35 +203,34 @@ namespace Platform.Data.Core.Triplets
 
         #region Infrastructure
 
-        public Link(LinkIndex link)
-        {
-            _link = link;
-        }
+        public Link(LinkIndex link) => _link = link;
 
         public static void StartMemoryManager(string storageFilename)
         {
-            lock (LockObject)
+            lock (_lockObject)
             {
-                if (!MemoryManagerIsReady)
+                if (!_memoryManagerIsReady)
                 {
                     if (OpenLinks(storageFilename) == 0)
+                    {
                         throw new Exception($"Файл ({storageFilename}) хранилища не удалось открыть.");
-
-                    MemoryManagerIsReady = true;
+                    }
+                    _memoryManagerIsReady = true;
                 }
             }
         }
 
         public static void StopMemoryManager()
         {
-            lock (LockObject)
+            lock (_lockObject)
             {
-                if (MemoryManagerIsReady)
+                if (_memoryManagerIsReady)
                 {
                     if (CloseLinks() == 0)
+                    {
                         throw new Exception("Файл хранилища не удалось закрыть. Возможно он был уже закрыт, или не открывался вовсе.");
-
-                    MemoryManagerIsReady = false;
+                    }
+                    _memoryManagerIsReady = false;
                 }
             }
         }
@@ -270,9 +269,10 @@ namespace Platform.Data.Core.Triplets
 
         private static bool LinkWasDeleted(LinkIndex link) => link != 0 && GetLinkerIndex(link) == 0;
 
-        private bool IsMatchingTo(Link source, Link linker, Link target) => ((Source == this && source == null) || (Source == source))
-                                                                         && ((Linker == this && linker == null) || (Linker == linker))
-                                                                         && ((Target == this && target == null) || (Target == target));
+        private bool IsMatchingTo(Link source, Link linker, Link target) 
+            => ((Source == this && source == null) || (Source == source))
+            && ((Linker == this && linker == null) || (Linker == linker))
+            && ((Target == this && target == null) || (Target == target));
 
         public LinkIndex ToIndex() => _link;
 
@@ -284,20 +284,28 @@ namespace Platform.Data.Core.Triplets
 
         public static Link Create(Link source, Link linker, Link target)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
+            }
             if (LinkWasDeleted(source))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве значения.", nameof(source));
+            }
             if (LinkWasDeleted(linker))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве значения.", nameof(linker));
+            }
             if (LinkWasDeleted(target))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве значения.", nameof(target));
+            }
             Link link = CreateLink(source, linker, target);
             if (link == null)
+            {
                 throw new OutOfMemoryException();
-
+            }
             CreatedEvent.Invoke(new LinkDefinition(link));
-
             return link;
         }
 
@@ -305,17 +313,21 @@ namespace Platform.Data.Core.Triplets
 
         public static Link Restore(LinkIndex index)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
-
+            }
             if (index == 0)
+            {
                 throw new ArgumentException("У связи не может быть нулевого адреса.");
-
+            }
             try
             {
                 Link link = index;
                 if (LinkDoesNotExist(link))
+                {
                     throw new Exception("Связь с указанным адресом удалена, либо не существовала.");
+                }
                 return link;
             }
             catch (Exception ex)
@@ -328,24 +340,25 @@ namespace Platform.Data.Core.Triplets
 
         public static Link CreateMapped(Link source, Link linker, Link target, Int mappingIndex)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
-
+            }
             Link mappedLink = GetMappedLink(mappingIndex);
-
             if (mappedLink == null)
             {
                 mappedLink = Create(source, linker, target);
                 SetMappedLink(mappingIndex, mappedLink);
-
                 if (GetMappedLink(mappingIndex) != mappedLink)
+                {
                     throw new Exception("Установить привязанную связь не удалось.");
+                }
             }
             else if (!mappedLink.IsMatchingTo(source, linker, target))
+            {
                 throw new Exception("Существующая привязанная связь не соответствует указанным Source, Linker и Target.");
-
-            LinkToMappingIndex[mappedLink] = mappingIndex;
-
+            }
+            _linkToMappingIndex[mappedLink] = mappingIndex;
             return mappedLink;
         }
 
@@ -357,15 +370,16 @@ namespace Platform.Data.Core.Triplets
             {
                 mappedLink = link;
                 SetMappedLink(mappingIndex, mappedLink);
-
                 if (GetMappedLink(mappingIndex) != mappedLink)
+                {
                     return false;
+                }
             }
             else if (!mappedLink.IsMatchingTo(link.Source, link.Linker, link.Target))
+            {
                 return false;
-
-            LinkToMappingIndex[mappedLink] = mappingIndex;
-
+            }
+            _linkToMappingIndex[mappedLink] = mappingIndex;
             return true;
         }
 
@@ -374,7 +388,9 @@ namespace Platform.Data.Core.Triplets
         public static Link GetMapped(Int mappingIndex)
         {
             if (!TryGetMapped(mappingIndex, out Link mappedLink))
+            {
                 throw new Exception($"Mapped link with index {mappingIndex} is not set.");
+            }
             return mappedLink;
         }
 
@@ -382,39 +398,49 @@ namespace Platform.Data.Core.Triplets
 
         public static bool TryGetMapped(Int mappingIndex, out Link mappedLink)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
-
+            }
             mappedLink = GetMappedLink(mappingIndex);
             if (mappedLink != null)
-                LinkToMappingIndex[mappedLink] = mappingIndex;
+            {
+                _linkToMappingIndex[mappedLink] = mappingIndex;
+            }
             return mappedLink != null;
         }
 
         public static void Update(ref Link link, Link newSource, Link newLinker, Link newTarget)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
+            }
             if (LinkDoesNotExist(link))
+            {
                 throw new ArgumentException("Нельзя обновить несуществующую связь.", nameof(link));
+            }
             if (LinkWasDeleted(newSource))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве нового значения.", nameof(newSource));
+            }
             if (LinkWasDeleted(newLinker))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве нового значения.", nameof(newLinker));
+            }
             if (LinkWasDeleted(newTarget))
+            {
                 throw new ArgumentException("Удалённая связь не может использоваться в качестве нового значения.", nameof(newTarget));
-
+            }
             LinkIndex previousLinkIndex = link;
-            LinkToMappingIndex.TryGetValue(link, out long mappingIndex);
+            _linkToMappingIndex.TryGetValue(link, out long mappingIndex);
             var previousDefinition = new LinkDefinition(link);
-
             link = UpdateLink(link, newSource, newLinker, newTarget);
-
             if (mappingIndex >= 0 && previousLinkIndex != link)
             {
-                LinkToMappingIndex.Remove(previousLinkIndex);
+                _linkToMappingIndex.Remove(previousLinkIndex);
                 SetMappedLink(mappingIndex, link);
-                LinkToMappingIndex.Add(link, mappingIndex);
+                _linkToMappingIndex.Add(link, mappingIndex);
             }
             UpdatedEvent(previousDefinition, new LinkDefinition(link));
         }
@@ -422,18 +448,17 @@ namespace Platform.Data.Core.Triplets
         public static void Delete(ref Link link)
         {
             if (LinkDoesNotExist(link))
+            {
                 return;
-
+            }
             LinkIndex previousLinkIndex = link;
-            LinkToMappingIndex.TryGetValue(link, out long mappingIndex);
+            _linkToMappingIndex.TryGetValue(link, out long mappingIndex);
             var previousDefinition = new LinkDefinition(link);
-
             DeleteLink(link);
             link = null;
-
             if (mappingIndex >= 0)
             {
-                LinkToMappingIndex.Remove(previousLinkIndex);
+                _linkToMappingIndex.Remove(previousLinkIndex);
                 SetMappedLink(mappingIndex, 0);
             }
             DeletedEvent(previousDefinition);
@@ -447,16 +472,19 @@ namespace Platform.Data.Core.Triplets
         //        throw new Exception("Если связь не существует, её нельзя заменить.");
         //    if (LinkDoesNotExist(replacement))
         //        throw new ArgumentException("Пустая или удалённая связь не может быть замещаемым значением.", "replacement");
-
         //    link = ReplaceLink(link, replacement);
         //}
 
         public static Link Search(Link source, Link linker, Link target)
         {
-            if (!MemoryManagerIsReady)
+            if (!_memoryManagerIsReady)
+            {
                 throw new Exception("Менеджер памяти ещё не готов.");
+            }
             if (LinkDoesNotExist(source) || LinkDoesNotExist(linker) || LinkDoesNotExist(target))
+            {
                 throw new Exception("Выполнить поиск связи можно только по существующим связям.");
+            }
             return SearchLink(source, linker, target);
         }
 
@@ -469,88 +497,124 @@ namespace Platform.Data.Core.Triplets
         public bool WalkThroughReferersAsSource(Func<Link, bool> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersBySourceCount;
             if (referers == 1)
+            {
                 return walker(FirstRefererBySource);
+            }
             else if (referers > 1)
+            {
                 return WalkThroughReferersBySource(this, x => walker(x) ? 1 : 0) != 0;
+            }
             else
+            {
                 return true;
+            }
         }
 
         public void WalkThroughReferersAsSource(Action<Link> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersBySourceCount;
             if (referers == 1)
+            {
                 walker(FirstRefererBySource);
+            }
             else if (referers > 1)
+            {
                 WalkThroughAllReferersBySource(this, x => walker(x));
+            }
         }
 
         public bool WalkThroughReferersAsLinker(Func<Link, bool> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersByLinkerCount;
             if (referers == 1)
+            {
                 return walker(FirstRefererByLinker);
+            }
             else if (referers > 1)
+            {
                 return WalkThroughReferersByLinker(this, x => walker(x) ? 1 : 0) != 0;
+            }
             else
+            {
                 return true;
+            }
         }
 
         public void WalkThroughReferersAsLinker(Action<Link> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersByLinkerCount;
             if (referers == 1)
+            {
                 walker(FirstRefererByLinker);
+            }
             else if (referers > 1)
+            {
                 WalkThroughAllReferersByLinker(this, x => walker(x));
+            }
         }
 
         public bool WalkThroughReferersAsTarget(Func<Link, bool> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersByTargetCount;
             if (referers == 1)
+            {
                 return walker(FirstRefererByTarget);
+            }
             else if (referers > 1)
+            {
                 return WalkThroughReferersByTarget(this, x => walker(x) ? 1 : 0) != 0;
+            }
             else
+            {
                 return true;
+            }
         }
 
         public void WalkThroughReferersAsTarget(Action<Link> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             var referers = ReferersByTargetCount;
             if (referers == 1)
+            {
                 walker(FirstRefererByTarget);
+            }
             else if (referers > 1)
+            {
                 WalkThroughAllReferersByTarget(this, x => walker(x));
+            }
         }
 
         public void WalkThroughReferers(Action<Link> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             void wrapper(ulong x) => walker(x);
-
             WalkThroughAllReferersBySource(this, wrapper);
             WalkThroughAllReferersByLinker(this, wrapper);
             WalkThroughAllReferersByTarget(this, wrapper);
@@ -559,10 +623,10 @@ namespace Platform.Data.Core.Triplets
         public void WalkThroughReferers(Func<Link, bool> walker)
         {
             if (LinkDoesNotExist(this))
+            {
                 throw new Exception("C несуществующей связью нельзя производитить операции.");
-
+            }
             long wrapper(ulong x) => walker(x) ? 1 : 0;
-
             WalkThroughReferersBySource(this, wrapper);
             WalkThroughReferersByLinker(this, wrapper);
             WalkThroughReferersByTarget(this, wrapper);

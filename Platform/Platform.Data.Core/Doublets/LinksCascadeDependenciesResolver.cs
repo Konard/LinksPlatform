@@ -6,7 +6,7 @@ namespace Platform.Data.Core.Doublets
 {
     public class LinksCascadeDependenciesResolver<TLink> : LinksDecoratorBase<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         public LinksCascadeDependenciesResolver(ILinks<TLink> links) : base(links) {}
 
@@ -30,7 +30,11 @@ namespace Platform.Data.Core.Doublets
 
             for (var i = (long)referencesCount - 1; i >= 0; i--)
             {
-                if (EqualityComparer.Equals(references[i], link)) continue;
+                if (_equalityComparer.Equals(references[i], link))
+                {
+                    continue;
+                }
+
                 Links.Delete(references[i]);
             }
 

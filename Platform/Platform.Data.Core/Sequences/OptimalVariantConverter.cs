@@ -7,33 +7,28 @@ namespace Platform.Data.Core.Sequences
 {
     public class OptimalVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
-        private static readonly EqualityComparer<TLink> EqualityComparer = EqualityComparer<TLink>.Default;
-        private static readonly Comparer<TLink> Comparer = Comparer<TLink>.Default;
+        private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
+        private static readonly Comparer<TLink> _comparer = Comparer<TLink>.Default;
 
         private readonly IConverter<IList<TLink>> _sequenceToItsLocalElementLevelsConverter;
 
-        public OptimalVariantConverter(
-            ILinks<TLink> links,
-            IConverter<IList<TLink>> sequenceToItsLocalElementLevelsConverter)
-            : base(links)
+        public OptimalVariantConverter(ILinks<TLink> links, IConverter<IList<TLink>> sequenceToItsLocalElementLevelsConverter) : base(links) 
             => _sequenceToItsLocalElementLevelsConverter = sequenceToItsLocalElementLevelsConverter;
 
         public override TLink Convert(IList<TLink> sequence)
         {
             var length = sequence.Count;
-
             if (length == 1)
+            {
                 return sequence[0];
-
+            }
             var links = Links;
-
             if (length == 2)
+            {
                 return links.GetOrCreate(sequence[0], sequence[1]);
-
+            }
             sequence = sequence.ToArray();
-
             var levels = _sequenceToItsLocalElementLevelsConverter.Convert(sequence);
-
             while (length > 2)
             {
                 var levelRepeat = 1;
@@ -43,12 +38,10 @@ namespace Platform.Data.Core.Sequences
                 var w = 0;
                 for (var i = 1; i < length; i++)
                 {
-                    if (EqualityComparer.Equals(currentLevel, levels[i]))
+                    if (_equalityComparer.Equals(currentLevel, levels[i]))
                     {
                         levelRepeat++;
-
                         skipOnce = false;
-
                         if (levelRepeat == 2)
                         {
                             sequence[w] = links.GetOrCreate(sequence[i - 1], sequence[i]);
@@ -74,9 +67,10 @@ namespace Platform.Data.Core.Sequences
                     {
                         currentLevel = levels[i];
                         levelRepeat = 1;
-
                         if (skipOnce)
+                        {
                             skipOnce = false;
+                        }
                         else
                         {
                             sequence[w] = sequence[i - 1];
@@ -92,23 +86,20 @@ namespace Platform.Data.Core.Sequences
                         }
                     }
                 }
-
                 length = w;
             }
-
             return links.GetOrCreate(sequence[0], sequence[1]);
         }
 
         private TLink GetGreatestNeigbourLowerThanCurrentOrCurrent(TLink previous, TLink current, TLink next)
         {
-            if (Comparer.Compare(previous, next) > 0)
-                return Comparer.Compare(previous, current) < 0 ? previous : current;
-            else
-                return Comparer.Compare(next, current) < 0 ? next : current;
+            return _comparer.Compare(previous, next) > 0
+                ? _comparer.Compare(previous, current) < 0 ? previous : current
+                : _comparer.Compare(next, current) < 0 ? next : current;
         }
 
-        private TLink GetNextLowerThanCurrentOrCurrent(TLink current, TLink next) => Comparer.Compare(next, current) < 0 ? next : current;
+        private TLink GetNextLowerThanCurrentOrCurrent(TLink current, TLink next) => _comparer.Compare(next, current) < 0 ? next : current;
 
-        private TLink GetPreviousLowerThanCurrentOrCurrent(TLink previous, TLink current) => Comparer.Compare(previous, current) < 0 ? previous : current;
+        private TLink GetPreviousLowerThanCurrentOrCurrent(TLink previous, TLink current) => _comparer.Compare(previous, current) < 0 ? previous : current;
     }
 }

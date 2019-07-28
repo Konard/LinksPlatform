@@ -14,9 +14,13 @@ namespace Platform.Examples
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(1, "Wikipedia xml file", args);
 
             if (!File.Exists(linksFile))
+            {
                 Console.WriteLine("Entered links file does not exists.");
+            }
             else if (!File.Exists(wikipediaFile))
+            {
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
+            }
             else
             {
                 const long gb32 = 34359738368;

@@ -14,9 +14,7 @@ namespace Platform.Data.Core.Sequences.Frequencies.Cache
             Link = link;
         }
 
-        public LinkFrequency()
-        {
-        }
+        public LinkFrequency() { }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void IncrementFrequency() => Frequency = ArithmeticHelpers<TLink>.Increment(Frequency);

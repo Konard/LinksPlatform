@@ -16,7 +16,9 @@ namespace Platform.Examples
             var linkIndex = link[_links.Constants.IndexPart];
 
             if (_links.Count(_links.Constants.Any, linkIndex) > 1)
+            {
                 base.WriteLink(writer, link);
+            }
             else
             {
                 var elements = new List<ulong>();
@@ -27,9 +29,13 @@ namespace Platform.Examples
                 CollectLinks(elements, ref linkIndex);
 
                 if (elements.All(x => UnicodeMap.IsCharLink(x) || _visited.Contains(x)))
+                {
                     WriteSequence(writer, elements);
+                }
                 else
+                {
                     _stack.Push(new KeyValuePair<ulong, List<ulong>>(linkIndex, elements));
+                }
             }
 
             if (_stack.Count > 0)
@@ -42,9 +48,13 @@ namespace Platform.Examples
                     WriteSequence(writer, last.Value);
 
                     if (_stack.Count == 0)
+                    {
                         break;
+                    }
                     else
+                    {
                         last = _stack.Peek();
+                    }
                 }
             }
         }
@@ -69,14 +79,20 @@ namespace Platform.Examples
                 if (Visit(innerLinkIndex))
                 {
                     if (innerLinkSource == linkIndexCopy)
+                    {
                         PushRight(elements, innerLinkTarget);
+                    }
                     else // if (innerLinkTarget == linkIndexCopy)
+                    {
                         PushLeft(elements, innerLinkSource);
+                    }
 
                     linkIndexCopy = innerLinkIndex;
 
                     if (_links.Count(_links.Constants.Any, innerLinkIndex) == 1)
+                    {
                         CollectLinks(elements, ref linkIndexCopy);
+                    }
                 }
 
                 return _links.Constants.Break;
@@ -88,9 +104,13 @@ namespace Platform.Examples
         private void PushRight(IList<ulong> elements, ulong element)
         {
             if (!UnicodeMap.IsCharLink(element) && !_visited.Contains(element) && _links.Count(_links.Constants.Any, element) == 1)
+            {
                 StopableSequenceWalker.WalkRight(element, _links.GetSource, _links.GetTarget, x => _links.IsPartialPoint(x) || UnicodeMap.IsCharLink(x) || _links.Count(_links.Constants.Any, x) > 1, (x) => Visit(x), x => { }, x => _links.Count(_links.Constants.Any, x) == 1 && !_visited.Contains(x), elements.AddAndReturnTrue);
+            }
             else
+            {
                 elements.Add(element);
+            }
         }
 
         private void PushLeft(IList<ulong> elements, ulong element)
@@ -102,10 +122,14 @@ namespace Platform.Examples
                 StopableSequenceWalker.WalkRight(element, _links.GetSource, _links.GetTarget, x => _links.IsPartialPoint(x) || UnicodeMap.IsCharLink(x) || _links.Count(_links.Constants.Any, x) > 1, (x) => Visit(x), x => { }, x => _links.Count(_links.Constants.Any, x) == 1 && !_visited.Contains(x), temp.AddAndReturnTrue);
 
                 for (int i = temp.Count - 1; i >= 0; i--)
+                {
                     elements.Insert(0, temp[i]);
+                }
             }
             else
+            {
                 elements.Insert(0, element);
+            }
         }
     }
 }

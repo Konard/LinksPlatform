@@ -65,7 +65,11 @@ namespace Platform.Sandbox
         private static void LeftRotate(ref TreeNode root)
         {
             var newRoot = root.Right;
-            if (newRoot == null) return;
+            if (newRoot == null)
+            {
+                return;
+            }
+
             root.Right = newRoot.Left == root ? newRoot : newRoot.Left;
             newRoot.Left = root;
             newRoot.Size = root.Size;
@@ -76,7 +80,11 @@ namespace Platform.Sandbox
         private static void RightRotate(ref TreeNode root)
         {
             var newRoot = root.Left;
-            if (newRoot == null) return;
+            if (newRoot == null)
+            {
+                return;
+            }
+
             root.Left = newRoot.Right == root ? newRoot : newRoot.Right;
             newRoot.Right = root;
             newRoot.Size = root.Size;
@@ -318,31 +326,53 @@ namespace Platform.Sandbox
             while (true)
             {
                 if (value > currentNode.Value)
+                {
                     if (IsRightThreaded(currentNode))
+                    {
                         return null;
+                    }
                     else
+                    {
                         currentNode = currentNode.Right;
+                    }
+                }
                 else if (value < currentNode.Value)
+                {
                     if (IsLeftThreaded(currentNode))
+                    {
                         return null;
+                    }
                     else
+                    {
                         currentNode = currentNode.Left;
+                    }
+                }
                 else
+                {
                     return currentNode;
+                }
             }
         }
 
         private static TreeNode GetFirstNode(TreeNode treeRoot)
         {
             var currentNode = treeRoot;
-            while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size) currentNode = currentNode.Left;
+            while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size)
+            {
+                currentNode = currentNode.Left;
+            }
+
             return currentNode;
         }
 
         private static TreeNode GetLastNode(TreeNode treeRoot)
         {
             var currentNode = treeRoot;
-            while (currentNode.Right != null && currentNode.Size >= currentNode.Right.Size) currentNode = currentNode.Right;
+            while (currentNode.Right != null && currentNode.Size >= currentNode.Right.Size)
+            {
+                currentNode = currentNode.Right;
+            }
+
             return currentNode;
         }
 
@@ -357,7 +387,11 @@ namespace Platform.Sandbox
                 else
                 {
                     currentNode = currentNode.Right;
-                    while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size) currentNode = currentNode.Left;
+                    while (currentNode.Left != null && currentNode.Size >= currentNode.Left.Size)
+                    {
+                        currentNode = currentNode.Left;
+                    }
+
                     return currentNode;
                 }
             }
@@ -412,7 +446,9 @@ namespace Platform.Sandbox
                 var value = rnd.Next(1000);
 
                 if (Search(treeRoot, value) == null)
+                {
                     UnsafeInsert(ref treeRoot, value);
+                }
                 //else
                 //    UnsafeRemove(ref treeRoot, value);
             }

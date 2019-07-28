@@ -215,13 +215,21 @@ namespace Platform.Sandbox
         private static Link Eval(Link link, Link argumentLink)
         {
             if (link.Source == Net.Link && link.Linker == ThatExactlyIs)
+            {
                 return link.Target;
+            }
             else if (link.Source == Result && link.Linker == Net.Of)
+            {
                 return ExecuteLinkOperationCore(link.Target, argumentLink);
+            }
             else if (link == RepresentationOfArgumentLink)
+            {
                 return argumentLink;
+            }
             else
+            {
                 return link;
+            }
 
             // else
             // Нужна будет также поддержка рекурсивного прохода по опредлению связи, с созданием альтернативной связи (проверить насколько набросок снизу подходит)
@@ -231,15 +239,25 @@ namespace Platform.Sandbox
         private static Link EvalWithReferenceToItself(Link link, Link argumentLink)
         {
             if (link.Source == Net.Link && link.Linker == ThatExactlyIs)
+            {
                 return link.Target;
+            }
             else if (link.Source == Result && link.Linker == Net.Of)
+            {
                 return ExecuteLinkOperationCore(link.Target, argumentLink);
+            }
             else if (link == RepresentationOfArgumentLink)
+            {
                 return argumentLink;
+            }
             else if (link == RepresenationOfReferenceToItself)
+            {
                 return null;
+            }
             else
+            {
                 return link;
+            }
         }
 
         private static Link CreateDefinitionFromLink(Link link)
@@ -260,24 +278,34 @@ namespace Platform.Sandbox
             var operationsList = new List<Link>();
 
             if (operations.Linker == Net.And)
+            {
                 operations.WalkThroughSequence(operation => operationsList.Add(operation));
+            }
             else
+            {
                 operationsList.Add(operations);
+            }
 
             var argumentsList = new List<Link>();
 
             if (arguments.Linker == Net.And)
+            {
                 arguments.WalkThroughSequence(arg => argumentsList.Add(arg));
+            }
             else if (arguments.Is(Net.Set))
             {
                 arguments.WalkThroughReferersAsTarget(referer =>
                 {
                     if (referer.Linker == Net.ContainedBy)
+                    {
                         argumentsList.Add(referer.Source);
+                    }
                 });
             }
             else
+            {
                 argumentsList.Add(arguments);
+            }
 
             Link result = null;
 
@@ -286,7 +314,9 @@ namespace Platform.Sandbox
                 var operationArgument = argumentsList[j];
 
                 if (operationArgument == RepresentationOfArgumentLink)
+                {
                     operationArgument = argument;
+                }
 
                 for (var i = 0; i < operationsList.Count; i++)
                 {
@@ -317,7 +347,10 @@ namespace Platform.Sandbox
                     var set = Net.CreateSet();
                     var selectionResult = ExecuteLinksSelection(operation, argument);
                     foreach (var item in selectionResult)
+                    {
                         Link.Create(item, Net.ContainedBy, set);
+                    }
+
                     return set;
                 }
                 else
@@ -408,7 +441,9 @@ namespace Platform.Sandbox
             var deletableLinkDefinition = deletionQuery.Target;
             var deletableLink = ExecuteLinkSelectionByDefinition(deletableLinkDefinition, argument);
             if (deletableLink != null)
+            {
                 Link.Delete(ref deletableLink);
+            }
         }
 
         private static Link ExecuteLinkPartSelection(Link selectionQuery, Link argument)
@@ -445,7 +480,9 @@ namespace Platform.Sandbox
             var resultLink = ExecuteLinkSelectionByDefinition(selectionQuery.Target, argument);
 
             if (resultLink == null)
+            {
                 resultLink = RepresentationOfAbsenceOfLink;
+            }
 
             return resultLink;
         }
@@ -498,12 +535,16 @@ namespace Platform.Sandbox
                 set.WalkThroughReferersAsTarget(referer =>
                     {
                         if (referer.Linker == Net.ContainedBy && checker(referer.Source))
+                        {
                             result.Add(referer.Source);
+                        }
                     });
                 set.WalkThroughReferersAsSource(referer =>
                     {
                         if (referer.Linker == Net.Contains && checker(referer.Target))
+                        {
                             result.Add(referer.Target);
+                        }
                     });
             }
             else if (set.Linker == Net.And)
@@ -511,13 +552,17 @@ namespace Platform.Sandbox
                 set.WalkThroughSequence(element =>
                     {
                         if (checker(element))
+                        {
                             result.Add(element);
+                        }
                     });
             }
             else
             {
                 if (checker(set))
+                {
                     result.Add(set);
+                }
             }
 
             return result;
@@ -624,7 +669,9 @@ namespace Platform.Sandbox
             definition.WalkThroughSequence(param =>
             {
                 if (IsLinkDescriptionParamSourceSpecific(param.Source))
+                {
                     specificLinksCount++;
+                }
             });
 
             if (specificLinksCount == 3)
@@ -634,11 +681,16 @@ namespace Platform.Sandbox
                 var resultSet = new HashSet<Link>();
                 var resultLink = Link.Search(sourceLink, linkerLink, targetLink);
                 if (resultLink != null)
+                {
                     resultSet.Add(resultLink);
+                }
+
                 return resultSet;
             }
             else
+            {
                 return ExecuteLinksSelectionCore(definition, argument);
+            }
         }
 
         private static HashSet<Link> ExecuteLinksSelectionCore(Link definition, Link argument)
@@ -706,17 +758,23 @@ namespace Platform.Sandbox
             if (param.Target == SourceLink)
             {
                 foreach (var value in paramValues)
+                {
                     value.WalkThroughReferersAsSource(referer => { result.Add(referer); });
+                }
             }
             else if (param.Target == LinkerLink)
             {
                 foreach (var value in paramValues)
+                {
                     value.WalkThroughReferersAsLinker(referer => { result.Add(referer); });
+                }
             }
             else if (param.Target == TargetLink)
             {
                 foreach (var value in paramValues)
+                {
                     value.WalkThroughReferersAsTarget(referer => { result.Add(referer); });
+                }
             }
 
             return result;
@@ -745,13 +803,21 @@ namespace Platform.Sandbox
         private static long GetParamLinkReferersCount(Link param)
         {
             if (param.Target == SourceLink)
+            {
                 return param.Source.ReferersBySourceCount;
+            }
             else if (param.Target == LinkerLink)
+            {
                 return param.Source.ReferersByLinkerCount;
+            }
             else if (param.Target == TargetLink)
+            {
                 return param.Source.ReferersByTargetCount;
+            }
             else
+            {
                 throw new Exception("Бляяя");
+            }
         }
 
         private static void GetLinks(Link sequence, out Link sourceLink, out Link linkerLink, out Link targetLink)

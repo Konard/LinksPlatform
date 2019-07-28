@@ -31,13 +31,18 @@ namespace Platform.Examples
             _documentMarker = CreateConstant(markerIndex++);
             
             for (var i = 0; i < 99; i++)
+            {
                 CreateConstant(markerIndex++);
+            }
         }
 
         private ulong CreateConstant(ulong markerIndex)
         {
             if (!_links.Exists(markerIndex))
+            {
                 _links.Create();
+            }
+
             return markerIndex;
         }
 
