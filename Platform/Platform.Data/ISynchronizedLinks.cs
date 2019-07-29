@@ -1,7 +1,7 @@
 ﻿using Platform.Threading.Synchronization;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Sequences
+namespace Platform.Data
 {
     // TODO: Move to Platform.Data
     public interface ISynchronizedLinks<TLink, TLinks, TConstants> : ISynchronized<TLinks>, ILinks<TLink, TConstants>
