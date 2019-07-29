@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     // TODO: Make LinksExternalReferenceValidator. A layer that checks each link to exist or to be external (hybrid link's raw number).
     public class LinksInnerReferenceValidator<T> : LinksDecoratorBase<T>

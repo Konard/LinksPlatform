@@ -1,10 +1,10 @@
 ﻿using System;
+using System.Text;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Platform.Numbers;
 using Platform.Unsafe;
 using Platform.Collections.Methods.Trees;
-using System.Text;
 using Platform.Data.Constants;
 
 namespace Platform.Data.Doublets.ResizableDirectMemory

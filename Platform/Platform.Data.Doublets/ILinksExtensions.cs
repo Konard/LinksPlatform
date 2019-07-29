@@ -12,7 +12,7 @@ using Platform.Data.Exceptions;
 
 namespace Platform.Data.Doublets
 {
-    public static class LinksExtensions
+    public static class ILinksExtensions
     {
         public static void RunRandomCreations<TLink>(this ILinks<TLink> links, long amountOfCreations)
         {

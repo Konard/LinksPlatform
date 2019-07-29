@@ -5,10 +5,10 @@ using Platform.Collections;
 using Platform.Collections.Arrays;
 using Platform.Collections.Lists;
 using Platform.Helpers.Scopes;
-using Platform.Data.Universal;
 using Platform.Data.Constants;
+using Platform.Data.Universal;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     /// <remarks>
     /// What does empty pattern (for condition or substitution) mean? Nothing or Everything?

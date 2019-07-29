@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Incrementers
 {
     public class UnaryNumberIncrementer<TLink> : LinksOperatorBase<TLink>, IIncrementer<TLink>
     {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.PropertyOperators
 {
     public class FrequencyPropertyOperator<TLink> : LinksOperatorBase<TLink>, ISpecificPropertyOperator<TLink, TLink>
     {

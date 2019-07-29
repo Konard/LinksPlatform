@@ -4,6 +4,7 @@ using Platform.Memory;
 using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Sandbox
 {

@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     /// <remarks>
     /// Not practical if newSource and newTarget are too big.

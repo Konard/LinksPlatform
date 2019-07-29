@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     public class LinksSelfReferenceResolver<TLink> : LinksDecoratorBase<TLink>
     {

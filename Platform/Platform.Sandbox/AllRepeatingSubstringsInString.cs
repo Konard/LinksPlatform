@@ -9,6 +9,9 @@ using Platform.Memory;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using TLink = System.UInt32;
+using Platform.Data.Doublets.PropertyOperators;
+using Platform.Data.Doublets.Decorators;
+using Platform.Data.Doublets.Converters;
 
 namespace Platform.Sandbox
 {

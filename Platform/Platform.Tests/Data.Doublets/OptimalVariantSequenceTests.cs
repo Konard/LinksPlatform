@@ -9,6 +9,9 @@ using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 using Platform.Data.Doublets.Sequences.Converters;
+using Platform.Data.Doublets.PropertyOperators;
+using Platform.Data.Doublets.Incrementers;
+using Platform.Data.Doublets.Converters;
 
 namespace Platform.Tests.Data.Doublets
 {

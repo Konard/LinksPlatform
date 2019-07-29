@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Collections.Stacks;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Stacks
 {
     public class Stack<TLink> : IStack<TLink>
     {

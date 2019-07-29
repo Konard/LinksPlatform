@@ -1,8 +1,8 @@
-﻿using Platform.Data.Constants;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Platform.Data.Constants;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     public abstract class LinksDecoratorBase<T> : ILinks<T>
     {

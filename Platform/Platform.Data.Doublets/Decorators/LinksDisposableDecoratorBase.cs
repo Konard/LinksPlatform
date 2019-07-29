@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using Platform.Data.Constants;
 using Platform.Disposables;
+using Platform.Data.Constants;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.Decorators
 {
     public abstract class LinksDisposableDecoratorBase<T> : DisposableBase, ILinks<T>
     {

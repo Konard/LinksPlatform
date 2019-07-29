@@ -17,6 +17,7 @@ using Platform.Data;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Tests.Data.Doublets
 {

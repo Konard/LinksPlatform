@@ -1,16 +1,16 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.CreteriaMatchers
 {
-    public class MarkedSequenceMatcher<TLink> : ICreteriaMatcher<TLink>
+    public class MarkedSequenceCreteriaMatcher<TLink> : ICreteriaMatcher<TLink>
     {
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
 
         private readonly ILinks<TLink> _links;
         private readonly TLink _sequenceMarkerLink;
 
-        public MarkedSequenceMatcher(ILinks<TLink> links, TLink sequenceMarkerLink)
+        public MarkedSequenceCreteriaMatcher(ILinks<TLink> links, TLink sequenceMarkerLink)
         {
             _links = links;
             _sequenceMarkerLink = sequenceMarkerLink;

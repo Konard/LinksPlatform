@@ -5,6 +5,7 @@ using Platform.Data.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 using Platform.Data.Doublets.Sequences.Converters;
+using Platform.Data.Doublets.Sequences.CreteriaMatchers;
 
 namespace Platform.Data.Doublets.Sequences
 {
@@ -22,7 +23,7 @@ namespace Platform.Data.Doublets.Sequences
         public bool EnforceSingleSequenceVersionOnWriteBasedOnExisting;
         public bool EnforceSingleSequenceVersionOnWriteBasedOnNew;
 
-        public MarkedSequenceMatcher<TLink> MarkedSequenceMatcher;
+        public MarkedSequenceCreteriaMatcher<TLink> MarkedSequenceMatcher;
         public IConverter<IList<TLink>, TLink> LinksToSequenceConverter;
         public SequencesIndexer<TLink> Indexer;
 
@@ -53,7 +54,7 @@ namespace Platform.Data.Doublets.Sequences
 
                 if (MarkedSequenceMatcher == null)
                 {
-                    MarkedSequenceMatcher = new MarkedSequenceMatcher<TLink>(links, SequenceMarkerLink);
+                    MarkedSequenceMatcher = new MarkedSequenceCreteriaMatcher<TLink>(links, SequenceMarkerLink);
                 }
             }
 

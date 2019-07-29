@@ -3,6 +3,7 @@ using Platform.Helpers.Scopes;
 using Platform.Memory;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Tests.Helpers
 {

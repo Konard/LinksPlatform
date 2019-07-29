@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Platform.Data;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.Decorators;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 

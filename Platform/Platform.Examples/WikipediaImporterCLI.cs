@@ -4,6 +4,7 @@ using Platform.IO;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
+using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Examples
 {
