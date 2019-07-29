@@ -461,16 +461,16 @@ namespace Platform.Data.Doublets.Sequences
                     var matcher = new Matcher(this, sequence, results, null);
                     if (sequence.Length >= 2)
                     {
-                        StepRight((Action<ulong>)matcher.AddFullMatchedToResults, sequence[0], sequence[1]);
+                        StepRight(matcher.AddFullMatchedToResults, sequence[0], sequence[1]);
                     }
                     var last = sequence.Length - 2;
                     for (var i = 1; i < last; i++)
                     {
-                        PartialStepRight((Action<ulong>)matcher.AddFullMatchedToResults, sequence[i], sequence[i + 1]);
+                        PartialStepRight(matcher.AddFullMatchedToResults, sequence[i], sequence[i + 1]);
                     }
                     if (sequence.Length >= 3)
                     {
-                        StepLeft((Action<ulong>)matcher.AddFullMatchedToResults, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
+                        StepLeft(matcher.AddFullMatchedToResults, sequence[sequence.Length - 2], sequence[sequence.Length - 1]);
                     }
                 }
                 return results;
@@ -1236,10 +1236,10 @@ namespace Platform.Data.Doublets.Sequences
                 foreach (var previousMatching in previousMatchings)
                 {
                     //AllCloseConnections(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
-                    StepRight((Action<ulong>)matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
-                    TryStepRightUp((Action<ulong>)matchings.AddAndReturnVoid, secondLinkUsage, previousMatching);
+                    StepRight(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
+                    TryStepRightUp(matchings.AddAndReturnVoid, secondLinkUsage, previousMatching);
                     //PartialStepRight(matchings.AddAndReturnVoid, secondLinkUsage, sequence[startAt]); // почему-то эта ошибочная запись приводит к желаемым результам.
-                    PartialStepRight((Action<ulong>)matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
+                    PartialStepRight(matchings.AddAndReturnVoid, previousMatching, secondLinkUsage);
                 }
             }
             if (matchings.Count == 0)

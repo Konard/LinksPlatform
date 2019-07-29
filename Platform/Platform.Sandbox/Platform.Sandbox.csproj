@@ -3,9 +3,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <AssemblyName>Platform.Sandbox</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>Platform.Sandbox</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

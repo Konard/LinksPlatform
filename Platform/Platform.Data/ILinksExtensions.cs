@@ -1,14 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using Platform.Helpers.Setters;
 using Platform.Data.Constants;
 using Platform.Data.Exceptions;
-using Platform.Helpers.Setters;
 
 namespace Platform.Data
 {
     public static class ILinksExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TLink Count<TLink, TConstants>(this ILinks<TLink, TConstants> links, params TLink[] restrictions)
             where TConstants : ILinksCombinedConstants<TLink, TLink, int, TConstants>
             => links.Count(restrictions);
@@ -71,7 +72,8 @@ namespace Platform.Data
         public static IList<TLink> GetLink<TLink, TConstants>(this ILinks<TLink, TConstants> links, TLink link)
             where TConstants : ILinksCombinedConstants<TLink, TLink, int, TConstants>
         {
-            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue, links.Constants.Break, default);
+            var constants = links.Constants;
+            var linkPartsSetter = new Setter<IList<TLink>, TLink>(constants.Continue, constants.Break, default);
             links.Each(linkPartsSetter.SetAndReturnTrue, link);
             return linkPartsSetter.Result;
         }

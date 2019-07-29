@@ -18,7 +18,6 @@ namespace Platform.Data.Sequences
     /// Ограничение на уровень глубины рекурсии может позволить использовать уменьшенный размер стека.
     /// Можно использовать глобальный стек (или несколько глобальных стеков на каждый поток).
     /// </remarks>
-    /// TODO: Move to Platform.Data.Sequences
     public class StopableSequenceWalker
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

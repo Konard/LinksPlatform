@@ -59,7 +59,7 @@ namespace Platform.Examples
             var result = _visited.Add(linkIndex);
             if (result)
             {
-                _addressToLineNumber.Add(linkIndex, (ulong)(_linesCounter + 1));
+                _addressToLineNumber.Add(linkIndex, _linesCounter + 1);
             }
             return result;
         }

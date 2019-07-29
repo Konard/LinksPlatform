@@ -2,9 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AssemblyName>Platform.Data.SlaveServer</AssemblyName>
     <OutputType>Exe</OutputType>
-    <PackageId>Platform.Data.SlaveServer</PackageId>
   </PropertyGroup>
 
   <ItemGroup>

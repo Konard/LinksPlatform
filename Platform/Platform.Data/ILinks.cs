@@ -1,6 +1,6 @@
-﻿using Platform.Data.Constants;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using Platform.Data.Constants;
 
 namespace Platform.Data
 {
@@ -11,7 +11,7 @@ namespace Platform.Data
     /// Этот интерфейс в данный момент не зависит от размера содержимого связи, а значит подходит как для дуплетов, так и для триплетов и т.п.
     /// Возможно этот интерфейс подходит даже для Sequences.
     /// </remarks>
-    public interface ILinks<TLink, TConstants> 
+    public interface ILinks<TLink, TConstants>
         where TConstants : ILinksCombinedConstants<TLink, TLink, int, TConstants>
     {
         #region Constants
