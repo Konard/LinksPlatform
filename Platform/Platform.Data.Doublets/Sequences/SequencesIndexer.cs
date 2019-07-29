@@ -3,7 +3,6 @@ using Platform.Data.Sequences;
 
 namespace Platform.Data.Doublets.Sequences
 {
-    // TODO: Rename file to SequencesIndexer.cs
     public class SequencesIndexer<TLink>
     {
         private static readonly EqualityComparer<TLink> _equalityComparer = EqualityComparer<TLink>.Default;
