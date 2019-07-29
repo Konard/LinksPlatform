@@ -5,9 +5,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Platform.Data\Platform.Data.csproj" />
     <PackageReference Include="Sigil.NetStandard" Version="4.8.0" />
     <PackageReference Include="Platform.Communication" Version="0.1.1" />
+    <PackageReference Include="Platform.Data" Version="0.0.1" />
   </ItemGroup>
 
 </Project>
