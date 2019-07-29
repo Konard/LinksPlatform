@@ -221,7 +221,16 @@ namespace Platform.Data.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TLink GetTarget<TLink>(this ILinks<TLink> links, IList<TLink> link) => link[links.Constants.TargetPart];
 
-
+        /// <summary>
+        /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
+        /// </summary>
+        /// <param name="links">Хранилище связей.</param>
+        /// <param name="handler">Обработчик каждой подходящей связи.</param>
+        /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
+        /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
+            => EqualityComparer<TLink>.Default.Equals(links.Each(handler, restrictions), links.Constants.Continue);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
@@ -247,7 +256,11 @@ namespace Platform.Data.Doublets
         /// <param name="handler">Обработчик каждой подходящей связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler) => links.Each(handler, links.Constants.Any, source, target);
+        public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler)
+        {
+            var constants = links.Constants;
+            return links.Each(handler, constants.Any, source, target);
+        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)

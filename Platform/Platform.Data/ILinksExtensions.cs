@@ -58,9 +58,9 @@ namespace Platform.Data
         /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
         /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink, TConstants>(this ILinks<TLink, TConstants> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
+        public static TLink Each<TLink, TConstants>(this ILinks<TLink, TConstants> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions)
             where TConstants : ILinksCombinedConstants<TLink, TLink, int, TConstants>
-            => !EqualityComparer<TLink>.Default.Equals(links.Each(handler, restrictions), links.Constants.Break);
+            => links.Each(handler, restrictions);
 
         /// <summary>
         /// Возвращает части-значения для связи с указанным индексом.
