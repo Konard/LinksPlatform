@@ -5,6 +5,7 @@ using Platform.Collections.Lists;
 using Platform.Data.Sequences;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
+using Platform.Data;
 
 namespace Platform.Examples
 {

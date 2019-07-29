@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using Xunit;
+using Platform.Data;
 using Platform.Data.Sequences;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences.Converters;

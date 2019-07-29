@@ -2,7 +2,7 @@
 {
     public static class LinkExtensions
     {
-        public static bool IsFullPoint(this UInt64Link link) => Point<ulong>.IsFullPoint(link);
-        public static bool IsPartialPoint(this UInt64Link link) => Point<ulong>.IsPartialPoint(link);
+        public static bool IsFullPoint<TLink>(this Link<TLink> link) => Point<TLink>.IsFullPoint(link);
+        public static bool IsPartialPoint<TLink>(this Link<TLink> link) => Point<TLink>.IsPartialPoint(link);
     }
 }

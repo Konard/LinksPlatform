@@ -3,6 +3,7 @@ using System.Linq;
 using System.Collections.Generic;
 using Xunit;
 using Platform.Interfaces;
+using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;

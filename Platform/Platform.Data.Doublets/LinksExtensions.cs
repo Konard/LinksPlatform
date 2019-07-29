@@ -3,25 +3,17 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using Platform.Ranges;
 using Platform.Collections.Arrays;
 using Platform.Numbers;
 using Platform.Random;
-using Platform.Helpers.Singletons;
 using Platform.Helpers.Setters;
 using Platform.Data.Exceptions;
-using Platform.Data.Constants;
-using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Data.Doublets
 {
     public static class LinksExtensions
     {
-        public static readonly LinksCombinedConstants<bool, ulong, int> Constants = Default<LinksCombinedConstants<bool, ulong, int>>.Instance;
-
-        public static void UseUnicode(this ILinks<ulong> links) => UnicodeMap.InitNew(links);
-
         public static void RunRandomCreations<TLink>(this ILinks<TLink> links, long amountOfCreations)
         {
             for (long i = 0; i < amountOfCreations; i++)
@@ -99,144 +91,6 @@ namespace Platform.Data.Doublets
             return firstLink;
         }
 
-        public static void EnsureEachLinkExists(this ILinks<ulong> links, IList<ulong> sequence)
-        {
-            if (sequence == null)
-            {
-                return;
-            }
-            for (var i = 0; i < sequence.Count; i++)
-            {
-                if (!links.Exists(sequence[i]))
-                {
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], $"sequence[{i}]");
-                }
-            }
-        }
-
-        public static void EnsureEachLinkIsAnyOrExists(this ILinks<ulong> links, IList<ulong> sequence)
-        {
-            if (sequence == null)
-            {
-                return;
-            }
-            for (var i = 0; i < sequence.Count; i++)
-            {
-                if (sequence[i] != Constants.Any && !links.Exists(sequence[i]))
-                {
-                    throw new ArgumentLinkDoesNotExistsException<ulong>(sequence[i], $"sequence[{i}]");
-                }
-            }
-        }
-
-        public static bool AnyLinkIsAny(this ILinks<ulong> links, params ulong[] sequence)
-        {
-            if (sequence == null)
-            {
-                return false;
-            }
-            var constants = links.Constants;
-            for (var i = 0; i < sequence.Length; i++)
-            {
-                if (sequence[i] == constants.Any)
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static string FormatStructure(this ILinks<ulong> links, ulong linkIndex, Func<UInt64Link, bool> isElement, bool renderIndex = false, bool renderDebug = false)
-        {
-            var sb = new StringBuilder();
-            var visited = new HashSet<ulong>();
-            links.AppendStructure(sb, visited, linkIndex, isElement, (innerSb, link) => innerSb.Append(link.Index), renderIndex, renderDebug);
-            return sb.ToString();
-        }
-
-        public static string FormatStructure(this ILinks<ulong> links, ulong linkIndex, Func<UInt64Link, bool> isElement, Action<StringBuilder, UInt64Link> appendElement, bool renderIndex = false, bool renderDebug = false)
-        {
-            var sb = new StringBuilder();
-            var visited = new HashSet<ulong>();
-            links.AppendStructure(sb, visited, linkIndex, isElement, appendElement, renderIndex, renderDebug);
-            return sb.ToString();
-        }
-
-        public static void AppendStructure(this ILinks<ulong> links, StringBuilder sb, HashSet<ulong> visited, ulong linkIndex, Func<UInt64Link, bool> isElement, Action<StringBuilder, UInt64Link> appendElement, bool renderIndex = false, bool renderDebug = false)
-        {
-            if (sb == null)
-            {
-                throw new ArgumentNullException(nameof(sb));
-            }
-            if (linkIndex == Constants.Null || linkIndex == Constants.Any || linkIndex == Constants.Itself)
-            {
-                return;
-            }
-            if (links.Exists(linkIndex))
-            {
-                if (visited.Add(linkIndex))
-                {
-                    sb.Append('(');
-                    var link = new UInt64Link(links.GetLink(linkIndex));
-                    if (renderIndex)
-                    {
-                        sb.Append(link.Index);
-                        sb.Append(':');
-                    }
-                    if (link.Source == link.Index)
-                    {
-                        sb.Append(link.Index);
-                    }
-                    else
-                    {
-                        var source = new UInt64Link(links.GetLink(link.Source));
-                        if (isElement(source))
-                        {
-                            appendElement(sb, source);
-                        }
-                        else
-                        {
-                            links.AppendStructure(sb, visited, source.Index, isElement, appendElement, renderIndex);
-                        }
-                    }
-                    sb.Append(' ');
-                    if (link.Target == link.Index)
-                    {
-                        sb.Append(link.Index);
-                    }
-                    else
-                    {
-                        var target = new UInt64Link(links.GetLink(link.Target));
-                        if (isElement(target))
-                        {
-                            appendElement(sb, target);
-                        }
-                        else
-                        {
-                            links.AppendStructure(sb, visited, target.Index, isElement, appendElement, renderIndex);
-                        }
-                    }
-                    sb.Append(')');
-                }
-                else
-                {
-                    if (renderDebug)
-                    {
-                        sb.Append('*');
-                    }
-                    sb.Append(linkIndex);
-                }
-            }
-            else
-            {
-                if (renderDebug)
-                {
-                    sb.Append('~');
-                }
-                sb.Append(linkIndex);
-            }
-        }
-
         public static bool IsInnerReference<TLink>(this ILinks<TLink> links, TLink reference)
         {
             var constants = links.Constants;
@@ -244,51 +98,7 @@ namespace Platform.Data.Doublets
             return comparer.Compare(constants.MinPossibleIndex, reference) >= 0 && comparer.Compare(reference, constants.MaxPossibleIndex) <= 0;
         }
 
-        #region Points
-
-        /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой полностью (связью замкнутой на себе дважды).</summary>
-        /// <param name="links">Хранилище связей.</param>
-        /// <param name="link">Индекс проверяемой связи.</param>
-        /// <returns>Значение, определяющее является ли связь точкой полностью.</returns>
-        /// <remarks>
-        /// Связь точка - это связь, у которой начало (Source) и конец (Target) есть сама эта связь.
-        /// Но что, если точка уже есть, а нужно создать пару с таким же значением? Должны ли точка и пара существовать одновременно?
-        /// Или в качестве решения для точек нужно использовать 0 в качестве начала и конца, а сортировать по индексу в массиве связей?
-        /// Какое тогда будет значение Source и Target у точки? 0 или её индекс?
-        /// Или точка должна быть одновременно точкой и парой, а также последовательностями из самой себя любого размера?
-        /// Как только есть ссылка на себя, появляется этот парадокс, причём достаточно даже одной ссылки на себя (частичной точки).
-        /// А что если не выбирать что является точкой, пара нулей (цикл через пустоту) или 
-        /// самостоятельный цикл через себя? Что если предоставить все варианты использования связей?
-        /// Что если разрешить и нули, а так же частичные варианты?
-        /// 
-        /// Что если точка, это только в том случае когда link.Source == link && link.Target == link , т.е. дважды ссылка на себя.
-        /// А пара это тогда, когда link.Source == link.Target && link.Source != link , т.е. ссылка не на себя а во вне.
-        /// 
-        /// Тогда если у нас уже создана пара, но нам нужна точка, мы можем используя промежуточную связь,
-        /// например "DoubletOf" обозначить что является точно парой, а что точно точкой.
-        /// И наоборот этот же метод поможет, если уже существует точка, но нам нужна пара.
-        /// </remarks>
-        public static bool IsFullPoint<T>(this ILinks<T> links, T link)
-        {
-            links.EnsureLinkExists(link);
-            return Point<T>.IsFullPoint(links.GetLink(link));
-        }
-
-        /// <summary>Возвращает значение, определяющее является ли связь с указанным индексом точкой частично (связью замкнутой на себе как минимум один раз).</summary>
-        /// <param name="links">Хранилище связей.</param>
-        /// <param name="link">Индекс проверяемой связи.</param>
-        /// <returns>Значение, определяющее является ли связь точкой частично.</returns>
-        /// <remarks>
-        /// Достаточно любой одной ссылки на себя.
-        /// Также в будущем можно будет проверять и всех родителей, чтобы проверить есть ли ссылки на себя (на эту связь).
-        /// </remarks>
-        public static bool IsPartialPoint<T>(this ILinks<T> links, T link)
-        {
-            links.EnsureLinkExists(link);
-            return Point<T>.IsPartialPoint(links.GetLink(link));
-        }
-
-        #endregion
+        
 
         #region Paths
 
@@ -308,12 +118,13 @@ namespace Platform.Data.Doublets
                 return false;
             }
             var equalityComparer = EqualityComparer<TLink>.Default;
+            var constants = links.Constants;
             for (var i = 1; i < path.Length; i++)
             {
                 var next = path[i];
                 var values = links.GetLink(current);
-                var source = values[Constants.SourcePart];
-                var target = values[Constants.TargetPart];
+                var source = values[constants.SourcePart];
+                var target = values[constants.TargetPart];
                 if (equalityComparer.Equals(source, target) && equalityComparer.Equals(source, next))
                 {
                     //throw new Exception(string.Format("Невозможно выбрать путь, так как и Source и Target совпадают с элементом пути {0}.", next));
@@ -345,8 +156,9 @@ namespace Platform.Data.Doublets
 
         public static TLink GetSquareMatrixSequenceElementByIndex<TLink>(this ILinks<TLink> links, TLink root, ulong size, ulong index)
         {
-            var source = Constants.SourcePart;
-            var target = Constants.TargetPart;
+            var constants = links.Constants;
+            var source = constants.SourcePart;
+            var target = constants.TargetPart;
             if (!MathHelpers.IsPowerOfTwo(size))
             {
                 throw new ArgumentOutOfRangeException(nameof(size), "Sequences with sizes other than powers of two are not supported.");
@@ -409,21 +221,7 @@ namespace Platform.Data.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static TLink GetTarget<TLink>(this ILinks<TLink> links, IList<TLink> link) => link[links.Constants.TargetPart];
 
-        /// <summary>
-        /// Возвращает части-значения для связи с указанным индексом.
-        /// </summary>
-        /// <param name="links">Хранилище связей.</param>
-        /// <param name="link">Индекс связи.</param>
-        /// <returns>Уникальную связь.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static IList<TLink> GetLink<TLink>(this ILinks<TLink> links, TLink link)
-        {
-            var linkPartsSetter = new Setter<IList<TLink>, TLink>(links.Constants.Continue, links.Constants.Break, default);
-            links.Each(linkPartsSetter.SetAndReturnTrue, link);
-            return linkPartsSetter.Result;
-        }
 
-        public static TLink Count<TLink>(this ILinks<TLink> links, params TLink[] restrictions) => links.Count(restrictions);
 
         /// <summary>
         /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
@@ -451,16 +249,6 @@ namespace Platform.Data.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Each<TLink>(this ILinks<TLink> links, TLink source, TLink target, Func<IList<TLink>, TLink> handler) => links.Each(handler, links.Constants.Any, source, target);
 
-        /// <summary>
-        /// Выполняет проход по всем связям, соответствующим шаблону, вызывая обработчик (handler) для каждой подходящей связи.
-        /// </summary>
-        /// <param name="links">Хранилище связей.</param>
-        /// <param name="handler">Обработчик каждой подходящей связи.</param>
-        /// <param name="restrictions">Ограничения на содержимое связей. Каждое ограничение может иметь значения: Constants.Null - 0-я связь, обозначающая ссылку на пустоту, Any - отсутствие ограничения, 1..∞ конкретный адрес связи.</param>
-        /// <returns>True, в случае если проход по связям не был прерван и False в обратном случае.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Each<TLink>(this ILinks<TLink> links, Func<IList<TLink>, TLink> handler, params TLink[] restrictions) => !EqualityComparer<TLink>.Default.Equals(links.Each(handler, restrictions), links.Constants.Break);
-
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static IList<IList<TLink>> All<TLink>(this ILinks<TLink> links, params TLink[] restrictions)
         {
@@ -476,15 +264,6 @@ namespace Platform.Data.Doublets
         }
 
         /// <summary>
-        /// Возвращает значение, определяющее существует ли связь с указанным индексом в хранилище связей.
-        /// </summary>
-        /// <param name="links">Хранилище связей.</param>
-        /// <param name="link">Индекс проверяемой на существование связи.</param>
-        /// <returns>Значение, определяющее существует ли связь.</returns>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool Exists<TLink>(this ILinks<TLink> links, TLink link) => Comparer<TLink>.Default.Compare(links.Count(link), default) > 0;
-
-        /// <summary>
         /// Возвращает значение, определяющее существует ли связь с указанными началом и концом в хранилище связей.
         /// </summary>
         /// <param name="links">Хранилище связей.</param>
@@ -496,26 +275,6 @@ namespace Platform.Data.Doublets
 
         #region Ensure
         // TODO: May be move to EnsureExtensions or make it both there and here
-
-        /// <param name="links">Хранилище связей.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link)
-        {
-            if (!links.Exists(link))
-            {
-                throw new ArgumentLinkDoesNotExistsException<TLink>(link);
-            }
-        }
-
-        /// <param name="links">Хранилище связей.</param>
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void EnsureLinkExists<TLink>(this ILinks<TLink> links, TLink link, string argumentName)
-        {
-            if (!links.Exists(link))
-            {
-                throw new ArgumentLinkDoesNotExistsException<TLink>(link, argumentName);
-            }
-        }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static void EnsureInnerReferenceExists<TLink>(this ILinks<TLink> links, TLink reference, string argumentName)
@@ -583,6 +342,39 @@ namespace Platform.Data.Doublets
             }
         }
 
+        /// <param name="links">Хранилище связей.</param>
+        public static void EnsureCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.Create, addresses);
+
+        /// <param name="links">Хранилище связей.</param>
+        public static void EnsurePointsCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.CreatePoint, addresses);
+
+        /// <param name="links">Хранилище связей.</param>
+        public static void EnsureCreated<TLink>(this ILinks<TLink> links, Func<TLink> creator, params TLink[] addresses)
+        {
+            var constants = links.Constants;
+            var nonExistentAddresses = new HashSet<ulong>(addresses.Where(x => !links.Exists(x)).Select(x => (ulong)(Integer<TLink>)x));
+            if (nonExistentAddresses.Count > 0)
+            {
+                var max = nonExistentAddresses.Max();
+                // TODO: Эту верхнюю границу нужно разрешить переопределять (проверить применяется ли эта логика)
+                max = Math.Min(max, (Integer<TLink>)constants.MaxPossibleIndex);
+                var createdLinks = new List<TLink>();
+                var equalityComparer = EqualityComparer<TLink>.Default;
+                TLink createdLink;
+                while (!equalityComparer.Equals(createdLink = creator(), (TLink)(Integer<TLink>)max))
+                {
+                    createdLinks.Add(createdLink);
+                }
+                for (var i = 0; i < createdLinks.Count; i++)
+                {
+                    if (!nonExistentAddresses.Contains((Integer<TLink>)createdLinks[i]))
+                    {
+                        links.Delete(createdLinks[i]);
+                    }
+                }
+            }
+        }
+
         #endregion
 
         /// <param name="links">Хранилище связей.</param>
@@ -592,12 +384,12 @@ namespace Platform.Data.Doublets
             var values = links.GetLink(link);
             ulong referencesAsSource = (Integer<TLink>)links.Count(constants.Any, link, constants.Any);
             var equalityComparer = EqualityComparer<TLink>.Default;
-            if (equalityComparer.Equals(values[Constants.SourcePart], link))
+            if (equalityComparer.Equals(values[constants.SourcePart], link))
             {
                 referencesAsSource--;
             }
             ulong referencesAsTarget = (Integer<TLink>)links.Count(constants.Any, constants.Any, link);
-            if (equalityComparer.Equals(values[Constants.TargetPart], link))
+            if (equalityComparer.Equals(values[constants.TargetPart], link))
             {
                 referencesAsTarget--;
             }
@@ -612,9 +404,10 @@ namespace Platform.Data.Doublets
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool Equals<TLink>(this ILinks<TLink> links, TLink link, TLink source, TLink target)
         {
+            var constants = links.Constants;
             var values = links.GetLink(link);
             var equalityComparer = EqualityComparer<TLink>.Default;
-            return equalityComparer.Equals(values[Constants.SourcePart], source) && equalityComparer.Equals(values[Constants.TargetPart], target);
+            return equalityComparer.Equals(values[constants.SourcePart], source) && equalityComparer.Equals(values[constants.TargetPart], target);
         }
 
         /// <summary>
@@ -678,39 +471,6 @@ namespace Platform.Data.Doublets
             else
             {
                 return links.Update(restrictions);
-            }
-        }
-
-        /// <param name="links">Хранилище связей.</param>
-        public static void EnsureCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.Create, addresses);
-
-        /// <param name="links">Хранилище связей.</param>
-        public static void EnsurePointsCreated<TLink>(this ILinks<TLink> links, params TLink[] addresses) => links.EnsureCreated(links.CreatePoint, addresses);
-
-        /// <param name="links">Хранилище связей.</param>
-        public static void EnsureCreated<TLink>(this ILinks<TLink> links, Func<TLink> creator, params TLink[] addresses)
-        {
-            var constants = links.Constants;
-            var nonExistentAddresses = new HashSet<ulong>(addresses.Where(x => !links.Exists(x)).Select(x => (ulong)(Integer<TLink>)x));
-            if (nonExistentAddresses.Count > 0)
-            {
-                var max = nonExistentAddresses.Max();
-                // TODO: Эту верхнюю границу нужно разрешить переопределять (проверить применяется ли эта логика)
-                max = Math.Min(max, (Integer<TLink>)constants.MaxPossibleIndex);
-                var createdLinks = new List<TLink>();
-                var equalityComparer = EqualityComparer<TLink>.Default;
-                TLink createdLink;
-                while (!equalityComparer.Equals(createdLink = creator(), (TLink)(Integer<TLink>)max))
-                {
-                    createdLinks.Add(createdLink);
-                }
-                for (var i = 0; i < createdLinks.Count; i++)
-                {
-                    if (!nonExistentAddresses.Contains((Integer<TLink>)createdLinks[i]))
-                    {
-                        links.Delete(createdLinks[i]);
-                    }
-                }
             }
         }
 

@@ -1,5 +1,6 @@
 ﻿namespace Platform.Data.Constants
 {
+    // TODO: Remove Doublets specific logic  
     public interface ILinksPartConstants<TPartIndex>
     {
         /// <summary>Возвращает индекс части, которая отвечает за индекс самой связи.</summary>

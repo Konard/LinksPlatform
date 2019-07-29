@@ -15,6 +15,7 @@ using Platform.Helpers.Singletons;
 using Platform.Helpers.Counters;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
+using Platform.Data;
 
 namespace Platform.Tests.Data.Doublets
 {
