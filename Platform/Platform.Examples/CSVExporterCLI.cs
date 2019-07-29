@@ -2,6 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 
 namespace Platform.Examples
 {

@@ -3,6 +3,7 @@ using Platform.Helpers.Counters;
 using Platform.Memory;
 using Platform.Data;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 
 namespace Platform.Sandbox
 {

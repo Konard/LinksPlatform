@@ -15,7 +15,7 @@ using Platform.Data.Constants;
 
 // ReSharper disable BuiltInTypeReferenceStyle
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     using id = UInt64;
 

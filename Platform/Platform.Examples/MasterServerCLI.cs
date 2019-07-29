@@ -6,6 +6,7 @@ using Platform.Threading;
 using Platform.IO;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Examples

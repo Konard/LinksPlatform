@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Triplets
+namespace Platform.Data.Triplets.Sequences
 {
     /// <remarks>
     /// TODO: Check that CollectMatchingSequences algorithm is working, if not throw it away.

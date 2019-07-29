@@ -1,7 +1,7 @@
 ﻿using System.IO;
 using Platform.Disposables;
-using Platform.Data;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Tests.Data.Doublets

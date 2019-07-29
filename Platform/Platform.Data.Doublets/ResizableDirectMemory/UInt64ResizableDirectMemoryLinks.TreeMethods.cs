@@ -5,7 +5,7 @@ using System.Text;
 using Platform.Collections.Methods.Trees;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     unsafe partial class UInt64ResizableDirectMemoryLinks
     {

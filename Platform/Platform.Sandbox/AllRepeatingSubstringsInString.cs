@@ -6,8 +6,8 @@ using Platform.Collections.Segments;
 using Platform.Collections.Segments.Walkers;
 using Platform.Collections.Trees;
 using Platform.Memory;
-using Platform.Data;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 using TLink = System.UInt32;
 
 namespace Platform.Sandbox

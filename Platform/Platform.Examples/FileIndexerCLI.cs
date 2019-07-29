@@ -2,6 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Examples

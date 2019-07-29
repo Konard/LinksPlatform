@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Triplets
+namespace Platform.Data.Triplets.Sequences
 {
     internal class CompressionExperiments
     {

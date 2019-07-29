@@ -2,7 +2,7 @@
 using Platform.Unsafe;
 using Platform.Collections.Methods.Lists;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     partial class ResizableDirectMemoryLinks<TLink>
     {

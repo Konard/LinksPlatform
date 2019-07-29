@@ -8,12 +8,13 @@ using System.Runtime.CompilerServices;
 using Platform.Collections;
 using Platform.Threading;
 using Platform.Helpers.Singletons;
+using Platform.Data;
 using Platform.Data.Doublets;
+using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 using Platform.Data.Doublets.Sequences.Converters;
-using Platform.Data;
 
 namespace Platform.Sandbox
 {

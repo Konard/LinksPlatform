@@ -22,7 +22,7 @@ using Platform.Data.Doublets;
 // ReSharper disable MemberCanBePrivate.Local
 // ReSharper disable UnusedMember.Local
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     /// <remarks>
     /// TODO: Вместо address и size принимать IMemory (возможно потребуется добавить Step и StepSize).

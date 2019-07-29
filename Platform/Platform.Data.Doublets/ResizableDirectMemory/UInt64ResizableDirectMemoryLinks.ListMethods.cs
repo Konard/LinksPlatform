@@ -1,6 +1,6 @@
 ﻿using Platform.Collections.Methods.Lists;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     unsafe partial class UInt64ResizableDirectMemoryLinks
     {

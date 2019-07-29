@@ -13,9 +13,10 @@ using Platform.Random;
 using Platform.Helpers;
 using Platform.Helpers.Singletons;
 using Platform.Helpers.Counters;
+using Platform.Data;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
-using Platform.Data;
+using Platform.Data.Doublets.ResizableDirectMemory;
 
 namespace Platform.Tests.Data.Doublets
 {

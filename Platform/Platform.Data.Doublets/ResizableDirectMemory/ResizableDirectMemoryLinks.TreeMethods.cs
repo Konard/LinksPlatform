@@ -7,7 +7,7 @@ using Platform.Collections.Methods.Trees;
 using System.Text;
 using Platform.Data.Constants;
 
-namespace Platform.Data.Doublets
+namespace Platform.Data.Doublets.ResizableDirectMemory
 {
     partial class ResizableDirectMemoryLinks<TLink>
     {
