@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Doublets.Sequences.Frequencies.Cache
+namespace Platform.Data.Doublets
 {
     /// <remarks>
     /// TODO: Может стоит попробовать ref во всех методах (IRefEqualityComparer)

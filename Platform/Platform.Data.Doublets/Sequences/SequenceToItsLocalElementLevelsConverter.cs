@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
-using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 
 namespace Platform.Data.Doublets.Sequences
 {
