@@ -8,7 +8,7 @@ using Platform.Numbers;
 using Platform.Data.Constants;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.Converters
 {
     /// <remarks>
     /// TODO: Возможно будет лучше если алгоритм будет выполняться полностью изолированно от Links на этапе сжатия.

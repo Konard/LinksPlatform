@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Platform.Collections.Stacks;
+using Platform.Data.Doublets.Sequences.HeightProviders;
 using Platform.Data.Sequences;
 
 namespace Platform.Data.Doublets.Sequences

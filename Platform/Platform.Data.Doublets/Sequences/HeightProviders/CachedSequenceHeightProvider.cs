@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Interfaces;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.HeightProviders
 {
     public class CachedSequenceHeightProvider<TLink> : LinksOperatorBase<TLink>, ISequenceHeightProvider<TLink>
     {

@@ -5,7 +5,7 @@ using System.Linq;
 using Xunit;
 using Platform.Data.Sequences;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.Sequences;
+using Platform.Data.Doublets.Sequences.Converters;
 
 namespace Platform.Tests.Data.Doublets
 {

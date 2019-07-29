@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.Converters
 {
     public class BalancedVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {

@@ -12,6 +12,7 @@ using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
+using Platform.Data.Doublets.Sequences.Converters;
 
 namespace Platform.Sandbox
 {

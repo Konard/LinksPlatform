@@ -9,6 +9,7 @@ using Platform.Helpers.Singletons;
 using LinkIndex = System.UInt64;
 using Platform.Data.Constants;
 using Platform.Data.Sequences;
+using Platform.Data.Doublets.Sequences.Walkers;
 
 namespace Platform.Data.Doublets.Sequences
 {

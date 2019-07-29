@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.Walkers
 {
     public class RightSequenceWalker<TLink> : SequenceWalkerBase<TLink>
     {

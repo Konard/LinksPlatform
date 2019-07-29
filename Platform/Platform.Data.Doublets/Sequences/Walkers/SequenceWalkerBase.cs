@@ -2,7 +2,7 @@
 using System.Runtime.CompilerServices;
 using Platform.Data.Sequences;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.Walkers
 {
     public abstract class SequenceWalkerBase<TLink> : LinksOperatorBase<TLink>, ISequenceWalker<TLink>
     {

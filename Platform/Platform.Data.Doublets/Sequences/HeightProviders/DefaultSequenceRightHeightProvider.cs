@@ -1,7 +1,7 @@
 ﻿using Platform.Interfaces;
 using Platform.Numbers;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.HeightProviders
 {
     public class DefaultSequenceRightHeightProvider<TLink> : LinksOperatorBase<TLink>, ISequenceHeightProvider<TLink>
     {

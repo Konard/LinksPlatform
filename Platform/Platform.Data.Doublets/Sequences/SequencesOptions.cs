@@ -4,6 +4,7 @@ using Platform.Interfaces;
 using Platform.Data.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
+using Platform.Data.Doublets.Sequences.Converters;
 
 namespace Platform.Data.Doublets.Sequences
 {

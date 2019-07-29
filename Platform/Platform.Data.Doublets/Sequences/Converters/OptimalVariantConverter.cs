@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Platform.Interfaces;
 
-namespace Platform.Data.Doublets.Sequences
+namespace Platform.Data.Doublets.Sequences.Converters
 {
     public class OptimalVariantConverter<TLink> : LinksListToSequenceConverterBase<TLink>
     {
