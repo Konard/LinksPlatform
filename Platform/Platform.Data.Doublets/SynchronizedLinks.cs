@@ -14,7 +14,7 @@ namespace Platform.Data.Doublets
     /// </remarks>
     public class SynchronizedLinks<T> : ISynchronizedLinks<T>
     {
-        public ILinksCombinedConstants<T, T, int> Constants { get; }
+        public LinksCombinedConstants<T, T, int> Constants { get; }
         public ISynchronization SyncRoot { get; }
         public ILinks<T> Sync { get; }
         public ILinks<T> Unsync { get; }

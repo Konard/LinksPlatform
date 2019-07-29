@@ -10,7 +10,7 @@ namespace Platform.Tests.Data.Doublets
 {
     public static class ResizableDirectMemoryLinksTests
     {
-        private static readonly LinksCombinedConstants<ulong, ulong, int> Constants = Default<LinksCombinedConstants<ulong, ulong, int>>.Instance;
+        private static readonly LinksCombinedConstants<ulong, ulong, int> _constants = Default<LinksCombinedConstants<ulong, ulong, int>>.Instance;
 
         [Fact]
         public static void BasicFileMappedMemoryTest()
@@ -57,13 +57,13 @@ namespace Platform.Tests.Data.Doublets
 
             memoryAdapter.Update(link, ulong.MaxValue, ulong.MaxValue);
 
-            var resultLink = Constants.Null;
+            var resultLink = _constants.Null;
 
             memoryAdapter.Each(foundLink =>
             {
-                resultLink = foundLink[Constants.IndexPart];
-                return Constants.Break;
-            }, Constants.Any, ulong.MaxValue, ulong.MaxValue);
+                resultLink = foundLink[_constants.IndexPart];
+                return _constants.Break;
+            }, _constants.Any, ulong.MaxValue, ulong.MaxValue);
 
             Assert.True(resultLink == link);
 

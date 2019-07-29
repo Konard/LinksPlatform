@@ -74,6 +74,9 @@ namespace Platform.Data.Doublets
         /// </summary>
         private id Total => _header->AllocatedLinks - _header->FreeLinks;
 
+        // TODO: Дать возможность переопределять в конструкторе
+        public LinksCombinedConstants<id, id, int> Constants { get; }
+
         public UInt64ResizableDirectMemoryLinks(string address) : this(address, DefaultLinksSizeStep) { }
 
         /// <summary>
@@ -100,9 +103,6 @@ namespace Platform.Data.Doublets
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
             _header->ReservedLinks = (id)((_memory.ReservedCapacity - sizeof(LinksHeader)) / sizeof(Link));
         }
-
-        // TODO: Дать возможность переопределять в конструкторе
-        public ILinksCombinedConstants<id, id, int> Constants { get; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public id Count(IList<id> restrictions)

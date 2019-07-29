@@ -37,7 +37,7 @@ namespace Platform.Data.Doublets
             }
         }
 
-        public static readonly TLink NullConstant = Use<ILinksCombinedConstants<TLink, TLink, int>>.Single.Null;
+        public static readonly TLink NullConstant = Use<LinksCombinedConstants<TLink, TLink, int>>.Single.Null;
         public static readonly IList<TLink> NullLink = new List<TLink> { NullConstant, NullConstant, NullConstant };
 
         // TODO: Подумать о том, как реализовать древовидный Restriction и Substitution (Links-Expression)

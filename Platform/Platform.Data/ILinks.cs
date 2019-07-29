@@ -11,7 +11,8 @@ namespace Platform.Data
     /// Этот интерфейс в данный момент не зависит от размера содержимого связи, а значит подходит как для дуплетов, так и для триплетов и т.п.
     /// Возможно этот интерфейс подходит даже для Sequences.
     /// </remarks>
-    public interface ILinks<TLink>
+    public interface ILinks<TLink, TConstants> 
+        where TConstants : ILinksCombinedConstants<TLink, TLink, int, TConstants>
     {
         #region Constants
 
@@ -19,7 +20,7 @@ namespace Platform.Data
         /// Возвращает набор констант, который необходим для эффективной коммуникации с методами этого интерфейса.
         /// Эти константы не меняются с момента создания точки доступа к хранилищу.
         /// </summary>
-        ILinksCombinedConstants<TLink, TLink, int> Constants { get; }
+        TConstants Constants { get; }
 
         #endregion
 

@@ -166,6 +166,8 @@ namespace Platform.Data.Doublets
         /// </summary>
         private TLink Total => Subtract(LinksHeader.GetAllocatedLinks(_header), LinksHeader.GetFreeLinks(_header));
 
+        public LinksCombinedConstants<TLink, TLink, int> Constants { get; }
+
         public ResizableDirectMemoryLinks(string address)
             : this(address, DefaultLinksSizeStep)
         {
@@ -201,8 +203,6 @@ namespace Platform.Data.Doublets
             // Гарантия корректности _header->ReservedLinks относительно _memory.ReservedCapacity
             LinksHeader.SetReservedLinks(_header, (Integer<TLink>)((_memory.ReservedCapacity - LinkHeaderSizeInBytes) / LinkSizeInBytes));
         }
-
-        public ILinksCombinedConstants<TLink, TLink, int> Constants { get; private set; }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public TLink Count(IList<TLink> restrictions)
@@ -582,6 +582,8 @@ namespace Platform.Data.Doublets
         #region Disposable
 
         protected override bool AllowMultipleDisposeCalls => true;
+
+        LinksCombinedConstants<TLink, TLink, int> ILinks<TLink, LinksCombinedConstants<TLink, TLink, int>>.Constants => throw new NotImplementedException();
 
         protected override void DisposeCore(bool manual, bool wasDisposed)
         {

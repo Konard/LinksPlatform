@@ -14,7 +14,7 @@ namespace Platform.Data.Doublets
         private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<TLink>
         {
             private readonly ResizableDirectMemoryLinks<TLink> _memory;
-            private readonly ILinksCombinedConstants<TLink, TLink, int> _constants;
+            private readonly LinksCombinedConstants<TLink, TLink, int> _constants;
             protected readonly IntPtr Links;
             protected readonly IntPtr Header;
 

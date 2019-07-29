@@ -12,7 +12,7 @@ namespace Platform.Data.Doublets
         private abstract class LinksTreeMethodsBase : SizedAndThreadedAVLBalancedTreeMethods<ulong>
         {
             private readonly UInt64ResizableDirectMemoryLinks _memory;
-            private readonly ILinksCombinedConstants<ulong, ulong, int> _constants;
+            private readonly LinksCombinedConstants<ulong, ulong, int> _constants;
             protected readonly Link* Links;
             protected readonly LinksHeader* Header;
 

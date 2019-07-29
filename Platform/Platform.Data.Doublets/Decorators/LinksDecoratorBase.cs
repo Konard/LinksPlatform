@@ -6,7 +6,7 @@ namespace Platform.Data.Doublets
 {
     public abstract class LinksDecoratorBase<T> : ILinks<T>
     {
-        public ILinksCombinedConstants<T, T, int> Constants { get; }
+        public LinksCombinedConstants<T, T, int> Constants { get; }
 
         public readonly ILinks<T> Links;
 
