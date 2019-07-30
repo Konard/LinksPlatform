@@ -357,8 +357,7 @@ namespace Platform.Tests.Data.Doublets
         [Fact]
         public void IndexTest()
         {
-            using (var scope = new TempLinksTestScope(useSequences: true,
-                sequencesOptions: new SequencesOptions<ulong> { UseIndex = true }))
+            using (var scope = new TempLinksTestScope(new SequencesOptions<ulong> { UseIndex = true }, useSequences: true))
             {
                 var links = scope.Links;
                 var sequences = scope.Sequences;

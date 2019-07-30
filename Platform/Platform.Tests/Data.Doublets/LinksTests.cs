@@ -10,6 +10,7 @@ using Platform.Disposables;
 using Platform.IO;
 using Platform.Ranges;
 using Platform.Random;
+using Platform.Timestamps;
 using Platform.Helpers;
 using Platform.Helpers.Singletons;
 using Platform.Helpers.Counters;
@@ -326,7 +327,7 @@ namespace Platform.Tests.Data.Doublets
 
             // Damage database
 
-            FileHelpers.WriteFirst(tempTransactionLogFilename, new UInt64LinksTransactionsLayer.Transition { TransactionId = 555 });
+            FileHelpers.WriteFirst(tempTransactionLogFilename, new UInt64LinksTransactionsLayer.Transition(new UniqueTimestampFactory(), 555));
 
             // Try load damaged database
             try

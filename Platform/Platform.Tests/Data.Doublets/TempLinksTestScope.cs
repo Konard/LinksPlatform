@@ -16,7 +16,12 @@ namespace Platform.Tests.Data.Doublets
         public readonly string TempTransactionLogFilename;
         private readonly bool _deleteFiles;
 
-        public TempLinksTestScope(bool deleteFiles = true, bool useSequences = false, SequencesOptions<ulong> sequencesOptions = new SequencesOptions<ulong>(), bool useLog = false)
+        public TempLinksTestScope(bool deleteFiles = true, bool useSequences = false, bool useLog = false)
+            : this(new SequencesOptions<ulong>(), deleteFiles, useSequences, useLog)
+        {
+        }
+
+        public TempLinksTestScope(SequencesOptions<ulong> sequencesOptions, bool deleteFiles = true, bool useSequences = false, bool useLog = false)
         {
             _deleteFiles = deleteFiles;
             TempFilename = Path.GetTempFileName();
