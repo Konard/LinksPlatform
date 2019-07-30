@@ -7,9 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Platform.Data.Triplets" Version="0.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
     <ProjectReference Include="..\Platform.Tests\Platform.Tests.csproj" />
-    <ProjectReference Include="..\Platform.Data.Triplets\Platform.Data.Triplets.csproj" />
   </ItemGroup>
 
 </Project>
