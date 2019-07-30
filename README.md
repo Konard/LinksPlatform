@@ -2,7 +2,13 @@
 
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
-## [Example]
+[Documentation](http://linksplatform.github.io/Documentation)
+
+[![introduction](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
+
+[Graphical introduction](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
+
+## [Example](https://github.com/linksplatform/HelloWorld.Doublets.DotNet)
 
 ```C#
 using System;
@@ -28,12 +34,6 @@ namespace HelloWorld.Doublets.DotNet
 ```
 
 ## Description
-
-[Documentation](http://linksplatform.github.io/Documentation)
-
-[![introduction](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
-
-[Graphical introduction](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
 
 Inspired by the work of Simon Williams ([The Associative Model of Data](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=888223180)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf), [whitepaper](http://iacis.org/iis/2009/P2009_1301.pdf).
 
