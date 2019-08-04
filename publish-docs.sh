@@ -13,7 +13,6 @@ fi
 # Save some useful information
 SHA=`git rev-parse --verify HEAD`
 COMMIT_AUTHOR_EMAIL="konard@me.com"
-TOKEN="013ce67101622e7c396d49d21b36b80aa087912b"
 
 # DocFX installation
 nuget install docfx.console
