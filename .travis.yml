@@ -4,6 +4,6 @@ dist: xenial
 mono: latest
 dotnet: 2.2
 script:
-  - dotnet run Platform/Platform.dotnet.sln -p Platform/Platform.Tests.Runner -c Release
+  - dotnet build Platform/Platform.dotnet.sln -c Release
 after_success:
   - bash ./publish-docs.sh
