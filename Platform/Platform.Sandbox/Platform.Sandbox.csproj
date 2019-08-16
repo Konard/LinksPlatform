@@ -12,7 +12,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Platform.Examples\Platform.Examples.csproj" />
-    <ProjectReference Include="..\Platform.Tests\Platform.Tests.csproj" />
   </ItemGroup>
 
 </Project>
