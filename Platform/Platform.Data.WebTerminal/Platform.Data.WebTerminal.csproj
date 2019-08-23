@@ -12,9 +12,4 @@
     <PackageReference Include="Platform.Data.Triplets" Version="0.0.3" />
   </ItemGroup>
 
-  <Target Name="PrecompileScript" BeforeTargets="BeforeBuild">
-    <Copy SourceFiles="..\$(ConfigurationName)\Platform.Data.Kernel.dll" DestinationFolder="$(TargetDir)" />
-    <Copy SourceFiles="..\$(ConfigurationName)\Platform.Data.Kernel.pdb" DestinationFolder="$(TargetDir)" />
-  </Target>
-
 </Project>
