@@ -5,6 +5,8 @@ using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Decorators;
+using Platform.Data.Doublets.Unicode;
+using Platform.Data.Doublets.Sequences.Indexes;
 
 namespace Platform.Examples
 {
@@ -27,8 +29,8 @@ namespace Platform.Examples
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     links.UseUnicode();
                     UnicodeMap.InitNew(syncLinks);
-                    var indexer = new SequencesIndexer<ulong>(syncLinks);
-                    var fileIndexer = new FileIndexer(syncLinks, indexer);
+                    var index = new SequenceIndex<ulong>(syncLinks);
+                    var fileIndexer = new FileIndexer(syncLinks, index);
                     //fileIndexer.IndexAsync(fileToIndex, cancellationSource.Token).Wait();
                     //fileIndexer.IndexSync(fileToIndex, cancellationSource.Token);
                     fileIndexer.IndexParallel(fileToIndex, cancellation.Token);

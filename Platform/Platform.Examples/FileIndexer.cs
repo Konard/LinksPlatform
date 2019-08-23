@@ -5,21 +5,22 @@ using System.Threading;
 using System.Threading.Tasks;
 using Platform.Threading;
 using Platform.IO;
-using Platform.Data.Doublets;
-using Platform.Data.Doublets.Sequences;
 using Platform.Data;
+using Platform.Data.Doublets;
+using Platform.Data.Doublets.Sequences.Indexes;
+using Platform.Data.Doublets.Unicode;
 
 namespace Platform.Examples
 {
     public class FileIndexer
     {
-        private readonly SequencesIndexer<ulong> _indexer;
+        private readonly SequenceIndex<ulong> _index;
         private readonly SynchronizedLinks<ulong> _links;
 
-        public FileIndexer(SynchronizedLinks<ulong> links, SequencesIndexer<ulong> indexer)
+        public FileIndexer(SynchronizedLinks<ulong> links, SequenceIndex<ulong> indexer)
         {
             _links = links;
-            _indexer = indexer;
+            _index = indexer;
         }
 
         public void IndexSync(string path, CancellationToken cancellationToken)
@@ -42,7 +43,7 @@ namespace Platform.Examples
                     }
                     lastCharOfPreviousChunk = buffer[readChars - 1];
                     var linkArray = UnicodeMap.FromCharsToLinkArray(buffer, readChars);
-                    _indexer.BulkIndexUnsync(linkArray);
+                    _index.Add(linkArray);
                     Console.WriteLine($"chars: {(ulong)steps * stepSize + (ulong)readChars}, links: {_links.Count() - UnicodeMap.MapSize}");
                     steps++;
                 }
@@ -74,7 +75,7 @@ namespace Platform.Examples
                     tasks.EnqueueAsRunnedTask(() =>
                     {
                         var linkArray = UnicodeMap.FromCharsToLinkArray(bufferCopy, readCharsCopy);
-                        _indexer.BulkIndex(linkArray);
+                        _index.Add(linkArray);
                     });
                     if (tasks.Count > 3)
                     {
@@ -109,7 +110,7 @@ namespace Platform.Examples
                 // NewLine -> First Character
                 _links.GetOrCreate(UnicodeMap.FromCharToLink('\n'), UnicodeMap.FromCharToLink(line[0]));
                 var linkArray = UnicodeMap.FromStringToLinkArray(line);
-                _indexer.BulkIndex(linkArray);
+                _index.Add(linkArray);
                 // Last Character -> NewLine
                 _links.GetOrCreate(UnicodeMap.FromCharToLink(line[line.Length - 1]), UnicodeMap.FromCharToLink('\n'));
                 var totalLinks = _links.Count() - UnicodeMap.MapSize;

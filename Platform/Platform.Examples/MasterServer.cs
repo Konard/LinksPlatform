@@ -6,6 +6,7 @@ using Platform.Data;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
+using Platform.Data.Doublets.Unicode;
 using Platform.Helpers.Singletons;
 
 namespace Platform.Examples

@@ -9,9 +9,9 @@ using Platform.Memory;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using TLink = System.UInt32;
-using Platform.Data.Doublets.PropertyOperators;
 using Platform.Data.Doublets.Decorators;
-using Platform.Data.Doublets.Converters;
+using Platform.Data.Doublets.Numbers.Unary;
+using Platform.Data.Doublets.PropertyOperators;
 
 namespace Platform.Sandbox
 {
@@ -176,7 +176,7 @@ namespace Platform.Sandbox
         private AddressToUnaryNumberConverter<TLink> _toNumberConverter;
         private PowerOf2ToUnaryNumberConverter<TLink> _powerOf2ToUnaryNumberConverter;
         private UnaryNumberToAddressAddOperationConverter<TLink> _fromNumberConverter;
-        private DefaultLinkPropertyOperator<TLink> _propertyOperator;
+        private PropertiesOperator<TLink> _propertyOperator;
         private TLink _currentLink;
 
         public override void WalkAll(IList<char> elements)
@@ -185,7 +185,7 @@ namespace Platform.Sandbox
 
             _linksDisposable = new ResizableDirectMemoryLinks<TLink>(_memory);
 
-            _links = new LinksSelfReferenceResolver<TLink>(_linksDisposable);
+            _links = new LinksItselfConstantToSelfReferenceResolver<TLink>(_linksDisposable);
             _links = new NonNullContentsLinkDeletionResolver<TLink>(_links);
 
             _meaningRoot = _links.CreatePoint();
@@ -198,12 +198,12 @@ namespace Platform.Sandbox
             _powerOf2ToUnaryNumberConverter = new PowerOf2ToUnaryNumberConverter<TLink>(_links, _unaryOne);
             _toNumberConverter = new AddressToUnaryNumberConverter<TLink>(_links, _powerOf2ToUnaryNumberConverter);
 
-            _propertyOperator = new DefaultLinkPropertyOperator<TLink>(_links);
+            _propertyOperator = new PropertiesOperator<TLink>(_links);
 
             base.WalkAll(elements);
 
-            Disposable.TryDispose(_linksDisposable);
-            Disposable.TryDispose(_memory);
+            _linksDisposable.DisposeIfPossible();
+            _memory.DisposeIfPossible();
         }
 
         protected override long GetSegmentFrequency(CharSegment segment)
@@ -241,7 +241,7 @@ namespace Platform.Sandbox
     public class Walker4 : DictionaryBasedDuplicateSegmentsWalkerBase<char, CharSegment>
     {
         public Walker4()
-            : base(resetDictionaryOnEachWalk: true)
+            : base(DefaultMinimumStringSegmentLength, resetDictionaryOnEachWalk: true)
         {
         }
 

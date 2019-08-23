@@ -9,6 +9,7 @@ using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Decorators;
+using Platform.Data.Doublets.Unicode;
 
 namespace Platform.Examples
 {
