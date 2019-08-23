@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Runtime.CompilerServices;
 using Platform.Collections;
 using Platform.Threading;
-using Platform.Helpers.Singletons;
+using Platform.Singletons;
 using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;

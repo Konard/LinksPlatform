@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Platform.Singletons;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data;
 using Platform.Data.Constants;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Unicode;
-using Platform.Helpers.Singletons;
 
 namespace Platform.Examples
 {
