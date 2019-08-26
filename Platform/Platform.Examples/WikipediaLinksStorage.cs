@@ -56,10 +56,10 @@ namespace Platform.Examples
         private ulong Create(ulong marker, string content)
         {
             var contentSequence = _stringToUnicodeSequenceConverter.Convert(content);
-            return _links.CreateAndUpdate(marker, contentSequence);
+            return _links.GetOrCreate(marker, contentSequence);
         }
 
-        public void AttachElementToParent(ulong elementToAttach, ulong parent) => _links.CreateAndUpdate(parent, elementToAttach);
+        public void AttachElementToParent(ulong elementToAttach, ulong parent) => _links.GetOrCreate(parent, elementToAttach);
     }
 }
 
