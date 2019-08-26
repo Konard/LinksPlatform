@@ -3,12 +3,8 @@
 [github.com/Konard/LinksPlatform](https://github.com/Konard/LinksPlatform)
 
 ## Description | Описание
-Holistic system for storage and transformation of information based on associative model of data. Целостная система для хранения и обработки информации, основанная на ассоциативной модели данных.
+Development of holistic system for storage and transformation of information based on associative model of data. Разработка целостной система для хранения и обработки информации, основанная на ассоциативной модели данных.
 
-## How to run | Как запустить
-### Prerequisites | Требования
+## Prerequisites | Требования
 * Install .NET Core SDK https://www.microsoft.com/net
 * Установить .NET Core SDK https://www.microsoft.com/net
-
-### Run Tests | Запустить тесты
-* `dotnet run Platform/Platform.dotnet.sln -p Platform/Platform.Tests.Runner`
