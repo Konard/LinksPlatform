@@ -9,6 +9,10 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
+            args = new string[] { @"F:\Архив Википедии\ru\xml\wikipedia-2019-08-26.links", @"F:\Архив Википедии\ru\xml\ruwiki-20151202-pages-articles.xml" };
+
+            new WikipediaImporterCLI().Run(args);
+
             //StringTests.CapitalizeFirstLetterTest();
 
             //ComparisonTests.GreaterOrEqualPerfomanceTest();

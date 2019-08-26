@@ -3,7 +3,6 @@ using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
-using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Examples
@@ -15,11 +14,7 @@ namespace Platform.Examples
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
             var wikipediaFile = ConsoleHelpers.GetOrReadArgument(1, "Wikipedia xml file", args);
 
-            if (!File.Exists(linksFile))
-            {
-                Console.WriteLine("Entered links file does not exists.");
-            }
-            else if (!File.Exists(wikipediaFile))
+            if (!File.Exists(wikipediaFile))
             {
                 Console.WriteLine("Entered wikipedia xml file does not exists.");
             }
@@ -29,14 +24,20 @@ namespace Platform.Examples
 
                 using (var cancellation = new ConsoleCancellationHandler())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, gb32))
-                using (var links = new UInt64Links(memoryAdapter))
+                //using (var links = new UInt64Links(memoryAdapter))
                 {
-                    var syncLinks = new SynchronizedLinks<ulong>(links);
-                    links.UseUnicode();
-                    var sequences = new Sequences(syncLinks, new SequencesOptions<ulong> { UseCompression = true });
-                    var wikipediaStorage = new WikipediaLinksStorage(sequences);
-                    var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
-                    wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
+                    var links = memoryAdapter.DecorateWithAutomaticUniquenessAndUsagesResolution();
+                    var wikipediaIndexer = new WikipediaIndexer<ulong>(links);
+                    var wikipediaIndexingImporter = new WikipediaImporter(wikipediaIndexer);
+                    wikipediaIndexingImporter.Import(wikipediaFile, cancellation.Token).Wait();
+                    if (!cancellation.IsCancellationRequested)
+                    {
+                        var cache = wikipediaIndexer.Cache;
+                        Console.WriteLine("Frequencies cache ready.");
+                        var wikipediaStorage = new WikipediaLinksStorage(links, cache);
+                        var wikipediaImporter = new WikipediaImporter(wikipediaStorage);
+                        wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
+                    }
                 }
             }
 
