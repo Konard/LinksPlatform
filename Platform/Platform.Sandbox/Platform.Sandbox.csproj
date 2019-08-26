@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="Platform.Data.Triplets" Version="0.0.4" />
+    <PackageReference Include="Platform.Threading" Version="0.0.5" />
   </ItemGroup>
 
   <ItemGroup>
