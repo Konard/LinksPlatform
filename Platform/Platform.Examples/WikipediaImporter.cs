@@ -91,8 +91,8 @@ namespace Platform.Examples
                         context = parentContexts.Pop();
                         if (topElement.StartsWith("page"))
                         {
-                            //if (context.ChildrenNamesCounts["page"] % 100 == 0)
-                            Console.WriteLine(topElement);
+                            if (context.ChildrenNamesCounts["page"] % 1000 == 0)
+                                Console.WriteLine(topElement);
                         }
                         break;
 
