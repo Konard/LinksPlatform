@@ -1,7 +1,7 @@
 # Links Platform ([русская версия](index.ru.html))
 Holistic system for storage and transformation of information (in development) based on associative model of data.
 
-## Prerequisites | Требования
+## Prerequisites
 * Linux, macOS or Windows operating system.
 * [.NET Core](https://www.microsoft.com/net) SDK with version 2.2 or later  
 
