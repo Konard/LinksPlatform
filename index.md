@@ -1,4 +1,4 @@
-# Links Platform ([русская версия](index.ru.html))
+# Links Platform ([русская версия](index.ru.md))
 Holistic system for storage and transformation of information (in development) based on associative model of data.
 
 ## Prerequisites
