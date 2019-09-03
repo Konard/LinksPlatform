@@ -1,5 +1,5 @@
 # Links Platform ([русская версия](index.ru.html))
-Holistic system for storage and transformation of information based on associative model of data (in development).
+Holistic system for storage and transformation of information (in development) based on associative model of data.
 
 ## Prerequisites | Требования
 * Linux, macOS or Windows operating system.
