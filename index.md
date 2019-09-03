@@ -16,7 +16,7 @@ Common interfaces and classes for both [Doublets](https://github.com/linksplatfo
 #### [Platform.Data.Triplets](https://github.com/linksplatform/Data.Triplets)
 #### [Platform.Data.Triplets.Kernel](https://github.com/linksplatform/Data.Triplets.Kernel)
 
-#### Auxiliary packages
+### Auxiliary packages
 
 #### [Platform.Data.Memory](https://github.com/linksplatform/Memory)
 #### [Platform.Data.Communication](https://github.com/linksplatform/Communication)
