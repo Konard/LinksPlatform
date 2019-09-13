@@ -39,7 +39,7 @@ namespace HelloWorld.Doublets.DotNet
 
 ## Описание
 
-Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=888223180)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
+Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=913469847)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
 
 Сравнение моделей данных:
 
