@@ -3,7 +3,8 @@ Holistic system for storage and transformation of information (in development) b
 
 ## Prerequisites
 * Linux, macOS or Windows operating system.
-* [.NET Core](https://www.microsoft.com/net) SDK with version 2.2 or later  
+* [.NET Core](https://www.microsoft.com/net) SDK with version 2.2 or later.
+* [MonoDevelop](https://www.monodevelop.com/), [Visual Studio](https://visualstudio.microsoft.com) or any other [IDE](https://en.wikipedia.org/wiki/Integrated_development_environment) or just a [text editor](https://en.wikipedia.org/wiki/Text_editor).
 
 ## Links Platform's NuGet packages
 
