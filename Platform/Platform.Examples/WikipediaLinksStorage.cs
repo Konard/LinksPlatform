@@ -9,36 +9,36 @@ using Platform.Data.Doublets.Unicode;
 
 namespace Platform.Examples
 {
-    public class WikipediaLinksStorage : IWikipediaStorage<ulong>
+    public class WikipediaLinksStorage<TLink> : IWikipediaStorage<TLink>
     {
-        private readonly StringToUnicodeSequenceConverter<ulong> _stringToUnicodeSequenceConverter;
-        private readonly ILinks<ulong> _links;
-        private ulong _unicodeSymbolMarker;
-        private ulong _unicodeSequenceMarker;
-        private ulong _elementMarker;
-        private ulong _textElementMarker;
-        private ulong _documentMarker;
+        private readonly StringToUnicodeSequenceConverter<TLink> _stringToUnicodeSequenceConverter;
+        private readonly ILinks<TLink> _links;
+        private TLink _unicodeSymbolMarker;
+        private TLink _unicodeSequenceMarker;
+        private TLink _elementMarker;
+        private TLink _textElementMarker;
+        private TLink _documentMarker;
 
-        private class Unindex : ISequenceIndex<ulong>
+        private class Unindex : ISequenceIndex<TLink>
         {
-            public bool Add(IList<ulong> sequence) => true;
-            public bool MightContain(IList<ulong> sequence) => false;
+            public bool Add(IList<TLink> sequence) => true;
+            public bool MightContain(IList<TLink> sequence) => false;
         }
 
-        public WikipediaLinksStorage(ILinks<ulong> links, LinkFrequenciesCache<ulong> frequenciesCache)
+        public WikipediaLinksStorage(ILinks<TLink> links, LinkFrequenciesCache<TLink> frequenciesCache)
         {
-            var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<ulong>(frequenciesCache);
-            var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<ulong>(links, linkToItsFrequencyNumberConverter);
-            var optimalVariantConverter = new OptimalVariantConverter<ulong>(links, sequenceToItsLocalElementLevelsConverter);
+            var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<TLink>(frequenciesCache);
+            var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<TLink>(links, linkToItsFrequencyNumberConverter);
+            var optimalVariantConverter = new OptimalVariantConverter<TLink>(links, sequenceToItsLocalElementLevelsConverter);
             InitConstants(links);
-            var charToUnicodeSymbolConverter = new CharToUnicodeSymbolConverter<ulong>(links, new AddressToRawNumberConverter<ulong>(), _unicodeSymbolMarker);
-            _stringToUnicodeSequenceConverter = new StringToUnicodeSequenceConverter<ulong>(links, charToUnicodeSymbolConverter, new Unindex(), optimalVariantConverter, _unicodeSequenceMarker);
+            var charToUnicodeSymbolConverter = new CharToUnicodeSymbolConverter<TLink>(links, new AddressToRawNumberConverter<TLink>(), _unicodeSymbolMarker);
+            _stringToUnicodeSequenceConverter = new StringToUnicodeSequenceConverter<TLink>(links, charToUnicodeSymbolConverter, new Unindex(), optimalVariantConverter, _unicodeSequenceMarker);
             _links = links;
         }
 
-        private void InitConstants(ILinks<ulong> links)
+        private void InitConstants(ILinks<TLink> links)
         {
-            var markerIndex = 1UL;
+            var markerIndex = Integer<TLink>.One;
             var meaningRoot = links.GetOrCreate(markerIndex, markerIndex);
             _unicodeSymbolMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));
             _unicodeSequenceMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));
@@ -47,19 +47,19 @@ namespace Platform.Examples
             _documentMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));
         }
 
-        public ulong CreateDocument(string name) => Create(_documentMarker, name);
+        public TLink CreateDocument(string name) => Create(_documentMarker, name);
 
-        public ulong CreateElement(string name) => Create(_elementMarker, name);
+        public TLink CreateElement(string name) => Create(_elementMarker, name);
 
-        public ulong CreateTextElement(string content) => Create(_textElementMarker, content);
+        public TLink CreateTextElement(string content) => Create(_textElementMarker, content);
 
-        private ulong Create(ulong marker, string content)
+        private TLink Create(TLink marker, string content)
         {
             var contentSequence = _stringToUnicodeSequenceConverter.Convert(content);
             return _links.GetOrCreate(marker, contentSequence);
         }
 
-        public void AttachElementToParent(ulong elementToAttach, ulong parent) => _links.GetOrCreate(parent, elementToAttach);
+        public void AttachElementToParent(TLink elementToAttach, TLink parent) => _links.GetOrCreate(parent, elementToAttach);
     }
 }
 

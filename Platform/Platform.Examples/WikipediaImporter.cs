@@ -14,11 +14,11 @@ namespace Platform.Examples
     /// TODO: Can be renamed to XMLImporter
     /// TODO: Add support for XML arguments
     /// </remarks>
-    class WikipediaImporter
+    class WikipediaImporter<TLink>
     {
-        private readonly IWikipediaStorage<ulong> _storage;
+        private readonly IWikipediaStorage<TLink> _storage;
 
-        public WikipediaImporter(IWikipediaStorage<ulong> storage) => _storage = storage;
+        public WikipediaImporter(IWikipediaStorage<TLink> storage) => _storage = storage;
 
         public Task Import(string file, CancellationToken token)
         {
@@ -112,10 +112,10 @@ namespace Platform.Examples
 
         private struct ElementContext
         {
-            public readonly ulong Parent;
+            public readonly TLink Parent;
             public readonly Dictionary<string, int> ChildrenNamesCounts;
 
-            public ElementContext(ulong parent)
+            public ElementContext(TLink parent)
             {
                 Parent = parent;
                 ChildrenNamesCounts = new Dictionary<string, int>();
