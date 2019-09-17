@@ -4,6 +4,8 @@ using Platform.IO;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.ResizableDirectMemory;
 using Platform.Data.Doublets.Decorators;
+using Platform.Data.Doublets.Sequences.Frequencies.Cache;
+using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 
 namespace Platform.Examples
 {
@@ -12,11 +14,11 @@ namespace Platform.Examples
         public void Run(params string[] args)
         {
             var linksFile = ConsoleHelpers.GetOrReadArgument(0, "Links file", args);
-            var wikipediaFile = ConsoleHelpers.GetOrReadArgument(1, "Wikipedia xml file", args);
+            var file = ConsoleHelpers.GetOrReadArgument(1, "Xml file", args);
 
-            if (!File.Exists(wikipediaFile))
+            if (!File.Exists(file))
             {
-                Console.WriteLine("Entered wikipedia xml file does not exists.");
+                Console.WriteLine("Entered xml file does not exists.");
             }
             else
             {
@@ -29,21 +31,21 @@ namespace Platform.Examples
                 {
                     Console.WriteLine("Press CTRL+C to stop.");
                     var links = memoryAdapter.DecorateWithAutomaticUniquenessAndUsagesResolution();
-                    var wikipediaIndexer = new XmlIndexer<uint>(links);
-                    var wikipediaIndexingImporter = new XmlImporter<uint>(wikipediaIndexer);
-                    wikipediaIndexingImporter.Import(wikipediaFile, cancellation.Token).Wait();
+                    var indexer = new XmlIndexer<uint>(links);
+                    var indexingImporter = new XmlImporter<uint>(indexer);
+                    indexingImporter.Import(file, cancellation.Token).Wait();
                     if (cancellation.NotRequested)
                     {
-                        var cache = wikipediaIndexer.Cache;
+                        var cache = indexer.Cache;
+                        //var counter = new TotalSequenceSymbolFrequencyCounter<uint>(links);
+                        //var cache = new LinkFrequenciesCache<uint>(links, counter);
                         Console.WriteLine("Frequencies cache ready.");
-                        var wikipediaStorage = new LinksXmlStorage<uint>(links, cache);
-                        var wikipediaImporter = new XmlImporter<uint>(wikipediaStorage);
-                        wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
+                        var storage = new LinksXmlStorage<uint>(links, false, cache);
+                        var importer = new XmlImporter<uint>(storage);
+                        importer.Import(file, cancellation.Token).Wait();
                     }
                 }
             }
-
-            ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
 }

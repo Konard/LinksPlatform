@@ -42,7 +42,6 @@ namespace Platform.Examples
                     exporter.Export(syncLinks, exportTo, isUnicodeMapped, doConvertUnicodeLinksToCharacters, doReferenceByLines, cancellation.Token);
                 }
             }
-            ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
 }

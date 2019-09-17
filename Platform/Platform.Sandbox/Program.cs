@@ -10,9 +10,16 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
+            //ThreadHelpers.InvokeWithExtendedMaxStackSize(() =>
+            //{
+            //    args = new string[] { @"F:\Архив Википедии\ru\xml\ruwiki-20151202-pages-articles.xml", "page" };
+
+            //    new XmlElementCounterCLI().Run(args);
+            //});
+
             ThreadHelpers.InvokeWithExtendedMaxStackSize(() =>
             {
-                args = new string[] { @"F:\Архив Википедии\ru\xml\wikipedia-2019-08-28.links", @"F:\Архив Википедии\ru\xml\ruwiki-20151202-pages-articles.xml" };
+                args = new string[] { @"F:\Архив Википедии\ru\xml\wikipedia-2019-09-17.links", @"F:\Архив Википедии\ru\xml\ruwiki-20151202-pages-articles.xml" };
 
                 new XmlImporterCLI().Run(args);
             });
@@ -43,8 +50,6 @@ namespace Platform.Sandbox
 
             //new CSVExporterCLI().Run(args);
             //new FileIndexerCLI().Run(args);
-            //new WikipediaImporterCLI().Run(args);
-            //new WikipediaPagesCounterCLI().Run(args);
 
             //DllImportTest.Test();
 

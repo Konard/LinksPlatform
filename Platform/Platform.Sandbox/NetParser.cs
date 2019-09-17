@@ -12,22 +12,20 @@ namespace Platform.Sandbox
         const string StatementPart = @"(?<part>((?<word>\w+)|""(?<string>[^""]+)""))";
         const string Statement = "^(" + StatementTermPart + "|" + StatementPart + @")(\s+" + StatementPart + @")+\.$";
 
-        private static readonly Regex StatementRegex = new Regex(Statement, RegexOptions.Compiled);
+        private static readonly Regex _statementRegex = new Regex(Statement, RegexOptions.Compiled);
 
         public static void ParseStatement(string statement)
         {
-            var match = StatementRegex.Match(statement);
+            var match = _statementRegex.Match(statement);
             if (match.Success)
             {
                 Console.WriteLine("-> Statement parsed successfully.");
-
 
                 foreach (Capture capture in match.Groups["part"].Captures)
                 {
                     var value = capture.Value.ToLower();
 
-
-
+                    throw new NotImplementedException();
                 }
             }
 

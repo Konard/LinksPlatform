@@ -10,11 +10,7 @@ using Platform.IO;
 
 namespace Platform.Examples
 {
-    /// <remarks>
-    /// TODO: Can be renamed to XMLImporter
-    /// TODO: Add support for XML arguments
-    /// </remarks>
-    class XmlImporter<TLink>
+    public class XmlImporter<TLink>
     {
         private readonly IXmlStorage<TLink> _storage;
 
@@ -24,18 +20,6 @@ namespace Platform.Examples
         {
             return Task.Factory.StartNew(() =>
             {
-                //const int linesLength = 500;
-                //var lines = new string[linesLength];
-                //using (var rawReader = new StreamReader(file))
-                //{
-                //    for (var i = 0; i < 500; i++)
-                //        lines[i] = rawReader.ReadLine();
-                //}
-                //using (var rawWriter = new StreamWriter(file+".500.first"))
-                //{
-                //    for (var i = 0; i < 500; i++)
-                //        rawWriter.WriteLine(lines[i]);
-                //}
                 try
                 {
                     var document = _storage.CreateDocument(file);
@@ -86,16 +70,15 @@ namespace Platform.Examples
                         break;
                     case XmlNodeType.EndElement:
                         ConsoleHelpers.Debug("{0} finished.", elements.Count <= 20 ? ToXPath(elements) : elements.Peek()); // XPath
-                        var topElement = elements.Pop();
+                        elements.Pop();
                         // Restoring scope
                         context = parentContexts.Pop();
-                        if (topElement.StartsWith("page"))
+                        if (elements.Count == 1)
                         {
-                            if (context.ChildrenNamesCounts["page"] % 1000 == 0)
-                                Console.WriteLine(topElement);
+                            if (context.TotalChildren % 10 == 0)
+                                Console.WriteLine(context.TotalChildren);
                         }
                         break;
-
                     case XmlNodeType.Text:
                         ConsoleHelpers.Debug("Starting text element...");
                         var content = reader.Value;
@@ -110,27 +93,13 @@ namespace Platform.Examples
 
         private string ToXPath(Stack<string> path) => string.Join("/", path.Reverse());
 
-        private struct ElementContext
+        private class ElementContext : XmlElementContext
         {
             public readonly TLink Parent;
-            public readonly Dictionary<string, int> ChildrenNamesCounts;
 
             public ElementContext(TLink parent)
             {
                 Parent = parent;
-                ChildrenNamesCounts = new Dictionary<string, int>();
-            }
-
-            public void IncrementChildNameCount(string name)
-            {
-                if (ChildrenNamesCounts.TryGetValue(name, out int count))
-                {
-                    ChildrenNamesCounts[name] = count + 1;
-                }
-                else
-                {
-                    ChildrenNamesCounts[name] = 0;
-                }
             }
         }
     }

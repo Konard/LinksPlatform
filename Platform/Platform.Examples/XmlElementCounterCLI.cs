@@ -8,21 +8,24 @@ namespace Platform.Examples
     {
         public void Run(params string[] args)
         {
-            var wikipediaFile = ConsoleHelpers.GetOrReadArgument(0, "Wikipedia xml file", args);
-            if (!File.Exists(wikipediaFile))
+            var file = ConsoleHelpers.GetOrReadArgument(0, "Xml file", args);
+            var elementName = ConsoleHelpers.GetOrReadArgument(1, "Element name to count", args);
+            if (!File.Exists(file))
             {
-                Console.WriteLine("Entered wikipedia xml file does not exists.");
+                Console.WriteLine("Entered xml file does not exists.");
+            }
+            else if (string.IsNullOrEmpty(elementName))
+            {
+                Console.WriteLine("Entered element name is empty.");
             }
             else
             {
                 using (var cancellation = new ConsoleCancellation())
                 {
                     Console.WriteLine("Press CTRL+C to stop.");
-                    var wikipediaPagesCounter = new XmlElementCounter();
-                    wikipediaPagesCounter.Count(wikipediaFile, cancellation.Token).Wait();
+                    new XmlElementCounter().Count(file, elementName, cancellation.Token).Wait();
                 }
             }
-            ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
 }

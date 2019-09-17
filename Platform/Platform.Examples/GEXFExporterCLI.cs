@@ -32,7 +32,6 @@ namespace Platform.Examples
                     exporter.Export(exportTo);
                 }
             }
-            ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
 }

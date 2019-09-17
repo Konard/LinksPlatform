@@ -36,7 +36,6 @@ namespace Platform.Examples
                     fileIndexer.IndexParallel(fileToIndex, cancellation.Token);
                 }
             }
-            ConsoleHelpers.PressAnyKeyToContinue();
         }
     }
 }

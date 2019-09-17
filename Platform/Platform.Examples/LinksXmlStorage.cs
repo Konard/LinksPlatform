@@ -22,17 +22,18 @@ namespace Platform.Examples
         private class Unindex : ISequenceIndex<TLink>
         {
             public bool Add(IList<TLink> sequence) => true;
-            public bool MightContain(IList<TLink> sequence) => false;
+            public bool MightContain(IList<TLink> sequence) => true;
         }
 
-        public LinksXmlStorage(ILinks<TLink> links, LinkFrequenciesCache<TLink> frequenciesCache)
+        public LinksXmlStorage(ILinks<TLink> links, bool indexSequenceBeforeCreation, LinkFrequenciesCache<TLink> frequenciesCache)
         {
             var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<TLink>(frequenciesCache);
             var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<TLink>(links, linkToItsFrequencyNumberConverter);
             var optimalVariantConverter = new OptimalVariantConverter<TLink>(links, sequenceToItsLocalElementLevelsConverter);
             InitConstants(links);
             var charToUnicodeSymbolConverter = new CharToUnicodeSymbolConverter<TLink>(links, new AddressToRawNumberConverter<TLink>(), _unicodeSymbolMarker);
-            _stringToUnicodeSequenceConverter = new StringToUnicodeSequenceConverter<TLink>(links, charToUnicodeSymbolConverter, new Unindex(), optimalVariantConverter, _unicodeSequenceMarker);
+            var index = indexSequenceBeforeCreation ? new CachedFrequencyIncrementingSequenceIndex<TLink>(frequenciesCache) : (ISequenceIndex<TLink>)new Unindex();
+            _stringToUnicodeSequenceConverter = new StringToUnicodeSequenceConverter<TLink>(links, charToUnicodeSymbolConverter, index, optimalVariantConverter, _unicodeSequenceMarker);
             _links = links;
         }
 
