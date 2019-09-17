@@ -32,10 +32,11 @@ namespace Platform.Examples
             }
             else
             {
-                using (var cancellation = new ConsoleCancellationHandler())
+                using (var cancellation = new ConsoleCancellation())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
+                    Console.WriteLine("Press CTRL+C to stop.");
                     var syncLinks = new SynchronizedLinks<ulong>(links);
                     var exporter = new TExporter();
                     exporter.Export(syncLinks, exportTo, isUnicodeMapped, doConvertUnicodeLinksToCharacters, doReferenceByLines, cancellation.Token);

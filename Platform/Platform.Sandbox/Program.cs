@@ -10,11 +10,11 @@ namespace Platform.Sandbox
     {
         public static void Main(string[] args)
         {
-            ThreadHelpers.SyncInvokeWithExtendedStack(() =>
+            ThreadHelpers.InvokeWithExtendedMaxStackSize(() =>
             {
                 args = new string[] { @"F:\Архив Википедии\ru\xml\wikipedia-2019-08-28.links", @"F:\Архив Википедии\ru\xml\ruwiki-20151202-pages-articles.xml" };
 
-                new WikipediaImporterCLI().Run(args);
+                new XmlImporterCLI().Run(args);
             });
 
             //StringTests.CapitalizeFirstLetterTest();

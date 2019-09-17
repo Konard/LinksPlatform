@@ -41,24 +41,23 @@ namespace Platform.Sandbox
             public long FileSizeInTransactionItems;
         }
 
-        private static readonly long BasicTransactionsOffset = Marshal.SizeOf<TransactionsState>();
-        private static readonly long TransactionItemSize = Marshal.SizeOf<TransactionItem>();
+        private static readonly long _basicTransactionsOffset = Marshal.SizeOf<TransactionsState>();
+        private static readonly long _transactionItemSize = Marshal.SizeOf<TransactionItem>();
 
-        private static long CurrentFileSizeInBytes;
-        private static MemoryMappedFile Log;
-        private static MemoryMappedViewAccessor LogAccessor;
-        private static TransactionsState CurrentState;
+        private static long _currentFileSizeInBytes;
+        private static MemoryMappedFile _log;
+        private static MemoryMappedViewAccessor _logAccessor;
+        private static TransactionsState _currentState;
 
-        private static bool TransactionOpened;
+        private static bool _transactionOpened;
 
         static Transactions()
         {
             OpenFile();
 
-
             var item = new TransactionItem
             {
-                TransactionId = CurrentState.LastTransactionId,
+                TransactionId = _currentState.LastTransactionId,
                 DateTime = DateTime.UtcNow,
                 Type = TransactionItemType.Creation,
                 Source = Net.Link.Source,
@@ -68,10 +67,9 @@ namespace Platform.Sandbox
 
             EnsureFileSize();
 
-            LogAccessor.Write(BasicTransactionsOffset, ref item);
+            _logAccessor.Write(_basicTransactionsOffset, ref item);
 
-            LogAccessor.Read(BasicTransactionsOffset, out item);
-
+            _logAccessor.Read(_basicTransactionsOffset, out item);
 
             CloseFile();
         }
@@ -79,39 +77,32 @@ namespace Platform.Sandbox
         static void StartTransaction()
         {
             // Защита от накопления кучи транзакций, которые не совершили ни одной операции
-            if (CurrentState.LastTransactionItemsCount > 0)
+            if (_currentState.LastTransactionItemsCount > 0)
             {
-                CurrentState.LastTransactionId++;
-                CurrentState.LastTransactionItemsCount = 0;
-                CurrentState.LastTransactionOffset = CurrentState.FileEndOffset;
+                _currentState.LastTransactionId++;
+                _currentState.LastTransactionItemsCount = 0;
+                _currentState.LastTransactionOffset = _currentState.FileEndOffset;
             }
-            TransactionOpened = true;
+            _transactionOpened = true;
         }
 
-        static void CloseTransaction()
-        {
-            TransactionOpened = false;
-        }
+        static void CloseTransaction() => _transactionOpened = false;
 
         static void LoadState()
         {
-            LogAccessor.Read(0, out CurrentState);
-
-            if (CurrentState.FileEndOffset == 0)
+            _logAccessor.Read(0, out _currentState);
+            if (_currentState.FileEndOffset == 0)
             {
-                CurrentState.FileEndOffset = BasicTransactionsOffset;
+                _currentState.FileEndOffset = _basicTransactionsOffset;
             }
         }
 
-        static void StoreState()
-        {
-            LogAccessor.Write(0, ref CurrentState);
-        }
+        static void StoreState() => _logAccessor.Write(0, ref _currentState);
 
         static void EnsureFileSize()
         {
-            var sizeInItems = CurrentState.FileSizeInTransactionItems;
-            if ((CurrentState.FileEndOffset - BasicTransactionsOffset) / TransactionItemSize == sizeInItems)
+            var sizeInItems = _currentState.FileSizeInTransactionItems;
+            if ((_currentState.FileEndOffset - _basicTransactionsOffset) / _transactionItemSize == sizeInItems)
             {
                 if (sizeInItems < 16)
                 {
@@ -121,12 +112,9 @@ namespace Platform.Sandbox
                 {
                     sizeInItems *= 2;
                 }
-
-                var newSizeInBates = BasicTransactionsOffset + sizeInItems * TransactionItemSize;
-
+                var newSizeInBates = _basicTransactionsOffset + sizeInItems * _transactionItemSize;
                 ReloadFile(newSizeInBates);
-
-                CurrentState.LastTransactionItemsCount = sizeInItems;
+                _currentState.LastTransactionItemsCount = sizeInItems;
             }
         }
 
@@ -139,35 +127,31 @@ namespace Platform.Sandbox
         static void CloseFile()
         {
             StoreState();
-            LogAccessor.Flush();
-            LogAccessor.Dispose();
-            Log.Dispose();
+            _logAccessor.Flush();
+            _logAccessor.Dispose();
+            _log.Dispose();
         }
 
         static void OpenFile(long sizeInBytes = 0)
         {
-            if (sizeInBytes < BasicTransactionsOffset)
+            if (sizeInBytes < _basicTransactionsOffset)
             {
-                sizeInBytes = BasicTransactionsOffset;
+                sizeInBytes = _basicTransactionsOffset;
             }
-
             long savedSizeInBytes = 0;
             if (File.Exists(TransactionsFileName))
             {
                 var fileInfo = new FileInfo(TransactionsFileName);
                 savedSizeInBytes = fileInfo.Length;
             }
-
             if (sizeInBytes < savedSizeInBytes)
             {
                 sizeInBytes = savedSizeInBytes;
             }
-
-            Log = MemoryMappedFile.CreateFromFile(TransactionsFileName, FileMode.OpenOrCreate, TransactionsMapName, sizeInBytes);
-            LogAccessor = Log.CreateViewAccessor();
+            _log = MemoryMappedFile.CreateFromFile(TransactionsFileName, FileMode.OpenOrCreate, TransactionsMapName, sizeInBytes);
+            _logAccessor = _log.CreateViewAccessor();
             LoadState();
-
-            CurrentFileSizeInBytes = sizeInBytes;
+            _currentFileSizeInBytes = sizeInBytes;
         }
 
         public static void Run()

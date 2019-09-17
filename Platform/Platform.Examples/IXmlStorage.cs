@@ -1,6 +1,6 @@
 ﻿namespace Platform.Examples
 {
-    public interface IWikipediaStorage<TLink>
+    public interface IXmlStorage<TLink>
     {
         TLink CreateDocument(string name);
         TLink CreateElement(string name);

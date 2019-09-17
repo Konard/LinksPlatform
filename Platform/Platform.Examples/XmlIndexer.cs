@@ -9,7 +9,7 @@ using Platform.Data.Doublets.Unicode;
 
 namespace Platform.Examples
 {
-    public class WikipediaIndexer<TLink> : IWikipediaStorage<TLink>
+    public class XmlIndexer<TLink> : IXmlStorage<TLink>
     {
         private readonly CachedFrequencyIncrementingSequenceIndex<TLink> _index;
         private readonly CharToUnicodeSymbolConverter<TLink> _charToUnicodeSymbolConverter;
@@ -18,7 +18,7 @@ namespace Platform.Examples
 
         public LinkFrequenciesCache<TLink> Cache { get; }
 
-        public WikipediaIndexer(ILinks<TLink> links)
+        public XmlIndexer(ILinks<TLink> links)
         {
             _nullConstant = links.Constants.Null;
             var totalSequenceSymbolFrequencyCounter = new TotalSequenceSymbolFrequencyCounter<TLink>(links);

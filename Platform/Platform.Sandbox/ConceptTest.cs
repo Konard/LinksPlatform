@@ -71,8 +71,7 @@ namespace Platform.Sandbox
 
                     //var seq = sequences.Create(temp1, temp5, temp2, temp1, temp2); //, temp5);
 
-                    var sequence = sequences.Create(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1,
-                        temp5);
+                    var sequence = sequences.Create(new[] { temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5 });
                     //, temp5);
 
                     //links.Each(0, 0, (x, isAPoint) => { links.PrintLink(x); return true; });
@@ -95,8 +94,7 @@ namespace Platform.Sandbox
 
                     Console.WriteLine(syncLinks.Count());
 
-                    sequences.Create(temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1,
-                        temp1);
+                    sequences.Create(new[] { temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1, temp1 });
 
                     Console.WriteLine(syncLinks.Count());
 

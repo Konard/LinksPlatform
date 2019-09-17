@@ -20,7 +20,7 @@ namespace Platform.Data.WebTerminal.Models
         public static LinkModel CreateLinkModel(Link link, int nestingLevel = 5)
         {
             LinkModel result = null;
-            ThreadHelpers.SyncInvokeWithExtendedStack(() =>
+            ThreadHelpers.InvokeWithExtendedMaxStackSize(() =>
             {
                 const int currentLevel = 0;
                 var visitedLinks = new HashSet<Link>();

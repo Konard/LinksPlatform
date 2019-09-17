@@ -9,7 +9,7 @@ using Platform.Data.Doublets.Unicode;
 
 namespace Platform.Examples
 {
-    public class WikipediaLinksStorage<TLink> : IWikipediaStorage<TLink>
+    public class LinksXmlStorage<TLink> : IXmlStorage<TLink>
     {
         private readonly StringToUnicodeSequenceConverter<TLink> _stringToUnicodeSequenceConverter;
         private readonly ILinks<TLink> _links;
@@ -25,7 +25,7 @@ namespace Platform.Examples
             public bool MightContain(IList<TLink> sequence) => false;
         }
 
-        public WikipediaLinksStorage(ILinks<TLink> links, LinkFrequenciesCache<TLink> frequenciesCache)
+        public LinksXmlStorage(ILinks<TLink> links, LinkFrequenciesCache<TLink> frequenciesCache)
         {
             var linkToItsFrequencyNumberConverter = new FrequenciesCacheBasedLinkToItsFrequencyNumberConverter<TLink>(frequenciesCache);
             var sequenceToItsLocalElementLevelsConverter = new SequenceToItsLocalElementLevelsConverter<TLink>(links, linkToItsFrequencyNumberConverter);

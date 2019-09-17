@@ -8,9 +8,9 @@ using Platform.Exceptions;
 
 namespace Platform.Examples
 {
-    public class WikipediaPagesCounter
+    public class XmlElementCounter
     {
-        public WikipediaPagesCounter() { }
+        public XmlElementCounter() { }
 
         public Task Count(string file, CancellationToken token)
         {

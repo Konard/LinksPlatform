@@ -11,7 +11,7 @@ namespace Platform.Data.SlaveServer
             //var links = new Links2();
             //var sequences = new Sequences(links);
             Console.WriteLine("Links slave server started.");
-            using (var cancellation = new ConsoleCancellationHandler())
+            using (var cancellation = new ConsoleCancellation())
             using (var sender = new UdpSender(8888))
             using (new UdpReceiver(7777, m =>
             {

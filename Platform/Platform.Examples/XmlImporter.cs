@@ -14,11 +14,11 @@ namespace Platform.Examples
     /// TODO: Can be renamed to XMLImporter
     /// TODO: Add support for XML arguments
     /// </remarks>
-    class WikipediaImporter<TLink>
+    class XmlImporter<TLink>
     {
-        private readonly IWikipediaStorage<TLink> _storage;
+        private readonly IXmlStorage<TLink> _storage;
 
-        public WikipediaImporter(IWikipediaStorage<TLink> storage) => _storage = storage;
+        public XmlImporter(IXmlStorage<TLink> storage) => _storage = storage;
 
         public Task Import(string file, CancellationToken token)
         {

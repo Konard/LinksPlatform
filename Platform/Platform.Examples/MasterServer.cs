@@ -4,7 +4,6 @@ using System.Text;
 using Platform.Singletons;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data;
-using Platform.Data.Constants;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Unicode;
@@ -13,7 +12,7 @@ namespace Platform.Examples
 {
     public class MasterServer
     {
-        private static readonly LinksCombinedConstants<bool, ulong, long> _constants = Default<LinksCombinedConstants<bool, ulong, long>>.Instance;
+        private static readonly LinksConstants<ulong> _constants = Default<LinksConstants<ulong>>.Instance;
 
         private readonly ILinks<ulong> _links;
         private readonly Sequences _sequences;

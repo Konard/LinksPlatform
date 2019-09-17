@@ -13,13 +13,13 @@ namespace Platform.Examples
         {
             try
             {
-                using (var cancellation = new ConsoleCancellationHandler(showDefaultIntroMessage: false))
+                using (var cancellation = new ConsoleCancellation())
                 using (var receiver = new UdpClient(8888))
                 using (var sender = new UdpSender(7777))
                 {
                     Console.WriteLine("Welcome to terminal.");
                     Console.WriteLine("Press CTRL+C or enter empty line to stop terminal.");
-                    while (cancellation.NoCancellationRequested)
+                    while (cancellation.NotRequested)
                     {
                         while (Console.KeyAvailable)
                         {

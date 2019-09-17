@@ -24,7 +24,7 @@ namespace Platform.Examples
 #if DEBUG
                 File.Delete(DefaultDatabaseFilename);
 #endif
-                using (var cancellation = new ConsoleCancellationHandler(showDefaultIntroMessage: false))
+                using (var cancellation = new ConsoleCancellation())
                 using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(DefaultDatabaseFilename, 8 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
@@ -57,7 +57,7 @@ namespace Platform.Examples
                         //using (var receiver = new UdpReceiver(7777, handleMessage))
                         using (var receiver = new UdpClient(7777))
                         {
-                            while (cancellation.NoCancellationRequested)
+                            while (cancellation.NotRequested)
                             {
                                 while (receiver.Available > 0)
                                 {

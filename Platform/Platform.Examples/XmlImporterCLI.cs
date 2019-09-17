@@ -7,7 +7,7 @@ using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Examples
 {
-    public class WikipediaImporterCLI : ICommandLineInterface
+    public class XmlImporterCLI : ICommandLineInterface
     {
         public void Run(params string[] args)
         {
@@ -22,21 +22,22 @@ namespace Platform.Examples
             {
                 const long gb32 = 34359738368;
 
-                using (var cancellation = new ConsoleCancellationHandler())
+                using (var cancellation = new ConsoleCancellation())
                 using (var memoryAdapter = new ResizableDirectMemoryLinks<uint>(linksFile, gb32))
                 //using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, gb32))
                 //using (var links = new UInt64Links(memoryAdapter))
                 {
+                    Console.WriteLine("Press CTRL+C to stop.");
                     var links = memoryAdapter.DecorateWithAutomaticUniquenessAndUsagesResolution();
-                    var wikipediaIndexer = new WikipediaIndexer<uint>(links);
-                    var wikipediaIndexingImporter = new WikipediaImporter<uint>(wikipediaIndexer);
+                    var wikipediaIndexer = new XmlIndexer<uint>(links);
+                    var wikipediaIndexingImporter = new XmlImporter<uint>(wikipediaIndexer);
                     wikipediaIndexingImporter.Import(wikipediaFile, cancellation.Token).Wait();
-                    if (!cancellation.IsCancellationRequested)
+                    if (cancellation.NotRequested)
                     {
                         var cache = wikipediaIndexer.Cache;
                         Console.WriteLine("Frequencies cache ready.");
-                        var wikipediaStorage = new WikipediaLinksStorage<uint>(links, cache);
-                        var wikipediaImporter = new WikipediaImporter<uint>(wikipediaStorage);
+                        var wikipediaStorage = new LinksXmlStorage<uint>(links, cache);
+                        var wikipediaImporter = new XmlImporter<uint>(wikipediaStorage);
                         wikipediaImporter.Import(wikipediaFile, cancellation.Token).Wait();
                     }
                 }

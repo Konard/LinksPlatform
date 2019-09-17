@@ -4,7 +4,7 @@ using Platform.IO;
 
 namespace Platform.Examples
 {
-    public class WikipediaPagesCounterCLI : ICommandLineInterface
+    public class XmlElementCounterCLI : ICommandLineInterface
     {
         public void Run(params string[] args)
         {
@@ -15,9 +15,10 @@ namespace Platform.Examples
             }
             else
             {
-                using (var cancellation = new ConsoleCancellationHandler())
+                using (var cancellation = new ConsoleCancellation())
                 {
-                    var wikipediaPagesCounter = new WikipediaPagesCounter();
+                    Console.WriteLine("Press CTRL+C to stop.");
+                    var wikipediaPagesCounter = new XmlElementCounter();
                     wikipediaPagesCounter.Count(wikipediaFile, cancellation.Token).Wait();
                 }
             }
