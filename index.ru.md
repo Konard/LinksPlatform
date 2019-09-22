@@ -11,9 +11,9 @@
 ### Основные пакеты
 
 #### [Platform.Data](https://linksplatform.github.io/Data)
-Общие интерфейсы и классы для [Дуплетов](https://linksplatform.github.io/Data.Doublets) и [Триплетов](https://linksplatform.github.io/Data.Triplets).
+Общие интерфейсы и классы для [Дуплетов](https://linksplatform.github.io/Data.Doublets/README.ru.html) и [Триплетов](https://linksplatform.github.io/Data.Triplets).
 
-#### [Platform.Data.Doublets](https://linksplatform.github.io/Data.Doublets)
+#### [Platform.Data.Doublets](https://linksplatform.github.io/Data.Doublets/README.ru.html)
 #### [Platform.Data.Triplets](https://linksplatform.github.io/Data.Triplets)
 #### [Platform.Data.Triplets.Kernel](https://linksplatform.github.io/Data.Triplets.Kernel)
 
