@@ -1,7 +1,5 @@
 [![Build status](https://travis-ci.org/Konard/LinksPlatform.svg?branch=master "Build status")](https://travis-ci.org/Konard/LinksPlatform)
 
-[![Support development](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fshieldsio-patreon.herokuapp.com%2Fkonard%2Fpledgesssss&style=for-the-badge "Support development")](https://patreon.com/konard)
-
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
 [Documentation](http://linksplatform.github.io/Documentation)
