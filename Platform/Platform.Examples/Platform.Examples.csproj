@@ -23,7 +23,7 @@
   <ItemGroup>
     <PackageReference Include="xunit.runner.utility" Version="2.4.1" />
     <PackageReference Include="Platform.Counters" Version="0.0.2" />
-    <PackageReference Include="Platform.Communication" Version="0.1.4" />
+    <PackageReference Include="Platform.Communication" Version="0.1.5" />
     <PackageReference Include="Platform.Data.Doublets" Version="0.2.1" />
   </ItemGroup>
 
