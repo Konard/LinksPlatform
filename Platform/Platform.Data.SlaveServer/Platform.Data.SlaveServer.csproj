@@ -8,7 +8,7 @@
   <ItemGroup>
     <PackageReference Include="Platform.Data.Doublets" Version="0.2.1" />
     <PackageReference Include="Platform.Communication" Version="0.1.4" />
-    <PackageReference Include="Platform.IO" Version="0.1.3" />
+    <PackageReference Include="Platform.IO" Version="0.1.4" />
   </ItemGroup>
 
 </Project>
