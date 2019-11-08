@@ -14,7 +14,7 @@
 using System;
 using Platform.Data;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.ResizableDirectMemory.Generic;
 
 namespace HelloWorld.Doublets.DotNet
 {
@@ -27,7 +27,7 @@ namespace HelloWorld.Doublets.DotNet
         var link = links.Create();
         link = links.Update(link, link, link);
         Console.WriteLine("Hello World!");
-        Console.WriteLine($"This is my first link: ({link}:{links.GetSource(link)}->{links.GetTarget(link)}).");
+        Console.WriteLine($"This is my first link: ({link}: {links.GetSource(link)}->{links.GetTarget(link)}).");
         Console.WriteLine($"Total links in the storage: {links.Count()}.");
         link = links.Update(link, default, default);
         links.Delete(link);
