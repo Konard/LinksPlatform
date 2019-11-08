@@ -7,7 +7,7 @@ using Platform.Collections.Segments.Walkers;
 using Platform.Collections.Trees;
 using Platform.Memory;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.ResizableDirectMemory.Generic;
 using TLink = System.UInt32;
 using Platform.Data.Doublets.Decorators;
 using Platform.Data.Doublets.Numbers.Unary;

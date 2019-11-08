@@ -10,7 +10,7 @@ using Platform.Threading;
 using Platform.Singletons;
 using Platform.Data;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.ResizableDirectMemory.Specific;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
@@ -244,13 +244,13 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             Array.Copy(sequence, copy, sequence.Length);
 
-            UInt64Link maxDoublet;
+            Link<ulong> maxDoublet;
 
             do
             {
-                var doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
+                var doubletsFrequencies = new Dictionary<Link<ulong>, ulong>();
 
-                maxDoublet = UInt64Link.Null;
+                maxDoublet = Link<ulong>.Null;
                 ulong maxFrequency = 1;
 
                 for (var i = 1; i < copy.Length; i++)
@@ -267,7 +267,7 @@ namespace Platform.Sandbox
                         break;
                     }
 
-                    var doublet = new UInt64Link(copy[startIndex], copy[i]);
+                    var doublet = new Link<ulong>(copy[startIndex], copy[i]);
 
                     if (doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
@@ -366,16 +366,16 @@ namespace Platform.Sandbox
             var copy = new ulong[sequence.Length];
             copy[0] = sequence[0];
 
-            var doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
+            var doubletsFrequencies = new Dictionary<Link<ulong>, ulong>();
 
-            var maxDoublet = UInt64Link.Null;
+            var maxDoublet = Link<ulong>.Null;
             ulong maxFrequency = 1;
 
             for (var i = 1; i < sequence.Length; i++)
             {
                 copy[i] = sequence[i];
 
-                var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
 
                 if (doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
@@ -444,7 +444,7 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                    var nextOldDoublet = new Link<ulong>(copy[previous], oldLeft);
                                     //if (!nextOldDoublet.Equals(maxDoublet))
                                     {
                                         //doubletsFrequencies[nextOldDoublet]--;
@@ -454,7 +454,7 @@ namespace Platform.Sandbox
                                         }
                                     }
 
-                                    var nextNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                    var nextNewDoublet = new Link<ulong>(copy[previous], copy[startIndex]);
                                     //doubletsFrequencies[nextNewDoublet]++;
                                     if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                     {
@@ -479,7 +479,7 @@ namespace Platform.Sandbox
                                 {
                                     ulong frequency;
 
-                                    var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                    var nextOldDoublet = new Link<ulong>(oldRight, copy[next]);
                                     //if (!nextOldDoublet.Equals(maxDoublet))
                                     {
                                         //doubletsFrequencies[nextOldDoublet]--;
@@ -489,7 +489,7 @@ namespace Platform.Sandbox
                                         }
                                     }
 
-                                    var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                    var nextNewDoublet = new Link<ulong>(copy[startIndex], copy[next]);
                                     //doubletsFrequencies[nextNewDoublet]++;
                                     if (doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                     {
@@ -513,7 +513,7 @@ namespace Platform.Sandbox
 
                 //}
 
-                maxDoublet = UInt64Link.Null;
+                maxDoublet = Link<ulong>.Null;
                 maxFrequency = 1;
 
                 foreach (var doubletsFrequency in doubletsFrequencies)
@@ -604,24 +604,24 @@ namespace Platform.Sandbox
         public struct Compressor
         {
             private readonly SynchronizedLinks<ulong> _links;
-            private UInt64Link _maxDoublet;
+            private Link<ulong> _maxDoublet;
             private ulong _maxFrequency;
-            private UInt64Link _maxDoublet2;
+            private Link<ulong> _maxDoublet2;
             private ulong _maxFrequency2;
-            private readonly Dictionary<UInt64Link, ulong> _doubletsFrequencies;
+            private readonly Dictionary<Link<ulong>, ulong> _doubletsFrequencies;
 
             public Compressor(SynchronizedLinks<ulong> links)
             {
                 _links = links;
-                _maxDoublet = UInt64Link.Null;
+                _maxDoublet = Link<ulong>.Null;
                 _maxFrequency = 1;
-                _maxDoublet2 = UInt64Link.Null;
+                _maxDoublet2 = Link<ulong>.Null;
                 _maxFrequency2 = 1;
-                _doubletsFrequencies = new Dictionary<UInt64Link, ulong>();
+                _doubletsFrequencies = new Dictionary<Link<ulong>, ulong>();
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private ulong IncrementFrequency(UInt64Link doublet)
+            private ulong IncrementFrequency(Link<ulong> doublet)
             {
                 if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
@@ -637,7 +637,7 @@ namespace Platform.Sandbox
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void DecrementFrequency(UInt64Link doublet)
+            private void DecrementFrequency(Link<ulong> doublet)
             {
                 if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                 {
@@ -682,7 +682,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
                     UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                 }
 
@@ -704,14 +704,14 @@ namespace Platform.Sandbox
                             if (r > 0)
                             {
                                 var previous = copy[w - 1];
-                                DecrementFrequency(new UInt64Link(previous, maxDoubletSource));
-                                IncrementFrequency(new UInt64Link(previous, maxDoubletResult));
+                                DecrementFrequency(new Link<ulong>(previous, maxDoubletSource));
+                                IncrementFrequency(new Link<ulong>(previous, maxDoubletResult));
                             }
                             if (r < oldLengthMinusTwo)
                             {
                                 var next = copy[r + 2];
-                                DecrementFrequency(new UInt64Link(maxDoubletTarget, next));
-                                IncrementFrequency(new UInt64Link(maxDoubletResult, next));
+                                DecrementFrequency(new Link<ulong>(maxDoubletTarget, next));
+                                IncrementFrequency(new Link<ulong>(maxDoubletResult, next));
                             }
 
                             copy[w++] = maxDoubletResult;
@@ -772,7 +772,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
 
                     if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
@@ -852,7 +852,7 @@ namespace Platform.Sandbox
 
                                     if (previous >= 0)
                                     {
-                                        var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                        var previousOldDoublet = new Link<ulong>(copy[previous], oldLeft);
                                         //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
                                             //doubletsFrequencies[nextOldDoublet]--;
@@ -872,7 +872,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var previousNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                        var previousNewDoublet = new Link<ulong>(copy[previous], copy[startIndex]);
                                         //doubletsFrequencies[nextNewDoublet]++;
                                         if (_doubletsFrequencies.TryGetValue(previousNewDoublet, out frequency))
                                         {
@@ -897,7 +897,7 @@ namespace Platform.Sandbox
 
                                     if (next < copy.Length)
                                     {
-                                        var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                        var nextOldDoublet = new Link<ulong>(oldRight, copy[next]);
                                         //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
                                             //doubletsFrequencies[nextOldDoublet]--;
@@ -917,7 +917,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                        var nextNewDoublet = new Link<ulong>(copy[startIndex], copy[next]);
                                         //doubletsFrequencies[nextNewDoublet]++;
                                         if (_doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                         {
@@ -950,7 +950,7 @@ namespace Platform.Sandbox
 
                     _doubletsFrequencies.Remove(_maxDoublet);
 
-                    _maxDoublet = UInt64Link.Null;
+                    _maxDoublet = Link<ulong>.Null;
                     _maxFrequency = 1;
 
                     foreach (var doubletsFrequency in _doubletsFrequencies)
@@ -1068,7 +1068,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
 
                     if (_doubletsFrequencies.TryGetValue(doublet, out ulong frequency))
                     {
@@ -1164,7 +1164,7 @@ namespace Platform.Sandbox
 
                                     if (previous >= 0)
                                     {
-                                        var previousOldDoublet = new UInt64Link(copy[previous], oldLeft);
+                                        var previousOldDoublet = new Link<ulong>(copy[previous], oldLeft);
                                         //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
                                             //doubletsFrequencies[nextOldDoublet]--;
@@ -1184,7 +1184,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var previousNewDoublet = new UInt64Link(copy[previous], copy[startIndex]);
+                                        var previousNewDoublet = new Link<ulong>(copy[previous], copy[startIndex]);
                                         //doubletsFrequencies[nextNewDoublet]++;
                                         if (_doubletsFrequencies.TryGetValue(previousNewDoublet, out frequency))
                                         {
@@ -1210,7 +1210,7 @@ namespace Platform.Sandbox
 
                                     if (next < copy.Length)
                                     {
-                                        var nextOldDoublet = new UInt64Link(oldRight, copy[next]);
+                                        var nextOldDoublet = new Link<ulong>(oldRight, copy[next]);
                                         //if (!nextOldDoublet.Equals(maxDoublet))
                                         {
                                             //doubletsFrequencies[nextOldDoublet]--;
@@ -1230,7 +1230,7 @@ namespace Platform.Sandbox
                                             }
                                         }
 
-                                        var nextNewDoublet = new UInt64Link(copy[startIndex], copy[next]);
+                                        var nextNewDoublet = new Link<ulong>(copy[startIndex], copy[next]);
                                         //doubletsFrequencies[nextNewDoublet]++;
                                         if (_doubletsFrequencies.TryGetValue(nextNewDoublet, out frequency))
                                         {
@@ -1262,7 +1262,7 @@ namespace Platform.Sandbox
                             //tempDoublet.Source = copy[startIndex];
                             //tempDoublet.Target = copy[i];
 
-                            var doublet = new UInt64Link(copy[startIndex], copy[i]);
+                            var doublet = new Link<ulong>(copy[startIndex], copy[i]);
 
                             //if (!maxDoublet.Equals(doublet))
                             //{
@@ -1330,11 +1330,11 @@ namespace Platform.Sandbox
                 var copy = new ulong[sequence.Length];
                 Array.Copy(sequence, copy, copy.Length);
 
-                var set = new HashSet<UInt64Link>();
+                var set = new HashSet<Link<ulong>>();
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
 
                     //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                     //if(_maxFrequency >= 2)
@@ -1389,7 +1389,7 @@ namespace Platform.Sandbox
 
                     //_doubletsFrequencies.Remove(_maxDoublet);
 
-                    _maxDoublet = UInt64Link.Null;
+                    _maxDoublet = Link<ulong>.Null;
 
                     //ResetMaxDoublet();
                     set.Clear();
@@ -1399,7 +1399,7 @@ namespace Platform.Sandbox
 
                     for (var i = 1; i < newLength; i++)
                     {
-                        var doublet = new UInt64Link(copy[i - 1], copy[i]);
+                        var doublet = new Link<ulong>(copy[i - 1], copy[i]);
 
                         //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                         //if (_maxFrequency >= 2)
@@ -1455,11 +1455,11 @@ namespace Platform.Sandbox
                 var copy = new ulong[sequence.Length];
                 Array.Copy(sequence, copy, copy.Length);
 
-                var set = new HashSet<UInt64Link>();
+                var set = new HashSet<Link<ulong>>();
 
                 for (var i = 1; i < sequence.Length; i++)
                 {
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
 
                     //UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                     //if(_maxFrequency >= 2)
@@ -1481,7 +1481,7 @@ namespace Platform.Sandbox
 
                     oldLength--;
 
-                    _maxDoublet = UInt64Link.Null;
+                    _maxDoublet = Link<ulong>.Null;
                     set.Clear();
 
                     // Substitute all usages
@@ -1526,7 +1526,7 @@ namespace Platform.Sandbox
 
                             if (_maxDoublet.IsNull()) // 4 sec
                             {
-                                var doublet = new UInt64Link(copy[r], copy[r + 1]);
+                                var doublet = new Link<ulong>(copy[r], copy[r + 1]);
                                 if (!set.Add(doublet))
                                 {
                                     _maxDoublet = doublet;
@@ -1617,7 +1617,7 @@ namespace Platform.Sandbox
                 {
                     copy[i] = sequence[i];
 
-                    var doublet = new UInt64Link(sequence[i - 1], sequence[i]);
+                    var doublet = new Link<ulong>(sequence[i - 1], sequence[i]);
                     UpdateMaxDoublet(doublet, IncrementFrequency(doublet));
                 }
 
@@ -1692,14 +1692,14 @@ namespace Platform.Sandbox
 
             private void ResetMaxDoublet()
             {
-                _maxDoublet = UInt64Link.Null;
+                _maxDoublet = Link<ulong>.Null;
                 _maxFrequency = 1;
-                _maxDoublet2 = UInt64Link.Null;
+                _maxDoublet2 = Link<ulong>.Null;
                 _maxFrequency2 = 1;
             }
 
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            private void UpdateMaxDoublet(UInt64Link doublet, ulong frequency)
+            private void UpdateMaxDoublet(Link<ulong> doublet, ulong frequency)
             {
                 if (frequency > 1)
                 {
@@ -1716,7 +1716,7 @@ namespace Platform.Sandbox
                 }
             }
 
-            private void UpdateMaxDoublet2(UInt64Link doublet, ulong frequency)
+            private void UpdateMaxDoublet2(Link<ulong> doublet, ulong frequency)
             {
                 if (!_maxDoublet.Equals(doublet))
                 {

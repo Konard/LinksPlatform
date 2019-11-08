@@ -653,7 +653,6 @@ namespace Platform.Sandbox
 
             // Создаём структуру Link по указателю на эталонную связя
             il.LoadConstant(standardLink.ToIndex());
-            il.ConvertTo<ulong>();
             il.NewObject(typeof(Link), new Type[0]);
 
             // Выполняем сравнение

@@ -2,10 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory;
-using Platform.Data.Doublets.Decorators;
-using Platform.Data.Doublets.Sequences.Frequencies.Cache;
-using Platform.Data.Doublets.Sequences.Frequencies.Counters;
+using Platform.Data.Doublets.ResizableDirectMemory.Generic;
 
 namespace Platform.Examples
 {

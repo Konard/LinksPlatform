@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using Platform.Numbers;
+using Platform.Data.Numbers.Raw;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.Numbers.Raw;
 using Platform.Data.Doublets.Sequences.Frequencies.Cache;
 using Platform.Data.Doublets.Sequences.Frequencies.Counters;
 using Platform.Data.Doublets.Sequences.Indexes;

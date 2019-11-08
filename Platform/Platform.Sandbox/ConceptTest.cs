@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Decorators;
-using Platform.Data.Doublets.ResizableDirectMemory;
+using Platform.Data.Doublets.ResizableDirectMemory.Specific;
 using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Sandbox
@@ -87,7 +87,7 @@ namespace Platform.Sandbox
                     //    return true;
                     //}, temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
 
-                    sequences.Compact(temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5);
+                    sequences.Compact(new[] { temp1, temp5, temp2, temp1, temp2, temp3, temp2, temp4, temp1, temp5 });
 
 
                     Console.WriteLine(sequencesCount);
