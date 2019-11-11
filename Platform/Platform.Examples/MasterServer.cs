@@ -7,6 +7,7 @@ using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Unicode;
+using Platform.Collections.Arrays;
 
 namespace Platform.Examples
 {
@@ -66,7 +67,7 @@ namespace Platform.Examples
 
         private void Create(ulong[] sequence)
         {
-            var link = _sequences.Create(sequence);
+            var link = _sequences.Create(sequence.ShiftRight());
             _sender.Send($"Sequence with balanced variant at {link} created.");
         }
 
@@ -88,7 +89,7 @@ namespace Platform.Examples
             }
             if (!containsZeroOrMany)
             {
-                var fullyMatched = _sequences.Each(sequence);
+                var fullyMatched = _sequences.Each(sequence.ShiftRight());
                 _sender.Send($"{fullyMatched.Count} sequences matched fully.");
                 foreach (var result in fullyMatched)
                 {
