@@ -11,6 +11,9 @@ namespace Platform.Examples
 {
     public class LinksXmlStorage<TLink> : IXmlStorage<TLink>
     {
+        private static readonly TLink _zero = default;
+        private static readonly TLink _one = Arithmetic.Increment(_zero);
+
         private readonly StringToUnicodeSequenceConverter<TLink> _stringToUnicodeSequenceConverter;
         private readonly ILinks<TLink> _links;
         private TLink _unicodeSymbolMarker;
@@ -39,7 +42,7 @@ namespace Platform.Examples
 
         private void InitConstants(ILinks<TLink> links)
         {
-            var markerIndex = Integer<TLink>.One;
+            var markerIndex = _one;
             var meaningRoot = links.GetOrCreate(markerIndex, markerIndex);
             _unicodeSymbolMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));
             _unicodeSequenceMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));

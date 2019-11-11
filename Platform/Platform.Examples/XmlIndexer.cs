@@ -11,6 +11,9 @@ namespace Platform.Examples
 {
     public class XmlIndexer<TLink> : IXmlStorage<TLink>
     {
+        private static readonly TLink _zero = default;
+        private static readonly TLink _one = Arithmetic.Increment(_zero);
+
         private readonly CachedFrequencyIncrementingSequenceIndex<TLink> _index;
         private readonly CharToUnicodeSymbolConverter<TLink> _charToUnicodeSymbolConverter;
         private TLink _unicodeSymbolMarker;
@@ -31,7 +34,7 @@ namespace Platform.Examples
 
         private void InitConstants(ILinks<TLink> links)
         {
-            var markerIndex = Integer<TLink>.One;
+            var markerIndex = _one;
             var meaningRoot = links.GetOrCreate(markerIndex, markerIndex);
             _unicodeSymbolMarker = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));
             _ = links.GetOrCreate(meaningRoot, Arithmetic.Increment(markerIndex));

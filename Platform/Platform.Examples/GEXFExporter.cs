@@ -1,16 +1,18 @@
 ﻿using System.Collections.Generic;
 using System.IO;
 using System.Xml;
-using Platform.Numbers;
+using Platform.Converters;
 using Platform.Communication.Protocol.Gexf;
-using Node = Platform.Communication.Protocol.Gexf.Node;
 using Platform.Data;
 using Platform.Data.Doublets;
+using Node = Platform.Communication.Protocol.Gexf.Node;
 
 namespace Platform.Examples
 {
     public class GEXFExporter<TLink>
     {
+        private static readonly UncheckedConverter<TLink, long> _addressToInt64Converter = UncheckedConverter<TLink, long>.Default;
+
         private readonly ILinks<TLink> _links;
 
         public GEXFExporter(ILinks<TLink> links)
@@ -36,7 +38,7 @@ namespace Platform.Examples
                 writer.WriteStartElement("nodes");
                 _links.Each(link =>
                 {
-                    Node.WriteXml(writer, (Integer<TLink>)link[_links.Constants.IndexPart], FormatLink(link));
+                    Node.WriteXml(writer, _addressToInt64Converter.Convert(link[_links.Constants.IndexPart]), FormatLink(link));
                     return _links.Constants.Continue;
                 });
                 // </nodes>
@@ -46,7 +48,7 @@ namespace Platform.Examples
                 writer.WriteStartElement("edges");
                 _links.Each(link =>
                 {
-                    Edge.WriteXml(writer, (long)edges++, (Integer<TLink>)link[_links.Constants.SourcePart], (Integer<TLink>)link[_links.Constants.TargetPart]);
+                    Edge.WriteXml(writer, (long)edges++, _addressToInt64Converter.Convert(link[_links.Constants.SourcePart]), _addressToInt64Converter.Convert(link[_links.Constants.TargetPart]));
                     return _links.Constants.Continue;
                 });
                 // </edges>
