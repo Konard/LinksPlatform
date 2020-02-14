@@ -20,6 +20,17 @@ Common interfaces and classes for both [Doublets](https://linksplatform.github.i
 ### Auxiliary packages
 
 #### [Platform.Data.Memory](https://linksplatform.github.io/Memory)
+Platform.Data.Memory class library contains classes for memory management simplification. There you will find multiple implementations of [IMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.IMemory.html) interface.
+
+The data can be accessed using [the raw pointer](https://linksplatform.github.io/Memory/api/Platform.Memory.IDirectMemory.html) or [by element's index](https://linksplatform.github.io/Memory/api/Platform.Memory.IArrayMemory-1.html) and can be stored in volatile memory:
+* [HeapResizableDirect](https://linksplatform.github.io/Memory/api/Platform.Memory.HeapResizableDirectMemory.html),
+* [ArrayMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.ArrayMemory-1.html)
+
+or in non-volatile memory:
+* [FileMappedResizableDirectMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.FileMappedResizableDirectMemory.html),
+* [TemporaryFileMappedResizableDirectMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.TemporaryFileMappedResizableDirectMemory.html),
+* [FileArrayMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.FileArrayMemory-1.html).
+
 #### [Platform.Data.Communication](https://linksplatform.github.io/Communication)
 #### [Platform.Collections.Methods](https://linksplatform.github.io/Collections.Methods)
 #### [Platform.IO](https://linksplatform.github.io/IO)
