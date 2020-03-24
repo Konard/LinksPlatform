@@ -2,7 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Specific;
+using Platform.Data.Doublets.Memory.United.Specific;
 using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Examples
@@ -24,7 +24,7 @@ namespace Platform.Examples
             }
             else
             {
-                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile))
+                using (var memoryAdapter = new UInt64UnitedMemoryLinks(linksFile))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);

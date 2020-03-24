@@ -3,7 +3,7 @@ using Platform.Counters;
 using Platform.Memory;
 using Platform.Data;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Specific;
+using Platform.Data.Doublets.Memory.United.Specific;
 using Platform.Data.Doublets.Decorators;
 
 namespace Platform.Sandbox
@@ -51,7 +51,7 @@ namespace Platform.Sandbox
             const int mb4 = 4 * 1024 * 1024;
 
             using (var memory = new HeapResizableDirectMemory(mb4))
-            using (var memoryManager = new UInt64ResizableDirectMemoryLinks(memory))
+            using (var memoryManager = new UInt64UnitedMemoryLinks(memory))
             using (var links = new UInt64Links(memoryManager))
             {
                 ulong[] digits = new ulong[10];

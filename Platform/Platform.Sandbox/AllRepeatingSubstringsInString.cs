@@ -7,7 +7,7 @@ using Platform.Collections.Segments.Walkers;
 using Platform.Collections.Trees;
 using Platform.Memory;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Generic;
+using Platform.Data.Doublets.Memory.United.Generic;
 using TLink = System.UInt32;
 using Platform.Data.Doublets.Decorators;
 using Platform.Data.Doublets.Numbers.Unary;
@@ -183,7 +183,7 @@ namespace Platform.Sandbox
         {
             _memory = new HeapResizableDirectMemory(512 * 1024 * 1024);
 
-            _linksDisposable = new ResizableDirectMemoryLinks<TLink>(_memory);
+            _linksDisposable = new UnitedMemoryLinks<TLink>(_memory);
 
             _links = new LinksItselfConstantToSelfReferenceResolver<TLink>(_linksDisposable);
             _links = new NonNullContentsLinkDeletionResolver<TLink>(_links);

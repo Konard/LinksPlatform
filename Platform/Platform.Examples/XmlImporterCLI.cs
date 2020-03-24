@@ -2,7 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Generic;
+using Platform.Data.Doublets.Memory.United.Generic;
 
 namespace Platform.Examples
 {
@@ -22,8 +22,8 @@ namespace Platform.Examples
                 const long gb32 = 34359738368;
 
                 using (var cancellation = new ConsoleCancellation())
-                using (var memoryAdapter = new ResizableDirectMemoryLinks<uint>(linksFile, gb32))
-                //using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, gb32))
+                using (var memoryAdapter = new UnitedMemoryLinks<uint>(linksFile, gb32))
+                //using (var memoryAdapter = new UInt64UnitedMemoryLinks(linksFile, gb32))
                 //using (var links = new UInt64Links(memoryAdapter))
                 {
                     Console.WriteLine("Press CTRL+C to stop.");

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Decorators;
-using Platform.Data.Doublets.ResizableDirectMemory.Specific;
+using Platform.Data.Doublets.Memory.United.Specific;
 using Platform.Data.Doublets.Sequences;
 
 namespace Platform.Sandbox
@@ -12,7 +12,7 @@ namespace Platform.Sandbox
     {
         public static void TestGexf(string filename)
         {
-            using (var memoryManager = new UInt64ResizableDirectMemoryLinks(filename, 512 * 1024 * 1024))
+            using (var memoryManager = new UInt64UnitedMemoryLinks(filename, 512 * 1024 * 1024))
             using (var links = new UInt64Links(memoryManager))
             {
                 //var options = new LinksOptions<ulong>();
@@ -34,7 +34,7 @@ namespace Platform.Sandbox
         {
             //try
             {
-                using (var memoryManager = new UInt64ResizableDirectMemoryLinks(filename, 512 * 1024 * 1024))
+                using (var memoryManager = new UInt64UnitedMemoryLinks(filename, 512 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryManager))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);
@@ -142,12 +142,12 @@ namespace Platform.Sandbox
             Console.ReadKey();
         }
 
-        private static void PrintLink(this UInt64ResizableDirectMemoryLinks links, ulong link)
+        private static void PrintLink(this UInt64UnitedMemoryLinks links, ulong link)
         {
             Console.WriteLine(links.FormatLink(links.GetLink(link)));
         }
 
-        private static string FormatLink(this UInt64ResizableDirectMemoryLinks links, IList<ulong> link)
+        private static string FormatLink(this UInt64UnitedMemoryLinks links, IList<ulong> link)
         {
             const string format = "{1} {0} {2}"; // "{0}: {1} -> {2}"
 

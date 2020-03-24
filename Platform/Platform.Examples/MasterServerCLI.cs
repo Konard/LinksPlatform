@@ -6,7 +6,7 @@ using Platform.Threading;
 using Platform.IO;
 using Platform.Communication.Protocol.Udp;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Specific;
+using Platform.Data.Doublets.Memory.United.Specific;
 using Platform.Data.Doublets.Sequences;
 using Platform.Data.Doublets.Decorators;
 using Platform.Data.Doublets.Unicode;
@@ -25,7 +25,7 @@ namespace Platform.Examples
                 File.Delete(DefaultDatabaseFilename);
 #endif
                 using (var cancellation = new ConsoleCancellation())
-                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(DefaultDatabaseFilename, 8 * 1024 * 1024))
+                using (var memoryAdapter = new UInt64UnitedMemoryLinks(DefaultDatabaseFilename, 8 * 1024 * 1024))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     var syncLinks = new SynchronizedLinks<ulong>(links);

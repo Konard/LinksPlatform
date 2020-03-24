@@ -2,7 +2,7 @@
 using System.IO;
 using Platform.IO;
 using Platform.Data.Doublets;
-using Platform.Data.Doublets.ResizableDirectMemory.Specific;
+using Platform.Data.Doublets.Memory.United.Specific;
 using Platform.Data.Doublets.Decorators;
 using Platform.Data.Doublets.Unicode;
 using Platform.Data.Doublets.Sequences.Indexes;
@@ -22,7 +22,7 @@ namespace Platform.Examples
             else
             {
                 using (var cancellation = new ConsoleCancellation())
-                using (var memoryAdapter = new UInt64ResizableDirectMemoryLinks(linksFile, UInt64ResizableDirectMemoryLinks.DefaultLinksSizeStep * 16))
+                using (var memoryAdapter = new UInt64UnitedMemoryLinks(linksFile, UInt64UnitedMemoryLinks.DefaultLinksSizeStep * 16))
                 using (var links = new UInt64Links(memoryAdapter))
                 {
                     Console.WriteLine("Press CTRL+C to stop.");
