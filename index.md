@@ -14,8 +14,13 @@ Holistic system for storage and transformation of information (in development) b
 Common interfaces and classes for both [Doublets](https://linksplatform.github.io/Data.Doublets) and [Triplets](https://linksplatform.github.io/Data.Triplets).
 
 #### [Platform.Data.Doublets](https://linksplatform.github.io/Data.Doublets)
+An implementation of Doublets.
+
 #### [Platform.Data.Triplets](https://linksplatform.github.io/Data.Triplets)
+A C# adapter of Triplets.
+
 #### [Platform.Data.Triplets.Kernel](https://linksplatform.github.io/Data.Triplets.Kernel)
+A native Triplets implementation.
 
 ### Auxiliary packages
 
@@ -32,6 +37,17 @@ or in non-volatile memory:
 * [FileArrayMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.FileArrayMemory-1.html).
 
 #### [Platform.Data.Communication](https://linksplatform.github.io/Communication)
+Platform.Data.Communication class library contains classes for communication simplification supporting different protocols.
+
+##### Gexf
+XML-mapping classes for [Graph Exchange XML Format](https://gephi.org/gexf/format/).
+
+##### Udp
+`UdpSender` and `UdpReceiver` classes to simplify implementation of different roles of `UdpClient`.
+
+##### Xml
+A `Serializer` class to help with XML serialization and deserialization.
+
 #### [Platform.Collections.Methods](https://linksplatform.github.io/Collections.Methods)
 #### [Platform.IO](https://linksplatform.github.io/IO)
 #### [Platform.Unsafe](https://linksplatform.github.io/Unsafe)
