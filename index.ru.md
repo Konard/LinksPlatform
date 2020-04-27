@@ -17,7 +17,7 @@
 #### [Platform.Data.Triplets](https://linksplatform.github.io/Data.Triplets)
 #### [Platform.Data.Triplets.Kernel](https://linksplatform.github.io/Data.Triplets.Kernel)
 
-### Вспомогательные проекты
+### Вспомогательные пакеты
 
 #### [Platform.Data.Memory](https://linksplatform.github.io/Memory)
 #### [Platform.Data.Communication](https://linksplatform.github.io/Communication)
