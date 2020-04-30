@@ -2,6 +2,10 @@
 
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
+The Links Platform is a framework, which includes two DBMS implementations based on an associative data model: [Doublets](https://github.com/linksplatform/Data.Doublets) и [Triplets](https://github.com/linksplatform/Data.Triplets); as well as translators between programming languages (for example [from C# to C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)).
+
+Most of the libraries included in this framework can be used separately if necessary and are located [on the Links Platform organization page](https://github.com/linksplatform). Implementations in C# are available for all libraries, in the near future they will also be available in С++ (translation is currently underway).
+
 [Documentation](http://linksplatform.github.io/Documentation)
 
 [![introduction](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
@@ -68,6 +72,8 @@ There are two variants of Link structure:
 - [Typed](https://en.wikipedia.org/wiki/Type_theory) ([semantic](https://en.wikipedia.org/wiki/Semantics)), with added [Linker](https://en.wikipedia.org/wiki/Linker) ([verb](https://en.wikipedia.org/wiki/Verb), [action](https://en.wikipedia.org/wiki/Action_(philosophy)), [type](https://en.wikipedia.org/wiki/Type_system), [category](https://en.wikipedia.org/wiki/Category_theory), [predicate](https://en.wikipedia.org/wiki/Predicate), [transition](https://en.wikipedia.org/wiki/Transition_system), [algorithm](https://en.wikipedia.org/wiki/Algorithm)), so any additional info about a type of connection between two links can be stored here.
 
 Links Platform planned as a [system](https://en.wikipedia.org/wiki/System_(disambiguation)), that [combines](https://en.wikipedia.org/wiki/Combine) simple [associative memory](https://en.wikipedia.org/wiki/Associative_memory) [storage](https://en.wikipedia.org/wiki/Computer_data_storage) (Links) and [transformation](https://en.wikipedia.org/wiki/Transformation) [execution](https://en.wikipedia.org/wiki/Execution_(computing)) [engine](https://en.wikipedia.org/wiki/Database_engine) (Triggers). There will be an ability to [program](https://en.wikipedia.org/wiki/Program_(machine)) that [system](https://en.wikipedia.org/wiki/System_(disambiguation)) dynamically, due to the fact that all [algorithms](https://en.wikipedia.org/wiki/Algorithm) will be treated as [data](https://en.wikipedia.org/wiki/Data_(disambiguation)) inside the [storage](https://en.wikipedia.org/wiki/Computer_data_storage). Such [algorithms](https://en.wikipedia.org/wiki/Algorithm) can also change themselves in [real-time](https://en.wikipedia.org/wiki/Real-time) based on [input](https://en.wikipedia.org/wiki/Input) from the [environment](https://en.wikipedia.org/wiki/Environment). The Links Platform is a method of modeling the high-level [associative memory](https://en.wikipedia.org/wiki/Associative_memory) effects of [human](https://en.wikipedia.org/wiki/Human) [mind](https://en.wikipedia.org/wiki/Mind).
+
+One of the most important goals of the project is to accelerate the development of automation to the level when automation can be itself automated. In other words, this project should help to implement a bot-programmer which will be able to create programs based on descriptions in human language.
 
 ## Road map
 [![Road Map, Status](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/RoadMap-status.png "Road Map, Status")](https://github.com/Konard/LinksPlatform/milestones)
