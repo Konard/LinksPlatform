@@ -39,6 +39,8 @@ namespace HelloWorld.Doublets.DotNet
 
 ## [SQLite vs Doublets](https://github.com/linksplatform/Comparisons.SQLiteVSDoublets)
 
+[![Image with result of performance comparison between SQLite and Doublets.](https://raw.githubusercontent.com/linksplatform/Documentation/master/doc/Examples/sqlite_vs_doublets_performance.png "Result of performance comparison between SQLite and Doublets")](https://github.com/linksplatform/Comparisons.SQLiteVSDoublets)
+
 ## Description
 
 Inspired by the work of Simon Williams ([The Associative Model of Data](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=913469847)), [book](http://www.sentences.com/docs/other_docs/AMD.pdf), [whitepaper](http://iacis.org/iis/2009/P2009_1301.pdf).
