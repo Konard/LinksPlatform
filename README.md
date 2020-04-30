@@ -12,7 +12,7 @@ Most of the libraries included in this framework can be used separately if neces
 
 [Graphical introduction](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
 
-## [Example](https://github.com/linksplatform/HelloWorld.Doublets.DotNet)
+## [Quick start example](https://github.com/linksplatform/HelloWorld.Doublets.DotNet)
 
 ```C#
 using System;
