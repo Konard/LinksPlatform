@@ -2,7 +2,7 @@
 
 # ПлатформаСвязей ([english version](https://github.com/Konard/LinksPlatform/blob/master/README.md))
 
-Платформа Связей — это фреймворк, в который входят две реализации СУБД на основе ассоциативной модели данных: [Дуплеты](https://github.com/linksplatform/Data.Doublets) и [Треплеты](https://github.com/linksplatform/Data.Triplets); а также трансляторы между языками программирования (например между [из C# в C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)).
+Платформа Связей — это фреймворк, в который входят две реализации СУБД на основе ассоциативной модели данных: [Дуплеты](https://github.com/linksplatform/Data.Doublets) и [Треплеты](https://github.com/linksplatform/Data.Triplets); а также трансляторы между языками программирования (например [из C# в C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)).
 
 Большая часть библиотек входящих в этот фреймворк могут быть использованы отдельно при необходимости и располагаются [на странице организации "Платформа Связей"](https://github.com/linksplatform). Для всех библиотек доступна реализация на C#, в ближайшем будущем они так же будут доступны и на С++ (в данный момент ведётся перевод).
 
