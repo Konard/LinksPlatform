@@ -39,6 +39,8 @@ namespace HelloWorld.Doublets.DotNet
 
 ## [SQLite против Дуплетов](https://github.com/linksplatform/Comparisons.SQLiteVSDoublets)
 
+[![Изображение с результатом сравнения производительности SQLite и Дуплетов.](https://raw.githubusercontent.com/linksplatform/Documentation/master/doc/Examples/sqlite_vs_doublets_performance.png "Результат сравнения производительности SQLite и Дуплетов")](https://github.com/linksplatform/Comparisons.SQLiteVSDoublets)
+
 ## Описание
 
 Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=913469847)), [книга (англ.)](http://www.sentences.com/docs/other_docs/AMD.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
