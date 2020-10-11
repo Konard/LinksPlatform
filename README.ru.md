@@ -61,13 +61,13 @@ namespace HelloWorld.Doublets.DotNet
 
 Есть два варианта структуры Связи:
 
-> <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/ST.png" width="400" title="Связь Начало-Конец, нетипизированная" alt="Связь Начало-Конец, нетипизированная" />
 > <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/ST-dots.png" width="400" title="Связь Начало-Конец, нетипизированная" alt="Связь Начало-Конец, нетипизированная" />
+> <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/doublet-colored.png" width="400" title="Связь Начало-Конец, нетипизированная" alt="Связь Начало-Конец, нетипизированная" />
 
 - Нетипизированная, каждая связь содержит Source (Начало, Подлежащее) и Target (Конец, Сказуемое, Дополнение).
 
-> <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/SLT.png" width="400" title="Связь Начало-Связка-Конец, типизированная" alt="Связь Начало-Связка-Конец, типизированная" />
 > <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/SLT-dots.png" width="400" title="Связь Начало-Связка-Конец, типизированная" alt="Связь Начало-Связка-Конец, типизированная" />
+> <img src="https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/triplet-colored.png" width="400" title="Связь Начало-Связка-Конец, типизированная" alt="Связь Начало-Связка-Конец, типизированная" />
 
 - Типизированная, с добавленным Linker (Глагол, Тип, Связка, Предикат, Сказуемое), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.
 
