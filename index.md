@@ -49,22 +49,67 @@ XML-mapping classes for [Graph Exchange XML Format](https://gephi.org/gexf/forma
 A `Serializer` class to help with XML serialization and deserialization.
 
 #### [Platform.Collections.Methods](https://linksplatform.github.io/Collections.Methods)
+Platform.Collections.Methods class library contains classes with storage/state agnostic implementation of lists and trees.
+
 #### [Platform.IO](https://linksplatform.github.io/IO)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Unsafe](https://linksplatform.github.io/Unsafe)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Numbers](https://linksplatform.github.io/Numbers)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Converters](https://linksplatform.github.io/Converters)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Scopes](https://linksplatform.github.io/Scopes)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Singletons](https://linksplatform.github.io/Singletons)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Reflection](https://linksplatform.github.io/Reflection)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Threading](https://linksplatform.github.io/Threading)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Collections](https://linksplatform.github.io/Collections)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Diagnostics](https://linksplatform.github.io/Diagnostics)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Counters](https://linksplatform.github.io/Counters)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Setters](https://linksplatform.github.io/Setters)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Comparers](https://linksplatform.github.io/Comparers)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Random](https://linksplatform.github.io/Random)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Timestamps](https://linksplatform.github.io/Timestamps)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Ranges](https://linksplatform.github.io/Ranges)
+Platform.Collections.Methods class library contains `Range` struct with Minimum and Maximum fields.
+
 #### [Platform.Disposables](https://linksplatform.github.io/Disposables)
+Platform.Collections.Methods class library contains classes and interfaces that help to make objects disposable in a fast, short, easy and safe way.
+
+##### DisposableBase
+`Platform.Disposables.DisposableBase` abstract class tries to dispose the object at both on instance destruction and `OnProcessExit` whatever comes first even if `Dispose` method was not called anywhere by user.
+
+##### Yet another IDisposable
+The `Platform.Disposables.IDisposable` interface extends the `System.IDisposable` with `IsDisposed` property and `Destruct` method.
+
 #### [Platform.Exceptions](https://linksplatform.github.io/Exceptions)
+Platform.Collections.Methods class library contains classes ... .
+
 #### [Platform.Interfaces](https://linksplatform.github.io/Interfaces)
+Platform.Collections.Methods class library contains common interfaces that did not fit in any major category.
