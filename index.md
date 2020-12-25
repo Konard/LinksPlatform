@@ -25,7 +25,7 @@ A native Triplets implementation.
 ### Auxiliary packages
 
 #### [Platform.Data.Memory](https://linksplatform.github.io/Memory)
-Platform.Data.Memory class library contains classes for memory management simplification. There you will find multiple implementations of [IMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.IMemory.html) interface.
+Platform.Data.Memory class library contains classes for memory management simplification. There you can find multiple implementations of [IMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.IMemory.html) interface.
 
 The data can be accessed using [the raw pointer](https://linksplatform.github.io/Memory/api/Platform.Memory.IDirectMemory.html) or [by element's index](https://linksplatform.github.io/Memory/api/Platform.Memory.IArrayMemory-1.html) and can be stored in volatile memory:
 * [HeapResizableDirect](https://linksplatform.github.io/Memory/api/Platform.Memory.HeapResizableDirectMemory.html),
