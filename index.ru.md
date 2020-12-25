@@ -20,6 +20,18 @@
 ### Вспомогательные пакеты
 
 #### [Platform.Data.Memory](https://linksplatform.github.io/Memory)
+
+Библиотека классов Platform.Data.Memory содержит классы для упрощения управления памятью. Там вы можете найти множество реализаций интерфейса [IMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.IMemory.html).
+
+Доступ к данным может осуществляться через [указатель](https://linksplatform.github.io/Memory/api/Platform.Memory.IDirectMemory.html) или через [индексатор](https://linksplatform.github.io/Memory/api/Platform.Memory.IArrayMemory-1.html) и данные могут храниться в энергозависимой памяти:
+* [HeapResizableDirect](https://linksplatform.github.io/Memory/api/Platform.Memory.HeapResizableDirectMemory.html),
+* [ArrayMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.ArrayMemory-1.html)
+
+или в энергонезависимой памяти:
+* [FileMappedResizableDirectMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.FileMappedResizableDirectMemory.html),
+* [TemporaryFileMappedResizableDirectMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.TemporaryFileMappedResizableDirectMemory.html),
+* [FileArrayMemory](https://linksplatform.github.io/Memory/api/Platform.Memory.FileArrayMemory-1.html).
+
 #### [Platform.Data.Communication](https://linksplatform.github.io/Communication)
 #### [Platform.Collections.Methods](https://linksplatform.github.io/Collections.Methods)
 #### [Platform.IO](https://linksplatform.github.io/IO)
