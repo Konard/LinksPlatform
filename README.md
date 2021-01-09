@@ -2,7 +2,7 @@
 
 # LinksPlatform ([русская версия](https://github.com/Konard/LinksPlatform/blob/master/README.ru.md))
 
-The Links Platform is a framework, which includes two DBMS implementations based on [the associative data model](https://en.wikipedia.org/wiki/Associative_model_of_data): [Doublets](https://github.com/linksplatform/Data.Doublets) и [Triplets](https://github.com/linksplatform/Data.Triplets); as well as translators between programming languages (for example [from C# to C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)).
+The Links Platform is a modular framework, which includes two DBMS implementations based on [the associative data model](https://en.wikipedia.org/wiki/Associative_model_of_data): [Doublets](https://github.com/linksplatform/Data.Doublets) и [Triplets](https://github.com/linksplatform/Data.Triplets); as well as translators between programming languages (for example [from C# to C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)).
 
 Most of the libraries included in this framework can be used separately if necessary and are located [on the Links Platform organization page](https://github.com/linksplatform). Implementations in C# are available for all libraries, in the near future they will also be available in С++ (translation is currently underway).
 
