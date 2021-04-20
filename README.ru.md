@@ -88,10 +88,14 @@ namespace HelloWorld.Doublets.DotNet
 
 ## [Часто задаваемые вопросы](https://github.com/Konard/LinksPlatform/wiki/%D0%A7%D0%90%D0%92%D0%9E)
 
+## Support
+
+Задавайте вопросы по адресу [stackoverflow.com/tags/links-platform](https://stackoverflow.com/tags/links-platform) (или с тегом `links-platform`) чтобы получить нашу бесплатную поддержку.
+
+Вы так же можете получить поддержку в режиме реального времени на [нашем официальном Discord сервере](https://discord.gg/rJrRwfJsYc).
+
 ## Контакты
 
 https://vk.com/linksplatform
 
 https://vk.com/konard
-
-[![Присоединиться к чату https://gitter.im/Konard/LinksPlatform](https://badges.gitter.im/Join%20Chat.svg "Присоединиться к чату")](https://gitter.im/Konard/LinksPlatform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
