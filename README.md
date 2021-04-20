@@ -88,10 +88,14 @@ One of the most important goals of the project is to accelerate the development 
 
 ## [Frequently asked questions](https://github.com/Konard/LinksPlatform/wiki/FAQ)
 
+## Support
+
+Ask questions at [stackoverflow.com/tags/links-platform](https://stackoverflow.com/tags/links-platform) (or with tag `links-platform`) to get our free support.
+
+You can also get real-time support on [our official discord server](https://discord.gg/rJrRwfJsYc).
+
 ## Contacts
 
 https://vk.com/linksplatform
 
 https://vk.com/konard
-
-[![Join the chat at https://gitter.im/Konard/LinksPlatform](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/Konard/LinksPlatform?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
