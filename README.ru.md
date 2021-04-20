@@ -92,7 +92,7 @@ namespace HelloWorld.Doublets.DotNet
 
 Задавайте вопросы по адресу [stackoverflow.com/tags/links-platform](https://stackoverflow.com/tags/links-platform) (или с тегом `links-platform`) чтобы получить нашу бесплатную поддержку.
 
-Вы так же можете получить поддержку в режиме реального времени на [нашем официальном Discord сервере](https://discord.gg/rJrRwfJsYc).
+Вы так же можете получить поддержку в режиме реального времени на [нашем официальном Discord сервере](https://discord.gg/eEXJyjWv5e).
 
 ## Контакты
 
