@@ -12,7 +12,7 @@
 
 [Графическое вступление](https://github.com/Konard/LinksPlatform/wiki/%D0%9E-%D1%82%D0%BE%D0%BC,-%D0%BA%D0%B0%D0%BA-%D0%B2%D1%81%D1%91-%D0%BD%D0%B0%D1%87%D0%B8%D0%BD%D0%B0%D0%BB%D0%BE%D1%81%D1%8C)
 
-## [Пример для быстрого старта](https://github.com/linksplatform/HelloWorld.Doublets.DotNet)
+## [Пример для быстрого старта](https://github.com/linksplatform/Examples.Doublets.CRUD.DotNet)
 
 ```C#
 using System;
@@ -20,25 +20,31 @@ using Platform.Data;
 using Platform.Data.Doublets;
 using Platform.Data.Doublets.Memory.United.Generic;
 
-namespace HelloWorld.Doublets.DotNet
-{
-    class Program
-    {
-        static void Main()
-        {
-            using (var links = new UnitedMemoryLinks<uint>("db.links"))
-            {
-                var link = links.Create();
-                link = links.Update(link, link, link);
-                Console.WriteLine("Привет Мир!");
-                Console.WriteLine($"Это моя первая связь: {links.Format(link)}");
-                Console.WriteLine($"Всего связей в хранилище: {links.Count()}.");
-                link = links.Update(link, default, default);
-                links.Delete(link);
-            }
-        }
-    }
-}
+// Хранилище дуплетов привязывается к файлу "db.links":
+using var links = new UnitedMemoryLinks<uint>("db.links");
+
+// Создание связи-дуплета: 
+var link = links.Create();
+
+// Связь обновляется чтобы ссылаться на себя дважды (в качестве начала и конца):
+link = links.Update(link, newSource: link, newTarget: link);
+
+// Операции чтения:
+Console.WriteLine($"Количество связей в хранилище данных: {links.Count()}.");
+Console.WriteLine("Содержимое хранилища данных:");
+var any = links.Constants.Any; // Означает любой адрес связи или отсутствие ограничения на адрес связи
+// Аргументы запроса интерпретируются в качестве органичений
+var query = new Link<uint>(index: any, source: any, target: any);
+links.Each((link) => {
+    Console.WriteLine(links.Format(link));
+    return links.Constants.Continue;
+}, query);
+
+// Сброс содержимого связи:
+link = links.Update(link, newSource: default, newTarget: default);
+
+// Удаление связи:
+links.Delete(link);
 ```
 
 ## [SQLite против Дуплетов](https://github.com/linksplatform/Comparisons.SQLiteVSDoublets)
