@@ -6,6 +6,8 @@ The Links Platform is a [modular](https://en.wikipedia.org/wiki/Modular_programm
 
 Each [library](https://en.wikipedia.org/wiki/Library_(computing)) of this [framework](https://en.wikipedia.org/wiki/Software_framework) can be used separately and located [at the Links Platform organization page](https://github.com/linksplatform).
 
+At the moment we use [C#](https://en.wikipedia.org/wiki/C_Sharp_(programming_language)), [C++](https://en.wikipedia.org/wiki/C%2B%2B), [C](https://en.wikipedia.org/wiki/C_(programming_language)), [JavaScript](https://en.wikipedia.org/wiki/JavaScript) and [Python](https://en.wikipedia.org/wiki/Python_(programming_language)) [programming languages](https://en.wikipedia.org/wiki/Programming_language).
+
 [Documentation](http://linksplatform.github.io/Documentation)
 
 [![introduction](https://raw.githubusercontent.com/LinksPlatform/Documentation/master/doc/Intro/intro-animation-500.gif "introduction")](https://github.com/Konard/LinksPlatform/wiki/How-it-all-began)
