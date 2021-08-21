@@ -16,7 +16,7 @@ jobs:
     - name: Build
       run: |
         cd Platform
-        dotnet build --no-restore
+        dotnet build
         cd ..
     - name: Publish Docs
       if: github.event_name == 'push'
