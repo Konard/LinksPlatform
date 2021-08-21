@@ -4,12 +4,6 @@ set -e # Exit with nonzero exit code if anything fails
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
-# Pull requests and commits to other branches shouldn't try to deploy, just build to verify
-if [ "$TRAVIS_PULL_REQUEST" != "false" -o "$TRAVIS_BRANCH" != "$SOURCE_BRANCH" ]; then
-    echo "Skipping deploy."
-    exit 0
-fi
-
 # Save some useful information
 SHA=`git rev-parse --verify HEAD`
 COMMIT_AUTHOR_EMAIL="konard@me.com"
@@ -33,7 +27,7 @@ cp -r doc/generated/site/* out
 
 # Now let's go have some fun with the cloned repo
 cd out
-git config user.name "Travis CI"
+git config user.name "GitHub Actions"
 git config user.email "$COMMIT_AUTHOR_EMAIL"
 git remote rm origin
 git remote add origin https://linksplatform-docs:$TOKEN@github.com/LinksPlatform/Documentation.git
