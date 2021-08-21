@@ -1,0 +1,23 @@
+name: .NET
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: |
+        cd Platform
+        dotnet build --no-restore
+        cd ..
+    - name: Publish Docs
+      if: github.event_name == 'push'
+      run: bash ./publish-docs.sh
