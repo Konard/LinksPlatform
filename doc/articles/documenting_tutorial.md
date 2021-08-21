@@ -9,7 +9,7 @@
 ## Introduction
 In this tutorial our team will try to plunge you into actions before reading theory if possible to prevent mood like\
 `I am reading these XML tags and cannot imagine how to use them`\
-You can skip any chapter if you think you have enough knowledge about it. Questions? Ask them on [Discord server](https://discord.gg/eEXJyjWv5e).
+You can skip any chapter if you think you have enough knowledge about it. Questions? Ask them on [out official Discord server](https://discord.gg/eEXJyjWv5e).
 
 ## The First Steps
 1. Get your own channel in [Discord](https://discord.gg/eEXJyjWv5e)
