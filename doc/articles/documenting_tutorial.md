@@ -7,6 +7,8 @@
 * [Documenting](#documenting)
 
 ## Introduction
+> ⚠️ This tutorial is made for working from IDE, text editor. You can try another way: document from [github](https://github.com/) directly.
+
 In this tutorial our team will try to plunge you into actions before reading theory if possible to prevent mood like\
 `I am reading these XML tags and cannot imagine how to use them`\
 You can skip any chapter if you think you have enough knowledge about it. Questions? Ask them on [out official Discord server](https://discord.gg/eEXJyjWv5e).
