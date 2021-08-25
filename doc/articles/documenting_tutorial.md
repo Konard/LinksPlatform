@@ -14,10 +14,14 @@ In this tutorial our team will try to plunge you into actions before reading the
 You can skip any chapter if you think you have enough knowledge about it. Questions? Ask them on [out official Discord server](https://discord.gg/eEXJyjWv5e).
 
 ## The First Steps
-1. Get your own channel in [Discord](https://discord.gg/eEXJyjWv5e)
+1. See what documenting is
+   1. Open any [repository with ready documentation](https://github.com/linksplatform/IO/blob/master/csharp/Platform.IO/TemporaryFile.cs)
+   2. Look on the text after `\\\`. It is XML Documentation comments
+   3. [See result](https://linksplatform.github.io/IO/csharp/api/Platform.IO.html)
+2. Get your own channel in [Discord](https://discord.gg/eEXJyjWv5e)
    1. Join discord server
    2. Write in main/documenting chat "I want to document code"
-2. Get your documentation task
+3. Get your documentation task
    1. Choose any documentation task from to-do on [documentation projects board](https://github.com/orgs/linksplatform/projects/1)
    2. Say it in your own discord channel chat. Example: "I would like to take this task - `link`"
 
@@ -43,7 +47,7 @@ You can skip any chapter if you think you have enough knowledge about it. Questi
 5. Write your first thoughts about what this method does in XML tags.
 6. Save changes (`CTRL+S`)
 7. Commit changes to your branch \
-   Use `github commit -m "MESSAGE"` command. Example `github commit -m "Update Life.AddHappiness() XML Docs"`
+   Use `git commit -m "MESSAGE"` command. Example `git commit -m "Update Life.AddHappiness() XML Docs"`
 8. Push the commits to the remote repository.
    Use `git push` command.
 9. Open the repository, open pull request TODO
