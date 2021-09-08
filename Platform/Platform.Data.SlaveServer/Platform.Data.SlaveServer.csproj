@@ -8,7 +8,6 @@
   <ItemGroup>
     <PackageReference Include="Platform.Data.Doublets.Sequences" Version="0.0.1" />
     <PackageReference Include="Platform.Communication" Version="0.2.0" />
-    <PackageReference Include="Platform.IO" Version="0.2.2" />
   </ItemGroup>
 
 </Project>
