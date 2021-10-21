@@ -55,7 +55,7 @@ links.Delete(link);
 
 ## Описание
 
-Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=913469847)), [книга (англ.)](https://web.archive.org/web/20181219134621/http://sentences.com/docs/amd.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
+Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://web.archive.org/web/20210814063207/https://en.wikipedia.org/wiki/Associative_model_of_data)), [книга (англ.)](https://web.archive.org/web/20181219134621/http://sentences.com/docs/amd.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
 
 Сравнение моделей данных:
 
