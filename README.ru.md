@@ -35,7 +35,7 @@ link = links.Update(link, newSource: link, newTarget: link);
 Console.WriteLine($"Количество связей в хранилище данных: {links.Count()}.");
 Console.WriteLine("Содержимое хранилища данных:");
 var any = links.Constants.Any; // Означает любой адрес связи или отсутствие ограничения на адрес связи
-// Аргументы запроса интерпретируются в качестве органичений
+// Аргументы запроса интерпретируются в качестве ограничений
 var query = new Link<uint>(index: any, source: any, target: any);
 links.Each((link) => {
     Console.WriteLine(links.Format(link));
