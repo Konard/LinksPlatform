@@ -1,6 +1,6 @@
 [![Статус сборки](https://travis-ci.org/Konard/LinksPlatform.svg?branch=master "Статус сборки")](https://travis-ci.org/Konard/LinksPlatform)
 
-# ПлатформаСвязей ([english version](https://github.com/Konard/LinksPlatform/blob/master/README.md))
+# ПлатформаСвязей ([english version](https://github.com/linksplatform#linksplatform-%D1%80%D1%83%D1%81%D1%81%D0%BA%D0%B0%D1%8F-%D0%B2%D0%B5%D1%80%D1%81%D0%B8%D1%8F))
 
 Платформа Связей — это [модульный](https://ru.wikipedia.org/wiki/%D0%9C%D0%BE%D0%B4%D1%83%D0%BB%D1%8C%D0%BD%D0%BE%D0%B5_%D0%BF%D1%80%D0%BE%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5) [фреймворк](https://ru.wikipedia.org/wiki/%D0%A4%D1%80%D0%B5%D0%B9%D0%BC%D0%B2%D0%BE%D1%80%D0%BA), в который входят две [реализации](https://ru.wikipedia.org/wiki/%D0%A0%D0%B5%D0%B0%D0%BB%D0%B8%D0%B7%D0%B0%D1%86%D0%B8%D1%8F) [СУБД](https://ru.wikipedia.org/wiki/%D0%A1%D0%B8%D1%81%D1%82%D0%B5%D0%BC%D0%B0_%D1%83%D0%BF%D1%80%D0%B0%D0%B2%D0%BB%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B1%D0%B0%D0%B7%D0%B0%D0%BC%D0%B8_%D0%B4%D0%B0%D0%BD%D0%BD%D1%8B%D1%85) на основе [ассоциативной модели данных](https://en.wikipedia.org/wiki/Associative_model_of_data): [Дуплеты](https://github.com/linksplatform/Data.Doublets) и [Триплеты](https://github.com/linksplatform/Data.Triplets); а также [трансляторы](https://ru.wikipedia.org/wiki/%D0%A2%D1%80%D0%B0%D0%BD%D1%81%D0%BB%D1%8F%D1%82%D0%BE%D1%80) (например [из C# в C++](https://github.com/linksplatform/RegularExpressions.Transformer.CSharpToCpp)) и [бот](https://github.com/linksplatform/Bot).
 
@@ -55,7 +55,7 @@ links.Delete(link);
 
 ## Описание
 
-Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://en.wikipedia.org/w/index.php?title=Associative_model_of_data&oldid=913469847)), [книга (англ.)](https://web.archive.org/web/20181219134621/http://sentences.com/docs/amd.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
+Вдохновлено работой Симона Вильямса ([Ассоциативная модель данных - англ.](https://web.archive.org/web/20210814063207/https://en.wikipedia.org/wiki/Associative_model_of_data)), [книга (англ.)](https://web.archive.org/web/20181219134621/http://sentences.com/docs/amd.pdf), [сравнение с реляционными моделями данных (англ.)](http://iacis.org/iis/2009/P2009_1301.pdf).
 
 Сравнение моделей данных:
 
@@ -80,6 +80,8 @@ links.Delete(link);
 - Типизированная, с добавленным Linker (Глагол, Тип, Связка, Предикат, Сказуемое), так, что теперь любая дополнительная информация о типе соединения между двумя связями может быть записана в это дополнительное поле.
 
 Платформа Связей запланирована как система, которая комбинирует хранилище ассоциативной памяти (Связи) и движок выполнения трансформаций (Триггеры). Эту систему можно будет программировать динамически, благодаря тому факту, что все алгоритмы будут восприниматься как данные внутри этого хранилища. Такие алгоритмы также способны изменять сами себя в режиме реального времени на основе входных данных из окружающей среды. Платформа Связей это один из способов моделирования высокоуровневых эффектов ассоциативной памяти человеческого разума.
+
+Мы делаем всё возможное, чтобы наша реализация ассоциативного хранилища была максимально точной, простой, универсальной, гибкой, надёжной и быстрой реализацией памяти для любых данных и знаний.
 
 Одна из важнейших целей проекта — ускорить развитие автоматизации до того уровня, чтобы можно было автоматизировать саму автоматизацию. Другими словами, этот проект должен позволить реализовать бота-программиста, который смог бы создавать программы на основе описания на человеческом языке.
 
