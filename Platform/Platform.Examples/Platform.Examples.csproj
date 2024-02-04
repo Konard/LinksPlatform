@@ -21,7 +21,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="xunit.runner.utility" Version="2.4.1" />
+    <PackageReference Include="xunit.runner.utility" Version="2.4.2" />
     <PackageReference Include="Platform.Counters" Version="0.0.2" />
     <PackageReference Include="Platform.Communication" Version="0.2.0" />
     <PackageReference Include="Platform.Data.Doublets" Version="0.6.10" />
